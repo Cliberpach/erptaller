@@ -1,0 +1,50 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('notes_release_detail', function (Blueprint $table) {
+
+            $table->unsignedBigInteger('note_release_id');
+
+            $table->unsignedBigInteger('product_id');
+            $table->foreign('product_id')->references('id')->on('products');
+
+            $table->unsignedBigInteger('brand_id');
+            $table->foreign('brand_id')->references('id')->on('brands');
+
+            $table->unsignedBigInteger('category_id');
+            $table->foreign('category_id')->references('id')->on('categories');
+
+            $table->unsignedBigInteger('warehouse_id');
+            $table->foreign('warehouse_id')->references('id')->on('warehouses');
+
+            $table->string('warehouse_name',160);
+            $table->string('product_name',160);
+            $table->string('brand_name',160);
+            $table->string('category_name',160);
+
+            $table->decimal('quantity', 10, 2)->unsigned();
+
+            $table->primary(['note_release_id', 'product_id']);
+
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('notes_release_detail');
+    }
+};

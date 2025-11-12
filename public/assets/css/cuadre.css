@@ -1,0 +1,111 @@
+
+    
+
+.modal-header{
+    display:flex;
+    flex-direction: column;
+}
+
+.model-header-btn{
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.modal-header-titulo{
+    width: 100%;
+    display:flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/*modal-footer*/
+.modal-footer p{
+    font-size: 11px;
+    margin:0; 
+}
+.col-info{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0;
+    gap:3px;
+    color: orange;
+}
+.col-botones{
+    display: flex;
+    justify-content: flex-end;
+    gap: 7px;
+    padding: 0;
+}
+.col-botones i{
+    margin:0 3px 0 0;
+}
+.col-botones button{
+    padding:7px;
+}
+
+
+/*TABLE*/
+td,
+th{
+    text-align: center;
+}
+
+
+
+
+/* CSS para el elemento de superposición */
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Fondo semitransparente */
+    display: none; /* Ocultar inicialmente */
+    z-index: 9999; /* Asegurar que esté por encima de otros elementos */
+}
+
+
+/*btn Cerrar Caja*/
+.acciones{
+    display:flex;
+}
+.btnCerrar{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    padding: 5px;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+.btnPdf{
+    padding: 5px 9px;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+.cerrado{
+    color: white;
+    background-color:#1ab394;
+    box-shadow: unset;
+    border:none;
+}
+.cerrado:hover{
+    background-color: #149f84;
+}
+
+/*errores*/
+.msgError{
+    color:red;
+    font-size: 12px;
+    margin:0;
+    position:absolute;
+}
+
+/*Sweet alert*/
+.swal2-backdrop-show{
+    z-index:2000;
+}
