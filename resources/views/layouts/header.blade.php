@@ -36,5 +36,6 @@
 <link href="{{ asset('assets/fontawesome/css/fontawesome.css') }}" rel="stylesheet" />
 <link href="{{ asset('assets/fontawesome/css/brands.css') }}" rel="stylesheet" />
 <link href="{{ asset('assets/fontawesome/css/solid.css') }}" rel="stylesheet" />
+<link href="{{ asset('assets/css/utils.css') }}" rel="stylesheet" />
 
 @yield('css')

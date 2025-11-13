@@ -17,6 +17,8 @@
     },
     "dependencies": {
         "@material-tailwind/html": "^2.3.2",
-        "flowbite": "^2.5.2"
+        "flowbite": "^2.5.2",
+        "tom-select": "^2.4.3",
+        "ziggy-js": "^2.6.0"
     }
 }

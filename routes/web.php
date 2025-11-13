@@ -35,8 +35,10 @@ use App\Http\Controllers\Tenant\RoleController;
 use App\Http\Controllers\Tenant\Sales\PaymentMethodController;
 use App\Http\Controllers\Tenant\SupplierController;
 use App\Http\Controllers\Tenant\ValuedKardexController;
+use App\Http\Controllers\Tenant\WorkShop\ModelController;
 use App\Models\PettyCash;
 use App\Models\Tenant\ReservationDocument;
+use App\Models\Tenant\WorkShop\ModelV;
 use Illuminate\Auth\Events\Logout;
 
 /*
@@ -317,6 +319,9 @@ Route::group(["prefix" => "mantenimiento"], function () {
 
 });
 
+require __DIR__ . '/tenant/taller/web.php';
+
+
 Route::get("landlord/ruc/{ruc}", [ApiController::class, 'apiRuc']);
 Route::get("landlord/dni/{dni}", [ApiController::class, 'apiDni']);
 
@@ -325,3 +330,9 @@ Route::get("/logout", [ModuleController::class,'logout'])->name('module.logout')
     Route::post('/closeCashBook', [PettyCashBookController::class, 'closeCashBook']);
 
 });
+
+Route::group(["prefix" => "utils"], function () {
+    Route::get('model-search', [ModelController::class, 'searchModel'])->name('tenant.utils.searchModel');
+});
+
+

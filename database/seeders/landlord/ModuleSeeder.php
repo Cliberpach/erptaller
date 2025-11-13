@@ -41,18 +41,20 @@ class ModuleSeeder extends Seeder
             'order' => '2'
         ]);
 
-        // Reserva
-        $book = Module::create([
-            'description' => 'Reservas',
+
+        // Taller
+        $taller = Module::create([
+            'description' => 'Taller',
             'order' => '1'
         ]);
 
         ModuleChild::create([
-            'module_id' => $book->id,
-            'description' => 'Reserva',
-            'route_name' => 'reservas.reserva',
-            'order' => '2'
+            'module_id'     => $taller->id,
+            'description'   => 'Vehiculos',
+            'route_name'    => 'taller.vehiculos',
+            'order'         => '2'
         ]);
+
 
         // Ventas
         $sale = Module::create([
@@ -182,26 +184,6 @@ class ModuleSeeder extends Seeder
             'description'   => 'Nota Salida',
             'route_name'    => 'inventarios.nota_salida',
             'order'         => '2'
-        ]);
-
-        // Campos
-        $field = Module::create([
-            'description' => 'Campos',
-            'order' => '1'
-        ]);
-
-        ModuleChild::create([
-            'module_id' => $field->id,
-            'description' => 'Tipo de Campo',
-            'route_name' => 'campos.index_tipo_campos',
-            'order' => '2'
-        ]);
-
-        ModuleChild::create([
-            'module_id' => $field->id,
-            'description' => 'Campo',
-            'route_name' => 'campos.campo',
-            'order' => '2'
         ]);
 
         // Compras

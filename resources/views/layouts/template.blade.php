@@ -2,32 +2,34 @@
 <html lang="en" class="light-style layout-menu-fixed" dir="ltr" data-theme="theme-default"
     data-assets-path="{{ asset('assets') }}" data-template="vertical-menu-template-free">
 
-    <link rel="icon" type="image/x-icon" href="{{ asset('assets/favicon.ico') }}">
+<link rel="icon" type="image/x-icon" href="{{ asset('assets/favicon.ico') }}">
 
 <head>
+    <!-- Scripts -->
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @routes
     @include('layouts/header')
 </head>
 
 <body>
 
-     <div class="row">
-            <div class="col-12">
-                @include('utils.spinners.spinner_1')
-            </div>
+    <div class="row">
+        <div class="col-12">
+            @include('utils.spinners.spinner_1')
         </div>
-        
+    </div>
+
     @include('layouts/body/body')
     @include('layouts/js')
 
 </body>
 
 <script>
-
-    document.addEventListener('DOMContentLoaded',()=>{
+    document.addEventListener('DOMContentLoaded', () => {
         showAlertsPlan();
     })
 
-    function showAlertsPlan(){
+    function showAlertsPlan() {
         toastr.clear();
         const hasMessageError = {{ Session::has('plan_md_error') ? 'true' : 'false' }};
 
@@ -37,7 +39,6 @@
 
         }
     }
-
 </script>
 
 </html>
