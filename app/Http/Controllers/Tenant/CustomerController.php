@@ -10,18 +10,20 @@ use App\Models\Landlord\Customer;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Throwable;
 
 class CustomerController extends Controller
 {
     //
-    public function index(){
+    public function index()
+    {
         $customersList = DB::connection('landlord')->select('select * from customers');
         $customer = Customer::all();
-        return view('customer.index',compact('customersList','customer'));
+        return view('customer.index', compact('customersList', 'customer'));
     }
     public function create()
     {
-    return view('customer.create-customer-modal');
+        return view('customer.create-customer-modal');
     }
 
     /*
@@ -37,7 +39,7 @@ class CustomerController extends Controller
         "phone"                     => "965345124"
         "email"                     => "ld@gmail.com"
     ]
-    */ 
+    */
 
     /*
         TIPOS DE DOCUMENTO IDENTIDAD SEGÚN SUNAT:
@@ -60,13 +62,15 @@ class CustomerController extends Controller
             $customer->phone                        =   $request->get('phone');
 
             //======== GRABANDO EL TIPO DE DOCUMENTO DE IDENTIDAD ========
-            $type_identity_document =   DB::select('select 
+            $type_identity_document =   DB::select(
+                'select
                                         tid.name,
                                         tid.abbreviation ,
                                         tid.code
                                         from types_identity_documents as tid
                                         where tid.id = ?',
-                                        [$request->get('type_identity_document')])[0];
+                [$request->get('type_identity_document')]
+            )[0];
 
             $customer->type_identity_document_id    =   $request->get('type_identity_document');
             $customer->type_document_name           =   $type_identity_document->name;
@@ -80,51 +84,46 @@ class CustomerController extends Controller
             $customer->province_id                  =   $request->get('province');
             $customer->district_id                  =   $request->get('district');
 
-            $department         =   DB::select('select 
+            $department         =   DB::select(
+                'select
                                     d.name,
                                     d.zone
                                     from departments as d
                                     where d.id = ?',
-                                    [$request->get('department')])[0]; 
+                [$request->get('department')]
+            )[0];
 
             $customer->department_name  =   $department->name;
 
-            $customer->province_name    =   DB::select('select 
-                                            p.name 
+            $customer->province_name    =   DB::select(
+                'select
+                                            p.name
                                             from provinces as p
                                             where p.id = ?',
-                                            [$request->get('province')])[0]->name;
-                                                
-            $customer->district_name    =   DB::select('select 
-                                            d.name 
+                [$request->get('province')]
+            )[0]->name;
+
+            $customer->district_name    =   DB::select(
+                'select
+                                            d.name
                                             from districts as d
                                             where d.id = ?',
-                                            [$request->get('district')])[0]->name;
+                [$request->get('district')]
+            )[0]->name;
 
             $customer->zone             =   $department->zone;
             $customer->ubigeo           =   $request->get('district');
             $customer->save();
 
             DB::commit();
-            return response()->json(['success'=>true,'message'=>'CLIENTE REGISTRADO!!!']);
+            return response()->json(['success' => true, 'message' => 'CLIENTE REGISTRADO!!!','customer'=>$customer]);
 
-            // $customer                   = new Customer();
-            // $customer->document_number  = $validatedData['document_number'];
-            // $customer->name             = $validatedData['name'];
-            // $customer->phone            = $validatedData['phone'];
-            // $customer->save();
-
-        } catch (\Throwable $th) {
+        } catch (Throwable $th) {
             DB::rollBack();
-            return response()->json(['success'=>false,'message'=>$th->getMessage(),'line'=>$th->getLine()]);
+            return response()->json(['success' => false, 'message' => $th->getMessage(), 'line' => $th->getLine(),'file'=>$th->getFile()]);
         }
-        // $validatedData = $request->validated();
-
-      
-
-        // return redirect()->route('tenant.ventas.cliente')->with('success', 'Cliente creado exitosamente.');
     }
-    
+
     public function edit($id)
     {
         $customer = Customer::findOrFail($id);
@@ -134,7 +133,7 @@ class CustomerController extends Controller
     public function update(CustomerRequest $request, $id)
     {
         $request->validated();
-        
+
         $customer = Customer::findOrFail($id);
         $customer->document_number = $request->document_number;
         $customer->name = $request->name;
@@ -144,13 +143,14 @@ class CustomerController extends Controller
         return redirect()->route('customers.index')->with('datos', 'Cliente actualizado');
     }
 
-    public function destroy($id){
+    public function destroy($id)
+    {
         // Encuentra el cliente
         $customer = Customer::findOrFail($id);
 
         // Elimina todas las reservas asociadas a este cliente
         $customer->bookings()->each(function ($booking) {
-            
+
             $booking->bookingDetails()->delete();
 
             $booking->delete();
@@ -163,18 +163,19 @@ class CustomerController extends Controller
     }
 
     //========== CONSULTAR DOCUMENTO ==========
-    public function consult_document(Request $request){
+    public function consult_document(Request $request)
+    {
 
         try {
             //========= VALIDANDO QUE EL TIPO DOCUMENTO Y N° DOCUMENTO NO SEAN NULL =======
-            $type_identity_document =   $request->get('type_identity_document',null);
-            $nro_document           =   $request->get('nro_document',null);
+            $type_identity_document =   $request->get('type_identity_document', null);
+            $nro_document           =   $request->get('nro_document', null);
 
-            if(!$type_identity_document){
+            if (!$type_identity_document) {
                 throw new Exception("EL TIPO DE DOCUMENTO ES OBLIGATORIO");
             }
 
-            if(!$nro_document){
+            if (!$nro_document) {
                 throw new Exception("EL N° DOC ES OBLIGATORIO");
             }
 
@@ -183,60 +184,62 @@ class CustomerController extends Controller
             }
 
             //========= VERIFICANDO QUE EXISTA EL TIPO DOC EN LA BD ========
-            $exists_tipo_doc    =   DB::select('select 
+            $exists_tipo_doc    =   DB::select('select
                                     tid.id,
                                     tid.name
-                                    from 
+                                    from
                                     types_identity_documents as tid
-                                    where tid.id = ?',[$type_identity_document]);
+                                    where tid.id = ?', [$type_identity_document]);
 
-            if(count($exists_tipo_doc) === 0){
+            if (count($exists_tipo_doc) === 0) {
                 throw new Exception("EL TIPO DE DOC NO EXISTE EN LA BD");
             }
 
-            if($type_identity_document != 1 && $type_identity_document != 3){
+            if ($type_identity_document != 1 && $type_identity_document != 3) {
                 throw new Exception("SOLO SE PUEDEN CONSULTAR DNI Y RUC");
             }
 
-            if ( $type_identity_document == 1 && strlen($nro_document) != 8) {
+            if ($type_identity_document == 1 && strlen($nro_document) != 8) {
                 throw new Exception("EL TIPO DE DOCUMENTO DNI DEBE TENER 8 DÍGITOS");
             }
 
-            if ( $type_identity_document == 3 && strlen($nro_document) != 11) {
+            if ($type_identity_document == 3 && strlen($nro_document) != 11) {
                 throw new Exception("EL TIPO DE DOCUMENTO RUC DEBE TENER 11 DÍGITOS");
             }
 
 
             //======= COMPROBAR QUE NO EXISTA EL DOCUMENTO EN LA TABLA CLIENTES =======
-            $exists_nro_document   =   DB::connection('landlord')->select('select 
+            $exists_nro_document   =   DB::connection('landlord')->select(
+                'select
                                         c.id,
                                         c.name
                                         from customers as c
-                                        where 
+                                        where
                                         c.type_identity_document_id = ?
-                                        and c.document_number = ? 
+                                        and c.document_number = ?
                                         and c.status = "ACTIVO"',
-                                        [$type_identity_document,$nro_document]);
+                [$type_identity_document, $nro_document]
+            );
 
-            if(count($exists_nro_document) > 0){
-                throw new Exception($exists_nro_document[0]->name.':'.$nro_document.'. YA EXISTE EN LA BD');
+            if (count($exists_nro_document) > 0) {
+                throw new Exception($exists_nro_document[0]->name . ':' . $nro_document . '. YA EXISTE EN LA BD');
             }
-            
-            if($type_identity_document == 1){
+
+            if ($type_identity_document == 1) {
 
                 $api_controller     =   new ApiController();
                 $res_consult_api    =   $api_controller->apiDni($nro_document);
                 $res_consult_api    =   json_decode($res_consult_api);
-                
+
                 //======= EN CASO LA CONSULTA FUE EXITOSA =====
-                if($res_consult_api->success){
-                    return response()->json(['success'=>true,'data'=>$res_consult_api->data,'message'=>'OPERACIÓN COMPLETADA']);
-                }else{
+                if ($res_consult_api->success) {
+                    return response()->json(['success' => true, 'data' => $res_consult_api->data, 'message' => 'OPERACIÓN COMPLETADA']);
+                } else {
                     throw new Exception($res_consult_api->message);
                 }
             }
 
-            if($type_identity_document == 3){
+            if ($type_identity_document == 3) {
 
                 $api_controller     =   new ApiController();
                 $res_consult_api    =   $api_controller->apiRuc($nro_document);
@@ -244,29 +247,54 @@ class CustomerController extends Controller
 
 
                 //======= EN CASO LA CONSULTA FUE EXITOSA =====
-                if($res_consult_api->success){
-                    return response()->json(['success'=>true,'data'=>$res_consult_api->data,'message'=>'OPERACIÓN COMPLETADA']);
-                }else{
+                if ($res_consult_api->success) {
+                    return response()->json(['success' => true, 'data' => $res_consult_api->data, 'message' => 'OPERACIÓN COMPLETADA']);
+                } else {
                     throw new Exception($res_consult_api->message);
                 }
             }
-
-
         } catch (\Throwable $th) {
-            return response()->json(['success'=>false,'message'=>$th->getMessage()]);
+            return response()->json(['success' => false, 'message' => $th->getMessage()]);
         }
     }
 
 
-    public function getListCustomers(){
+    public function getListCustomers()
+    {
         try {
-            $listCustomers  =   Customer::where('status','ACTIVO')->get();
+            $listCustomers  =   Customer::where('status', 'ACTIVO')->get();
 
-            return response()->json(['success'=>true,'listCustomers'=>$listCustomers]);
+            return response()->json(['success' => true, 'listCustomers' => $listCustomers]);
         } catch (\Throwable $th) {
-            return response()->json(['success'=>false,'message'=>$th->getMessage()]);
+            return response()->json(['success' => false, 'message' => $th->getMessage()]);
         }
     }
 
 
+    /**
+     * Buscar clientes (para TomSelect server-side)
+     */
+    public function searchCustomer(Request $request)
+    {
+        $query = trim($request->get('q', ''));
+
+        if (empty($query)) {
+            return response()->json(['data' => []]);
+        }
+
+        $customers = Customer::query()
+            ->whereRaw("CONCAT(type_document_abbreviation, ':', document_number, ' - ', name) LIKE ?", ["%{$query}%"])
+            ->orWhereRaw("CONCAT(document_number, ' - ', name) LIKE ?", ["%{$query}%"])
+            ->orWhere('name', 'LIKE', "%{$query}%")
+            ->limit(20)
+            ->get(['id', 'type_document_abbreviation', 'document_number', 'name', 'email']);
+
+        $data = $customers->map(fn($c) => [
+            'id' => $c->id,
+            'full_name' => "{$c->type_document_abbreviation}:{$c->document_number} - {$c->name}",
+            'email' => $c->email,
+        ]);
+
+        return response()->json(['data' => $data]);
+    }
 }

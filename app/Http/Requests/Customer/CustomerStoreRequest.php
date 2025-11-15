@@ -20,8 +20,13 @@ class CustomerStoreRequest extends FormRequest
 
     protected function prepareForValidation()
     {
-        
+        $this->merge([
+            'department' => str_pad($this->department, 2, '0', STR_PAD_LEFT),
+            'province'   => str_pad($this->province, 4, '0', STR_PAD_LEFT),
+            'district'   => str_pad($this->district, 6, '0', STR_PAD_LEFT),
+        ]);
     }
+
 
     /**
      * Get the validation rules that apply to the request.
@@ -31,8 +36,8 @@ class CustomerStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            
-            'name'          => 'required|max:160',            
+
+            'name'          => 'required|max:160',
             'phone'         => 'nullable|max:20',
             'email'         => 'nullable|email|max:160',
         ];

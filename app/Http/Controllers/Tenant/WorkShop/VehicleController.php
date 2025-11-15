@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Tenant\Taller;
+namespace App\Http\Controllers\Tenant\WorkShop;
 
 use App\Exports\Tenant\Inventory\Brand\BrandFormatExport;
 use Illuminate\Http\Request;
@@ -11,28 +11,55 @@ use App\Http\Requests\Tenant\Inventory\Brand\BrandUpdateRequest;
 use App\Imports\Inventory\Brand\BrandImport;
 use Illuminate\Support\Facades\DB;
 use App\Models\Brand;
+use App\Models\CompanyInvoice;
+use App\Models\Department;
+use App\Models\District;
+use App\Models\Province;
+use App\Models\Tenant\TypeIdentityDocument;
 use Throwable;
 use Yajra\DataTables\Facades\DataTables;
 use Maatwebsite\Excel\Facades\Excel;
 
-class VehiculoController extends Controller
+class VehicleController extends Controller
 {
     //
     public function index()
     {
-        $brandList = Brand::all();
-        return view('brand.index', compact('brandList'));
+        return view('workshop.vehicles.index');
     }
 
-    public function getAll(Request $request)
+    public function getVehiculos(Request $request)
     {
-        $categories =   Brand::select(
-            'id',
-            'name'
-        )
-            ->where('status', 'ACTIVE');
+        $vehicles  =   DB::table('vehicles as v')
+            ->join('brandsv as b', 'b.id', 'v.brand_id')
+            ->join('models as m', 'm.id', 'v.model_id')
+            ->join('model_years as my', 'my.id', 'v.year_id')
+            ->join('colors as c', 'c.id', 'v.color_id')
+            ->select(
+                'v.id',
+                'v.name as customer_name',
+                'v.plate',
+                'b.description as brand_name',
+                'm.description as model_name',
+                'my.description as year_name',
+                'c.description as color_name',
+                'v.observation'
+            );
 
-        return DataTables::of($categories)->make(true);
+        return DataTables::of($vehicles)->make(true);
+    }
+
+    public function create(Request $request)
+    {
+
+        $types_identity_documents   =   TypeIdentityDocument::where('status', 'ACTIVO')->get();
+        $departments        =   Department::all();
+        $districts          =   District::all();
+        $provinces          =   Province::all();
+        $company_invoice    =   CompanyInvoice::find(1);
+
+        return view('workshop.vehicles.create',
+        compact('types_identity_documents','departments','districts','provinces','company_invoice'));
     }
 
     // Almacenar una nueva marca
@@ -125,7 +152,7 @@ class VehiculoController extends Controller
         return Excel::download(new BrandFormatExport(), 'formato_import_marcas.xlsx');
     }
 
-/*
+    /*
 array:1 [ // app\Http\Controllers\Tenant\CategoryController.php:146
   "marcas_import_excel" =>
 Illuminate\Http\UploadedFile {#1885

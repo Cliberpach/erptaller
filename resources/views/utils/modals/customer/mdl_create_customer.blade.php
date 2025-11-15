@@ -35,8 +35,22 @@
 </div>
 
 <script>
-    function eventsMdlCreateCustomer() {
+    let customerParameters = {
+        documentSearchCustomer: null
+    };
 
+    function iniciarSelect2() {
+        $('.select2_form_customer').select2({
+            theme: "bootstrap-5",
+            width: $(this).data('width') ? $(this).data('width') : $(this).hasClass('w-100') ? '100%' : 'style',
+            placeholder: $(this).data('placeholder'),
+            dropdownParent: $('#mdlCreateCustomer'),
+        });
+    }
+
+
+    function eventsMdlCreateCustomer() {
+        iniciarSelect2();
         document.querySelector('#formStoreCustomer').addEventListener('submit', (e) => {
             e.preventDefault();
             storeCustomer();
@@ -243,22 +257,21 @@
     }
 
     function changeDepartment(department_id) {
-
-        console.log('department_id', department_id);
+        console.log('CHANGE DEPARTMENT')
 
         const lstProvinces = @json($provinces);
         const lstDistricts = @json($districts);
-
         let lstProvincesFiltered = [];
 
         if (department_id) {
 
-            departamento_id = String(department_id).padStart(2, '0');
+            department_id = String(department_id).padStart(2, '0');
+            console.log('department_id', department_id);
 
             lstProvincesFiltered = lstProvinces.filter((province) => {
                 return province.department_id == department_id;
             })
-
+            console.log('PROVINCIAS FILTRADAS', lstProvincesFiltered);
             $('#province').empty().trigger('change');
 
             lstProvincesFiltered.forEach((province) => {
@@ -363,13 +376,9 @@
 
                     if (res.success) {
 
-                        //======== TRAER LISTADO DE PROVEEDORES ACTUALIZADO =====
-                        const lstUpdatedCustomers = await getUpdatedCustomers();
+                        const customerNew = res.customer;
+                        setCustomerNew(customerNew);
 
-                        //========= REPINTAR SELECT2 DE CLIENTES ========
-                        paintSelect2Customers(lstUpdatedCustomers);
-                        // console.log('lst proveedors');
-                        // console.log(lstProveedoresActualizados);
                         $('#mdlCreateCustomer').modal('hide');
                         toastr.success(res.message, 'OPERACIÓN COMPLETADA');
                         Swal.close();
@@ -396,61 +405,20 @@
     }
 
 
-    function paintSelect2Customers(lstUpdatedCustomers) {
-        $('#customer_id').empty();
+    function setCustomerNew(customerNew) {
+        console.log(customerNew);
+        
+        const option = {
+            id: customerNew.id,
+            full_name: `${customerNew.type_document_abbreviation}:${customerNew.document_number} - ${customerNew.name}`,
+            email: customerNew.email ?? ''
+        };
 
-        $('#customer_id').append('<option></option>');
-
-        lstUpdatedCustomers.forEach(function(customer) {
-            $('#customer_id').append(
-                $('<option></option>').val(customer.id).text(
-                    `${customer.type_document_abbreviation}:${customer.document_number}-${customer.name}`)
-            );
-        });
-
-        $('#customer_id').select2({
-            allowClear: true,
-            theme: "bootstrap-5",
-            width: $(this).data('width') ? $(this).data('width') : $(this).hasClass('w-100') ? '100%' : 'style',
-            placeholder: $(this).data('placeholder')
-        });
-
-        const lastId = lstUpdatedCustomers[lstUpdatedCustomers.length - 1].id;
-
-        if (lastId) {
-            $('#customer_id').val(lastId).trigger('change');
+        if (!window.clientSelect.options[option.id]) {
+            window.clientSelect.addOption(option);
         }
-    }
 
-    async function getUpdatedCustomers() {
-        try {
-            toastr.clear();
-            const token = document.querySelector('input[name="_token"]').value;
-            const urlGetListCustomers = @json(route('tenant.ventas.cliente.getListCustomers'));
+        window.clientSelect.setValue(option.id);
 
-            const response = await fetch(urlGetListCustomers, {
-                method: 'GET',
-                headers: {
-                    'X-CSRF-TOKEN': token
-                },
-            });
-
-            const res = await response.json();
-
-            if (res.success) {
-
-                toastr.clear();
-                toastr.info(res.message, 'CLIENTES OBTENIDOS');
-                return res.listCustomers;
-
-            } else {
-                toastr.error(res.message, 'ERROR EN EL SERVIDOR');
-                return null;
-            }
-
-        } catch (error) {
-            toastr.error(error, 'ERROR EN LA PETICIÓN OBTENER CLIENTES');
-            return null;
-        }
     }
 </script>

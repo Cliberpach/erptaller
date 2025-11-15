@@ -1,9 +1,9 @@
 <?php
 
-use App\Http\Controllers\Tenant\Taller\VehiculoController;
 use App\Http\Controllers\Tenant\WorkShop\BrandController;
 use App\Http\Controllers\Tenant\WorkShop\ColorController;
 use App\Http\Controllers\Tenant\WorkShop\ModelController;
+use App\Http\Controllers\Tenant\WorkShop\VehicleController;
 use App\Http\Controllers\Tenant\WorkShop\YearController;
 use Illuminate\Support\Facades\Route;
 
@@ -11,7 +11,10 @@ Route::group(["prefix" => "taller"], function () {
 
     Route::group(["prefix" => "vehiculos"], function () {
 
-        Route::get('index', [VehiculoController::class, 'index'])->name('tenant.taller.vehiculos');
+        Route::get('index', [VehicleController::class, 'index'])->name('tenant.taller.vehiculos.index');
+        Route::get('getVehiculos', [VehicleController::class, 'getVehiculos'])->name('tenant.taller.vehiculos.getVehiculos');
+        Route::get('create', [VehicleController::class, 'create'])->name('tenant.taller.vehiculos.create');
+
     });
 
     Route::group(["prefix" => "colores"], function () {

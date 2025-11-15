@@ -125,4 +125,16 @@ array:4 [ // app\Http\Controllers\Tenant\WorkShop\YearController.php:113
             return response()->json(['success' => false, 'message' => $th->getMessage()]);
         }
     }
+
+    public function getYearsModel(int $model){
+        try {
+
+            $years  =   Year::where('model_id',$model)->where('status','ACTIVE')->get();
+
+            return response()->json(['success'=>true,'message'=>'AÑOS OBTENIDOS','years'=>$years]);
+
+        } catch (Throwable $th) {
+            return response()->json(['success' => false, 'message' => $th->getMessage()]);
+        }
+    }
 }

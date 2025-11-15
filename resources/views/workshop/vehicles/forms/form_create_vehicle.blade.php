@@ -1,0 +1,84 @@
+<form id="form_create_vehicle" method="POST">
+    @csrf
+    @method('POST')
+
+    <div class="row g-3">
+
+        <!-- Cliente -->
+        <div class="col-md-6">
+            <label for="client_id" class="form-label fw-bold required_field">Cliente:</label><i class="fas fa-user-plus btn btn-warning" onclick="openMdlNewCustomer();" style="margin-left:4px;margin-bottom:4px;"></i>
+            <select class="form-select" id="client_id" name="client_id" required>
+                <option value="">Seleccione un cliente</option>
+                <!-- Aquí puedes llenar dinámicamente las opciones -->
+            </select>
+            <div class="invalid-feedback">
+                Debe seleccionar un cliente.
+            </div>
+            <p class="client_id_error msgError mb-0"></p>
+        </div>
+
+        <!-- Placa + botón lupa -->
+        <div class="col-md-6">
+            <label for="plate" class="form-label fw-bold required_field">Placa:</label>
+            <div class="input-group">
+                <input
+                    type="text"
+                    class="form-control text-uppercase"
+                    id="plate"
+                    name="plate"
+                    maxlength="8"
+                    placeholder="Ej: ABC123"
+                    required
+                >
+                <button class="btn btn-outline-secondary" type="button" id="btn_search_plate" title="Buscar vehículo">
+                    <i class="fas fa-search"></i>
+                </button>
+                <div class="invalid-feedback">
+                    Debe ingresar una placa válida (máx. 8 caracteres).
+                </div>
+            </div>
+            <p class="plate_error msgError mb-0"></p>
+        </div>
+
+        <!-- Marca - Modelo -->
+        <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+            <label for="model_id" class="form-label fw-bold required_field">Marca - Modelo:</label>
+            <select class="form-select" id="model_id" name="model_id" required onchange="getYearsModel(this.value)">
+                <option value="">Seleccione una marca - modelo</option>
+            </select>
+            <div class="invalid-feedback">
+                Debe seleccionar una marca.
+            </div>
+            <p class="model_id_error msgError mb-0"></p>
+        </div>
+
+         <!-- Año -->
+        <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+            <label for="year_id" class="form-label fw-bold required_field">Año:</label>
+            <select class="form-select" id="year_id" name="year_id" required>
+                <option value="">Seleccione un Año</option>
+            </select>
+            <div class="invalid-feedback">
+                Debe seleccionar un año.
+            </div>
+            <p class="year_id_error msgError mb-0"></p>
+        </div>
+
+        <!-- Observación -->
+        <div class="col-12">
+            <label for="observation" class="form-label fw-bold">Observación:</label>
+            <textarea
+                class="form-control"
+                id="observation"
+                name="observation"
+                rows="3"
+                maxlength="300"
+                placeholder="Ingrese alguna observación (máximo 300 caracteres)"
+            ></textarea>
+            <small class="text-muted d-block text-right">
+                Máx. 300 caracteres
+            </small>
+            <p class="observation_error msgError mb-0"></p>
+        </div>
+    </div>
+</form>

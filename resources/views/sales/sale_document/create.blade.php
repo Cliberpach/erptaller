@@ -461,7 +461,6 @@
         } );
     }
 
-
     function iniciarDataTableProductos(){
         const urlGetProductos = '{{ route('tenant.ventas.comprobante_venta.getProductos') }}';
 
@@ -765,7 +764,7 @@
                     const sale_index        =   @json(route('tenant.ventas.comprobante_venta'));
 
                     window.location.href    =   sale_index;
-                    
+
                 }else{
                     toastr.error(res.message,'ERROR EN EL SERVIDOR');
                     Swal.close();
