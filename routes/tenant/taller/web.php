@@ -14,6 +14,10 @@ Route::group(["prefix" => "taller"], function () {
         Route::get('index', [VehicleController::class, 'index'])->name('tenant.taller.vehiculos.index');
         Route::get('getVehiculos', [VehicleController::class, 'getVehiculos'])->name('tenant.taller.vehiculos.getVehiculos');
         Route::get('create', [VehicleController::class, 'create'])->name('tenant.taller.vehiculos.create');
+        Route::post('store', [VehicleController::class, 'store'])->name('tenant.taller.vehiculos.store');
+        Route::get('edit/{id}', [VehicleController::class, 'edit'])->name('tenant.taller.vehiculos.edit');
+        Route::put('update/{id}', [VehicleController::class, 'update'])->name('tenant.taller.vehiculos.update');
+        Route::delete('destroy/{id}', [VehicleController::class, 'destroy'])->name('tenant.taller.vehiculos.destroy');
 
     });
 
@@ -45,6 +49,7 @@ Route::group(["prefix" => "taller"], function () {
         Route::get('getModelo/{id}', [ModelController::class, 'getModelo'])->name('tenant.taller.modelos.getModelo');
         Route::delete('delete/{id}', [ModelController::class, 'destroy'])->name('tenant.taller.modelos.destroy');
         Route::put('update/{id}', [ModelController::class, 'update'])->name('tenant.taller.modelos.update');
+
     });
 
     Route::group(["prefix" => "years"], function () {

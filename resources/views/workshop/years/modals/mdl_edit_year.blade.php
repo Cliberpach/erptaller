@@ -40,36 +40,24 @@
         id: null
     };
 
-    async function openMdlEditMarca(yearId) {
+    async function openMdlEditYear(yearId) {
         parametrosMdlEditColor.id = yearId;
 
         const data = await getYear(yearId);
         if (!data) return;
-        pintarModeloEdit(data);
+        pintarYearEdit(data);
         $('#modal_edit_color').modal('show');
     }
 
-    function eventsMdlEditMarca() {
+    function eventsMdlEditYear() {
         document.querySelector('#form_edit_color').addEventListener('submit', (e) => {
             e.preventDefault();
             actualizarYear(e.target);
         })
     }
 
-    function pintarModeloEdit(year) {
-        console.log(year);
+    function pintarYearEdit(year) {
         document.querySelector('#description_edit').value = year.description;
-
-        if (!window.modalEditSelect.options[year.model_id]) {
-            const text  =   `${year.model.brand.description} - ${year.model.description}`;
-            window.modalEditSelect.addOption({
-                id: year.model_id,
-                text: text
-            });
-        }
-
-        window.modalEditSelect.setValue(year.model_id, true);
-
     }
 
     async function getYear(yearId) {

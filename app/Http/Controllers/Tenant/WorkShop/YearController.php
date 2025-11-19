@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\Tenant\WorkShop;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Tenant\WorkShop\Year\YearStoreRequest;
-use App\Http\Requests\Tenant\WorkShop\Year\YearUpdateRequest;
-use App\Http\Services\Tenant\WorkShop\Years\YearManager;
-use App\Models\Tenant\WorkShop\Year;
+use App\Http\Requests\Landlord\Year\YearStoreRequest;
+use App\Http\Requests\Landlord\Year\YearUpdateRequest;
+use App\Http\Services\Landlord\WorkShop\Years\YearManager;
+use App\Models\Landlord\Year;
 use Illuminate\Http\Request;
 use Yajra\DataTables\DataTables;
 use Illuminate\Support\Facades\DB;
@@ -23,21 +23,19 @@ class YearController extends Controller
 
     public function index()
     {
-        $brands =   Year::where('status','ACTIVE')->get();
-        return view('workshop.years.index',compact('brands'));
+        $brands =   Year::where('status', 'ACTIVE')->get();
+        return view('workshop.years.index', compact('brands'));
     }
 
     public function getYears(Request $request)
     {
-        $years = DB::table('model_years as my')
-                    ->join('brandsv as b','b.id','my.brand_id')
-                    ->join('models as m','m.id','my.model_id')
-                    ->select(
-                        'my.id',
-                        'my.description',
-                        'b.description as brand_name',
-                        'm.description as model_name'
-                    )->where('my.status','ACTIVE');
+        $years = DB::connection('landlord')
+            ->table('years as y')
+            ->select(
+                'y.id',
+                'y.description'
+            )
+            ->where('y.status', 'ACTIVE');
 
         return DataTables::of($years)->toJson();
     }
@@ -54,7 +52,7 @@ class YearController extends Controller
         }
     }
 
-/*
+    /*
 array:4 [ // app\Http\Controllers\Tenant\WorkShop\YearController.php:81
   "_token" => "whjxe4Khd8ttu83I4cdp4MshzLG5d1HbDuXliTWt"
   "_method" => "POST"
@@ -76,16 +74,9 @@ array:4 [ // app\Http\Controllers\Tenant\WorkShop\YearController.php:81
             DB::rollBack();
             return response()->json(['success' => false, 'message' => $th->getMessage()]);
         }
-
-
-        if ($request->has('fetch') && $request->input('fetch') == 'SI') {
-            return response()->json(['message' => 'success',    'data' => $color]);
-        }
-
-        return redirect()->route('almacenes.colores.index')->with('guardar', 'success');
     }
 
-/*
+    /*
 array:4 [ // app\Http\Controllers\Tenant\WorkShop\YearController.php:113
   "_token" => "whjxe4Khd8ttu83I4cdp4MshzLG5d1HbDuXliTWt"
   "description_edit" => "2023"
@@ -126,13 +117,13 @@ array:4 [ // app\Http\Controllers\Tenant\WorkShop\YearController.php:113
         }
     }
 
-    public function getYearsModel(int $model){
+    public function getYearsModel(int $model)
+    {
         try {
 
-            $years  =   Year::where('model_id',$model)->where('status','ACTIVE')->get();
+            $years  =   Year::where('model_id', $model)->where('status', 'ACTIVE')->get();
 
-            return response()->json(['success'=>true,'message'=>'AÑOS OBTENIDOS','years'=>$years]);
-
+            return response()->json(['success' => true, 'message' => 'AÑOS OBTENIDOS', 'years' => $years]);
         } catch (Throwable $th) {
             return response()->json(['success' => false, 'message' => $th->getMessage()]);
         }

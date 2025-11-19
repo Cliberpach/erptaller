@@ -46,14 +46,14 @@
         modal.show();
     }
 
-    function eventsMdlCreateMarca() {
+    function eventsMdlCreateYear() {
         document.querySelector('#form_create_color').addEventListener('submit', (e) => {
             e.preventDefault();
-            registrarModelo(e.target);
+            registrarYear(e.target);
         })
     }
 
-    function registrarModelo(formCreateColor) {
+    function registrarYear(formCreateColor) {
 
         const modeloNombre = document.querySelector('#description').value;
 

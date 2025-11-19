@@ -2,23 +2,17 @@
 
 namespace App\Http\Controllers\Tenant\WorkShop;
 
-use App\Almacenes\Talla;
-use App\Almacenes\ProductoColorTalla;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Tenant\WorkShop\Model\ModelStoreRequest;
-use App\Http\Requests\Tenant\WorkShop\Model\ModelUpdateRequest;
-use App\Http\Services\Tenant\WorkShop\Brands\BrandManager;
-use App\Http\Services\Tenant\WorkShop\Models\ModelManager;
-use App\Models\Tenant\WorkShop\Brand;
-use App\Models\Tenant\WorkShop\Color;
-use App\Models\Tenant\WorkShop\ModelV;
+use App\Http\Requests\Landlord\Model\ModelStoreRequest;
+use App\Http\Requests\Landlord\Model\ModelUpdateRequest;
+use App\Http\Services\Landlord\WorkShop\Models\ModelManager;
+use App\Models\Landlord\Brand;
+use App\Models\Landlord\ModelV;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Facades\Validator;
 use Yajra\DataTables\DataTables;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\Rule;
 use Throwable;
 
 class ModelController extends Controller
@@ -40,13 +34,16 @@ class ModelController extends Controller
     public function getModelos(Request $request)
     {
 
-        $marcas = DB::table('models as m')
-            ->join('brandsv as b', 'b.id', 'm.brand_id')
+        $marcas = DB::connection('landlord')
+            ->table('models as m')
+            ->join('brandsv as b', 'b.id', '=', 'm.brand_id')
             ->select(
                 'm.id',
                 'm.description',
                 'b.description as brand_name'
-            )->where('m.status', 'ACTIVE');
+            )
+            ->where('m.status', 'ACTIVE');
+
 
         return DataTables::of($marcas)->toJson();
     }
@@ -140,7 +137,7 @@ array:4 [ // app\Http\Controllers\Tenant\WorkShop\ModelController.php:102
     {
         $term = $request->input('q');
 
-        $results = \App\Models\Tenant\WorkShop\ModelV::query()
+        $results = ModelV::query()
             ->select('models.id', 'models.description as model', 'brandsv.description as brand')
             ->join('brandsv', 'brandsv.id', '=', 'models.brand_id')
             ->where('models.status', 'ACTIVE')

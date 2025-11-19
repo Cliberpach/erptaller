@@ -16,7 +16,7 @@
                     <i class="fa-solid fa-upload"></i> IMPORTAR
                 </button> --}}
 
-                <a href="{{route('tenant.taller.vehiculos.create')}}" class="btn btn-primary text-white">
+                <a href="{{ route('tenant.taller.vehiculos.create') }}" class="btn btn-primary text-white">
                     <i class="fas fa-plus-circle"></i> Nuevo
                 </a>
             </div>
@@ -33,6 +33,11 @@
     </div>
 @endsection
 
+<style>
+    .swal2-container {
+        z-index: 9999999;
+    }
+</style>
 
 @section('js')
     <script>
@@ -43,13 +48,11 @@
             events();
         })
 
-        function events() {
-            eventsMdlCreateMarca();
-            eventsMdlEditMarca();
-        }
+        function events() {}
 
         function iniciarDtVehicles() {
             dtVehicles = new DataTable('#dt-vehiculos', {
+                "serverSide": true,
                 "processing": true,
                 "ajax": '{{ route('tenant.taller.vehiculos.getVehiculos') }}',
                 "columns": [{
@@ -60,49 +63,65 @@
                     },
                     {
                         data: 'customer_name',
-                        name: 'v.name',
+                        name: 'customer_name',
+                        searchable: true,
+                        orderable: true,
                         className: "text-center"
                     },
                     {
                         data: 'plate',
                         name: 'v.plate',
+                        searchable: true,
+                        orderable: true,
                         className: "text-center"
                     },
                     {
                         data: 'brand_name',
                         name: 'b.description',
+                        searchable: true,
+                        orderable: true,
                         className: "text-center"
                     },
                     {
                         data: 'model_name',
                         name: 'm.description',
+                        searchable: true,
+                        orderable: true,
                         className: "text-center"
                     },
                     {
                         data: 'year_name',
-                        name: 'my.description',
+                        name: 'y.description',
+                        searchable: true,
+                        orderable: true,
                         className: "text-center"
                     },
                     {
-                        data: 'color_description',
+                        data: 'color_name',
                         name: 'c.description',
+                        searchable: true,
+                        orderable: true,
                         className: "text-center"
                     },
                     {
                         data: 'observation',
                         name: 'v.observation',
+                        searchable: false,
+                        orderable: false,
                         className: "text-center"
                     },
                     {
                         searchable: false,
+                        orderable: false,
                         data: null,
                         className: "text-center",
                         render: function(data) {
+
                             return `
                             <div class="btn-group">
                                 <button
                                     class="btn btn-warning btn-sm modificarDetalle"
-                                    onclick="openMdlEditMarca(${data.id})"
+                                    onclick="redirectParams('tenant.taller.vehiculos.edit',${data.id})"
                                     type="button"
                                     title="Modificar">
                                     <i class="fa fa-edit"></i>
@@ -167,7 +186,49 @@
 
         function eliminar(id) {
             const fila = getRowById(dtVehicles, id);
-            const descripcion = fila?.description || 'Sin descripción';
+            const htmlVehicleInfo = `
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-2" style="font-size: 1.2rem;">
+
+                    <div class="mb-1">
+                        <i class="fas fa-user text-primary me-1 small"></i>
+                        <span class="fw-bold small">Cliente:</span><br>
+                        <span class="text-muted small">${fila.customer_name}</span>
+                    </div>
+
+                    <div class="mb-1">
+                        <i class="fas fa-car text-info me-1 small"></i>
+                        <span class="fw-bold small">Placa:</span><br>
+                        <span class="text-muted small">${fila.plate}</span>
+                    </div>
+
+                    <div class="mb-1">
+                        <i class="fas fa-flag text-success me-1 small"></i>
+                        <span class="fw-bold small">Marca:</span><br>
+                        <span class="text-muted small">${fila.brand_name}</span>
+                    </div>
+
+                    <div class="mb-1">
+                        <i class="fas fa-tag text-warning me-1 small"></i>
+                        <span class="fw-bold small">Modelo:</span><br>
+                        <span class="text-muted small">${fila.model_name}</span>
+                    </div>
+
+                    <div class="mb-1">
+                        <i class="fas fa-calendar-alt text-primary me-1 small"></i>
+                        <span class="fw-bold small">Año:</span><br>
+                        <span class="text-muted small">${fila.year_name}</span>
+                    </div>
+
+                    <div class="mb-0">
+                        <i class="fas fa-palette text-danger me-1 small"></i>
+                        <span class="fw-bold small">Color:</span><br>
+                        <span class="text-muted small">${fila.color_name}</span>
+                    </div>
+
+                </div>
+            </div>
+        `;
 
             const swalWithBootstrapButtons = Swal.mixin({
                 customClass: {
@@ -179,14 +240,8 @@
             });
 
             swalWithBootstrapButtons.fire({
-                title: '¿Desea eliminar el año?',
-                html: `
-                    <div style="text-align: center; font-size: 15px;">
-                        <p><i class="fa fa-palette text-primary"></i>
-                            <strong>Descripción:</strong> ${descripcion}
-                        </p>
-                    </div>
-                `,
+                title: '¿Desea eliminar el vehículo?',
+                html: `${htmlVehicleInfo}`,
                 icon: 'question',
                 showCancelButton: true,
                 confirmButtonText: 'Sí, eliminar',
@@ -196,19 +251,19 @@
             }).then(async (result) => {
                 if (result.isConfirmed) {
                     Swal.fire({
-                        title: 'Eliminando año...',
+                        title: 'Eliminando vehículo...',
                         html: `
-                    <div style="display:flex; align-items:center; justify-content:center; flex-direction:column;">
-                        <i class="fa fa-spinner fa-spin fa-3x text-primary mb-3"></i>
-                        <p style="margin:0; font-weight:600;">Por favor, espere un momento</p>
-                    </div>
-                `,
+                            <div style="display:flex; align-items:center; justify-content:center; flex-direction:column;">
+                                <i class="fa fa-spinner fa-spin fa-3x text-primary mb-3"></i>
+                                <p style="margin:0; font-weight:600;">Por favor, espere un momento</p>
+                            </div>
+                        `,
                         allowOutsideClick: false,
                         showConfirmButton: false
                     });
 
                     try {
-                        const res = await axios.delete(route('tenant.taller.years.destroy', id));
+                        const res = await axios.delete(route('tenant.taller.vehiculos.destroy', id));
                         if (res.data.success) {
                             toastr.success(res.data.message, 'OPERACIÓN COMPLETADA');
                             dtVehicles.ajax.reload();
@@ -216,7 +271,7 @@
                             toastr.error(res.data.message, 'ERROR EN EL SERVIDOR');
                         }
                     } catch (error) {
-                        toastr.error(error, 'ERROR EN LA PETICIÓN ELIMINAR AÑO');
+                        toastr.error(error, 'ERROR EN LA PETICIÓN ELIMINAR VEHÍCULO');
                     } finally {
                         Swal.close();
                     }
@@ -235,11 +290,5 @@
                 }
             });
         }
-
-
-
-        $(".btn-modal-file").on('click', function() {
-            $("#modal_file").modal("show");
-        });
     </script>
 @endsection

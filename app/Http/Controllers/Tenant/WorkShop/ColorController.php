@@ -2,20 +2,15 @@
 
 namespace App\Http\Controllers\Tenant\WorkShop;
 
-use App\Almacenes\Talla;
-use App\Almacenes\ProductoColorTalla;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Tenant\WorkShop\Color\ColorStoreRequest;
-use App\Http\Requests\Tenant\WorkShop\Color\ColorUpdateRequest;
-use App\Http\Services\Tenant\WorkShop\Colors\ColorManager;
-use App\Models\Tenant\WorkShop\Color;
-use Carbon\Carbon;
+use App\Http\Requests\Landlord\Color\ColorStoreRequest;
+use App\Http\Requests\Landlord\Color\ColorUpdateRequest;
+use App\Http\Services\Landlord\WorkShop\Colors\ColorManager;
+use App\Models\Landlord\Color;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Facades\Validator;
 use Yajra\DataTables\DataTables;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\Rule;
 use Throwable;
 
 class ColorController extends Controller

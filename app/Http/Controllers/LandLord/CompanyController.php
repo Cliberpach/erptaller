@@ -63,7 +63,7 @@ class CompanyController extends Controller
             ->get();
 
         return DataTables::of($companies)->make(true);
-        
+
     }
 
 
@@ -82,12 +82,12 @@ class CompanyController extends Controller
     }
 
     public function edit($id):View{
-        
+
         $all_modules    =   Module::with('children.grandchildren')->get();
 
-        $tenant_data    =   DB::select('select 
+        $tenant_data    =   DB::select('select
                             c.ruc,
-                            t.database 
+                            t.database
                             from tenants as t
                             inner join companies as c on c.tenant_id = t.id
                             where c.id = ?',[$id])[0];
@@ -123,7 +123,7 @@ class CompanyController extends Controller
             DB::raw('CASE WHEN number_fields > 6 THEN "SIN LÍMITE" ELSE number_fields END AS number_fields'),
         )->get();
 
-       
+
         return view('company.edit_company_landlord',compact('all_modules', 'plans','company',
         'tenant_modules','tenant_modules_children','tenant_modules_grand_children','user'));
     }
@@ -131,7 +131,7 @@ class CompanyController extends Controller
     public function store(CompanyStoreRequest $request): RedirectResponse
     {
         try {
-        
+
             DB::beginTransaction();
 
             $domain = strtolower($request->get("domain"));
@@ -150,6 +150,7 @@ class CompanyController extends Controller
             $company->email                         =   $request->get("correo");
             $company->plan                          =   $request->get("plan_id");
             $company->files_route                   =   "{$domain}_{$tenant->id}";
+            $company->token_placa                   =  "nsHeEpNSOBr8ucEFnL7OtKmVkZhefUuvoM8O1Lz7uFEOi4KtFZ54==";
 
             if ($request->hasFile('certificate_url')) {
                 $imagen = $request->file('certificate_url');
@@ -184,7 +185,7 @@ class CompanyController extends Controller
                 'tenant_id'     => $tenant->id,
                 'files_route'   => "{$domain}_{$tenant->id}"
             ]);
-            
+
             $this->insertDataTenant($tenant->database, $request);
 
             //======= CREAR CARPETA DE ARCHIVOS PARA EL TENANT  EN PUBLIC/STORAGE/ ====
@@ -195,7 +196,7 @@ class CompanyController extends Controller
 
             //========== HABILITAR SSL PARA EL SUBDOMINIO DEL TENANT =====
             /*$env = env('APP_ENV');
-            
+
             if($env === 'production'){
                 $mainDomain = 'eldeportivo.online';
                 $command    = "sudo certbot --expand -d {$mainDomain} -d www.{$mainDomain} -d {$domain}.{$mainDomain}";
@@ -373,16 +374,16 @@ array:17 [▼ // app\Http\Controllers\LandLord\CompanyController.php:315
   ]
   --- aveces llega grand_child_id ---
 ]
-*/ 
+*/
     public function update(CompanyStoreRequest $request,$id){
         try {
-           
+
             DB::beginTransaction();
 
             //======== OBTENEMOS EL NOMBRE DEL TENANT ===========
-            $tenant_data    =   DB::select('select 
+            $tenant_data    =   DB::select('select
                                 c.ruc,
-                                t.database 
+                                t.database
                                 from tenants as t
                                 inner join companies as c on c.tenant_id = t.id
                                 where c.id = ?',[$id])[0];
@@ -445,7 +446,7 @@ array:17 [▼ // app\Http\Controllers\LandLord\CompanyController.php:315
                     'updated_at'    => Carbon::now(),
                 ]);
             }
-    
+
             foreach ($this->children as $children) {
                 DB::table("$tenant_data->database.module_children")
                 ->insert([
@@ -458,7 +459,7 @@ array:17 [▼ // app\Http\Controllers\LandLord\CompanyController.php:315
                     'updated_at'    => Carbon::now(),
                 ]);
             }
-    
+
             foreach ($this->grand_children as $grand_children) {
                 DB::table("$tenant_data->database.module_grand_children")
                 ->insert([
@@ -487,7 +488,7 @@ array:17 [▼ // app\Http\Controllers\LandLord\CompanyController.php:315
 
             //======== ACTUALIZAR CORREO Y CONTRASEÑA DEL TENANT ========
             DB::table("$tenant_data->database.users as u")
-            ->where('u.id', '1') 
+            ->where('u.id', '1')
             ->update(
                 ['u.password'           =>  Hash::make($request->get('password')),
                 'u.password_visible'    =>  $request->get('password'),
@@ -495,7 +496,7 @@ array:17 [▼ // app\Http\Controllers\LandLord\CompanyController.php:315
             );
 
             DB::commit();
-          
+
             return to_route("landlord.mantenimientos.empresa");
         } catch (\Exception $ex) {
             DB::rollback();
@@ -508,25 +509,25 @@ array:17 [▼ // app\Http\Controllers\LandLord\CompanyController.php:315
 array:1 [ // app\Http\Controllers\LandLord\CompanyController.php:263
   "company_id" => "1"
 ]
-*/ 
+*/
     public function resetearClave(Request $request){
         DB::beginTransaction();
         try {
-            
+
             $company_id     =   $request->get('company_id');
 
-            $tenant_data    =   DB::select('select 
+            $tenant_data    =   DB::select('select
                                 c.ruc,
-                                t.database 
+                                t.database
                                 from tenants as t
                                 inner join companies as c on c.tenant_id = t.id
                                 where c.id = ?',[$company_id])[0];
 
-                                
+
             DB::table("$tenant_data->database.users as u")
-            ->where('u.id', '1') 
+            ->where('u.id', '1')
             ->update(['u.password' => Hash::make($tenant_data->ruc)]);
-            
+
             DB::commit();
             return response()->json(['success'=>true,'message'=>'CLAVE RESETEADA CON ÉXITO!!!']);
         } catch (\Throwable $th) {
@@ -536,45 +537,45 @@ array:1 [ // app\Http\Controllers\LandLord\CompanyController.php:263
     }
 
     public function deleteTenant($id){
-        
+
         try {
 
             //====== OBTENER EMPRESA =======
             $company = LandlordCompany::find($id);
-    
+
             if(!$company){
                 throw new Exception("NO EXISTE LA EMPRESA EN LA BD!!");
             }
-    
+
             //====== OBTENER DATOS DEL TENANT =======
-            $tenant_data = DB::select('select 
+            $tenant_data = DB::select('select
                                             c.ruc,
-                                            t.database 
+                                            t.database
                                             from tenants as t
                                             inner join companies as c on c.tenant_id = t.id
                                             where c.id = ?',[$id])[0];
-    
+
             //======== VERIFICAR SI EXISTE LA BD DEL TENANT =======
             $exists = DB::select("SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = ?", [$tenant_data->database]);
             if (!$exists) {
                 throw new Exception("NO EXISTE LA BD DEL TENANT!!");
             }
-    
+
             //===== ELIMINAR LA BD DEL TENANT =======
             DB::statement("DROP DATABASE IF EXISTS {$tenant_data->database}");
-    
+
             //======= ELIMINAR ARCHIVOS DEL TENANT ======
             $path_directory_tenant = public_path('storage/'.$company->files_route);
             if (File::exists($path_directory_tenant) && File::isDirectory($path_directory_tenant)) {
                 File::deleteDirectory($path_directory_tenant);
             }
-    
+
             //====== DESACTIVAR LA EMPRESA ========
             $company->status = '0';
             $company->update();
-    
+
             return response()->json(['success'=>true,'message'=>'EMPRESA ELIMINADA!!!']);
-            
+
         } catch (\Throwable $th) {
             return response()->json(['success'=>false,'message'=>$th->getMessage()]);
         }

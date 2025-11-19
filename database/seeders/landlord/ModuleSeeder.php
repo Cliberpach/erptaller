@@ -50,11 +50,38 @@ class ModuleSeeder extends Seeder
 
         ModuleChild::create([
             'module_id'     => $taller->id,
-            'description'   => 'Vehiculos',
-            'route_name'    => 'taller.vehiculos',
+            'description'   => 'Colores',
+            'route_name'    => 'taller.colores.index',
             'order'         => '2'
         ]);
 
+        ModuleChild::create([
+            'module_id'     => $taller->id,
+            'description'   => 'Años',
+            'route_name'    => 'taller.years.index',
+            'order'         => '2'
+        ]);
+
+        ModuleChild::create([
+            'module_id'     => $taller->id,
+            'description'   => 'Marcas',
+            'route_name'    => 'taller.marcas.index',
+            'order'         => '2'
+        ]);
+
+        ModuleChild::create([
+            'module_id'     => $taller->id,
+            'description'   => 'Modelos',
+            'route_name'    => 'taller.modelos.index',
+            'order'         => '2'
+        ]);
+
+        ModuleChild::create([
+            'module_id'     => $taller->id,
+            'description'   => 'Vehiculos',
+            'route_name'    => 'taller.vehiculos.index',
+            'order'         => '2'
+        ]);
 
         // Ventas
         $sale = Module::create([

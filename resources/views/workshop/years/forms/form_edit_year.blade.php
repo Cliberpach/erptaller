@@ -12,17 +12,5 @@
             <p class="description_edit_error msgError text-danger small mt-1"></p>
         </div>
 
-        <!-- Marca - Modelo -->
-        <div class="col-12">
-            <label for="model_id_edit" class="form-label fw-bold required_field">Marca - Modelo:</label>
-            <select class="form-select" id="model_id_edit" name="model_id_edit" required>
-                <option value="">Seleccione una marca - modelo</option>
-            </select>
-            <div class="invalid-feedback">
-                Debe seleccionar un modelo.
-            </div>
-            <p class="model_id_edit_error msgError mb-0"></p>
-        </div>
-
     </div>
 </form>

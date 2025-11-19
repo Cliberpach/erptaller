@@ -215,8 +215,6 @@
             });
         }
 
-
-
         $(".btn-modal-file").on('click', function() {
             $("#modal_file").modal("show");
         });

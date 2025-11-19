@@ -20,18 +20,14 @@ return new class extends Migration
             $table->unsignedBigInteger('customer_id');
 
             $table->unsignedBigInteger('brand_id');
-            $table->foreign('brand_id')->references('id')->on('brandsv');
 
             $table->unsignedBigInteger('model_id');
-            $table->foreign('model_id')->references('id')->on('models');
 
             $table->unsignedBigInteger('year_id');
-            $table->foreign('year_id')->references('id')->on('model_years');
 
             $table->unsignedBigInteger('color_id');
-            $table->foreign('color_id')->references('id')->on('colors');
 
-            $table->string('observations', 300);
+            $table->string('observation', 300);
 
             $table->enum('status', ['ACTIVE', 'INACTIVE'])->default('ACTIVE');
 

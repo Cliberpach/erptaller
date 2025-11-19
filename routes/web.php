@@ -36,7 +36,9 @@ use App\Http\Controllers\Tenant\Sales\PaymentMethodController;
 use App\Http\Controllers\Tenant\SupplierController;
 use App\Http\Controllers\Tenant\ValuedKardexController;
 use App\Http\Controllers\Tenant\WorkShop\ModelController;
+use App\Http\Controllers\Tenant\WorkShop\VehicleController;
 use App\Http\Controllers\Tenant\WorkShop\YearController;
+use App\Http\Controllers\UtilController;
 use App\Models\PettyCash;
 use App\Models\Tenant\ReservationDocument;
 use App\Models\Tenant\WorkShop\ModelV;
@@ -336,7 +338,7 @@ Route::group(["prefix" => "utils"], function () {
     Route::get('model-search', [ModelController::class, 'searchModel'])->name('tenant.utils.searchModel');
     Route::get('customer-search', [CustomerController::class, 'searchCustomer'])->name('tenant.utils.searchCustomer');
     Route::get('get-years/{model}', [YearController::class, 'getYearsModel'])->name('tenant.utils.getYearsModel');
-
+    Route::get('serch-plate/{placa}', [VehicleController::class, 'searchPlate'])->name('tenant.utils.searchPlate');
 });
 
 

@@ -15,17 +15,5 @@
             <p class="description_error msgError mb-0"></p>
         </div>
 
-        <!-- Marca - Modelo -->
-        <div class="col-12">
-            <label for="model_id" class="form-label fw-bold required_field">Marca - Modelo:</label>
-            <select class="form-select" id="model_id" name="model_id" required>
-                <option value="">Seleccione una marca - modelo</option>
-            </select>
-            <div class="invalid-feedback">
-                Debe seleccionar una marca.
-            </div>
-            <p class="model_id_error msgError mb-0"></p>
-        </div>
-
     </div>
 </form>

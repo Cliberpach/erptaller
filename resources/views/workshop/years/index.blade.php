@@ -18,7 +18,7 @@
                 </button> --}}
 
                 <a onclick="openMdlCreateMarca()" class="btn btn-primary text-white">
-                    <i class="fas fa-plus-circle"></i> Nuevo
+                    <i class="fas fa-plus-circle"></i> NUEVO
                 </a>
             </div>
         </div>
@@ -52,122 +52,12 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             iniciarDtYears();
-            iniciarTomSelect();
             events();
         })
 
         function events() {
-            eventsMdlCreateMarca();
-            eventsMdlEditMarca();
-        }
-
-        function iniciarTomSelect() {
-            const select = document.getElementById('brand_id');
-            if (select && !select.tomselect) {
-                window.brandSelect = new TomSelect(select, {
-                    create: false,
-                    sortField: {
-                        field: "text",
-                        direction: "asc"
-                    },
-                    plugins: ['clear_button'],
-                });
-            }
-
-            const selectBrandEdit = document.getElementById('brand_id_edit');
-            if (selectBrandEdit && !selectBrandEdit.tomselect) {
-                window.brandEditSelect = new TomSelect(selectBrandEdit, {
-                    create: false,
-                    sortField: {
-                        field: "text",
-                        direction: "asc"
-                    },
-                    plugins: ['clear_button'],
-                });
-            }
-
-            const modelSelect = document.getElementById('model_id');
-            if (modelSelect) {
-                new TomSelect(modelSelect, {
-                    valueField: 'id',
-                    labelField: 'text',
-                    searchField: 'text',
-                    placeholder: 'Buscar marca - modelo...',
-                    maxOptions: 50,
-                    loadThrottle: 300,
-                    closeAfterSelect: true,
-                    preload: false,
-                    maxItems: 1,
-                    create: false,
-                    plugins: ['remove_button'], // agrega la X
-                    load: function(query, callback) {
-                        if (!query.length) return callback();
-                        axios.get(route('tenant.utils.searchModel'), {
-                                params: {
-                                    q: query
-                                }
-                            })
-                            .then((res) => {
-                                callback(res.data);
-                            })
-                            .catch(() => {
-                                callback();
-                            });
-                    },
-                    render: {
-                        option: function(item, escape) {
-                            return `<div>
-                        <strong>${escape(item.text)}</strong>
-                    </div>`;
-                        },
-                        item: function(item, escape) {
-                            return `<div>${escape(item.text)}</div>`;
-                        }
-                    }
-                });
-            }
-
-
-            const modelEditSelect = document.getElementById('model_id_edit');
-            if (modelEditSelect) {
-                window.modalEditSelect = new TomSelect(modelEditSelect, {
-                    valueField: 'id',
-                    labelField: 'text',
-                    searchField: 'text',
-                    placeholder: 'Buscar marca - modelo...',
-                    maxOptions: 50,
-                    loadThrottle: 300,
-                    closeAfterSelect: true,
-                    preload: false,
-                    maxItems: 1,
-                    create: false,
-                    plugins: ['remove_button'], // agrega la X
-                    load: function(query, callback) {
-                        if (!query.length) return callback();
-                        axios.get(route('tenant.utils.searchModel'), {
-                                params: {
-                                    q: query
-                                }
-                            })
-                            .then((res) => {
-                                callback(res.data);
-                            })
-                            .catch(() => {
-                                callback();
-                            });
-                    },
-                    render: {
-                        option: function(item, escape) {
-                            return `<div>
-                        <strong>${escape(item.text)}</strong>
-                    </div>`;
-                        },
-                        item: function(item, escape) {
-                            return `<div>${escape(item.text)}</div>`;
-                        }
-                    }
-                });
-            }
+            eventsMdlCreateYear();
+            eventsMdlEditYear();
         }
 
         function iniciarDtYears() {
@@ -186,16 +76,6 @@
                         className: "text-center"
                     },
                     {
-                        data: 'brand_name',
-                        name: 'b.description',
-                        className: "text-center"
-                    },
-                    {
-                        data: 'model_name',
-                        name: 'm.description',
-                        className: "text-center"
-                    },
-                    {
                         searchable: false,
                         data: null,
                         className: "text-center",
@@ -204,7 +84,7 @@
                             <div class="btn-group">
                                 <button
                                     class="btn btn-warning btn-sm modificarDetalle"
-                                    onclick="openMdlEditMarca(${data.id})"
+                                    onclick="openMdlEditYear(${data.id})"
                                     type="button"
                                     title="Modificar">
                                     <i class="fa fa-edit"></i>

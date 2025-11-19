@@ -249,6 +249,14 @@ function formatMoney(valor) {
     return parseFloat(valor).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
+function redirect(routeName){
+    window.location.href = route(routeName);
+}
+
+function redirectParams(routeName,id){
+    window.location.href = route(routeName,id);
+}
+
 
 
 

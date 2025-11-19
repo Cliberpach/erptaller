@@ -8,16 +8,10 @@
     @include('utils.modals.customer.mdl_create_customer')
     <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
-            <h4 class="card-title mb-md-0 mb-2">LISTA DE VEHÍCULOS</h4>
+            <h4 class="card-title mb-md-0 mb-2">REGISTRAR VEHÍCULO</h4>
 
             <div class="d-flex flex-wrap gap-2">
-                {{-- <button class="btn btn-warning" onclick="openMdlImportMarca()">
-                    <i class="fa-solid fa-upload"></i> IMPORTAR
-                </button> --}}
 
-                <a onclick="openMdlCreateMarca()" class="btn btn-primary text-white">
-                    <i class="fas fa-plus-circle"></i> Nuevo
-                </a>
             </div>
         </div>
         <div class="card-body">
@@ -25,6 +19,24 @@
                 <div class="col-12">
                     @include('workshop.vehicles.forms.form_create_vehicle')
                 </div>
+            </div>
+        </div>
+        <div class="card-footer">
+            <div class="row">
+                <div class="col-12 d-flex justify-content-end">
+
+                    <!-- BOTÓN VOLVER -->
+                    <button type="button" class="btn btn-danger me-1" onclick="redirect('tenant.taller.vehiculos.index')">
+                        <i class="fas fa-arrow-left"></i> VOLVER
+                    </button>
+
+                    <!-- BOTÓN REGISTRAR -->
+                    <button class="btn btn-primary" form="form_create_vehicle" type="submit">
+                        <i class="fas fa-save"></i> REGISTRAR
+                    </button>
+
+                </div>
+
             </div>
         </div>
     </div>
@@ -47,6 +59,15 @@
 
         function events() {
             eventsMdlCreateCustomer();
+
+            document.querySelector('#btn_search_plate').addEventListener('click', () => {
+                accionBuscarPlaca();
+            })
+
+            document.querySelector('#form_create_vehicle').addEventListener('submit', (e) => {
+                e.preventDefault();
+                storeVehicle(e.target);
+            })
         }
 
         function iniciarTomSelect() {
@@ -85,49 +106,7 @@
 
             const modelSelect = document.getElementById('model_id');
             if (modelSelect) {
-                new TomSelect(modelSelect, {
-                    valueField: 'id',
-                    labelField: 'text',
-                    searchField: 'text',
-                    placeholder: 'Buscar marca - modelo...',
-                    maxOptions: 50,
-                    loadThrottle: 300,
-                    closeAfterSelect: true,
-                    preload: false,
-                    maxItems: 1,
-                    create: false,
-                    plugins: ['remove_button'], // agrega la X
-                    load: function(query, callback) {
-                        if (!query.length) return callback();
-                        axios.get(route('tenant.utils.searchModel'), {
-                                params: {
-                                    q: query
-                                }
-                            })
-                            .then((res) => {
-                                callback(res.data);
-                            })
-                            .catch(() => {
-                                callback();
-                            });
-                    },
-                    render: {
-                        option: function(item, escape) {
-                            return `<div>
-                        <strong>${escape(item.text)}</strong>
-                    </div>`;
-                        },
-                        item: function(item, escape) {
-                            return `<div>${escape(item.text)}</div>`;
-                        }
-                    }
-                });
-            }
-
-
-            const modelEditSelect = document.getElementById('model_id_edit');
-            if (modelEditSelect) {
-                window.modalEditSelect = new TomSelect(modelEditSelect, {
+                window.modelSelect = new TomSelect(modelSelect, {
                     valueField: 'id',
                     labelField: 'text',
                     searchField: 'text',
@@ -184,7 +163,32 @@
                                 ${escape(item.description)}
                             </div>
                         `,
-                                    item: (item, escape) => `
+                        item: (item, escape) => `
+                            <div>${escape(item.description)}</div>
+                        `
+                    }
+                });
+            }
+
+            const colorSelect = document.getElementById('color_id');
+            if (colorSelect && !colorSelect.tomselect) {
+                window.colorSelect = new TomSelect(colorSelect, {
+                    valueField: 'id',
+                    labelField: 'description',
+                    searchField: ['description', 'id'],
+                    create: false,
+                    sortField: {
+                        field: 'id',
+                        direction: 'desc'
+                    },
+                    plugins: ['clear_button'],
+                    render: {
+                        option: (item, escape) => `
+                            <div>
+                                ${escape(item.description)}
+                            </div>
+                        `,
+                        item: (item, escape) => `
                             <div>${escape(item.description)}</div>
                         `
                     }
@@ -200,118 +204,138 @@
             buttonsStyling: false
         })
 
-        function eliminar(id) {
-            const fila = getRowById(dtYears, id);
-            const descripcion = fila?.description || 'Sin descripción';
-
-            const swalWithBootstrapButtons = Swal.mixin({
-                customClass: {
-                    confirmButton: 'btn btn-success me-2',
-                    cancelButton: 'btn btn-danger',
-                    actions: 'd-flex justify-content-center gap-2 mt-3'
-                },
-                buttonsStyling: false // Necesario para que Bootstrap controle el estilo
-            });
-
-            swalWithBootstrapButtons.fire({
-                title: '¿Desea eliminar el año?',
-                html: `
-                    <div style="text-align: center; font-size: 15px;">
-                        <p><i class="fa fa-palette text-primary"></i>
-                            <strong>Descripción:</strong> ${descripcion}
-                        </p>
-                    </div>
-                `,
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonText: 'Sí, eliminar',
-                cancelButtonText: 'No, cancelar',
-                focusCancel: true,
-                reverseButtons: true
-            }).then(async (result) => {
-                if (result.isConfirmed) {
-                    Swal.fire({
-                        title: 'Eliminando año...',
-                        html: `
-                    <div style="display:flex; align-items:center; justify-content:center; flex-direction:column;">
-                        <i class="fa fa-spinner fa-spin fa-3x text-primary mb-3"></i>
-                        <p style="margin:0; font-weight:600;">Por favor, espere un momento</p>
-                    </div>
-                `,
-                        allowOutsideClick: false,
-                        showConfirmButton: false
-                    });
-
-                    try {
-                        const res = await axios.delete(route('tenant.taller.years.destroy', id));
-                        if (res.data.success) {
-                            toastr.success(res.data.message, 'OPERACIÓN COMPLETADA');
-                            dtYears.ajax.reload();
-                        } else {
-                            toastr.error(res.data.message, 'ERROR EN EL SERVIDOR');
-                        }
-                    } catch (error) {
-                        toastr.error(error, 'ERROR EN LA PETICIÓN ELIMINAR AÑO');
-                    } finally {
-                        Swal.close();
-                    }
-
-                } else if (result.dismiss === Swal.DismissReason.cancel) {
-                    swalWithBootstrapButtons.fire({
-                        title: 'Cancelado',
-                        text: 'La solicitud ha sido cancelada.',
-                        icon: 'error',
-                        confirmButtonText: 'Entendido',
-                        customClass: {
-                            confirmButton: 'btn btn-secondary'
-                        },
-                        buttonsStyling: false
-                    });
-                }
-            });
-        }
-
         $(".btn-modal-file").on('click', function() {
             $("#modal_file").modal("show");
         });
 
-        async function getYearsModel(modelId) {
+        async function accionBuscarPlaca() {
+            const placa = document.querySelector('#plate').value.trim();
+
+            if (placa.length < 6 || placa.length > 8) {
+                toastr.error('LA PLACA DEBE TENER ENTRE 6 Y 8 CARACTERES');
+                return;
+            }
+
+            searchPlate(placa);
+
+        }
+
+        async function searchPlate(placa) {
+            mostrarAnimacion1();
             try {
-                mostrarAnimacion1();
-                const res = await axios.get(route('tenant.utils.getYearsModel', modelId));
+                toastr.clear();
+                const res = await axios.get(route('tenant.utils.searchPlate', placa));
                 if (res.data.success) {
-                    paintYearSelect(res.data.years);
-                    toastr.success(res.data.message, 'OPERACIÓN COMPLETADA');
+
+                    if (res.data.origin == 'BD') {
+                        toastr.error('VEHICULO YA EXISTE EN BD');
+                        return;
+                    }
+
+                    const dataApi = res.data.data;
+                    if (dataApi.mensaje == 'SUCCESS') {
+                        toastr.info(dataApi.mensaje);
+                        setDataApi(dataApi.data, res.data.model);
+                    }
                 } else {
                     toastr.error(res.data.message, 'ERROR EN EL SERVIDOR');
                 }
             } catch (error) {
-                toastr.error(error, 'ERROR EN LA PETICIÓN OBTENER AÑOS');
+                toastr.error(error, 'ERROR EN LA PETICIÓN CONSULTAR PLACA');
             } finally {
                 ocultarAnimacion1();
             }
         }
 
-        function paintYearSelect(years) {
-            console.log(years);
-            if (!window.yearSelect) {
-                console.warn('TomSelect de años no inicializado');
+        function setDataApi(data, model) {
+
+            const mensaje = data.mensaje;
+            if(mensaje == 'No encontrado'){
+                toastr.error(mensaje);
                 return;
             }
 
-            const select = window.yearSelect;
+            window.modelSelect.clear();
+            window.modelSelect.clearOptions();
 
-            select.clear();
-            select.clearOptions();
+            const marca = data.marca;
+            const modelo = data.modelo;
 
-            if (Array.isArray(years) && years.length > 0) {
-                select.addOptions(years.map(year => ({
-                    id: year.id,
-                    description: year.description
-                })));
+            const text = `${marca} - ${modelo}`;
+
+            window.modelSelect.addOption({
+                id: model.id,
+                text
+            });
+
+            window.modelSelect.setValue(model.id);
+        }
+
+        async function storeVehicle(formCreateVehicle) {
+
+            const result = await Swal.fire({
+                title: '¿Desea registrar el vehículo?',
+                text: "Confirme para continuar",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'SI, registrar',
+                cancelButtonText: 'NO',
+                reverseButtons: true,
+                customClass: {
+                    confirmButton: 'btn btn-primary',
+                    cancelButton: 'btn btn-secondary'
+                },
+                buttonsStyling: false
+            });
+
+            if (result.isConfirmed) {
+
+                try {
+
+                    clearValidationErrors('msgError');
+
+                    Swal.fire({
+                        title: 'Registrando vehículo...',
+                        text: 'Por favor espere',
+                        allowOutsideClick: false,
+                        allowEscapeKey: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+
+                    const res = await axios.post(route('tenant.taller.vehiculos.store'), formCreateVehicle);
+                    if (res.data.success) {
+                        toastr.success(res.data.message, 'OPERACIÓN COMPLETADA');
+                        redirect('tenant.taller.vehiculos.index');
+                    } else {
+                        toastr.error(res.data.message, 'ERROR EN EL SERVIDOR');
+                        Swal.close();
+                    }
+
+                } catch (error) {
+                    Swal.close();
+                    if (error.response && error.response.status === 422) {
+                        const errors = error.response.data.errors;
+                        paintValidationErrors(errors, 'error');
+                        return;
+                    }
+                }
+
+            } else {
+
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Operación cancelada',
+                    text: 'No se realizaron acciones.',
+                    confirmButtonText: 'OK',
+                    customClass: {
+                        confirmButton: 'btn btn-secondary'
+                    },
+                    buttonsStyling: false
+                });
+
             }
-
-            select.refreshOptions(false);
         }
     </script>
 @endsection
