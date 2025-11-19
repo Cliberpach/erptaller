@@ -12,9 +12,14 @@ class BrandSeeder extends Seeder
         $brands = [
 
             // 🇯🇵 JAPÓN
-            'Toyota','Lexus','Daihatsu','Hino',
-            'Honda','Acura',
-            'Nissan','Infiniti',
+            'Toyota',
+            'Lexus',
+            'Daihatsu',
+            'Hino',
+            'Honda',
+            'Acura',
+            'Nissan',
+            'Infiniti',
             'Mazda',
             'Subaru',
             'Mitsubishi Motors',
@@ -22,9 +27,16 @@ class BrandSeeder extends Seeder
             'Isuzu',
 
             // 🇺🇸 ESTADOS UNIDOS
-            'Ford','Lincoln',
-            'Chevrolet','GMC','Cadillac','Buick',
-            'Dodge','Chrysler','Jeep','Ram',
+            'Ford',
+            'Lincoln',
+            'Chevrolet',
+            'GMC',
+            'Cadillac',
+            'Buick',
+            'Dodge',
+            'Chrysler',
+            'Jeep',
+            'Ram',
             'Tesla',
             'Rivian',
             'Lucid Motors',
@@ -32,9 +44,18 @@ class BrandSeeder extends Seeder
             'Karma Automotive',
 
             // 🇩🇪 ALEMANIA
-            'Volkswagen','Audi','Porsche','Bentley','Lamborghini','Bugatti', // VAG
-            'Mercedes-Benz','Maybach','Smart',
-            'BMW','Mini','Rolls-Royce',
+            'Volkswagen',
+            'Audi',
+            'Porsche',
+            'Bentley',
+            'Lamborghini',
+            'Bugatti', // VAG
+            'Mercedes-Benz',
+            'Maybach',
+            'Smart',
+            'BMW',
+            'Mini',
+            'Rolls-Royce',
             'Opel',
 
             // 🇰🇷 COREA DEL SUR
@@ -44,7 +65,9 @@ class BrandSeeder extends Seeder
             'Samsung Motors (Renault Korea)',
 
             // 🇫🇷 FRANCIA
-            'Renault','Dacia','Alpine',
+            'Renault',
+            'Dacia',
+            'Alpine',
             'Peugeot',
             'Citroën',
             'DS Automobiles',
@@ -142,7 +165,13 @@ class BrandSeeder extends Seeder
             'Thai Rung',
 
             // MARCAS DE MOTOS (si también manejas vehículos en general)
-            'Yamaha','Kawasaki','KTM','Harley-Davidson','Ducati','Triumph','Royal Enfield',
+            'Yamaha',
+            'Kawasaki',
+            'KTM',
+            'Harley-Davidson',
+            'Ducati',
+            'Triumph',
+            'Royal Enfield',
 
             // CAMIONES Y COMERCIALES
             'Freightliner',
@@ -161,7 +190,7 @@ class BrandSeeder extends Seeder
 
         foreach ($brands as $brand) {
             Brand::create([
-                'description' => $brand,
+                'description' => mb_strtoupper(trim($brand), 'UTF-8'),
                 'status' => 'ACTIVE',
             ]);
         }
