@@ -50,6 +50,13 @@ class ModuleSeeder extends Seeder
 
         ModuleChild::create([
             'module_id'     => $taller->id,
+            'description'   => 'Servicios',
+            'route_name'    => 'taller.servicios.index',
+            'order'         => '2'
+        ]);
+
+        ModuleChild::create([
+            'module_id'     => $taller->id,
             'description'   => 'Colores',
             'route_name'    => 'taller.colores.index',
             'order'         => '2'
@@ -343,6 +350,5 @@ class ModuleSeeder extends Seeder
             'route_name' => 'consultas.reservas',
             'order' => '3'
         ]);
-
     }
 }

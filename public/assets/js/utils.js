@@ -1,12 +1,12 @@
 
-document.addEventListener('DOMContentLoaded',()=>{
+document.addEventListener('DOMContentLoaded', () => {
     eventsUtils();
 })
 
-function eventsUtils(){
+function eventsUtils() {
 
-    document.addEventListener('input',(e)=>{
-        if(e.target.classList.contains('inputDecimalPositivo')){
+    document.addEventListener('input', (e) => {
+        if (e.target.classList.contains('inputDecimalPositivo')) {
 
             const input = e.target;
 
@@ -122,16 +122,16 @@ function eventsUtils(){
 
 //============== LIMPIAR UNA TABLA ========
 function clearTable(idTabla) {
-    const tbody =   document.querySelector(`#${idTabla} tbody`);
+    const tbody = document.querySelector(`#${idTabla} tbody`);
     while (tbody.firstChild) {
         tbody.removeChild(tbody.firstChild);
     }
 }
 
-function destroyDataTable(dtTable){
-    if(dtTable){
+function destroyDataTable(dtTable) {
+    if (dtTable) {
         dtTable.destroy();
-        dtTable =   null;
+        dtTable = null;
     }
 }
 
@@ -144,8 +144,8 @@ function ocultarAnimacion1() {
 }
 
 //=========== OBTENER FILA POR EL ID DE UN DATATABLE =========
-function getRowById(dtTabla,registro_id) {
-    let data    = dtTabla.rows().data();
+function getRowById(dtTabla, registro_id) {
+    let data = dtTabla.rows().data();
     let rowData = null;
 
     for (let i = 0; i < data.length; i++) {
@@ -171,25 +171,25 @@ function getRowByIndex(dtTabla, index) {
 }
 
 //======= LIMPIAR ERRORES DE VALIDACIÓN ========
-function clearValidationErrors(error_class){
-    const lstTagErrors    =   document.querySelectorAll(`.${error_class}`);
-    lstTagErrors.forEach((tag)=>{
-        tag.textContent    =   '';
+function clearValidationErrors(error_class) {
+    const lstTagErrors = document.querySelectorAll(`.${error_class}`);
+    lstTagErrors.forEach((tag) => {
+        tag.textContent = '';
     })
 }
 
 
-function paintValidationErrors(objValidationErrors,suffix){
+function paintValidationErrors(objValidationErrors, suffix) {
 
     for (let clave in objValidationErrors) {
-        const pError        =   document.querySelector(`.${clave}_${suffix}`);
-        pError.textContent  =   objValidationErrors[clave][0];
+        const pError = document.querySelector(`.${clave}_${suffix}`);
+        pError.textContent = objValidationErrors[clave][0];
     }
 
 }
 
-function loadDataTableSimple(dtTable,id){
-    dtTable  =   new DataTable(`#${id}`,{
+function loadDataTableSimple(dtTable, id) {
+    dtTable = new DataTable(`#${id}`, {
         language: {
             "lengthMenu": "Mostrar _MENU_ registros por página",
             "zeroRecords": "No se encontraron resultados",
@@ -216,9 +216,9 @@ function loadDataTableSimple(dtTable,id){
     return dtTable;
 }
 
-function loadDataTableResponsive(id){
-    const dtTable  =   new DataTable(`#${id}`,{
-        responsive:true,
+function loadDataTableResponsive(id) {
+    const dtTable = new DataTable(`#${id}`, {
+        responsive: true,
         language: {
             "lengthMenu": "Mostrar _MENU_ registros por página",
             "zeroRecords": "No se encontraron resultados",
@@ -249,12 +249,24 @@ function formatMoney(valor) {
     return parseFloat(valor).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
-function redirect(routeName){
+function formatSoles(valor) {
+    const num = parseFloat(valor);
+
+    if (isNaN(num)) return valor;
+
+    return num.toLocaleString('es-PE', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    });
+}
+
+
+function redirect(routeName) {
     window.location.href = route(routeName);
 }
 
-function redirectParams(routeName,id){
-    window.location.href = route(routeName,id);
+function redirectParams(routeName, id) {
+    window.location.href = route(routeName, id);
 }
 
 

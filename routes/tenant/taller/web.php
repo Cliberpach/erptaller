@@ -3,11 +3,22 @@
 use App\Http\Controllers\Tenant\WorkShop\BrandController;
 use App\Http\Controllers\Tenant\WorkShop\ColorController;
 use App\Http\Controllers\Tenant\WorkShop\ModelController;
+use App\Http\Controllers\Tenant\WorkShop\ServiceController;
 use App\Http\Controllers\Tenant\WorkShop\VehicleController;
 use App\Http\Controllers\Tenant\WorkShop\YearController;
 use Illuminate\Support\Facades\Route;
 
 Route::group(["prefix" => "taller"], function () {
+
+    Route::group(["prefix" => "servicios"], function () {
+
+        Route::get('index', [ServiceController::class, 'index'])->name('tenant.taller.servicios.index');
+        Route::get('getServices', [ServiceController::class, 'getServices'])->name('tenant.taller.servicios.getServices');
+        Route::post('store', [ServiceController::class, 'store'])->name('tenant.taller.servicios.store');
+        Route::get('getService/{id}', [ServiceController::class, 'getService'])->name('tenant.taller.servicios.getService');
+        Route::put('update/{id}', [ServiceController::class, 'update'])->name('tenant.taller.servicios.update');
+        Route::delete('destroy/{id}', [ServiceController::class, 'destroy'])->name('tenant.taller.servicios.destroy');
+    });
 
     Route::group(["prefix" => "vehiculos"], function () {
 
@@ -18,7 +29,6 @@ Route::group(["prefix" => "taller"], function () {
         Route::get('edit/{id}', [VehicleController::class, 'edit'])->name('tenant.taller.vehiculos.edit');
         Route::put('update/{id}', [VehicleController::class, 'update'])->name('tenant.taller.vehiculos.update');
         Route::delete('destroy/{id}', [VehicleController::class, 'destroy'])->name('tenant.taller.vehiculos.destroy');
-
     });
 
     Route::group(["prefix" => "colores"], function () {
@@ -49,7 +59,6 @@ Route::group(["prefix" => "taller"], function () {
         Route::get('getModelo/{id}', [ModelController::class, 'getModelo'])->name('tenant.taller.modelos.getModelo');
         Route::delete('delete/{id}', [ModelController::class, 'destroy'])->name('tenant.taller.modelos.destroy');
         Route::put('update/{id}', [ModelController::class, 'update'])->name('tenant.taller.modelos.update');
-
     });
 
     Route::group(["prefix" => "years"], function () {
