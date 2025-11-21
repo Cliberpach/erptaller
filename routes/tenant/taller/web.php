@@ -3,12 +3,24 @@
 use App\Http\Controllers\Tenant\WorkShop\BrandController;
 use App\Http\Controllers\Tenant\WorkShop\ColorController;
 use App\Http\Controllers\Tenant\WorkShop\ModelController;
+use App\Http\Controllers\Tenant\WorkShop\QuoteController;
 use App\Http\Controllers\Tenant\WorkShop\ServiceController;
 use App\Http\Controllers\Tenant\WorkShop\VehicleController;
 use App\Http\Controllers\Tenant\WorkShop\YearController;
 use Illuminate\Support\Facades\Route;
 
 Route::group(["prefix" => "taller"], function () {
+
+    Route::group(["prefix" => "cotizaciones"], function () {
+
+        Route::get('index', [QuoteController::class, 'index'])->name('tenant.taller.cotizaciones.index');
+        Route::get('create', [QuoteController::class, 'create'])->name('tenant.taller.cotizaciones.create');
+        Route::get('getQuotes', [QuoteController::class, 'getQuotes'])->name('tenant.taller.cotizaciones.getQuotes');
+        Route::post('store', [QuoteController::class, 'store'])->name('tenant.taller.cotizaciones.store');
+        Route::get('getQuote/{id}', [QuoteController::class, 'getService'])->name('tenant.taller.cotizaciones.getQuote');
+        Route::put('update/{id}', [QuoteController::class, 'update'])->name('tenant.taller.cotizaciones.update');
+        Route::delete('destroy/{id}', [QuoteController::class, 'destroy'])->name('tenant.taller.cotizaciones.destroy');
+    });
 
     Route::group(["prefix" => "servicios"], function () {
 

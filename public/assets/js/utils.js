@@ -118,8 +118,6 @@ function eventsUtils() {
 
 }
 
-
-
 //============== LIMPIAR UNA TABLA ========
 function clearTable(idTabla) {
     const tbody = document.querySelector(`#${idTabla} tbody`);
@@ -188,8 +186,8 @@ function paintValidationErrors(objValidationErrors, suffix) {
 
 }
 
-function loadDataTableSimple(dtTable, id) {
-    dtTable = new DataTable(`#${id}`, {
+function loadDataTableSimple(id) {
+    const dtTable = new DataTable(`#${id}`, {
         language: {
             "lengthMenu": "Mostrar _MENU_ registros por página",
             "zeroRecords": "No se encontraron resultados",

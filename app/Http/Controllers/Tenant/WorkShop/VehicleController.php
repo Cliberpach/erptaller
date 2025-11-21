@@ -6,8 +6,6 @@ use App\Exports\Tenant\Inventory\Brand\BrandFormatExport;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Tenant\Inventory\Brand\BrandImportExcelRequest;
-use App\Http\Requests\Tenant\Inventory\Brand\BrandStoreRequest;
-use App\Http\Requests\Tenant\Inventory\Brand\BrandUpdateRequest;
 use App\Http\Requests\Tenant\WorkShop\VehicleStoreRequest;
 use App\Http\Requests\Tenant\WorkShop\VehicleUpdateRequest;
 use App\Http\Services\Tenant\WorkShop\Vehicles\VehicleManager;
@@ -60,7 +58,7 @@ class VehicleController extends Controller
                 'y.description as year_name',
                 'c.description as color_name',
                 'v.observation'
-            )->where('v.status','ACTIVE');
+            )->where('v.status', 'ACTIVE');
 
 
         return DataTables::of($vehicles)
@@ -210,39 +208,6 @@ array:8 [ // app\Http\Controllers\Tenant\WorkShop\VehicleController.php:159
         return Excel::download(new BrandFormatExport(), 'formato_import_marcas.xlsx');
     }
 
-    /*
-array:1 [ // app\Http\Controllers\Tenant\CategoryController.php:146
-  "marcas_import_excel" =>
-Illuminate\Http\UploadedFile {#1885
-*/
-    public function importExcel(BrandImportExcelRequest $request)
-    {
-        DB::beginTransaction();
-        try {
-
-            $import = new BrandImport();
-
-            Excel::import($import, $request->file('marcas_import_excel'));
-
-            $resultado = $import->getResultados();
-
-            if ($resultado->con_errores) {
-                return response()->json(['success' => false, 'message' => 'ERRORES EN EL EXCEL', 'resultado' => $resultado]);
-            } else {
-                $lstMarcas  =   $resultado->listadoMarcas;
-                foreach ($lstMarcas as $categoria_excel) {
-                    $brand              =   new Brand();
-                    $brand->name        =   mb_strtoupper($categoria_excel['name'], 'UTF-8');
-                    $brand->save();
-                }
-                DB::commit();
-                return response()->json(['success' => true, 'message' => 'EXCEL IMPORTADO CON ÉXITO', 'resultado' => $resultado]);
-            }
-        } catch (Throwable $th) {
-            DB::rollBack();
-            return response()->json(['success' => false, 'message' => $th->getMessage()]);
-        }
-    }
 
     /*
 {
@@ -277,5 +242,32 @@ Illuminate\Http\UploadedFile {#1885
             DB::connection('landlord')->rollBack();
             return response()->json(['success' => false, 'message' => $th->getMessage()]);
         }
+    }
+
+    /**
+     * Buscar clientes (para TomSelect server-side)
+     */
+    public function searchVehicle(Request $request)
+    {
+        $query = trim($request->get('q', ''));
+
+        if (empty($query)) {
+            return response()->json(['data' => []]);
+        }
+
+        $vehicles = Vehicle::from('vehicles as v')
+            ->join('erptaller.models as m', 'm.id', 'v.model_id')
+            ->join('erptaller.brandsv as b', 'b.id', 'v.brand_id')
+            ->where('plate', 'LIKE', "%{$query}%")
+            ->limit(20)
+            ->get(['v.id', 'm.description as model_name', 'v.plate', 'b.description as brand_name']);
+
+        $data = $vehicles->map(fn($v) => [
+            'id' => $v->id,
+            'text' => "{$v->plate}",
+            'subtext' => "{$v->model_name}-{$v->brand_name}",
+        ]);
+
+        return response()->json(['data' => $data]);
     }
 }

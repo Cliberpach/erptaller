@@ -50,6 +50,13 @@ class ModuleSeeder extends Seeder
 
         ModuleChild::create([
             'module_id'     => $taller->id,
+            'description'   => 'Cotizaciones',
+            'route_name'    => 'taller.cotizaciones.index',
+            'order'         => '2'
+        ]);
+
+        ModuleChild::create([
+            'module_id'     => $taller->id,
             'description'   => 'Servicios',
             'route_name'    => 'taller.servicios.index',
             'order'         => '2'

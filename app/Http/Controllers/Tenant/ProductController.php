@@ -62,7 +62,7 @@ class ProductController extends Controller
     }
 
 
-/*
+    /*
 array:12 [ // app\Http\Controllers\Tenant\ProductController.php:74
   "_token" => "toQgu5tmflxhBWA5u0kr4ZpszFEo4UdPaFmcqoRO"
   "name" => "ASDASASDZXC"
@@ -180,7 +180,7 @@ array:11 [ // app\Http\Controllers\Tenant\ProductController.php:127
         return Excel::download(new ProductoExport(), 'formato_import_productos.xlsx');
     }
 
-/*
+    /*
 array:1 [ // app\Http\Controllers\Tenant\ProductController.php:190
   "productos_import_excel" =>Illuminate\Http\UploadedFile
 */
@@ -235,5 +235,45 @@ array:1 [ // app\Http\Controllers\Tenant\ProductController.php:190
             DB::rollBack();
             return response()->json(['success' => false, 'message' => $th->getMessage(), 'line' => $th->getLine()]);
         }
+    }
+
+    /**
+     * Buscar clientes (para TomSelect server-side)
+     */
+    public function searchProduct(Request $request)
+    {
+        $query = trim($request->get('q', ''));
+
+        if (empty($query)) {
+            return response()->json(['data' => []]);
+        }
+
+        $products = Product::from('products as p')
+            ->join('categories as c', 'c.id', 'p.category_id')
+            ->join('brands as b', 'b.id', 'p.brand_id')
+            ->where(function ($q) use ($query) {
+                $q->where('p.name', 'LIKE', "%{$query}%")
+                    ->orWhere('c.name', 'LIKE', "%{$query}%")
+                    ->orWhere('b.name', 'LIKE', "%{$query}%");
+            })->limit(20)
+            ->get(
+                ['p.id',
+                'b.name as brand_name',
+                'p.name',
+                'c.name as category_name',
+                'p.sale_price'
+            ]);
+
+        $data = $products->map(fn($p) => [
+            'id' => $p->id,
+            'text' => "{$p->name}",
+            'subtext' => "{$p->category_name}-{$p->brand_name}",
+            'sale_price' =>  $p->sale_price,
+            'name'  =>  $p->name,
+            'category_name' =>  $p->category_name,
+            'brand_name'    =>  $p->brand_name
+        ]);
+
+        return response()->json(['data' => $data]);
     }
 }
