@@ -71,8 +71,8 @@
         }
 
         function iniciarTomSelect() {
+            
             const initialCustomer = @json($customerFormatted);
-
             window.clientSelect = new TomSelect('#client_id', {
                 valueField: 'id',
                 labelField: 'full_name',
@@ -260,7 +260,7 @@
                 toastr.error(mensaje);
                 return;
             }
-            
+
             window.modelSelect.clear();
             window.modelSelect.clearOptions();
 

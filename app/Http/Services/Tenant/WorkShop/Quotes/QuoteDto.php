@@ -6,10 +6,10 @@ use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Company;
 use App\Models\Landlord\Customer;
-use App\Models\Landlord\ModelV;
 use App\Models\Product;
 use App\Models\Tenant\Warehouse;
 use App\Models\Tenant\WorkShop\Quote\Quote;
+use App\Models\Tenant\WorkShop\Service;
 use DateTime;
 
 class QuoteDto
@@ -51,7 +51,7 @@ class QuoteDto
         return $dto;
     }
 
-    public function getDtoQuoteProduct($item, Quote $quote):array
+    public function getDtoQuoteProduct($item, Quote $quote): array
     {
         $dto = [];
         $dto['quote_id']        =   $quote->id;
@@ -78,6 +78,22 @@ class QuoteDto
         $dto['amount']          =   $item->total;
         return $dto;
     }
+
+    public function getDtoQuoteService($item, Quote $quote): array
+    {
+        $dto = [];
+        $dto['quote_id']        =   $quote->id;
+
+        $service                =   Service::findOrFail($item->id);
+        $dto['service_id']      =   $service->id;
+        $dto['service_name']    =   $service->name;
+
+        $dto['quantity']        =   $item->quantity;
+        $dto['price_sale']      =   $item->sale_price;
+        $dto['amount']          =   $item->total;
+        return $dto;
+    }
+
 
     public function calculateAmounts(array $lst_products, array $lst_services): array
     {

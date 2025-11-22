@@ -106,4 +106,8 @@ class UtilController extends Controller
 
         return $warehouse_product[0]->stock;
     }
+
+
+
+
 }

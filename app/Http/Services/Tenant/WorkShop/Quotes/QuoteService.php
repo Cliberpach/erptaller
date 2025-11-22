@@ -24,14 +24,16 @@ class QuoteService
 
         $quote      =   $this->s_repository->insertQuote($dto);
         $this->s_repository->insertQuoteDetail($data['lst_products'],$data['lst_services'], $quote);
-        dd($quote);
+
         return $quote;
     }
 
     public function update(array $data, int $id): Quote
     {
+        $data       =   $this->s_validation->validationUpdate($data, $id);
         $dto        =   $this->s_dto->getDtoStore($data);
-        $quote    =   $this->s_repository->updateQuote($dto, $id);
+    
+        $quote      =   $this->s_repository->updateQuote($dto, $id);
         return $quote;
     }
 

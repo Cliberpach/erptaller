@@ -1,4 +1,4 @@
-<form id="form-create-quote" method="POST">
+<form id="form-edit-quote" method="POST">
     @csrf
     @method('POST')
 
@@ -25,7 +25,7 @@
                         <option value="">Seleccionar</option>
                         @foreach ($warehouses as $warehouse)
                             <option
-                            @if ($warehouse->id == 1)
+                            @if ($warehouse->id == $quote->warehouse_id)
                                 selected
                             @endif
                             value="{{ $warehouse->id }}">{{ $warehouse->descripcion }}</option>
@@ -62,14 +62,14 @@
                 <div class="col-lg-4 col-md-6 col-sm-12">
                     <label class="form-label fw-bold required_field">Placa:</label>
                     <input type="text" class="form-control text-uppercase" id="plate" name="plate"
-                        maxlength="8" minlength="6" placeholder="Ej: ABC123" required>
+                        maxlength="8" minlength="6" placeholder="Ej: ABC123" required value="{{$quote->plate}}">
                     <p class="plate_error msgError mb-0"></p>
                 </div>
 
                 <!-- Fecha Expiración -->
                 <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
                     <label class="form-label fw-bold required_field">Fecha Expiración:</label>
-                    <input type="date" class="form-control" id="expiration_date" name="expiration_date">
+                    <input value="{{$quote->expiration_date}}" type="date" class="form-control" id="expiration_date" name="expiration_date">
                     <p class="expiration_date_error msgError mb-0"></p>
                 </div>
 

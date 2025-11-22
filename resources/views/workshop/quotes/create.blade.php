@@ -83,6 +83,14 @@
                 storeQuote(e.target);
             })
 
+            window.clientSelect.on('change', function(value) {
+                actionChangeClient(value);
+            });
+
+            window.vehicleSelect.on('change', function(value) {
+                actionChangeVehicle(value);
+            });
+
             window.productSelect.on('change', function(value) {
                 actionChangeProduct(value);
             });
@@ -171,7 +179,11 @@
                 load: async (query, callback) => {
                     if (!query.length) return callback();
                     try {
-                        const url = `{{ route('tenant.utils.searchVehicle') }}?q=${encodeURIComponent(query)}`;
+                        const url = route('tenant.utils.searchVehicle', {
+                            q: query,
+                            customer_id: window.clientSelect.getValue()
+                        });
+
                         const response = await fetch(url);
                         if (!response.ok) throw new Error('Error al buscar vehiculos');
                         const data = await response.json();
@@ -337,7 +349,21 @@
             window.modelSelect.setValue(model.id);
         }
 
+        function validationStoreQuote() {
+            if (lstProducts.length === 0 && lstServices.length === 0) {
+                toastr.error('DEBE AGREGAR AL MENOS UN PRODUCTO O SERVICIO A LA COTIZACIÓN');
+                return false;
+            }
+            return true;
+        }
+
         async function storeQuote(formCreateQuote) {
+
+            toastr.clear();
+            const isValid = validationStoreQuote();
+            if (!isValid) {
+                return;
+            }
 
             const result = await Swal.fire({
                 title: '¿Desea registrar la cotización?',
@@ -614,7 +640,7 @@
         function validationFormService(id, quantity, price) {
             if (isNaN(id)) {
                 toastr.error('DEBE SELECCIONAR UN SERVICIO');
-                window.productSelect.open();
+                window.serviceSelect.open();
                 return false;
             }
             if (isNaN(quantity)) {
@@ -715,6 +741,53 @@
             document.querySelector('#subtotal_amount').innerText = formatSoles(amounts.subTotal);
             document.querySelector('#igv_amount').innerText = formatSoles(amounts.tax);
             document.querySelector('#total_amount').innerText = formatSoles(amounts.totalPay);
+        }
+
+        async function actionChangeClient(value) {
+            if (!value) return;
+
+            mostrarAnimacion1();
+            try {
+
+                const res = await axios.get(route('tenant.utils.searchVehicle', {
+                    q: '',
+                    customer_id: value
+                }));
+
+                if (res.data.success) {
+                    toastr.info(res.data.message, 'OPERACIÓN COMPLETADA');
+                    setVehiclesClient(res.data.data);
+                }
+
+            } catch (error) {
+                toastr.error(error, 'ERROR AL CARGAR VEHÍCULOS DEL CLIENTE');
+                return;
+            } finally {
+                ocultarAnimacion1();
+            }
+
+        }
+
+        function setVehiclesClient(vehicles) {
+            window.vehicleSelect.clear();
+            window.vehicleSelect.clearOptions();
+
+            vehicles.forEach(v => {
+                window.vehicleSelect.addOption({
+                    id: v.id,
+                    text: v.text,
+                    subtext: v.subtext
+                });
+            });
+        }
+
+        function actionChangeVehicle(value) {
+            document.querySelector('#plate').value = '';
+
+            if(!value) return;
+            const vehicle = window.vehicleSelect.options[value];
+            console.log(vehicle);
+            document.querySelector('#plate').value = vehicle.text;
         }
     </script>
 @endsection

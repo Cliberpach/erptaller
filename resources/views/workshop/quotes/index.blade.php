@@ -55,8 +55,7 @@
                 "serverSide": true,
                 "processing": true,
                 "ajax": '{{ route('tenant.taller.cotizaciones.getQuotes') }}',
-                "columns": [
-                    {
+                "columns": [{
                         data: 'id',
                         className: "text-center",
                         "visible": false,
@@ -86,9 +85,12 @@
                     {
                         data: 'total',
                         name: 'q.total',
-                        searchable: true,
-                        orderable: true,
-                        className: "text-center"
+                        searchable: false,
+                        orderable: false,
+                        className: "text-center",
+                        render: function(data, type, row) {
+                            return formatSoles(data);
+                        }
                     },
                     {
                         data: 'create_user_name',
@@ -100,9 +102,35 @@
                     {
                         data: 'status',
                         name: 'q.status',
-                        searchable: true,
-                        orderable: true,
-                        className: "text-center"
+                        searchable: false,
+                        orderable: false,
+                        className: "text-center",
+                        render: function(data, type, row) {
+
+                            let badgeClass = '';
+                            let label = data ?? '';
+
+                            switch (data) {
+                                case 'ACTIVO':
+                                    badgeClass = 'badge bg-primary';
+                                    break;
+                                case 'ANULADO':
+                                    badgeClass = 'badge bg-danger';
+                                    break;
+                                case 'CONVERTIDO':
+                                    badgeClass = 'badge bg-warning';
+                                    break;
+                                case 'EXPIRADO':
+                                    badgeClass = 'badge bg-dark';
+                                    break;
+                                default:
+                                    badgeClass = 'badge bg-secondary';
+                                    break;
+                            }
+
+                            return `<span class="${badgeClass}">${label}</span>`;
+
+                        }
                     },
                     {
                         data: 'created_at',
@@ -126,23 +154,24 @@
                         render: function(data) {
 
                             return `
-                            <div class="btn-group">
-                                <button
-                                    class="btn btn-warning btn-sm modificarDetalle"
-                                    onclick="redirectParams('tenant.taller.vehiculos.edit',${data.id})"
-                                    type="button"
-                                    title="Modificar">
-                                    <i class="fa fa-edit"></i>
-                                </button>
-                                <a
-                                    class="btn btn-danger btn-sm"
-                                    href="#"
-                                    onclick="eliminar(${data.id})"
-                                    title="Eliminar">
-                                    <i class="fa fa-trash"></i>
-                                </a>
-                            </div>
-                        `;
+                                <div class="dropdown text-center">
+                                    <button class="btn btn-sm btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                        <i class="fa fa-cog"></i>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        <li>
+                                            <a class="dropdown-item modificarDetalle" href="#" onclick="redirectParams('tenant.taller.cotizaciones.edit', ${data.id})">
+                                                <i class="fa fa-edit me-2"></i> Modificar
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item text-danger" href="#" onclick="eliminar(${data.id})">
+                                                <i class="fa fa-trash me-2"></i> Eliminar
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                                `;
                         }
                     }
                 ],

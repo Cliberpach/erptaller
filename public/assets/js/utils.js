@@ -245,6 +245,20 @@ function loadDataTableResponsive(id) {
     return dtTable;
 }
 
+function formatQuantity(valor) {
+    if (valor === null || valor === undefined || valor === '') return '0';
+
+    let numero = parseFloat(valor);
+
+    if (isNaN(numero)) return '0';
+
+    return numero.toLocaleString('en-US', {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2 
+    });
+}
+
+
 function formatMoney(valor) {
     return parseFloat(valor).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }

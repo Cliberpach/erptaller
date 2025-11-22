@@ -29,7 +29,7 @@ return new class extends Migration
 
             $table->string('observation', 300);
 
-            $table->enum('status', ['ACTIVE', 'INACTIVE'])->default('ACTIVE');
+            $table->enum('status', ['ACTIVO', 'ANULADO'])->default('ACTIVO');
 
             $table->unsignedBigInteger('creator_user_id')->nullable();
             $table->unsignedBigInteger('editor_user_id')->nullable();

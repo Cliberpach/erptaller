@@ -3,11 +3,18 @@
 namespace App\Http\Controllers\Tenant\WorkShop;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\FormatController;
+use App\Http\Requests\Tenant\WorkShop\Quote\QuoteStoreRequest;
 use App\Http\Requests\Tenant\WorkShop\Service\ServiceUpdateRequest;
 use App\Http\Services\Tenant\WorkShop\Quotes\QuoteManager;
 use App\Models\Company;
+use App\Models\Landlord\Customer;
 use App\Models\Landlord\Year;
 use App\Models\Tenant\Warehouse;
+use App\Models\Tenant\WorkShop\Quote\Quote;
+use App\Models\Tenant\WorkShop\Quote\QuoteProduct;
+use App\Models\Tenant\WorkShop\Quote\QuoteService;
+use App\Models\Tenant\WorkShop\Vehicle;
 use Illuminate\Http\Request;
 use Yajra\DataTables\DataTables;
 use Illuminate\Support\Facades\DB;
@@ -67,7 +74,7 @@ class QuoteController extends Controller
         return view('workshop.quotes.create', compact('igv', 'warehouses'));
     }
 
-/*
+    /*
 array:17 [ // app\Http\Controllers\Tenant\WorkShop\QuoteController.php:91
   "_token" => "4olnC7YeO8JO17Yg4QWlat1MAQSJzc8VyqntCFyC"
   "_method" => "POST"
@@ -88,16 +95,16 @@ array:17 [ // app\Http\Controllers\Tenant\WorkShop\QuoteController.php:91
   "lst_services" => "[{"id":1,"name":"LAVADO DE AUTOS","sale_price":30,"quantity":1,"total":30}]"
 ]
 */
-    public function store(Request $request)
+    public function store(QuoteStoreRequest $request)
     {
         DB::beginTransaction();
 
         try {
-          
+
             $quote  =   $this->s_quote->store($request->toArray());
 
             Session::flash('success', 'COTIZACIÓN REGISTRADA CON ÉXITO');
-            //DB::commit();
+            DB::commit();
             return response()->json(['success' => true, 'message' => 'COTIZACIÓN REGISTRADA CON ÉXITO']);
         } catch (Throwable $th) {
             DB::rollBack();
@@ -105,25 +112,54 @@ array:17 [ // app\Http\Controllers\Tenant\WorkShop\QuoteController.php:91
         }
     }
 
-    /*
-array:5 [ // app\Http\Controllers\Tenant\WorkShop\ServiceController.php:94
-  "_token" => "WNiCYcelXPamrMrwCEwMpkGmbqb3gcz0HVwsnn68"
-  "name_edit" => "LAVADO DE AUTOS"
-  "price_edit" => "21.00"
-  "description_edit" => "TEST"
+    public function edit(int $id)
+    {
+        $igv        =   round(Company::find(1)->igv, 2);
+        $warehouses =   Warehouse::where('estado', 'ACTIVO')->get();
+        $quote      =   Quote::findOrFail($id);
+
+        $customer_formatted = FormatController::getFormatInitialCustomer($quote->customer_id);
+        $vehicle_formatted = FormatController::getFormatInitialVehicle($quote->vehicle_id);
+        $lst_products =   FormatController::formatLstProducts(QuoteProduct::where('quote_id', $id)->get()->toArray());
+        $lst_services =   FormatController::formatLstServices(QuoteService::where('quote_id', $id)->get()->toArray());
+
+        return view(
+            'workshop.quotes.edit',
+            compact('igv', 'warehouses', 'quote', 'customer_formatted','vehicle_formatted','lst_products','lst_services')
+        );
+    }
+
+/*
+array:17 [ // app\Http\Controllers\Tenant\WorkShop\QuoteController.php:145
+  "_token" => "dmJ2sDFFwSLunK4KEKQdm6Wkn6XbriZ10upcdNKx"
   "_method" => "PUT"
+  "warehouse_id" => "1"
+  "client_id" => "2"
+  "vehicle_id" => "6"
+  "plate" => "TR3423"
+  "expiration_date" => "2025-11-27"
+  "product_id" => null
+  "product_quantity" => null
+  "product_price" => null
+  "dt-quotes-products_length" => "10"
+  "service_id" => null
+  "service_quantity" => null
+  "service_price" => null
+  "dt-quotes-services_length" => "10"
+  "lst_products" => "[{"id":1,"name":"BUJÍA 20 MM","category_name":"BUJÍAS","brand_name":"ASUS","sale_price":"14.990000","quantity":"3.000000","total":"44.970000"}]"
+  "lst_services" => "[{"id":1,"name":"LAVADO DE AUTOS","sale_price":"30.000000","quantity":"1.000000","total":"30.000000"}]"
 ]
 */
-    public function update(ServiceUpdateRequest $request, int $id)
+    public function update(Request $request, int $id)
     {
         DB::beginTransaction();
         try {
-
-            $service  =   $this->s_quote->update($request->validated(), $id);
+           
+            $quote  =   $this->s_quote->update($request->toArray(), $id);
 
             DB::commit();
 
-            return response()->json(['success' => true, 'message' => 'SERVICIO ACTUALIZADO CON ÉXITO']);
+            return response()->json(['success' => true, 'message' => 'COTIZACIÓN ACTUALIZADA CON ÉXITO']);
         } catch (Throwable $th) {
             DB::rollBack();
             return response()->json(['success' => false, 'message' => $th->getMessage()]);

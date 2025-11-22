@@ -15,6 +15,7 @@ Route::group(["prefix" => "taller"], function () {
 
         Route::get('index', [QuoteController::class, 'index'])->name('tenant.taller.cotizaciones.index');
         Route::get('create', [QuoteController::class, 'create'])->name('tenant.taller.cotizaciones.create');
+        Route::get('edit/{id}', [QuoteController::class, 'edit'])->name('tenant.taller.cotizaciones.edit');
         Route::get('getQuotes', [QuoteController::class, 'getQuotes'])->name('tenant.taller.cotizaciones.getQuotes');
         Route::post('store', [QuoteController::class, 'store'])->name('tenant.taller.cotizaciones.store');
         Route::get('getQuote/{id}', [QuoteController::class, 'getService'])->name('tenant.taller.cotizaciones.getQuote');

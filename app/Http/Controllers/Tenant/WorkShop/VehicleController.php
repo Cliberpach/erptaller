@@ -249,25 +249,35 @@ array:8 [ // app\Http\Controllers\Tenant\WorkShop\VehicleController.php:159
      */
     public function searchVehicle(Request $request)
     {
-        $query = trim($request->get('q', ''));
+        try {
+            $query          = trim($request->get('q', ''));
+            $customer_id    = $request->get('customer_id', null);
 
-        if (empty($query)) {
-            return response()->json(['data' => []]);
+            $vehicles = Vehicle::from('vehicles as v')
+                ->join('erptaller.models as m', 'm.id', 'v.model_id')
+                ->join('erptaller.brandsv as b', 'b.id', 'v.brand_id');
+
+            if($query){
+                $vehicles->where('v.plate', 'LIKE', "%{$query}%");
+            }
+
+            if ($customer_id) {
+                $vehicles->where('v.customer_id', $customer_id);
+            }
+
+            $vehicles = $vehicles->limit(20)
+                        ->get(['v.id', 'm.description as model_name', 'v.plate', 'b.description as brand_name']);
+
+
+            $data = $vehicles->map(fn($v) => [
+                'id' => $v->id,
+                'text' => "{$v->plate}",
+                'subtext' => "{$v->brand_name}-{$v->model_name}",
+            ]);
+
+            return response()->json(['success' => true, 'data' => $data,'message'=>'VEHÍCULOS OBTENIDOS']);
+        } catch (Throwable $th) {
+            return response()->json(['success' => false, 'message' => $th->getMessage()]);
         }
-
-        $vehicles = Vehicle::from('vehicles as v')
-            ->join('erptaller.models as m', 'm.id', 'v.model_id')
-            ->join('erptaller.brandsv as b', 'b.id', 'v.brand_id')
-            ->where('plate', 'LIKE', "%{$query}%")
-            ->limit(20)
-            ->get(['v.id', 'm.description as model_name', 'v.plate', 'b.description as brand_name']);
-
-        $data = $vehicles->map(fn($v) => [
-            'id' => $v->id,
-            'text' => "{$v->plate}",
-            'subtext' => "{$v->model_name}-{$v->brand_name}",
-        ]);
-
-        return response()->json(['data' => $data]);
     }
 }
