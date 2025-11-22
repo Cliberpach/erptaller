@@ -34,6 +34,8 @@ return new class extends Migration
             $table->string('plate', 8);
 
             $table->decimal('total', 16, 6)->unsigned();
+            $table->decimal('subtotal', 16, 6)->unsigned();
+            $table->decimal('igv', 16, 6)->unsigned();
 
             $table->unsignedBigInteger('creator_user_id')->nullable();
             $table->unsignedBigInteger('editor_user_id')->nullable();

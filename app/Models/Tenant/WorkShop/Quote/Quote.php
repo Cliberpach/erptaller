@@ -1,7 +1,6 @@
 <?php
 
-namespace App\Models\Tenant\WorkShop;
-
+namespace App\Models\Tenant\WorkShop\Quote;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -24,6 +23,8 @@ class Quote extends Model
         'plate',
 
         'total',
+        'subtotal',
+        'igv',
 
         'creator_user_id',
         'editor_user_id',
@@ -48,14 +49,6 @@ class Quote extends Model
                 $quote->creator_user_id = auth()->id();
                 $quote->create_user_name = auth()->user()->name;
             }
-
-            if (empty($quote->name)) {
-                $quote->name = $quote->plate;
-            }
-
-            if (empty($quote->status)) {
-                $quote->status = 'ACTIVE';
-            }
         });
 
         static::updating(function ($quote) {
@@ -63,7 +56,7 @@ class Quote extends Model
                 $quote->editor_user_id = auth()->id();
                 $quote->editor_user_name = auth()->user()->name;
             }
-            if ($quote->isDirty('status') && $quote->status === 'INACTIVE') {
+            if ($quote->isDirty('status') && $quote->status === 'ANULADO') {
                 if (auth()->check()) {
                     $quote->delete_user_id = auth()->id();
                     $quote->delete_user_name = auth()->user()->name;

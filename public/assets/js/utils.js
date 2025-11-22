@@ -121,9 +121,10 @@ function eventsUtils() {
 //============== LIMPIAR UNA TABLA ========
 function clearTable(idTabla) {
     const tbody = document.querySelector(`#${idTabla} tbody`);
-    while (tbody.firstChild) {
-        tbody.removeChild(tbody.firstChild);
-    }
+    console.log(tbody);
+    // while (tbody.firstChild) {
+    //     tbody.removeChild(tbody.firstChild);
+    // }
 }
 
 function destroyDataTable(dtTable) {
@@ -131,6 +132,7 @@ function destroyDataTable(dtTable) {
         dtTable.destroy();
         dtTable = null;
     }
+    return dtTable;
 }
 
 function mostrarAnimacion1() {
@@ -257,7 +259,6 @@ function formatSoles(valor) {
         maximumFractionDigits: 2
     });
 }
-
 
 function redirect(routeName) {
     window.location.href = route(routeName);

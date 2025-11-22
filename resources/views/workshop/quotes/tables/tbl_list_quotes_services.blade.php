@@ -4,6 +4,7 @@
             <th class="text-center">#</th>
             <th class="text-center">SERVICIO</th>
             <th class="text-center">CANT</th>
+            <th class="text-center">PRECIO</th>
             <th class="text-center">TOTAL</th>
         </tr>
     </thead>

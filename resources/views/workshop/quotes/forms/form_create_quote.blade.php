@@ -1,4 +1,4 @@
-<form id="form_create_vehicle" method="POST">
+<form id="form-create-quote" method="POST">
     @csrf
     @method('POST')
 
@@ -16,7 +16,23 @@
 
         <div class="card-body">
 
-            <div class="row g-3">
+            <div class="row g-3 pt-3">
+
+                <!-- Almacén -->
+                <div class="col-12 d-none">
+                    <label class="form-label fw-bold required_field">Almacén:</label>
+                    <select class="form-control" id="warehouse_id" name="warehouse_id" required>
+                        <option value="">Seleccionar</option>
+                        @foreach ($warehouses as $warehouse)
+                            <option
+                            @if ($warehouse->id == 1)
+                                selected
+                            @endif
+                            value="{{ $warehouse->id }}">{{ $warehouse->descripcion }}</option>
+                        @endforeach
+                    </select>
+                    <p class="warehouse_id_error msgError mb-0"></p>
+                </div>
 
                 <!-- Cliente -->
                 <div class="col-lg-6 col-md-8 col-sm-12">
@@ -48,6 +64,13 @@
                     <input type="text" class="form-control text-uppercase" id="plate" name="plate"
                         maxlength="8" minlength="6" placeholder="Ej: ABC123" required>
                     <p class="plate_error msgError mb-0"></p>
+                </div>
+
+                <!-- Fecha Expiración -->
+                <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
+                    <label class="form-label fw-bold required_field">Fecha Expiración:</label>
+                    <input type="date" class="form-control" id="expiration_date" name="expiration_date">
+                    <p class="expiration_date_error msgError mb-0"></p>
                 </div>
 
             </div>
@@ -121,6 +144,7 @@
 
         <div class="card-body">
             <div class="row g-3 mb-3 pt-3">
+
                 <div class="col-lg-6 col-md-8 col-sm-12">
                     <label class="form-label fw-bold required_field">Servicio:</label>
                     <select class="form-control" id="service_id" name="service_id" required>
@@ -129,13 +153,47 @@
                     <p class="service_id_error msgError mb-0"></p>
                 </div>
 
+                <!-- CANTIDAD -->
+                <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
+                    <label class="form-label fw-bold required_field">Cantidad:</label>
+                    <input type="text" class="form-control inputDecimalPositivo" id="service_quantity"
+                        name="service_quantity" placeholder="0.00" required>
+                    <p class="service_quantity_error msgError mb-0"></p>
+                </div>
+
+                <!-- PRECIO -->
+                <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
+                    <label class="form-label fw-bold required_field">Precio:</label>
+                    <input type="text" class="form-control inputDecimalPositivo" id="service_price"
+                        name="service_price" placeholder="0.00" required>
+                    <p class="service_price_error msgError mb-0"></p>
+                </div>
+
+                <!-- AGREGAR -->
+                <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
+                    <button class="btn btn-primary btn-add-service" type="button">AGREGAR <i class="fas fa-plus"
+                            style="margin-left:4px;"></i></button>
+                </div>
+
                 <div class="col-12">
                     <div class="table-responsive">
                         @include('workshop.quotes.tables.tbl_list_quotes_services')
                     </div>
                 </div>
+
             </div>
         </div>
     </div>
+
+    <div class="row">
+        <div class="col-12 d-flex justify-content-lg-end">
+            <div class="col-12 col-lg-4">
+                <div class="table-responsive">
+                    @include('workshop.quotes.tables.tbl_amounts')
+                </div>
+            </div>
+        </div>
+    </div>
+
 
 </form>

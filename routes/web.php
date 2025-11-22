@@ -36,6 +36,7 @@ use App\Http\Controllers\Tenant\Sales\PaymentMethodController;
 use App\Http\Controllers\Tenant\SupplierController;
 use App\Http\Controllers\Tenant\ValuedKardexController;
 use App\Http\Controllers\Tenant\WorkShop\ModelController;
+use App\Http\Controllers\Tenant\WorkShop\ServiceController;
 use App\Http\Controllers\Tenant\WorkShop\VehicleController;
 use App\Http\Controllers\Tenant\WorkShop\YearController;
 use App\Http\Controllers\UtilController;
@@ -326,6 +327,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
 });
 
 Route::group(["prefix" => "utils"], function () {
+    Route::get('service-search', [ServiceController::class, 'searchService'])->name('tenant.utils.searchService');
     Route::get('product-search', [ProductController::class, 'searchProduct'])->name('tenant.utils.searchProduct');
     Route::get('model-search', [ModelController::class, 'searchModel'])->name('tenant.utils.searchModel');
     Route::get('customer-search', [CustomerController::class, 'searchCustomer'])->name('tenant.utils.searchCustomer');

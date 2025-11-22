@@ -86,11 +86,16 @@
 
         toastr.clear();
         const product = getFormProductEdit();
-        setProductEdit(product,lstProducts);
-        destroyDataTable(dtProducts);
+        setProductEdit(product, lstProducts);
+        dtProducts = destroyDataTable(dtProducts);
         clearTable('dt-quotes-products');
         paintQuoteProducts(lstProducts);
         dtProducts = loadDataTableSimple('dt-quotes-products');
+
+        calculateAmounts();
+        paintAmounts();
+        toastr.success('PRODUCTO ACTUALIZADO EN EL DETALLE DE PRODUCTOS');
+
         $('#mdl_edit_product').modal('hide');
 
     }
@@ -117,7 +122,7 @@
 
     }
 
-    function setProductEdit(product,lstItems) {
+    function setProductEdit(product, lstItems) {
         const index = lstItems.findIndex((i) => i.id == product.id);
 
         lstItems[index].sale_price = product.sale_price;

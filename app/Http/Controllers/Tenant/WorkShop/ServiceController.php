@@ -9,6 +9,7 @@ use App\Http\Requests\Tenant\WorkShop\Service\ServiceStoreRequest;
 use App\Http\Requests\Tenant\WorkShop\Service\ServiceUpdateRequest;
 use App\Http\Services\Tenant\WorkShop\Services\ServiceManager;
 use App\Models\Landlord\Year;
+use App\Models\Tenant\WorkShop\Service;
 use Illuminate\Http\Request;
 use Yajra\DataTables\DataTables;
 use Illuminate\Support\Facades\DB;
@@ -56,7 +57,7 @@ class ServiceController extends Controller
         }
     }
 
-/*
+    /*
 array:5 [ // app\Http\Controllers\Tenant\WorkShop\ServiceController.php:70
   "_token" => "WNiCYcelXPamrMrwCEwMpkGmbqb3gcz0HVwsnn68"
   "_method" => "POST"
@@ -80,7 +81,7 @@ array:5 [ // app\Http\Controllers\Tenant\WorkShop\ServiceController.php:70
         }
     }
 
-/*
+    /*
 array:5 [ // app\Http\Controllers\Tenant\WorkShop\ServiceController.php:94
   "_token" => "WNiCYcelXPamrMrwCEwMpkGmbqb3gcz0HVwsnn68"
   "name_edit" => "LAVADO DE AUTOS"
@@ -94,7 +95,7 @@ array:5 [ // app\Http\Controllers\Tenant\WorkShop\ServiceController.php:94
         DB::beginTransaction();
         try {
 
-            $service  =   $this->s_service->update($request->validated(),$id);
+            $service  =   $this->s_service->update($request->validated(), $id);
 
             DB::commit();
 
@@ -132,5 +133,39 @@ array:5 [ // app\Http\Controllers\Tenant\WorkShop\ServiceController.php:94
         } catch (Throwable $th) {
             return response()->json(['success' => false, 'message' => $th->getMessage()]);
         }
+    }
+
+    /**
+     * Buscar clientes (para TomSelect server-side)
+     */
+    public function searchService(Request $request)
+    {
+        $query = trim($request->get('q', ''));
+
+        if (empty($query)) {
+            return response()->json(['data' => []]);
+        }
+
+        $services = Service::from('services as s')
+            ->where(function ($q) use ($query) {
+                $q->where('s.name', 'LIKE', "%{$query}%");
+            })->limit(20)
+            ->get(
+                [
+                    's.id',
+                    's.name',
+                    's.price',
+                ]
+            );
+
+        $data = $services->map(fn($s) => [
+            'id' => $s->id,
+            'text' => "{$s->name}",
+            'subtext' => "S/ " . number_format($s->price, 2),
+            'sale_price' => number_format($s->price, 2),
+            'name'  =>  $s->name
+        ]);
+
+        return response()->json(['data' => $data]);
     }
 }

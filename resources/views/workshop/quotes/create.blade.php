@@ -7,6 +7,7 @@
 @section('content')
     {{-- @include('utils.modals.customer.mdl_create_customer') --}}
     @include('workshop.quotes.modals.mdl_edit_product')
+    @include('workshop.quotes.modals.mdl_edit_service')
 
     <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
@@ -34,7 +35,7 @@
                     </button>
 
                     <!-- BOTÓN REGISTRAR -->
-                    <button class="btn btn-primary" form="form_create_vehicle" type="submit">
+                    <button class="btn btn-primary" form="form-create-quote" type="submit">
                         <i class="fas fa-save"></i> REGISTRAR
                     </button>
 
@@ -54,8 +55,14 @@
 @section('js')
     <script>
         const lstProducts = [];
+        const lstServices = [];
         let dtProducts = null;
         let dtServices = null;
+        const amounts = {
+            subTotal: 0,
+            tax: 0,
+            totalPay: 0
+        }
 
         document.addEventListener('DOMContentLoaded', () => {
             dtProducts = loadDataTableSimple('dt-quotes-products');
@@ -69,14 +76,19 @@
         function events() {
             //eventsMdlCreateCustomer();
             eventsMdlEditProduct();
+            eventsMdlEditService();
 
-            document.querySelector('#form_create_vehicle').addEventListener('submit', (e) => {
+            document.querySelector('#form-create-quote').addEventListener('submit', (e) => {
                 e.preventDefault();
-                storeVehicle(e.target);
+                storeQuote(e.target);
             })
 
             window.productSelect.on('change', function(value) {
                 actionChangeProduct(value);
+            });
+
+            window.serviceSelect.on('change', function(value) {
+                actionChangeService(value);
             });
 
             document.addEventListener('click', (e) => {
@@ -85,21 +97,40 @@
                     actionAddProduct();
                 }
 
-                const btnDelteProduct = e.target.closest('.btn-delete-product');
-                if (btnDelteProduct) {
-                    actionDeleteProduct(e.target, lstProducts);
+                const btnDeleteProduct = e.target.closest('.btn-delete-product');
+                if (btnDeleteProduct) {
+                    actionDeleteProduct(btnDeleteProduct, lstProducts);
+                }
+
+                const btnAddService = e.target.closest('.btn-add-service');
+                if (btnAddService) {
+                    actionAddService();
+                }
+
+                const btnDeleteService = e.target.closest('.btn-delete-service');
+                if (btnDeleteService) {
+                    actionDeleteService(btnDeleteService, lstServices);
                 }
             });
-
 
         }
 
         function iniciarTomSelect() {
 
+            window.warehouseSelect = new TomSelect('#warehouse_id', {
+                create: false,
+                plugins: ['clear_button'],
+                sortField: {
+                    field: "text",
+                    direction: "asc"
+                }
+            });
+
             window.clientSelect = new TomSelect('#client_id', {
                 valueField: 'id',
                 labelField: 'full_name',
                 searchField: ['full_name'],
+                plugins: ['clear_button'],
                 placeholder: 'Seleccione un cliente',
                 maxOptions: 20,
                 create: false,
@@ -132,6 +163,7 @@
                 valueField: 'id',
                 labelField: 'text',
                 searchField: ['text'],
+                plugins: ['clear_button'],
                 placeholder: 'Seleccione un vehículo',
                 maxOptions: 20,
                 create: false,
@@ -151,11 +183,11 @@
                 },
                 render: {
                     option: (item, escape) => `
-                <div>
-                    <strong>${escape(item.text)}</strong><br>
-                    <small>${escape(item.subtext ?? '')}</small>
-                </div>
-            `,
+                        <div>
+                            <strong>${escape(item.text)}</strong><br>
+                            <small>${escape(item.subtext ?? '')}</small>
+                        </div>
+                    `,
                     item: (item, escape) => `<div>${escape(item.text)}</div>`
                 }
             });
@@ -192,6 +224,41 @@
                     item: (item, escape) => `<div>${escape(item.text)}</div>`
                 }
             });
+
+
+            window.serviceSelect = new TomSelect('#service_id', {
+                valueField: 'id',
+                labelField: 'text',
+                searchField: ['text'],
+                placeholder: 'Seleccione un servicio',
+                maxOptions: 20,
+                create: false,
+                preload: false,
+                plugins: ['clear_button'],
+                load: async (query, callback) => {
+                    if (!query.length) return callback();
+                    try {
+                        const url = `{{ route('tenant.utils.searchService') }}?q=${encodeURIComponent(query)}`;
+                        const response = await fetch(url);
+                        if (!response.ok) throw new Error('Error al buscar servicios');
+                        const data = await response.json();
+                        callback(data.data ?? []);
+                    } catch (error) {
+                        console.error('Error cargando servicios:', error);
+                        callback();
+                    }
+                },
+                render: {
+                    option: (item, escape) => `
+                <div>
+                    <strong>${escape(item.text)}</strong><br>
+                    <small>${escape(item.subtext ?? '')}</small>
+                </div>
+            `,
+                    item: (item, escape) => `<div>${escape(item.text)}</div>`
+                }
+            });
+
 
         }
 
@@ -270,11 +337,11 @@
             window.modelSelect.setValue(model.id);
         }
 
-        async function storeVehicle(formCreateVehicle) {
+        async function storeQuote(formCreateQuote) {
 
             const result = await Swal.fire({
-                title: '¿Desea registrar el vehículo?',
-                text: "Confirme para continuar",
+                title: '¿Desea registrar la cotización?',
+                text: "Confirmar",
                 icon: 'question',
                 showCancelButton: true,
                 confirmButtonText: 'SI, registrar',
@@ -294,7 +361,7 @@
                     clearValidationErrors('msgError');
 
                     Swal.fire({
-                        title: 'Registrando vehículo...',
+                        title: 'Registrando cotización...',
                         text: 'Por favor espere',
                         allowOutsideClick: false,
                         allowEscapeKey: false,
@@ -303,10 +370,14 @@
                         }
                     });
 
-                    const res = await axios.post(route('tenant.taller.vehiculos.store'), formCreateVehicle);
+                    const formData = new FormData(formCreateQuote);
+                    formData.append('lst_products', JSON.stringify(lstProducts));
+                    formData.append('lst_services', JSON.stringify(lstServices));
+                    const res = await axios.post(route('tenant.taller.cotizaciones.store'), formData);
+
                     if (res.data.success) {
                         toastr.success(res.data.message, 'OPERACIÓN COMPLETADA');
-                        redirect('tenant.taller.vehiculos.index');
+                        redirect('tenant.taller.cotizaciones.index');
                     } else {
                         toastr.error(res.data.message, 'ERROR EN EL SERVIDOR');
                         Swal.close();
@@ -360,11 +431,15 @@
                 return;
             }
 
-            addProduct(productSelected, lstProducts);
-            destroyDataTable(dtProducts);
+            addItem(productSelected, lstProducts);
+            dtProducts = destroyDataTable(dtProducts);
             clearTable('dt-quotes-products');
             paintQuoteProducts(lstProducts);
             dtProducts = loadDataTableSimple('dt-quotes-products');
+
+            calculateAmounts();
+            paintAmounts();
+            toastr.success('PRODUCTO AGREGADO AL DETALLE DE PRODUCTOS');
 
         }
 
@@ -422,8 +497,8 @@
             return true;
         }
 
-        function addProduct(productSelected, lstItems) {
-            lstItems.push(productSelected);
+        function addItem(itemSelected, lstItems) {
+            lstItems.push(itemSelected);
         }
 
         function paintQuoteProducts(lstItems) {
@@ -466,16 +541,180 @@
             }
 
             lstItems.splice(indexItem, 1);
-            refreshDt(dtProducts, 'dt-quotes-products');
 
+            dtProducts = destroyDataTable(dtProducts);
+            clearTable('dt-quotes-products');
+            paintQuoteProducts(lstItems);
+            dtProducts = loadDataTableSimple('dt-quotes-products');
+
+            calculateAmounts();
+            paintAmounts();
             toastr.info('PRODUCTO ELIMINADO DEL DETALLE PRODUCTOS');
         }
 
-        function refreshDt(dtProducts, idTable) {
-            destroyDataTable(dtProducts);
-            clearTable(idTable);
-            paintQuoteProducts(lstProducts);
-            dtProducts = loadDataTableSimple(idTable);
+        function actionChangeService(value) {
+            if (!value) return;
+
+            const item = serviceSelect.options[value];
+
+            if (item && item.sale_price) {
+                document.querySelector('#service_price').value = item.sale_price;
+            }
+        }
+
+        function actionAddService() {
+
+            toastr.clear();
+            const serviceSelected = getServiceSelected();
+            if (!serviceSelected) {
+                return null;
+            }
+
+            const validation = validationAddService(serviceSelected, lstServices);
+            if (!validation) {
+                return;
+            }
+
+            addItem(serviceSelected, lstServices);
+            dtServices = destroyDataTable(dtServices);
+            clearTable('dt-quotes-services');
+            paintQuoteServices(lstServices);
+            dtServices = loadDataTableSimple('dt-quotes-services');
+
+            calculateAmounts();
+            paintAmounts();
+            toastr.success('SERVICIO AGREGADO AL DETALLE DE SERVICIOS');
+
+        }
+
+        function getServiceSelected() {
+
+            const id = parseInt(window.serviceSelect.getValue());
+            const quantity = parseFloat(document.querySelector('#service_quantity').value);
+            const price = parseFloat(document.querySelector('#service_price').value);
+
+            const validation = validationFormService(id, quantity, price);
+            if (!validation) {
+                return null;
+            };
+
+            const serviceSelected = window.serviceSelect.options[id];
+
+            const service = {
+                id,
+                name: serviceSelected.name,
+                sale_price: price,
+                quantity,
+                total: price * quantity
+            }
+
+            return service;
+        }
+
+        function validationFormService(id, quantity, price) {
+            if (isNaN(id)) {
+                toastr.error('DEBE SELECCIONAR UN SERVICIO');
+                window.productSelect.open();
+                return false;
+            }
+            if (isNaN(quantity)) {
+                toastr.error('DEBE INGRESAR UNA CANTIDAD EN EL SERVICIO');
+                document.querySelector('#service_quantity').focus();
+                return false;
+            }
+            if (isNaN(price)) {
+                toastr.error('DEBE INGRESAR UN PRECIO EN EL SERVICIO');
+                document.querySelector('#service_price').focus();
+                return false;
+            }
+            return true;
+        }
+
+        function validationAddService(serviceSelected, lstItems) {
+            const indexExists = lstItems.findIndex((i) => i.id == serviceSelected.id);
+            if (indexExists != -1) {
+                toastr.error(`${lstItems[indexExists].name} YA EXISTE EN EL DETALLE DE SERVICIOS`);
+                return false;
+            }
+            return true;
+        }
+
+        function paintQuoteServices(lstItems) {
+            const tbody = document.querySelector('#dt-quotes-services tbody');
+            let rows = ``;
+
+            lstItems.forEach((item) => {
+                rows += `
+                    <tr>
+                        <td class="text-center">
+                            <button onclick="openMdlEditService(${item.id})" type="button" class="btn btn-sm btn-primary btn-edit" data-id="${item.id}">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button type="button" class="btn btn-sm btn-danger btn-delete-service" data-id="${item.id}">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </td>
+                        <td>${item.name}</td>
+                        <td>${item.quantity}</td>
+                        <td>${item.sale_price}</td>
+                        <td>${item.total}</td>
+                    </tr>
+                `;
+            });
+
+            tbody.innerHTML = rows;
+        }
+
+        function actionDeleteService(btn, lstItems) {
+
+            toastr.clear();
+            const id = btn.getAttribute('data-id');
+            console.log(id);
+
+            const indexItem = lstItems.findIndex(i => i.id == id);
+            if (indexItem === -1) {
+                toastr.error('EL SERVICIO NO EXISTE EN EL DETALLE DE SERVICIOS');
+                return;
+            }
+
+            lstItems.splice(indexItem, 1);
+
+            dtServices = destroyDataTable(dtServices);
+            clearTable('dt-quotes-services');
+            paintQuoteServices(lstItems);
+            dtServices = loadDataTableSimple('dt-quotes-services');
+
+            calculateAmounts();
+            paintAmounts();
+            toastr.info('SERVICIO ELIMINADO DEL DETALLE SERVICIOS');
+        }
+
+        function calculateAmounts() {
+            let igv = @json($igv);
+            let totalPay = 0;
+            let tax = 0;
+            let subTotal = 0;
+
+            lstProducts.forEach((item) => {
+                totalPay += parseFloat(item.total);
+            });
+
+            lstServices.forEach((item) => {
+                totalPay += parseFloat(item.total);
+            });
+
+            subTotal = totalPay / ((100 + igv) / 100);
+            tax = totalPay - subTotal;
+
+            amounts.subTotal = subTotal;
+            amounts.tax = tax;
+            amounts.totalPay = totalPay;
+        }
+
+        function paintAmounts() {
+            document.querySelector('#subtotal_amount').innerText = formatSoles(amounts.subTotal);
+            document.querySelector('#igv_amount').innerText = formatSoles(amounts.tax);
+            document.querySelector('#total_amount').innerText = formatSoles(amounts.totalPay);
         }
     </script>
 @endsection

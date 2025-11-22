@@ -3,24 +3,24 @@
 namespace App\Http\Controllers\Tenant\WorkShop;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Landlord\Year\YearStoreRequest;
-use App\Http\Requests\Landlord\Year\YearUpdateRequest;
-use App\Http\Requests\Tenant\WorkShop\Service\ServiceStoreRequest;
 use App\Http\Requests\Tenant\WorkShop\Service\ServiceUpdateRequest;
-use App\Http\Services\Tenant\WorkShop\Services\ServiceManager;
+use App\Http\Services\Tenant\WorkShop\Quotes\QuoteManager;
+use App\Models\Company;
 use App\Models\Landlord\Year;
+use App\Models\Tenant\Warehouse;
 use Illuminate\Http\Request;
 use Yajra\DataTables\DataTables;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Session;
 use Throwable;
 
 class QuoteController extends Controller
 {
-    private ServiceManager $s_service;
+    private QuoteManager $s_quote;
 
     public function __construct()
     {
-        $this->s_service  =   new ServiceManager();
+        $this->s_quote  =   new QuoteManager();
     }
 
     public function index()
@@ -43,7 +43,7 @@ class QuoteController extends Controller
                 'q.expiration_date',
                 'q.created_at'
             )
-            ->where('q.status','<>', 'ANULADO');
+            ->where('q.status', '<>', 'ANULADO');
 
         return DataTables::of($quotes)->toJson();
     }
@@ -52,7 +52,7 @@ class QuoteController extends Controller
     {
         try {
 
-            $year  =   $this->s_service->getService($id);
+            $year  =   $this->s_quote->getService($id);
 
             return response()->json(['success' => true, 'message' => 'SERVICIO OBTENIDO', 'data' => $year]);
         } catch (Throwable $th) {
@@ -60,35 +60,52 @@ class QuoteController extends Controller
         }
     }
 
-    public function create(Request $request){
-        return view('workshop.quotes.create');
+    public function create(Request $request)
+    {
+        $igv        =   round(Company::find(1)->igv, 2);
+        $warehouses =   Warehouse::where('estado', 'ACTIVO')->get();
+        return view('workshop.quotes.create', compact('igv', 'warehouses'));
     }
 
 /*
-array:5 [ // app\Http\Controllers\Tenant\WorkShop\ServiceController.php:70
-  "_token" => "WNiCYcelXPamrMrwCEwMpkGmbqb3gcz0HVwsnn68"
+array:17 [ // app\Http\Controllers\Tenant\WorkShop\QuoteController.php:91
+  "_token" => "4olnC7YeO8JO17Yg4QWlat1MAQSJzc8VyqntCFyC"
   "_method" => "POST"
-  "name" => "LAVADO DE AUTOS"
-  "price" => "21"
-  "description" => "TEST"
+  "warehouse_id" => "1"
+  "client_id" => "2"
+  "vehicle_id" => "6"
+  "plate" => "TR3423"
+  "expiration_date" => "2025-11-28"
+  "product_id" => "1"
+  "product_quantity" => "3"
+  "product_price" => "14.99"
+  "dt-quotes-products_length" => "10"
+  "service_id" => "1"
+  "service_quantity" => "1"
+  "service_price" => "30.00"
+  "dt-quotes-services_length" => "10"
+  "lst_products" => "[{"id":1,"name":"BUJÍA 20 MM","category_name":"BUJÍAS","brand_name":"ASUS","sale_price":14.99,"quantity":3,"total":44.97}]"
+  "lst_services" => "[{"id":1,"name":"LAVADO DE AUTOS","sale_price":30,"quantity":1,"total":30}]"
 ]
 */
-    public function store(ServiceStoreRequest $request)
+    public function store(Request $request)
     {
         DB::beginTransaction();
 
         try {
-            $service  =   $this->s_service->store($request->toArray());
+          
+            $quote  =   $this->s_quote->store($request->toArray());
 
-            DB::commit();
-            return response()->json(['success' => true, 'message' => 'SERVICIO REGISTRADO CON ÉXITO']);
+            Session::flash('success', 'COTIZACIÓN REGISTRADA CON ÉXITO');
+            //DB::commit();
+            return response()->json(['success' => true, 'message' => 'COTIZACIÓN REGISTRADA CON ÉXITO']);
         } catch (Throwable $th) {
             DB::rollBack();
-            return response()->json(['success' => false, 'message' => $th->getMessage()]);
+            return response()->json(['success' => false, 'message' => $th->getMessage(), 'file' => $th->getFile(), 'line' => $th->getLine()]);
         }
     }
 
-/*
+    /*
 array:5 [ // app\Http\Controllers\Tenant\WorkShop\ServiceController.php:94
   "_token" => "WNiCYcelXPamrMrwCEwMpkGmbqb3gcz0HVwsnn68"
   "name_edit" => "LAVADO DE AUTOS"
@@ -102,7 +119,7 @@ array:5 [ // app\Http\Controllers\Tenant\WorkShop\ServiceController.php:94
         DB::beginTransaction();
         try {
 
-            $service  =   $this->s_service->update($request->validated(),$id);
+            $service  =   $this->s_quote->update($request->validated(), $id);
 
             DB::commit();
 
@@ -119,7 +136,7 @@ array:5 [ // app\Http\Controllers\Tenant\WorkShop\ServiceController.php:94
         DB::beginTransaction();
         try {
 
-            $service  =   $this->s_service->destroy($id);
+            $service  =   $this->s_quote->destroy($id);
 
             DB::commit();
 
