@@ -12,7 +12,7 @@ use Throwable;
 class FormatController extends Controller
 {
 
-    public static function getFormatInitialVehicle(int $vehicle_id): array
+    public static function getFormatInitialVehicle(?int $vehicle_id): array
     {
         $vehicle    =   Vehicle::from('vehicles as v')
             ->join('erptaller.models as m', 'm.id', 'v.model_id')

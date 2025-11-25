@@ -64,7 +64,7 @@ class UtilController extends Controller
 
             $token  =   Company::find(1)->token_placa;
 
-            $url = "https://multijc.com/api/queryplaca/" . $placa."/".$token;
+            $url = "https://multijc.com/api/queryplaca/" . $placa . "/" . $token;
 
             $client = new \GuzzleHttp\Client(['verify' => false]);
             $token = 'c36358c49922c564f035d4dc2ff3492fbcfd31ee561866960f75b79f7d645d7d';
@@ -78,7 +78,7 @@ class UtilController extends Controller
             $estado     =   $response->getStatusCode();
             $data       =   json_decode($response->getBody()->getContents());
 
-            return response()->json(['success' => true, 'data' => $data,'origin'=>'API']);
+            return response()->json(['success' => true, 'data' => $data, 'origin' => 'API']);
         } catch (Throwable $th) {
             return response()->json(['success' => false, 'message' => $th->getMessage()]);
         }
@@ -108,6 +108,63 @@ class UtilController extends Controller
     }
 
 
+    public static function getInventoryVehicleChecks()
+    {
+        $items = DB::connection('landlord')
+            ->table('general_table_details as gtd')
+            ->join('general_tables as gt', 'gt.id', '=', 'gtd.general_table_id')
+            ->join('general_table_categories as gtc', 'gtc.id', '=', 'gtd.category_id')
+            ->where('gtd.status', 'ACTIVO')
+            ->where('gt.id', 1)
+            ->select(
+                'gt.id as general_table_id',
+                'gt.name as general_table_name',
+                'gtd.id as detail_id',
+                'gtd.name as detail_name',
+                'gtc.id as category_id',
+                'gtc.name as category_name'
+            )
+            ->orderBy('gtc.id')
+            ->orderBy('gtd.id')
+            ->get();
 
+        $groupedByCategoryId = [];
 
+        foreach ($items as $item) {
+            $categoryId = $item->category_id;
+
+            if (!isset($groupedByCategoryId[$categoryId])) {
+                $groupedByCategoryId[$categoryId] = [
+                    'category_id'   => $item->category_id,
+                    'category_name' => $item->category_name,
+                    'items'         => []
+                ];
+            }
+
+            $groupedByCategoryId[$categoryId]['items'][] = [
+                'id'   => $item->detail_id,
+                'name' => $item->detail_name
+            ];
+        }
+
+        return array_values($groupedByCategoryId);
+    }
+
+    public static function getIdentityDocuments(){
+        $tipos_documento    =   DB::connection('landlord')
+                                ->table('general_table_details as gtd')
+                                ->where('gtd.status','ACTIVO')
+                                ->where('gtd.general_table_id',2)
+                                ->get();
+
+       return $tipos_documento;
+    }
+
+    public static function getPositions(){
+        $cargos    =   DB::table('positions as p')
+                                ->where('p.status','ACTIVO')
+                                ->get();
+
+       return $cargos;
+    }
 }

@@ -4,8 +4,9 @@ namespace App\Http\Controllers\Tenant\WorkShop;
 
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\FormatController;
+use App\Http\Controllers\UtilController;
 use App\Http\Requests\Tenant\WorkShop\Quote\QuoteStoreRequest;
-use App\Http\Services\Tenant\WorkShop\Quotes\QuoteManager;
+use App\Http\Services\Tenant\WorkShop\WorkOrders\WorkOrderManager;
 use App\Models\Company;
 use App\Models\Tenant\Warehouse;
 use App\Models\Tenant\WorkShop\Quote\Quote;
@@ -17,18 +18,18 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Throwable;
 
-class QuoteController extends Controller
+class WorkOrderController extends Controller
 {
-    private QuoteManager $s_quote;
+    private WorkOrderManager $s_order;
 
     public function __construct()
     {
-        $this->s_quote  =   new QuoteManager();
+        $this->s_order  =   new WorkOrderManager();
     }
 
     public function index()
     {
-        return view('workshop.quotes.index');
+        return view('workshop.work_orders.index');
     }
 
     public function getQuotes(Request $request)
@@ -55,7 +56,7 @@ class QuoteController extends Controller
     {
         try {
 
-            $year  =   $this->s_quote->getQuote($id);
+            $year  =   $this->s_order->getQuote($id);
 
             return response()->json(['success' => true, 'message' => 'COTIZACIÓN OBTENIDA', 'data' => $year]);
         } catch (Throwable $th) {
@@ -67,7 +68,9 @@ class QuoteController extends Controller
     {
         $igv        =   round(Company::find(1)->igv, 2);
         $warehouses =   Warehouse::where('estado', 'ACTIVO')->get();
-        return view('workshop.quotes.create', compact('igv', 'warehouses'));
+        $checks_inventory_vehicle = UtilController::getInventoryVehicleChecks();
+       
+        return view('workshop.work_orders.create', compact('igv', 'warehouses','checks_inventory_vehicle'));
     }
 
     /*
@@ -97,7 +100,7 @@ array:17 [ // app\Http\Controllers\Tenant\WorkShop\QuoteController.php:91
 
         try {
 
-            $quote  =   $this->s_quote->store($request->toArray());
+            $quote  =   $this->s_order->store($request->toArray());
 
             Session::flash('success', 'COTIZACIÓN REGISTRADA CON ÉXITO');
             DB::commit();
@@ -151,7 +154,7 @@ array:17 [ // app\Http\Controllers\Tenant\WorkShop\QuoteController.php:145
         DB::beginTransaction();
         try {
 
-            $quote  =   $this->s_quote->update($request->toArray(), $id);
+            $quote  =   $this->s_order->update($request->toArray(), $id);
 
             DB::commit();
 
@@ -168,7 +171,7 @@ array:17 [ // app\Http\Controllers\Tenant\WorkShop\QuoteController.php:145
         DB::beginTransaction();
         try {
 
-            $service  =   $this->s_quote->destroy($id);
+            $service  =   $this->s_order->destroy($id);
 
             DB::commit();
 

@@ -10,6 +10,7 @@ use App\Models\Landlord\Customer;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Spatie\Multitenancy\Models\Tenant;
 use Throwable;
 
 class CustomerController extends Controller
@@ -116,11 +117,10 @@ class CustomerController extends Controller
             $customer->save();
 
             DB::commit();
-            return response()->json(['success' => true, 'message' => 'CLIENTE REGISTRADO!!!','customer'=>$customer]);
-
+            return response()->json(['success' => true, 'message' => 'CLIENTE REGISTRADO!!!', 'customer' => $customer]);
         } catch (Throwable $th) {
             DB::rollBack();
-            return response()->json(['success' => false, 'message' => $th->getMessage(), 'line' => $th->getLine(),'file'=>$th->getFile()]);
+            return response()->json(['success' => false, 'message' => $th->getMessage(), 'line' => $th->getLine(), 'file' => $th->getFile()]);
         }
     }
 
@@ -276,25 +276,43 @@ class CustomerController extends Controller
      */
     public function searchCustomer(Request $request)
     {
-        $query = trim($request->get('q', ''));
+        try {
 
-        if (empty($query)) {
-            return response()->json(['data' => []]);
+            $query = trim($request->get('q', ''));
+            $vehicle_id = $request->get('vehicle_id', null);
+
+            $customers = DB::table('erptaller.customers as c');
+
+            if ($query) {
+                $customers->whereRaw("CONCAT(type_document_abbreviation, ':', document_number, ' - ', name) LIKE ?", ["%{$query}%"])
+                    ->orWhereRaw("CONCAT(document_number, ' - ', name) LIKE ?", ["%{$query}%"])
+                    ->orWhere('name', 'LIKE', "%{$query}%");
+            }
+
+            if ($vehicle_id) {
+                $currentTenant = Tenant::current()->database;
+                $customers->join(DB::raw("{$currentTenant}.vehicles as v"), 'v.customer_id', '=', 'c.id')
+                    ->where('v.id', $vehicle_id);
+            }
+
+            $results = $customers->limit(20)->get([
+                'c.id',
+                'c.type_document_abbreviation',
+                'c.document_number',
+                'c.name',
+                'c.email'
+            ]);
+
+            $data = $results->map(fn($c) => [
+                'id' => $c->id,
+                'full_name' => "{$c->type_document_abbreviation}:{$c->document_number} - {$c->name}",
+                'email' => $c->email,
+            ]);
+
+            return response()->json(['success' => true, 'message' => 'CLIENTES OBTENIDOS', 'data' => $data]);
+        } catch (Throwable $th) {
+            DB::rollBack();
+            return response()->json(['success' => false, 'message' => $th->getMessage()]);
         }
-
-        $customers = Customer::query()
-            ->whereRaw("CONCAT(type_document_abbreviation, ':', document_number, ' - ', name) LIKE ?", ["%{$query}%"])
-            ->orWhereRaw("CONCAT(document_number, ' - ', name) LIKE ?", ["%{$query}%"])
-            ->orWhere('name', 'LIKE', "%{$query}%")
-            ->limit(20)
-            ->get(['id', 'type_document_abbreviation', 'document_number', 'name', 'email']);
-
-        $data = $customers->map(fn($c) => [
-            'id' => $c->id,
-            'full_name' => "{$c->type_document_abbreviation}:{$c->document_number} - {$c->name}",
-            'email' => $c->email,
-        ]);
-
-        return response()->json(['data' => $data]);
     }
 }

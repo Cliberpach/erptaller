@@ -8,30 +8,23 @@ use App\Http\Controllers\Tenant\BrandController;
 use App\Http\Controllers\Tenant\CategoryController;
 use App\Http\Controllers\Tenant\PettyCashController;
 use App\Http\Controllers\Tenant\FieldController;
-use App\Http\Controllers\Tenant\CompanyController;
 use App\Http\Controllers\Tenant\Consultas\ConsultasCreditosController;
 use App\Http\Controllers\Tenant\Consultas\QueryReservationController;
 use App\Http\Controllers\Tenant\CustomerController;
 use App\Http\Controllers\Tenant\InventoryController;
-use App\Http\Controllers\Tenant\InvoiceController;
 use App\Http\Controllers\Tenant\KardexController;
-use App\Http\Controllers\Tenant\Maintenance\ConfigurationController;
 use App\Http\Controllers\Tenant\ModuleController;
 use App\Http\Controllers\Tenant\NoteIncomeController;
 use App\Http\Controllers\Tenant\NoteReleaseController;
 use App\Http\Controllers\Tenant\PettyCashBookController;
-use App\Http\Controllers\Tenant\PlanController;
 use App\Http\Controllers\Tenant\ProductController;
 use App\Http\Controllers\Tenant\Purchase\PurchaseDocumentoController;
 use App\Http\Controllers\Tenant\PurchaseController;
 use App\Http\Controllers\Tenant\SaleController;
-use App\Http\Controllers\Tenant\ReportController;
 use App\Http\Controllers\Tenant\Reports\ReportContableController;
 use App\Http\Controllers\Tenant\Reports\ReportFieldController;
-use App\Http\Controllers\Tenant\Reports\ReportReservations;
 use App\Http\Controllers\Tenant\Reports\ReportSaleController;
 use App\Http\Controllers\Tenant\Reports\ReservationDocumentController;
-use App\Http\Controllers\Tenant\RoleController;
 use App\Http\Controllers\Tenant\Sales\PaymentMethodController;
 use App\Http\Controllers\Tenant\SupplierController;
 use App\Http\Controllers\Tenant\ValuedKardexController;
@@ -39,11 +32,6 @@ use App\Http\Controllers\Tenant\WorkShop\ModelController;
 use App\Http\Controllers\Tenant\WorkShop\ServiceController;
 use App\Http\Controllers\Tenant\WorkShop\VehicleController;
 use App\Http\Controllers\Tenant\WorkShop\YearController;
-use App\Http\Controllers\UtilController;
-use App\Models\PettyCash;
-use App\Models\Tenant\ReservationDocument;
-use App\Models\Tenant\WorkShop\ModelV;
-use Illuminate\Auth\Events\Logout;
 
 /*
 |--------------------------------------------------------------------------
@@ -293,29 +281,9 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
         Route::get('downloadCdr/{id}', [ReservationDocumentController::class, 'downloadCdr'])->name('tenant.reportes.comprobantes_reservas.downloadCdr');
     });
 
-    Route::group(["prefix" => "mantenimiento"], function () {
-        Route::get('empresa', [CompanyController::class, 'index'])->name('tenant.mantenimientos.empresa');
-        Route::get('empresa/registrar', [CompanyController::class, 'create'])->name('tenant.mantenimientos.empresas.create');
-        Route::get('empresa/editar/{id}', [CompanyController::class, 'edit'])->name('tenant.mantenimientos.empresa.edit');
-        Route::put('empresa/update/{id}', [CompanyController::class, 'update'])->name('tenant.mantenimientos.empresa.update');
-        Route::post('empresa', [CompanyController::class, 'store'])->name('tenant.mantenimientos.empresas.store');
-        Route::put('updateInvoice/{id}', [CompanyController::class, 'updateInvoice'])->name('tenant.mantenimientos.empresas.updateInvoice');
-        Route::post('storeNumeration', [CompanyController::class, 'storeNumeration'])->name('tenant.mantenimientos.empresas.storeNumeration');
-        Route::get('getListNumeration', [CompanyController::class, 'getListNumeration'])->name('tenant.mantenimientos.empresas.getListNumeration');
-
-
-        Route::get('plan', [PlanController::class, 'index'])->name('tenant.mantenimientos.plan');
-        Route::get('usuario', [UserController::class, 'index'])->name('tenant.mantenimientos.usuario');
-        Route::get('rol', [RoleController::class, 'index'])->name('tenant.mantenimientos.rol');
-        Route::get('horario-de-atencion', [BookController::class, 'schedule'])->name('tenant.mantenimientos.horario');
-        Route::post('horario-de-atencion/guardar', [BookController::class, 'saveSchedule'])->name('tenant.mantenimientos.horario.store');
-
-        //========== CONFIGURACION =========
-        Route::get('configuracion', [ConfigurationController::class, 'index'])->name('tenant.mantenimientos.configuracion');
-        Route::post('configuracion/store', [ConfigurationController::class, 'store'])->name('tenant.mantenimientos.configuracion.store');
-    });
 
     require __DIR__ . '/tenant/taller/web.php';
+    require __DIR__ . '/tenant/mantenimiento/web.php';
 
 
     Route::get("landlord/ruc/{ruc}", [ApiController::class, 'apiRuc']);
@@ -334,5 +302,5 @@ Route::group(["prefix" => "utils"], function () {
     Route::get('vehicle-search', [VehicleController::class, 'searchVehicle'])->name('tenant.utils.searchVehicle');
     Route::get('get-years/{model}', [YearController::class, 'getYearsModel'])->name('tenant.utils.getYearsModel');
     Route::get('serch-plate/{placa}', [VehicleController::class, 'searchPlate'])->name('tenant.utils.searchPlate');
-    
+
 });

@@ -1,7 +1,7 @@
 @extends('layouts.template')
 
 @section('title')
-    Cotizaciones
+    Órdenes de Trabajo
 @endsection
 
 @section('content')
@@ -11,7 +11,7 @@
 
     <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
-            <h4 class="card-title mb-md-0 mb-2">EDITAR COTIZACIÓN</h4>
+            <h4 class="card-title mb-md-0 mb-2">REGISTRAR ÓRDEN TRABAJO</h4>
 
             <div class="d-flex flex-wrap gap-2">
 
@@ -20,7 +20,7 @@
         <div class="card-body">
             <div class="row">
                 <div class="col-12">
-                    @include('workshop.quotes.forms.form_edit_quote')
+                    @include('workshop.work_orders.forms.form_create_order')
                 </div>
             </div>
         </div>
@@ -34,9 +34,9 @@
                         <i class="fas fa-arrow-left"></i> VOLVER
                     </button>
 
-                    <!-- BOTÓN ACTUALIZAR -->
-                    <button class="btn btn-primary" form="form-edit-quote" type="submit">
-                        <i class="fas fa-save"></i> ACTUALIZAR
+                    <!-- BOTÓN REGISTRAR -->
+                    <button class="btn btn-primary" form="form-create-quote" type="submit">
+                        <i class="fas fa-save"></i> REGISTRAR
                     </button>
 
                 </div>
@@ -53,9 +53,11 @@
 </style>
 
 @section('js')
+    <script src="https://unpkg.com/justgage@latest/dist/justgage.umd.js"></script>
+
     <script>
-        const lstProducts = @json($lst_products);
-        const lstServices = @json($lst_services);
+        const lstProducts = [];
+        const lstServices = [];
         let dtProducts = null;
         let dtServices = null;
         const amounts = {
@@ -64,11 +66,22 @@
             totalPay: 0
         }
 
+        const gauge = new JustGage({
+            id: "gauge",
+            value: 50,
+            min: 0,
+            max: 100,
+            label: "Gasolina (%)",
+            pointer: true,
+            levelColors: ["#ff0000", "#f9c802", "#00b050"],
+            gaugeWidthScale: 0.7
+        });
+
+
         document.addEventListener('DOMContentLoaded', () => {
             dtProducts = loadDataTableSimple('dt-quotes-products');
             dtServices = loadDataTableSimple('dt-quotes-services');
 
-            loadPreviewData();
             iniciarTomSelect();
             events();
 
@@ -79,7 +92,11 @@
             eventsMdlEditProduct();
             eventsMdlEditService();
 
-            document.querySelector('#form-edit-quote').addEventListener('submit', (e) => {
+            document.getElementById("fuelSelect").addEventListener("change", function() {
+                gauge.refresh(this.value);
+            });
+
+            document.querySelector('#form-create-quote').addEventListener('submit', (e) => {
                 e.preventDefault();
                 storeQuote(e.target);
             })
@@ -135,11 +152,8 @@
                 }
             });
 
-            const initialCustomer = @json($customer_formatted);
             window.clientSelect = new TomSelect('#client_id', {
                 valueField: 'id',
-                options: [initialCustomer],
-                items: [initialCustomer.id],
                 labelField: 'full_name',
                 searchField: ['full_name'],
                 plugins: ['clear_button'],
@@ -171,12 +185,9 @@
                 }
             });
 
-            const initialVehicle = @json($vehicle_formatted);
             window.vehicleSelect = new TomSelect('#vehicle_id', {
                 valueField: 'id',
                 labelField: 'text',
-                options: [initialVehicle],
-                items: [initialVehicle.id],
                 searchField: ['text'],
                 plugins: ['clear_button'],
                 placeholder: 'Seleccione un vehículo',
@@ -356,7 +367,7 @@
             window.modelSelect.setValue(model.id);
         }
 
-        function validationQuote() {
+        function validationStoreQuote() {
             if (lstProducts.length === 0 && lstServices.length === 0) {
                 toastr.error('DEBE AGREGAR AL MENOS UN PRODUCTO O SERVICIO A LA COTIZACIÓN');
                 return false;
@@ -367,17 +378,17 @@
         async function storeQuote(formCreateQuote) {
 
             toastr.clear();
-            const isValid = validationQuote();
+            const isValid = validationStoreQuote();
             if (!isValid) {
                 return;
             }
 
             const result = await Swal.fire({
-                title: '¿Desea actualizar la cotización?',
+                title: '¿Desea registrar la cotización?',
                 text: "Confirmar",
                 icon: 'question',
                 showCancelButton: true,
-                confirmButtonText: 'SI, actualizar',
+                confirmButtonText: 'SI, registrar',
                 cancelButtonText: 'NO',
                 reverseButtons: true,
                 customClass: {
@@ -394,7 +405,7 @@
                     clearValidationErrors('msgError');
 
                     Swal.fire({
-                        title: 'Actualizando cotización...',
+                        title: 'Registrando cotización...',
                         text: 'Por favor espere',
                         allowOutsideClick: false,
                         allowEscapeKey: false,
@@ -406,9 +417,7 @@
                     const formData = new FormData(formCreateQuote);
                     formData.append('lst_products', JSON.stringify(lstProducts));
                     formData.append('lst_services', JSON.stringify(lstServices));
-                    formData.append('_method', 'PUT');
-                    const res = await axios.post(route('tenant.taller.cotizaciones.update',
-                        @json($quote->id)), formData);
+                    const res = await axios.post(route('tenant.taller.cotizaciones.store'), formData);
 
                     if (res.data.success) {
                         toastr.success(res.data.message, 'OPERACIÓN COMPLETADA');
@@ -554,9 +563,9 @@
                         <td>${item.name}</td>
                         <td>${item.category_name}</td>
                         <td>${item.brand_name}</td>
-                        <td>${formatQuantity(item.quantity)}</td>
-                        <td>${formatSoles(item.sale_price)}</td>
-                        <td>${formatSoles(item.total)}</td>
+                        <td>${item.quantity}</td>
+                        <td>${item.sale_price}</td>
+                        <td>${item.total}</td>
                     </tr>
                 `;
             });
@@ -690,9 +699,9 @@
                             </button>
                         </td>
                         <td>${item.name}</td>
-                        <td>${formatQuantity(item.quantity)}</td>
-                        <td>${formatSoles(item.sale_price)}</td>
-                        <td>${formatSoles(item.total)}</td>
+                        <td>${item.quantity}</td>
+                        <td>${item.sale_price}</td>
+                        <td>${item.total}</td>
                     </tr>
                 `;
             });
@@ -791,11 +800,8 @@
         }
 
         async function actionChangeVehicle(value) {
-            document.querySelector('#plate').value = '';
 
             if (!value) return;
-            const vehicle = window.vehicleSelect.options[value];
-            document.querySelector('#plate').value = vehicle.text;
 
             //========= TRAER CLIENTES ==========
             mostrarAnimacion1();
@@ -837,22 +843,6 @@
                 window.clientSelect.on('change', actionChangeClient);
 
             }
-        }
-
-        function loadPreviewData() {
-
-            dtProducts = destroyDataTable(dtProducts);
-            clearTable('dt-quotes-products');
-            paintQuoteProducts(lstProducts);
-            dtProducts = loadDataTableSimple('dt-quotes-products');
-
-            dtServices = destroyDataTable(dtServices);
-            clearTable('dt-quotes-services');
-            paintQuoteServices(lstServices);
-            dtServices = loadDataTableSimple('dt-quotes-services');
-
-            calculateAmounts();
-            paintAmounts();
         }
     </script>
 @endsection

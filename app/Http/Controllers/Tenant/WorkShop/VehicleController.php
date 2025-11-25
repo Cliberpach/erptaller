@@ -268,7 +268,6 @@ array:8 [ // app\Http\Controllers\Tenant\WorkShop\VehicleController.php:159
             $vehicles = $vehicles->limit(20)
                         ->get(['v.id', 'm.description as model_name', 'v.plate', 'b.description as brand_name']);
 
-
             $data = $vehicles->map(fn($v) => [
                 'id' => $v->id,
                 'text' => "{$v->plate}",

@@ -407,8 +407,7 @@
                     formData.append('lst_products', JSON.stringify(lstProducts));
                     formData.append('lst_services', JSON.stringify(lstServices));
                     formData.append('_method', 'PUT');
-                    const res = await axios.post(route('tenant.taller.cotizaciones.update',
-                        @json($quote->id)), formData);
+                    const res = await axios.post(route('tenant.taller.cotizaciones.update',@json($quote->id)), formData);
 
                     if (res.data.success) {
                         toastr.success(res.data.message, 'OPERACIÓN COMPLETADA');
@@ -790,53 +789,13 @@
             });
         }
 
-        async function actionChangeVehicle(value) {
+        function actionChangeVehicle(value) {
             document.querySelector('#plate').value = '';
 
             if (!value) return;
             const vehicle = window.vehicleSelect.options[value];
+            console.log(vehicle);
             document.querySelector('#plate').value = vehicle.text;
-
-            //========= TRAER CLIENTES ==========
-            mostrarAnimacion1();
-            try {
-
-                const res = await axios.get(route('tenant.utils.searchCustomer', {
-                    q: '',
-                    vehicle_id: value
-                }));
-
-                if (res.data.success) {
-                    toastr.info(res.data.message, 'OPERACIÓN COMPLETADA');
-                    setCustomerOfVehicle(res.data.data);
-                }
-
-            } catch (error) {
-                toastr.error(error, 'ERROR AL CARGAR CLIENTE DEL VEHÍCULO');
-                return;
-            } finally {
-                ocultarAnimacion1();
-            }
-        }
-
-        function setCustomerOfVehicle(customer) {
-            window.clientSelect.clear();
-            window.clientSelect.clearOptions();
-
-            customer.forEach(v => {
-                window.clientSelect.addOption({
-                    id: v.id,
-                    full_name: v.full_name,
-                    email: v.email
-                });
-            });
-
-            if (customer.length > 0) {
-                window.clientSelect.off('change');
-                window.clientSelect.setValue(customer[0].id);
-                window.clientSelect.on('change', actionChangeClient);
-
-            }
         }
 
         function loadPreviewData() {

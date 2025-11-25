@@ -57,6 +57,13 @@ class ModuleSeeder extends Seeder
 
         ModuleChild::create([
             'module_id'     => $taller->id,
+            'description'   => 'Ordenes Trabajo',
+            'route_name'    => 'taller.ordenes_trabajo.index',
+            'order'         => '2'
+        ]);
+
+        ModuleChild::create([
+            'module_id'     => $taller->id,
             'description'   => 'Servicios',
             'route_name'    => 'taller.servicios.index',
             'order'         => '2'
@@ -306,6 +313,23 @@ class ModuleSeeder extends Seeder
             'route_name' => 'mantenimientos.plan',
             'order' => '2',
             'show' => 'landlord'
+        ]);
+
+
+        ModuleChild::create([
+            'module_id' => $maintenance->id,
+            'description' => 'Cargos',
+            'route_name' => 'mantenimientos.cargos.index',
+            'order' => '2',
+            'show' => 'tenant'
+        ]);
+
+        ModuleChild::create([
+            'module_id' => $maintenance->id,
+            'description' => 'Colaboradores',
+            'route_name' => 'mantenimientos.colaboradores.index',
+            'order' => '2',
+            'show' => 'tenant'
         ]);
 
         ModuleChild::create([

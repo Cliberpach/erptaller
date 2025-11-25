@@ -765,7 +765,6 @@
             } finally {
                 ocultarAnimacion1();
             }
-
         }
 
         function setVehiclesClient(vehicles) {
@@ -781,13 +780,53 @@
             });
         }
 
-        function actionChangeVehicle(value) {
+        async function actionChangeVehicle(value) {
             document.querySelector('#plate').value = '';
 
-            if(!value) return;
+            if (!value) return;
             const vehicle = window.vehicleSelect.options[value];
-            console.log(vehicle);
             document.querySelector('#plate').value = vehicle.text;
+
+            //========= TRAER CLIENTES ==========
+            mostrarAnimacion1();
+            try {
+
+                const res = await axios.get(route('tenant.utils.searchCustomer', {
+                    q: '',
+                    vehicle_id: value
+                }));
+
+                if (res.data.success) {
+                    toastr.info(res.data.message, 'OPERACIÓN COMPLETADA');
+                    setCustomerOfVehicle(res.data.data);
+                }
+
+            } catch (error) {
+                toastr.error(error, 'ERROR AL CARGAR CLIENTE DEL VEHÍCULO');
+                return;
+            } finally {
+                ocultarAnimacion1();
+            }
+        }
+
+        function setCustomerOfVehicle(customer) {
+            window.clientSelect.clear();
+            window.clientSelect.clearOptions();
+
+            customer.forEach(v => {
+                window.clientSelect.addOption({
+                    id: v.id,
+                    full_name: v.full_name,
+                    email: v.email
+                });
+            });
+
+            if (customer.length > 0) {
+                window.clientSelect.off('change');
+                window.clientSelect.setValue(customer[0].id);
+                window.clientSelect.on('change', actionChangeClient);
+
+            }
         }
     </script>
 @endsection

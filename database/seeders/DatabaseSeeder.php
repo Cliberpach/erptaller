@@ -16,6 +16,8 @@ use Database\Seeders\Tenant\BankSeeder;
 use Database\Seeders\Tenant\BrandSeeder;
 use Database\Seeders\Tenant\CategorySeeder;
 use Database\Seeders\Landlord\CustomerSeeder;
+use Database\Seeders\Landlord\GeneralTableSeeder;
+use Database\Seeders\Landlord\IdentityDocumentSeeder;
 use Database\Seeders\Landlord\ModelSeeder;
 use Database\Seeders\Landlord\YearSeeder;
 use Database\Seeders\Tenant\ConfigurationSeeder;
@@ -47,6 +49,8 @@ class DatabaseSeeder extends Seeder
         // example: $this->call(TipoDocumentoSeeder::class);
         // note: no olvida llamar al seeder en use part
         $this->call(ConfigurationSeeder::class);
+        $this->call(GeneralTableSeeder::class);
+        $this->call(IdentityDocumentSeeder::class);
         $this->call(PaymentMethodSeeder::class);
         $this->call(WarehouseSeeder::class);
         $this->call(TypeIdentityDocumentSeeder::class);
@@ -81,6 +85,5 @@ class DatabaseSeeder extends Seeder
         $this->call(YearSeeder::class);
         $this->call(LandlordBrandSeeder::class);
         $this->call(ModelSeeder::class);
-
     }
 }
