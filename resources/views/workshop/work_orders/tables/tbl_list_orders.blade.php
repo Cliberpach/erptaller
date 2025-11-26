@@ -1,4 +1,4 @@
-<table class="table-striped table-bordered table-hover table" style="text-transform:uppercase" id="dt-quotes">
+<table class="table-striped table-bordered table-hover table" style="text-transform:uppercase" id="dt-orders">
     <thead>
         <tr>
             <th class="text-center">#</th>
@@ -9,7 +9,6 @@
             <th class="text-center">REGISTRADOR</th>
             <th class="text-center">ESTADO</th>
             <th class="text-center">FEC REGISTRO</th>
-            <th class="text-center">FEC EXPIRACION</th>
             <th data-priority="1" class="text-center"></th>
         </tr>
     </thead>

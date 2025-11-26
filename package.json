@@ -17,6 +17,10 @@
     },
     "dependencies": {
         "@material-tailwind/html": "^2.3.2",
+        "filepond": "^4.32.10",
+        "filepond-plugin-file-validate-size": "^2.2.8",
+        "filepond-plugin-image-edit": "^1.6.3",
+        "filepond-plugin-image-preview": "^4.6.12",
         "flowbite": "^2.5.2",
         "tom-select": "^2.4.3",
         "ziggy-js": "^2.6.0"

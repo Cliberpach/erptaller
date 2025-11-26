@@ -35,6 +35,11 @@
     <!-- end card -->
 @endsection
 
+<style>
+    .swal2-container {
+        z-index: 9999999;
+    }
+</style>
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
@@ -62,7 +67,7 @@
             const tipo_documento = document.querySelector('#document_type').value;
             toastr.clear();
 
-            if (tipo_documento != 1) {
+            if (tipo_documento != 39) {
                 toastr.error('SOLO SE PUEDE CONSULTAR TIPO DE DOCUMENTO DNI');
                 return;
             }

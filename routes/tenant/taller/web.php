@@ -16,12 +16,12 @@ Route::group(["prefix" => "taller"], function () {
 
         Route::get('index', [WorkOrderController::class, 'index'])->name('tenant.taller.ordenes_trabajo.index');
         Route::get('create', [WorkOrderController::class, 'create'])->name('tenant.taller.ordenes_trabajo.create');
-        Route::get('edit/{id}', [WorkOrderController::class, 'edit'])->name('tenant.taller.cotizaciones.edit');
-        Route::get('getQuotes', [WorkOrderController::class, 'getQuotes'])->name('tenant.taller.cotizaciones.getQuotes');
-        Route::post('store', [WorkOrderController::class, 'store'])->name('tenant.taller.cotizaciones.store');
-        Route::get('getQuote/{id}', [WorkOrderController::class, 'getService'])->name('tenant.taller.cotizaciones.getQuote');
-        Route::put('update/{id}', [WorkOrderController::class, 'update'])->name('tenant.taller.cotizaciones.update');
-        Route::delete('destroy/{id}', [WorkOrderController::class, 'destroy'])->name('tenant.taller.cotizaciones.destroy');
+        Route::get('edit/{id}', [WorkOrderController::class, 'edit'])->name('tenant.taller.ordenes_trabajo.edit');
+        Route::get('getWorkOrders', [WorkOrderController::class, 'getWorkOrders'])->name('tenant.taller.ordenes_trabajo.getWorkOrders');
+        Route::post('store', [WorkOrderController::class, 'store'])->name('tenant.taller.ordenes_trabajo.store');
+        Route::get('getWorkOrder/{id}', [WorkOrderController::class, 'getWorkOrder'])->name('tenant.taller.ordenes_trabajo.getWorkOrder');
+        Route::put('update/{id}', [WorkOrderController::class, 'update'])->name('tenant.taller.ordenes_trabajo.update');
+        Route::delete('destroy/{id}', [WorkOrderController::class, 'destroy'])->name('tenant.taller.ordenes_trabajo.destroy');
     });
 
     Route::group(["prefix" => "cotizaciones"], function () {

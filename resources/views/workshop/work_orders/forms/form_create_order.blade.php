@@ -10,7 +10,7 @@
          SECCIÓN PRINCIPAL / CLIENTE
     =========================== -->
     <div class="card border-primary mb-4 shadow-sm">
-        <div class="card-header bg-primary fw-bold py-2 text-white small">
+        <div class="card-header bg-primary fw-bold small py-2 text-white">
             DATOS DEL CLIENTE Y VEHÍCULO
         </div>
 
@@ -61,71 +61,10 @@
     </div>
 
     <!-- ==========================
-     INVENTARIO DEL VEHÍCULO
-=========================== -->
-    <div class="card border-primary mb-4 shadow-sm">
-        <div
-            class="card-header bg-primary fw-bold small d-flex justify-content-between align-items-center py-2 text-white">
-            INVENTARIO DEL VEHÍCULO
-            <button class="btn btn-light btn-sm" type="button" data-bs-toggle="collapse"
-                data-bs-target="#inventoryCollapse" aria-expanded="true" aria-controls="inventoryCollapse">
-                  <i class="fas fa-caret-down"></i>
-            </button>
-        </div>
-
-        <div class="card-body pb-1 pt-3">
-
-            <!-- Contenido colapsable -->
-            <div id="inventoryCollapse" class="collapse">
-                @foreach ($checks_inventory_vehicle as $category)
-                    <h6 class="fw-bold text-secondary mb-2 mt-3">
-                        {{ $category['category_name'] }}
-                    </h6>
-
-                    <div class="row g-2">
-                        @foreach ($category['items'] as $item)
-                            <div class="col-lg-3 col-md-4 col-sm-12">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="inventory_items[]"
-                                        value="{{ $item['id'] }}" id="inv_item_{{ $item['id'] }}">
-
-                                    <label class="form-check-label small" for="inv_item_{{ $item['id'] }}">
-                                        {{ $item['name'] }}
-                                    </label>
-                                </div>
-                            </div>
-                        @endforeach
-                    </div>
-                @endforeach
-
-                <div class="row g-2 mt-2">
-                    <div class="col-lg-3 col-md-4 col-sm-12 col-xs-12">
-                        <label for="fuelSelect" class="form-check-label text-secondary fw-bold">NIVEL DE
-                            GASOLINA:</label>
-                        <select id="fuelSelect" class="form-control">
-                            <option value="0">VACÍO</option>
-                            <option value="25">1/4</option>
-                            <option value="50" selected>1/2</option>
-                            <option value="75">3/4</option>
-                            <option value="100">LLENO</option>
-                        </select>
-
-                        <div style="width: 250px; margin-bottom: 20px;" class="mt-2">
-                            <div id="gauge"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-
-    </div>
-
-    <!-- ==========================
          SECCIÓN PRODUCTOS
     =========================== -->
     <div class="card border-success mb-4 shadow-sm">
-        <div class="card-header bg-primary fw-bold py-2 text-white small">
+        <div class="card-header bg-primary fw-bold small py-2 text-white">
             PRODUCTOS
         </div>
 
@@ -181,7 +120,7 @@
          SECCIÓN SERVICIOS
     =========================== -->
     <div class="card border-info mb-4 shadow-sm">
-        <div class="card-header bg-info fw-bold py-2 text-white small">
+        <div class="card-header bg-info fw-bold small py-2 text-white">
             SERVICIOS
         </div>
 
@@ -228,6 +167,145 @@
             </div>
         </div>
     </div>
+
+    <!-- ==========================
+     INVENTARIO DEL VEHÍCULO
+=========================== -->
+    <div class="card border-primary mb-4 shadow-sm">
+        <div
+            class="card-header bg-primary fw-bold small d-flex justify-content-between align-items-center py-2 text-white">
+            INVENTARIO DEL VEHÍCULO
+            <button class="btn btn-light btn-sm" type="button" data-bs-toggle="collapse"
+                data-bs-target="#inventoryCollapse" aria-expanded="true" aria-controls="inventoryCollapse">
+                <i class="fas fa-caret-down"></i>
+            </button>
+        </div>
+
+        <div class="card-body pb-1 pt-3">
+
+            <!-- Contenido colapsable -->
+            <div id="inventoryCollapse" class="collapse">
+                @foreach ($checks_inventory_vehicle as $category)
+                    <h6 class="fw-bold text-secondary mb-2 mt-3">
+                        {{ $category['category_name'] }}
+                    </h6>
+
+                    <div class="row g-2">
+                        @foreach ($category['items'] as $item)
+                            <div class="col-lg-3 col-md-4 col-sm-12">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="inventory_items[]"
+                                        value="{{ $item['id'] }}" id="inv_item_{{ $item['id'] }}">
+
+                                    <label class="form-check-label small" for="inv_item_{{ $item['id'] }}">
+                                        {{ $item['name'] }}
+                                    </label>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                @endforeach
+
+                <div class="row g-2 mt-2">
+                    <div class="col-lg-3 col-md-4 col-sm-12 col-xs-12">
+                        <label for="fuelSelect" class="form-check-label text-secondary fw-bold">NIVEL DE
+                            GASOLINA:</label>
+                        <select id="fuelSelect" class="form-control">
+                            <option value="0">VACÍO</option>
+                            <option value="25">1/4</option>
+                            <option value="50" selected>1/2</option>
+                            <option value="75">3/4</option>
+                            <option value="100">LLENO</option>
+                        </select>
+
+                        <div style="width: 250px; margin-bottom: 20px;" class="mt-2">
+                            <div id="gauge"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="card border-primary mb-4 shadow-sm">
+        <div
+            class="card-header bg-primary fw-bold small d-flex justify-content-between align-items-center py-2 text-white">
+            OPERARIOS
+            <button class="btn btn-light btn-sm" type="button" data-bs-toggle="collapse"
+                data-bs-target="#operariosCollapse" aria-expanded="true" aria-controls="operariosCollapse">
+                <i class="fas fa-caret-down"></i>
+            </button>
+        </div>
+
+        <div class="card-body pb-1 pt-3">
+            <div id="operariosCollapse" class="collapse">
+
+                <h6 class="fw-bold text-secondary mb-3 mt-2">
+                    Seleccionar Técnicos (Máx: 3)
+                </h6>
+
+                <div class="row g-3">
+
+                    <div class="col-lg-4 col-md-6 col-sm-12">
+                        <label class="form-label small fw-bold">Técnico</label>
+                        <select id="technicians" name="technicians[]" class="select2-tecnicos form-select">
+                            <option value="">Seleccionar</option>
+
+                            @foreach ($technicians as $tec)
+                                <option value="{{ $tec->id }}">{{ $tec->name }}</option>
+                            @endforeach
+
+                        </select>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+    <div class="card border-primary mb-4 shadow-sm">
+        <div
+            class="card-header bg-primary fw-bold small d-flex justify-content-between align-items-center py-2 text-white">
+            IMÁGENES DEL VEHÍCULO
+            <button class="btn btn-light btn-sm" type="button" data-bs-toggle="collapse"
+                data-bs-target="#vehicleImagesCollapse" aria-expanded="true" aria-controls="vehicleImagesCollapse">
+                <i class="fas fa-caret-down"></i>
+            </button>
+        </div>
+
+        <div class="card-body pb-1 pt-3">
+            <div id="vehicleImagesCollapse" class="collapse">
+
+                <h6 class="fw-bold text-secondary mb-3 mt-2">
+                    Subir imágenes del vehículo (Máx: 5)
+                </h6>
+
+                <div class="row g-3">
+
+                    @for ($i = 1; $i <= 5; $i++)
+                        <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
+                            <label class="form-label small fw-bold">Imagen {{ $i }}</label>
+                            <input accept="image/jpeg" data-max-files="1" data-allow-reorder="true"
+                                data-max-file-size="3MB" type="file" name="vehicle_images[]" accept="image/*"
+                                class="filepond-input">
+                        </div>
+                    @endfor
+
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <style>
+        .filepond--credits {
+            display: none !important;
+        }
+    </style>
 
     <div class="row">
         <div class="col-12 d-flex justify-content-lg-end">

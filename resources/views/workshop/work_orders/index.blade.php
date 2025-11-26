@@ -5,7 +5,7 @@
 @endsection
 
 @section('content')
-    @include('workshop.years.modals.mdl_edit_year')
+    @include('workshop.work_orders.modals.mdl_show_order')
 
     <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
@@ -25,7 +25,7 @@
             <div class="row">
                 <div class="col">
                     <div class="table-responsive">
-                        @include('workshop.quotes.tables.tbl_list_quotes')
+                        @include('workshop.work_orders.tables.tbl_list_orders')
                     </div>
                 </div>
             </div>
@@ -41,20 +41,20 @@
 
 @section('js')
     <script>
-        let dtQuotes = null;
+        let dtOrders = null;
 
         document.addEventListener('DOMContentLoaded', () => {
-            iniciarDtQuotes();
+            loadDtOrders();
             events();
         })
 
         function events() {}
 
-        function iniciarDtQuotes() {
-            dtQuotes = new DataTable('#dt-quotes', {
+        function loadDtOrders() {
+            dtOrders = new DataTable('#dt-orders', {
                 "serverSide": true,
                 "processing": true,
-                "ajax": '{{ route('tenant.taller.cotizaciones.getQuotes') }}',
+                "ajax": '{{ route('tenant.taller.ordenes_trabajo.getWorkOrders') }}',
                 "columns": [{
                         data: 'id',
                         className: "text-center",
@@ -141,38 +141,37 @@
                         className: "text-center"
                     },
                     {
-                        data: 'expiration_date',
-                        name: 'q.expiration_date',
-                        searchable: false,
-                        orderable: false,
-                        className: "text-center"
-                    },
-                    {
                         searchable: false,
                         orderable: false,
                         data: null,
                         className: "text-center",
                         render: function(data) {
 
-                            return `
-                                <div class="dropdown text-center">
-                                    <button class="btn btn-sm btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                                        <i class="fa fa-cog"></i>
-                                    </button>
-                                    <ul class="dropdown-menu dropdown-menu-end">
-                                        <li>
-                                            <a class="dropdown-item modificarDetalle" href="#" onclick="redirectParams('tenant.taller.cotizaciones.edit', ${data.id})">
-                                                <i class="fa fa-edit me-2"></i> Modificar
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a class="dropdown-item text-danger" href="#" onclick="eliminar(${data.id})">
-                                                <i class="fa fa-trash me-2"></i> Eliminar
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </div>
-                                `;
+                            let actions = `
+                                            <div class="dropdown text-center">
+                                                <button class="btn btn-sm btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                                    <i class="fa fa-cog"></i>
+                                                </button>
+                                                <ul class="dropdown-menu dropdown-menu-end">
+                                                    <li>
+                                                        <a class="dropdown-item" href="#" onclick="openMdlShowOrder(${data.id})">
+                                                            <i class="fa fa-eye me-2"></i> Ver
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a class="dropdown-item modificarDetalle" href="#" onclick="redirectParams('tenant.taller.cotizaciones.edit', ${data.id})">
+                                                            <i class="fa fa-edit me-2"></i> Modificar
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a class="dropdown-item text-danger" href="#" onclick="eliminar(${data.id})">
+                                                            <i class="fa fa-trash me-2"></i> Eliminar
+                                                        </a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                            `;
+                            return actions;
                         }
                     }
                 ],
@@ -223,7 +222,7 @@
         })
 
         function eliminar(id) {
-            const fila = getRowById(dtQuotes, id);
+            const fila = getRowById(dtOrders, id);
             const htmlVehicleInfo = `
             <div class="card shadow-sm border-0">
                 <div class="card-body p-2" style="font-size: 1.2rem;">
@@ -304,7 +303,7 @@
                         const res = await axios.delete(route('tenant.taller.vehiculos.destroy', id));
                         if (res.data.success) {
                             toastr.success(res.data.message, 'OPERACIÓN COMPLETADA');
-                            dtQuotes.ajax.reload();
+                            dtOrders.ajax.reload();
                         } else {
                             toastr.error(res.data.message, 'ERROR EN EL SERVIDOR');
                         }

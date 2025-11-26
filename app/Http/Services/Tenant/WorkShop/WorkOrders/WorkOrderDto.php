@@ -6,19 +6,23 @@ use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Company;
 use App\Models\Landlord\Customer;
+use App\Models\Landlord\GeneralTable\GeneralTableDetail;
 use App\Models\Product;
 use App\Models\Tenant\Warehouse;
-use App\Models\Tenant\WorkShop\Quote\Quote;
 use App\Models\Tenant\WorkShop\Service;
-use DateTime;
+use App\Models\Tenant\WorkShop\Vehicle;
+use App\Models\Tenant\WorkShop\WorkOrder\WorkOrder;
+use App\Models\User;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\File;
 
 class WorkOrderDto
 {
     public function getDtoStore(array $data): array
     {
-        $dto                =   [];
+        $dto                    =   [];
 
-        $warehouse          =   Warehouse::findOrFail($data['warehouse_id']);
+        $warehouse              =   Warehouse::findOrFail($data['warehouse_id']);
         $dto['warehouse_id']    =   $warehouse->id;
         $dto['warehouse_name']  =   $warehouse->descripcion;
 
@@ -28,21 +32,12 @@ class WorkOrderDto
         $dto['customer_document_number']            =   $customer->document_number;
         $dto['customer_name']                       =   mb_strtoupper(trim($customer->name));
 
-        $dto['plate']       =   mb_strtoupper(trim($data['plate']));
         $dto['vehicle_id']  =   $data['vehicle_id'];
-
-        $days_validity      =   0;
-        if (isset($data['expiration_date'])) {
-            $dto['expiration_date'] =   $data['expiration_date'];
-            $date1                      =   new DateTime(date('Y-m-d'));
-            $date2                      =   new DateTime($data['expiration_date']);
-            $interval                   =   $date1->diff($date2);
-            $days_validity              =   $interval->days;
-            $dto['days_validity']       =   $days_validity;
-        }
+        $vehicle            =   Vehicle::findOrFail($dto['vehicle_id']);
+        $dto['plate']       =   $vehicle->plate;
 
         //======== AMOUNTS ======
-        $dto_amounts    =   $this->calculateAmounts($data['lst_products'], $data['lst_services']);
+        $dto_amounts        =   $this->calculateAmounts($data['lst_products'], $data['lst_services']);
         $dto['total']       =   $dto_amounts['total'];
         $dto['subtotal']    =   $dto_amounts['subtotal'];
         $dto['igv']         =   $dto_amounts['igv'];
@@ -50,12 +45,12 @@ class WorkOrderDto
         return $dto;
     }
 
-    public function getDtoQuoteProduct($item, Quote $quote): array
+    public function getDtoOrderProduct($item, WorkOrder $work_order): array
     {
         $dto = [];
-        $dto['quote_id']        =   $quote->id;
-        $dto['warehouse_id']    =   $quote->warehouse_id;
-        $dto['warehouse_name']  =   $quote->warehouse_name;
+        $dto['work_order_id']   =   $work_order->id;
+        $dto['warehouse_id']    =   $work_order->warehouse_id;
+        $dto['warehouse_name']  =   $work_order->warehouse_name;
 
         $product                =   Product::findOrFail($item->id);
         $dto['product_id']      =   $product->id;
@@ -78,10 +73,10 @@ class WorkOrderDto
         return $dto;
     }
 
-    public function getDtoQuoteService($item, Quote $quote): array
+    public function getDtoOrderService($item, WorkOrder $work_order): array
     {
         $dto = [];
-        $dto['quote_id']        =   $quote->id;
+        $dto['work_order_id']   =   $work_order->id;
 
         $service                =   Service::findOrFail($item->id);
         $dto['service_id']      =   $service->id;
@@ -93,6 +88,63 @@ class WorkOrderDto
         return $dto;
     }
 
+    public function getDtoInventory(array $lst_items, WorkOrder $work_order): array
+    {
+        $items   =   [];
+        foreach ($lst_items as $item) {
+            $inventory  =   GeneralTableDetail::where('id', $item)->where('status', 'ACTIVO')->first();
+            $_item      =   [
+                'work_order_id'     =>  $work_order->id,
+                'inventory_id'      =>  $item,
+                'inventory_name'    =>  $inventory->name,
+            ];
+            $items[]    =   $_item;
+        }
+        return $items;
+    }
+
+    public function getDtoTechnicians(array $lst_items, WorkOrder $work_order): array
+    {
+        $items   =   [];
+        foreach ($lst_items as $item) {
+            $user  =   User::where('id', $item)->where('status', 'ACTIVO')->first();
+            $_item      =   [
+                'work_order_id'     =>  $work_order->id,
+                'technical_id'     =>  $item,
+                'technical_name'    =>  $user->name,
+            ];
+            $items[]    =   $_item;
+        }
+        return $items;
+    }
+
+    public function getDtoOrderImages(array $lst_items, WorkOrder $work_order): array
+    {
+        $carpet_company =   Company::findOrFail(1)->files_route;
+        $path = public_path("storage/{$carpet_company}/work_orders/images/");
+        if (!File::exists($path)) {
+            File::makeDirectory($path, 0755, true);
+        }
+
+        $dtoImages = [];
+
+        foreach ($lst_items as $index => $file) {
+            if ($file instanceof UploadedFile && $file->isValid()) {
+
+                $extension = $file->getClientOriginalExtension();
+                $filename = $work_order->id . '_' . $index . '.' . $extension;
+                $file->move($path, $filename);
+
+                $dtoImages[] = [
+                    'work_order_id' => $work_order->id,
+                    'img_route'     => "storage/{$carpet_company}/work_orders/images/{$filename}",
+                    'img_name'      => $filename,
+                ];
+            }
+        }
+
+        return $dtoImages;
+    }
 
     public function calculateAmounts(array $lst_products, array $lst_services): array
     {

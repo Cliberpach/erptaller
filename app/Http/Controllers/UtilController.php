@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Landlord\Company;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
@@ -166,5 +167,19 @@ class UtilController extends Controller
                                 ->get();
 
        return $cargos;
+    }
+
+    public static function getTechnicians(){
+
+        $technicians   =   DB::table('users as u')
+                        ->join('model_has_roles as mhr','mhr.model_id','u.id')
+                        ->join('roles as r','r.id','mhr.role_id')
+                        ->where('r.name','TECNICO')
+                        ->select(
+                            'u.id',
+                            'u.name'
+                        )
+                        ->get();
+        return $technicians;
     }
 }

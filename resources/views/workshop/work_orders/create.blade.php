@@ -30,7 +30,7 @@
 
                     <!-- BOTÓN VOLVER -->
                     <button type="button" class="btn btn-danger me-1"
-                        onclick="redirect('tenant.taller.cotizaciones.index')">
+                        onclick="redirect('tenant.taller.ordenes_trabajo.index')">
                         <i class="fas fa-arrow-left"></i> VOLVER
                     </button>
 
@@ -82,7 +82,8 @@
             dtProducts = loadDataTableSimple('dt-quotes-products');
             dtServices = loadDataTableSimple('dt-quotes-services');
 
-            iniciarTomSelect();
+            loadTomSelect();
+            loadFilePound();
             events();
 
         })
@@ -141,7 +142,13 @@
 
         }
 
-        function iniciarTomSelect() {
+        function loadTomSelect() {
+
+            window.techniciansSelect = new TomSelect("#technicians", {
+                create: false,
+                maxItems: 3,
+                plugins: ['remove_button']
+            });
 
             window.warehouseSelect = new TomSelect('#warehouse_id', {
                 create: false,
@@ -384,7 +391,7 @@
             }
 
             const result = await Swal.fire({
-                title: '¿Desea registrar la cotización?',
+                title: '¿Desea registrar la orden?',
                 text: "Confirmar",
                 icon: 'question',
                 showCancelButton: true,
@@ -405,7 +412,7 @@
                     clearValidationErrors('msgError');
 
                     Swal.fire({
-                        title: 'Registrando cotización...',
+                        title: 'Registrando orden...',
                         text: 'Por favor espere',
                         allowOutsideClick: false,
                         allowEscapeKey: false,
@@ -417,11 +424,12 @@
                     const formData = new FormData(formCreateQuote);
                     formData.append('lst_products', JSON.stringify(lstProducts));
                     formData.append('lst_services', JSON.stringify(lstServices));
-                    const res = await axios.post(route('tenant.taller.cotizaciones.store'), formData);
+
+                    const res = await axios.post(route('tenant.taller.ordenes_trabajo.store',), formData);
 
                     if (res.data.success) {
                         toastr.success(res.data.message, 'OPERACIÓN COMPLETADA');
-                        redirect('tenant.taller.cotizaciones.index');
+                        redirect('tenant.taller.ordenes_trabajo.index');
                     } else {
                         toastr.error(res.data.message, 'ERROR EN EL SERVIDOR');
                         Swal.close();
@@ -843,6 +851,19 @@
                 window.clientSelect.on('change', actionChangeClient);
 
             }
+        }
+
+        function loadFilePound() {
+            document.querySelectorAll('.filepond-input').forEach(input => {
+                FilePond.create(input, {
+                    allowImagePreview: true,
+                    imagePreviewHeight: 120,
+                    imageCropAspectRatio: '1:1',
+                    styleLayout: 'compact',
+                    stylePanelAspectRatio: 0.5,
+                    storeAsFile: true,
+                });
+            });
         }
     </script>
 @endsection

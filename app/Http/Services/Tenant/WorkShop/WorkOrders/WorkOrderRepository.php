@@ -3,10 +3,12 @@
 namespace App\Http\Services\Tenant\WorkShop\WorkOrders;
 
 use App\Models\Tenant\WorkShop\Quote\Quote;
-use App\Models\Tenant\WorkShop\Quote\QuoteProduct;
-use App\Models\Tenant\WorkShop\Quote\QuoteService;
-use App\Models\Tenant\WorkShop\Service;
-use App\Models\Tenant\WorkShop\Vehicle;
+use App\Models\Tenant\WorkShop\WorkOrder\WorkOrder;
+use App\Models\Tenant\WorkShop\WorkOrder\WorkOrderImage;
+use App\Models\Tenant\WorkShop\WorkOrder\WorkOrderInventory;
+use App\Models\Tenant\WorkShop\WorkOrder\WorkOrderProduct;
+use App\Models\Tenant\WorkShop\WorkOrder\WorkOrderService;
+use App\Models\Tenant\WorkShop\WorkOrder\WorkOrderTechnical;
 
 class WorkOrderRepository
 {
@@ -18,21 +20,36 @@ class WorkOrderRepository
         $this->s_dto    =   new WorkOrderDto();
     }
 
-    public function insertQuote(array $dto): Quote
+    public function insertWorkOrder(array $dto): WorkOrder
     {
-        return Quote::create($dto);
+        return WorkOrder::create($dto);
     }
 
-    public function insertQuoteDetail(array $lst_products, array $lst_services, Quote $quote)
+    public function insertWorkOrderDetail(array $lst_products, array $lst_services, WorkOrder $work_order)
     {
         foreach ($lst_products as $item) {
-            $dto_item = $this->s_dto->getDtoQuoteProduct($item, $quote);
-            QuoteProduct::create($dto_item);
+            $dto_item = $this->s_dto->getDtoOrderProduct($item, $work_order);
+            WorkOrderProduct::create($dto_item);
         }
         foreach ($lst_services as $item) {
-            $dto_item = $this->s_dto->getDtoQuoteService($item, $quote);
-            QuoteService::create($dto_item);
+            $dto_item = $this->s_dto->getDtoOrderService($item, $work_order);
+            WorkOrderService::create($dto_item);
         }
+    }
+
+    public function insertWorkInventory(array $dto)
+    {
+        WorkOrderInventory::insert($dto);
+    }
+
+    public function insertWorkTechnicians(array $dto)
+    {
+        WorkOrderTechnical::insert($dto);
+    }
+
+      public function insertWorkImages(array $dto)
+    {
+        WorkOrderImage::insert($dto);
     }
 
     public function updateQuote(array $dto, int $id): Quote
@@ -50,9 +67,24 @@ class WorkOrderRepository
         return $quote;
     }
 
-    public function getQuote(int $id): Quote
+    public function getWorkOrder(int $id): array
     {
-        $quote    =   Quote::findOrFail($id);
-        return $quote;
+        $order          =   WorkOrder::findOrFail($id);
+        $products       =   WorkOrderProduct::where('work_order_id',$id)->get();
+        $services       =   WorkOrderService::where('work_order_id',$id)->get();
+        $inventory      =   WorkOrderInventory::where('work_order_id',$id)->get();
+        $technicians    =   WorkOrderTechnical::where('work_order_id',$id)->get();
+        $images         =   WorkOrderImage::where('work_order_id',$id)->get();
+
+        $data   =   [
+            'order' =>  $order,
+            'products'  =>  $products,
+            'services'  =>  $services,
+            'inventory' =>  $inventory,
+            'technicians'   =>  $technicians,
+            'images'        =>  $images
+        ];
+
+        return $data;
     }
 }

@@ -10,11 +10,11 @@
         <th scope="col">DÍAS TRABAJO</th>
         <th scope="col">DÍAS DESCANSO</th>
         <th scope="col">PAGO MENSUAL</th>
-        <th scope="col">ACCIONES</th>
+        <th data-priority="1" scope="col"></th>
 
       </tr>
     </thead>
     <tbody>
-     
+
     </tbody>
 </table>

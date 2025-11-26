@@ -7,11 +7,13 @@ use App\Http\Controllers\UtilController;
 use App\Http\Requests\General\Herramientas\Colaboradores\ColaboradorStoreRequest;
 use App\Http\Requests\Market\Herramientas\Colaboradores\ColaboradorUpdateRequest;
 use App\Http\Requests\Tenant\Maintenance\Collaborator\CollaboratorStoreRequest;
+use App\Http\Requests\Tenant\Maintenance\Collaborator\CollaboratorUpdateRequest;
 use App\Models\Herramientas\Cargo;
 use App\Models\Herramientas\Colaborador;
 use App\Models\Herramientas\TipoDocumento;
 use App\Models\Tenant\Maintenance\Collaborator\Collaborator;
 use App\Models\Tenant\Maintenance\Position;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Exception;
@@ -42,6 +44,7 @@ class CollaboratorController extends Controller
                 'co.monthly_salary',
                 'p.name as position_name',
                 'co.status',
+                'co.document_type_id'
             )
             ->where('co.status', 'ACTIVO');
 
@@ -105,17 +108,11 @@ array:10 [ // app\Http\Controllers\Tenant\Maintenance\CollaboratorController.php
 
     public function edit($id)
     {
-        $tipos_documento    =   TipoDocumento::where('estado', 'ACTIVO')->get();
-        $colaborador        =   DB::select('select
-                                c.*
-                                from colaboradores as c
-                                where
-                                c.id = ?', [$id])[0];
+        $tipos_documento    =   UtilController::getIdentityDocuments();
+        $cargos             =   UtilController::getPositions();
+        $colaborador        =   Collaborator::findOrFail($id);
 
-        $cargos             =   Cargo::where('estado', 'ACTIVO')->get();
-
-
-        return view('general.herramientas.colaboradores.edit', compact('tipos_documento', 'colaborador', 'cargos'));
+        return view('maintenance.collaborators.edit', compact('tipos_documento', 'colaborador', 'cargos'));
     }
 
     /*
@@ -133,38 +130,28 @@ array:11 [ // app\Http\Controllers\General\Herramientas\ColaboradorController.ph
   "pago_mensual" => "12222.00"
 ]
 */
-    public function update(ColaboradorUpdateRequest $request, $id)
+    public function update(CollaboratorUpdateRequest $request, $id)
     {
 
         DB::beginTransaction();
         try {
-            $colaborador                    =   Colaborador::find($id);
+            $colaborador                    =   Collaborator::find($id);
 
-            //====== VALIDACIÓN NO CAMBIAR SUBSISTEMA SI EL COLABORADOR ESTÁ ENLAZADO A UN USUARIO ======
-            if ($colaborador->subsistema !== $request->get('subsistema')) {
-                $usuarios           =   DB::select(
-                    'SELECT count(*) as total FROM users AS u
-                                        WHERE u.colaborador_id = ?
-                                        AND u.estado ="ACTIVO"',
-                    [$id]
-                )[0];
+            $colaborador->document_type_id = $request->get('document_type');
+            $colaborador->document_number  = $request->get('document_number');
 
-                if ($usuarios->total > 0) {
-                    throw new Exception('NO PUEDES CAMBIAR EL SUBSISTEMA DE UN COLABORADOR ASIGNADO A UN USUARIO ACTIVO');
-                }
-            }
+            $colaborador->full_name = mb_strtoupper($request->get('full_name'), 'UTF-8');
 
-            $colaborador->tipo_documento_id =   $request->get('tipo_documento');
-            $colaborador->nombre            =   Str::upper($request->get('nombre'));
-            $colaborador->cargo_id          =   $request->get('cargo');
-            $colaborador->direccion         =   Str::upper($request->get('direccion'));
-            $colaborador->telefono          =   $request->get('telefono');
-            $colaborador->dias_trabajo      =   $request->get('dias_trabajo');
-            $colaborador->dias_descanso     =   $request->get('dias_descanso');
-            $colaborador->pago_mensual      =   $request->get('pago_mensual');
-            $colaborador->nro_documento     =   $request->get('nro_documento');
-            $colaborador->pago_dia          =   $request->get('pago_mensual') / 30;
-            $colaborador->subsistema        =   $request->get('subsistema');
+            $colaborador->position_id = $request->get('position');
+
+            $colaborador->address = mb_strtoupper($request->get('address'), 'UTF-8');
+            $colaborador->phone   = $request->get('phone');
+
+            $colaborador->work_days = $request->get('work_days');
+            $colaborador->rest_days = $request->get('rest_days');
+
+            $colaborador->monthly_salary = $request->get('monthly_salary');
+            $colaborador->daily_salary   = $request->get('monthly_salary') / 30;
             $colaborador->update();
 
             DB::commit();
@@ -179,13 +166,20 @@ array:11 [ // app\Http\Controllers\General\Herramientas\ColaboradorController.ph
     {
         DB::beginTransaction();
         try {
-            $colaborador                    =   Colaborador::find($id);
-            $colaborador->estado            =   'ANULADO';
+
+            $colaborador                    =   Collaborator::find($id);
+            $colaborador->status            =   'ANULADO';
             $colaborador->update();
+
+            $user   =   User::where('collaborator_id',$id)->where('status','ACTIVO')->first();
+            if($user){
+                $user->status = 'ANULADO';
+                $user->save();
+            }
 
             DB::commit();
             return response()->json(['success' => true, 'message' => 'COLABORADOR ELIMINADO']);
-        } catch (\Throwable $th) {
+        } catch (Throwable $th) {
             DB::rollBack();
             return response()->json(['success' => false, 'message' => $th->getMessage()]);
         }

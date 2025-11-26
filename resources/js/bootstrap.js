@@ -11,8 +11,26 @@ window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 
 import TomSelect from "tom-select";
 import "tom-select/dist/css/tom-select.bootstrap5.css";
-
 window.TomSelect   =   TomSelect;
+
+import * as FilePond from "filepond";
+import "filepond/dist/filepond.min.css";
+import FilePondPluginImagePreview from "filepond-plugin-image-preview";
+import "filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css";
+import FilePondPluginFileValidateSize from "filepond-plugin-file-validate-size";
+import es_ES from "filepond/locale/es-es.js";
+
+FilePond.registerPlugin(
+    FilePondPluginImagePreview,
+    FilePondPluginFileValidateSize,
+);
+
+FilePond.setOptions(es_ES);
+
+window.FilePond = FilePond;
+
+
+
 
 /**
  * Echo exposes an expressive API for subscribing to channels and listening

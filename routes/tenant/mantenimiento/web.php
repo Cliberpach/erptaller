@@ -34,7 +34,7 @@ Route::group(["prefix" => "mantenimiento"], function () {
     Route::group(["prefix" => "colaborador"], function () {
         Route::get('index', [CollaboratorController::class, 'index'])->name('tenant.mantenimientos.colaboradores.index');
         Route::get('getColaboradores', [CollaboratorController::class, 'getCollaborators'])->name('tenant.mantenimientos.colaboradores.getColaboradores');
-        Route::get('edit', [CollaboratorController::class, 'edit'])->name('tenant.mantenimientos.colaboradores.edit');
+        Route::get('edit/{id}', [CollaboratorController::class, 'edit'])->name('tenant.mantenimientos.colaboradores.edit');
         Route::put('update/{id}', [CollaboratorController::class, 'update'])->name('tenant.mantenimientos.colaboradores.update');
         Route::delete('destroy/{id}', [CollaboratorController::class, 'destroy'])->name('tenant.mantenimientos.colaboradores.destroy');
         Route::get('create', [CollaboratorController::class, 'create'])->name('tenant.mantenimientos.colaboradores.create');

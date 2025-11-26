@@ -18,6 +18,11 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->string('password_visible');
+            $table->enum('status', ['ACTIVO', 'ANULADO'])->default('ACTIVO');
+
+            $table->unsignedBigInteger('collaborator_id');
+            $table->foreign('collaborator_id')->references('id')->on('collaborators')->onDelete('restrict');
+
             $table->rememberToken();
             $table->timestamps();
         });

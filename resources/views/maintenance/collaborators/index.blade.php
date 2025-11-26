@@ -31,6 +31,12 @@
     <!-- end card -->
 @endsection
 
+<style>
+    .swal2-container {
+        z-index: 9999999;
+    }
+</style>
+
 <script>
     let dtColaboradores = null;
 
@@ -48,6 +54,9 @@
                 url: urlGetColaboradores,
                 type: 'GET',
             },
+            order: [
+                [0, 'desc']
+            ],
             columns: [{
                     data: 'id',
                     name: 'id',
@@ -100,7 +109,10 @@
                     data: 'monthly_salary',
                     name: 'co.monthly_salary',
                     searchable: false,
-                    orderable: false
+                    orderable: false,
+                    render: function(data, type, row) {
+                        return formatSoles(data);
+                    }
                 },
                 {
                     data: null,
@@ -174,16 +186,36 @@
         let message = '';
         let tipo_documento = '';
 
-        if (row.tipo_documento_id == 1) {
+        if (row.document_type_id == 39) {
             tipo_documento = 'DNI';
         }
 
-        if (row.tipo_documento_id == 2) {
+        if (row.document_type_id == 41) {
             tipo_documento = 'CARNET EXTRANJERÍA';
         }
 
+        message = `
+            <div class="text-center">
+                <p>
+                    <i class="fas fa-user-times text-danger fa-2x"></i><br>
+                </p>
 
-        message = `Desea eliminar el colaborador: ${row.nombre}, ${tipo_documento}:${row.nro_documento}`;
+                <p class="mt-3">
+                    <i class="fas fa-id-card"></i>
+                    <strong>${row.full_name}</strong><br>
+                    <i class="fas fa-file-alt"></i> ${tipo_documento}:
+                    <strong>${row.document_number}</strong>
+                </p>
+
+                <hr>
+
+                <p class="text-danger mt-2">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <strong>Advertencia:</strong><br>
+                    También se <u>anulará el usuario asociado</u> a este colaborador.
+                </p>
+            </div>
+        `;
 
         const swalWithBootstrapButtons = Swal.mixin({
             customClass: {
@@ -193,8 +225,8 @@
             buttonsStyling: false
         });
         swalWithBootstrapButtons.fire({
-            title: message,
-            text: "Operación no reversible!",
+            title: 'Desea eliminar el colaborador',
+            html: `${message}`,
             icon: "warning",
             showCancelButton: true,
             confirmButtonText: "Sí, eliminar!",
