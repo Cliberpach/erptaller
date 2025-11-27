@@ -18,6 +18,14 @@ return new class extends Migration
 
             $table->enum('status', ['ACTIVO', 'ANULADO'])->default('ACTIVO');
 
+            $table->unsignedBigInteger('creator_user_id')->nullable();
+            $table->unsignedBigInteger('editor_user_id')->nullable();
+            $table->unsignedBigInteger('delete_user_id')->nullable();
+
+            $table->string('delete_user_name')->nullable();
+            $table->string('editor_user_name')->nullable();
+            $table->string('create_user_name')->nullable();
+            
             $table->timestamps();
         });
     }
