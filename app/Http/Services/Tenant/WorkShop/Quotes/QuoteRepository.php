@@ -50,9 +50,19 @@ class QuoteRepository
         return $quote;
     }
 
-    public function getQuote(int $id): Quote
+    public function getQuote(int $id): array
     {
-        $quote    =   Quote::findOrFail($id);
-        return $quote;
+        $quote          =   Quote::findOrFail($id);
+        $products       =   QuoteProduct::where('quote_id', $id)->get();
+        $services       =   QuoteService::where('quote_id', $id)->get();
+
+        $data   =   [
+            'quote'     =>  $quote,
+            'products'  =>  $products,
+            'services'  =>  $services,
+
+        ];
+
+        return $data;
     }
 }

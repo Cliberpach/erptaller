@@ -6,8 +6,8 @@
 
 @section('content')
     {{-- @include('utils.modals.customer.mdl_create_customer') --}}
-    @include('workshop.quotes.modals.mdl_edit_product')
-    @include('workshop.quotes.modals.mdl_edit_service')
+    @include('workshop.work_orders.modals.mdl_edit_product')
+    @include('workshop.work_orders.modals.mdl_edit_service')
 
     <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
@@ -241,7 +241,10 @@
                 load: async (query, callback) => {
                     if (!query.length) return callback();
                     try {
-                        const url = `{{ route('tenant.utils.searchProduct') }}?q=${encodeURIComponent(query)}`;
+                        const url = route('tenant.utils.searchProductStock', {
+                            q: query,
+                            warehouse_id: window.warehouseSelect.getValue()
+                        });
                         const response = await fetch(url);
                         if (!response.ok) throw new Error('Error al buscar productos');
                         const data = await response.json();
@@ -253,15 +256,14 @@
                 },
                 render: {
                     option: (item, escape) => `
-                <div>
-                    <strong>${escape(item.text)}</strong><br>
-                    <small>${escape(item.subtext ?? '')}</small>
-                </div>
-            `,
+                        <div>
+                            <strong>${escape(item.text)}</strong><br>
+                            <small>${escape(item.subtext ?? '')}</small>
+                        </div>
+                    `,
                     item: (item, escape) => `<div>${escape(item.text)}</div>`
                 }
             });
-
 
             window.serviceSelect = new TomSelect('#service_id', {
                 valueField: 'id',
@@ -425,7 +427,7 @@
                     formData.append('lst_products', JSON.stringify(lstProducts));
                     formData.append('lst_services', JSON.stringify(lstServices));
 
-                    const res = await axios.post(route('tenant.taller.ordenes_trabajo.store',), formData);
+                    const res = await axios.post(route('tenant.taller.ordenes_trabajo.store'), formData);
 
                     if (res.data.success) {
                         toastr.success(res.data.message, 'OPERACIÓN COMPLETADA');
@@ -468,9 +470,12 @@
             if (item && item.sale_price) {
                 document.querySelector('#product_price').value = item.sale_price;
             }
+            if (item && item.stock) {
+                document.querySelector('#product_stock').value = item.stock;
+            }
         }
 
-        function actionAddProduct() {
+        async function actionAddProduct() {
 
             toastr.clear();
             const productSelected = getProductSelected();
@@ -478,7 +483,7 @@
                 return null;
             }
 
-            const validation = validationAddProduct(productSelected, lstProducts);
+            const validation = await validationAddProduct(productSelected, lstProducts);
             if (!validation) {
                 return;
             }
@@ -509,6 +514,7 @@
             const productSelected = window.productSelect.options[id];
 
             const product = {
+                warehouse_id:productSelected.warehouse_id,
                 id,
                 name: productSelected.name,
                 category_name: productSelected.category_name,
@@ -540,7 +546,13 @@
             return true;
         }
 
-        function validationAddProduct(productSelected, lstItems) {
+        async function validationAddProduct(productSelected, lstItems) {
+
+            const validationStock   =   await validatedProductStock(productSelected);
+            if(!validationStock){
+                return false;
+            }
+
             const indexExists = lstItems.findIndex((i) => i.id == productSelected.id);
             if (indexExists != -1) {
                 toastr.error(`${lstItems[indexExists].name} YA EXISTE EN EL DETALLE DE PRODUCTOS`);
@@ -865,5 +877,29 @@
                 });
             });
         }
+
+        async function validatedProductStock(item){
+            mostrarAnimacion1();
+            try {
+                const res = await axios.get(route('tenant.utils.validatedProductStock',{
+                    warehouse_id:item.warehouse_id,
+                    product_id:item.id,
+                    quantity:item.quantity
+                }));
+
+                if(res.data.success){
+                    return res.data;
+                }
+
+                toastr.error(res.data.message,'ERROR EN EL SERVIDOR');
+                return null;
+            } catch (error) {
+                toastr.error('ERROR EN LA PETICIÓN VALIDAR STOCK');
+                return null;
+            }finally{
+                ocultarAnimacion1();
+            }
+        }
+
     </script>
 @endsection

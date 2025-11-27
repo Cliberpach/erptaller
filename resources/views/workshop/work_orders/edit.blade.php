@@ -1,17 +1,17 @@
 @extends('layouts.template')
 
 @section('title')
-    Cotizaciones
+    Órdenes de Trabajo
 @endsection
 
 @section('content')
     {{-- @include('utils.modals.customer.mdl_create_customer') --}}
-    @include('workshop.quotes.modals.mdl_edit_product')
-    @include('workshop.quotes.modals.mdl_edit_service')
+    @include('workshop.work_orders.modals.mdl_edit_product')
+    @include('workshop.work_orders.modals.mdl_edit_service')
 
     <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
-            <h4 class="card-title mb-md-0 mb-2">EDITAR COTIZACIÓN</h4>
+            <h4 class="card-title mb-md-0 mb-2">EDITAR ÓRDEN DE TRABAJO</h4>
 
             <div class="d-flex flex-wrap gap-2">
 
@@ -20,7 +20,7 @@
         <div class="card-body">
             <div class="row">
                 <div class="col-12">
-                    @include('workshop.quotes.forms.form_edit_quote')
+                    @include('workshop.work_orders.forms.form_edit_order')
                 </div>
             </div>
         </div>
@@ -30,12 +30,12 @@
 
                     <!-- BOTÓN VOLVER -->
                     <button type="button" class="btn btn-danger me-1"
-                        onclick="redirect('tenant.taller.cotizaciones.index')">
+                        onclick="redirect('tenant.taller.ordenes_trabajo.index')">
                         <i class="fas fa-arrow-left"></i> VOLVER
                     </button>
 
-                    <!-- BOTÓN ACTUALIZAR -->
-                    <button class="btn btn-primary" form="form-edit-quote" type="submit">
+                    <!-- BOTÓN REGISTRAR -->
+                    <button class="btn btn-primary" form="form-edit-order" type="submit">
                         <i class="fas fa-save"></i> ACTUALIZAR
                     </button>
 
@@ -53,6 +53,8 @@
 </style>
 
 @section('js')
+    <script src="https://unpkg.com/justgage@latest/dist/justgage.umd.js"></script>
+
     <script>
         const lstProducts = @json($lst_products);
         const lstServices = @json($lst_services);
@@ -64,12 +66,25 @@
             totalPay: 0
         }
 
+        const gauge = new JustGage({
+            id: "gauge",
+            value: 50,
+            min: 0,
+            max: 100,
+            label: "Gasolina (%)",
+            pointer: true,
+            levelColors: ["#ff0000", "#f9c802", "#00b050"],
+            gaugeWidthScale: 0.7
+        });
+
+
         document.addEventListener('DOMContentLoaded', () => {
             dtProducts = loadDataTableSimple('dt-quotes-products');
             dtServices = loadDataTableSimple('dt-quotes-services');
 
+            loadTomSelect();
+            loadFilePound();
             loadPreviewData();
-            iniciarTomSelect();
             events();
 
         })
@@ -79,9 +94,13 @@
             eventsMdlEditProduct();
             eventsMdlEditService();
 
-            document.querySelector('#form-edit-quote').addEventListener('submit', (e) => {
+            document.getElementById("fuelSelect").addEventListener("change", function() {
+                gauge.refresh(this.value);
+            });
+
+            document.querySelector('#form-edit-order').addEventListener('submit', (e) => {
                 e.preventDefault();
-                storeQuote(e.target);
+                updateOrder(e.target);
             })
 
             window.clientSelect.on('change', function(value) {
@@ -124,7 +143,13 @@
 
         }
 
-        function iniciarTomSelect() {
+        function loadTomSelect() {
+
+            window.techniciansSelect = new TomSelect("#technicians", {
+                create: false,
+                maxItems: 3,
+                plugins: ['remove_button']
+            });
 
             window.warehouseSelect = new TomSelect('#warehouse_id', {
                 create: false,
@@ -138,12 +163,12 @@
             const initialCustomer = @json($customer_formatted);
             window.clientSelect = new TomSelect('#client_id', {
                 valueField: 'id',
-                options: [initialCustomer],
-                items: [initialCustomer.id],
                 labelField: 'full_name',
                 searchField: ['full_name'],
+                options: [initialCustomer],
+                items: [initialCustomer.id],
                 plugins: ['clear_button'],
-                placeholder: 'Seleccione un cliente',
+                placeholder: 'Seleccionar',
                 maxOptions: 20,
                 create: false,
                 preload: false,
@@ -175,11 +200,11 @@
             window.vehicleSelect = new TomSelect('#vehicle_id', {
                 valueField: 'id',
                 labelField: 'text',
-                options: [initialVehicle],
-                items: [initialVehicle.id],
                 searchField: ['text'],
                 plugins: ['clear_button'],
-                placeholder: 'Seleccione un vehículo',
+                options: [initialVehicle],
+                items: [initialVehicle.id],
+                placeholder: 'Seleccionar',
                 maxOptions: 20,
                 create: false,
                 preload: false,
@@ -223,7 +248,10 @@
                 load: async (query, callback) => {
                     if (!query.length) return callback();
                     try {
-                        const url = `{{ route('tenant.utils.searchProduct') }}?q=${encodeURIComponent(query)}`;
+                        const url = route('tenant.utils.searchProductStock', {
+                            q: query,
+                            warehouse_id: window.warehouseSelect.getValue()
+                        });
                         const response = await fetch(url);
                         if (!response.ok) throw new Error('Error al buscar productos');
                         const data = await response.json();
@@ -356,7 +384,7 @@
             window.modelSelect.setValue(model.id);
         }
 
-        function validationQuote() {
+        function validationSubmit() {
             if (lstProducts.length === 0 && lstServices.length === 0) {
                 toastr.error('DEBE AGREGAR AL MENOS UN PRODUCTO O SERVICIO A LA COTIZACIÓN');
                 return false;
@@ -364,20 +392,20 @@
             return true;
         }
 
-        async function storeQuote(formCreateQuote) {
+        async function updateOrder(formCreateQuote) {
 
             toastr.clear();
-            const isValid = validationQuote();
+            const isValid = validationSubmit();
             if (!isValid) {
                 return;
             }
 
             const result = await Swal.fire({
-                title: '¿Desea actualizar la cotización?',
+                title: '¿Desea actualizar la orden?',
                 text: "Confirmar",
                 icon: 'question',
                 showCancelButton: true,
-                confirmButtonText: 'SI, actualizar',
+                confirmButtonText: 'SI',
                 cancelButtonText: 'NO',
                 reverseButtons: true,
                 customClass: {
@@ -394,7 +422,7 @@
                     clearValidationErrors('msgError');
 
                     Swal.fire({
-                        title: 'Actualizando cotización...',
+                        title: 'Actualizando orden...',
                         text: 'Por favor espere',
                         allowOutsideClick: false,
                         allowEscapeKey: false,
@@ -403,15 +431,16 @@
                         }
                     });
 
+                    const id = @json($work_order->id);
                     const formData = new FormData(formCreateQuote);
                     formData.append('lst_products', JSON.stringify(lstProducts));
                     formData.append('lst_services', JSON.stringify(lstServices));
                     formData.append('_method', 'PUT');
-                    const res = await axios.post(route('tenant.taller.cotizaciones.update',@json($quote->id)), formData);
+                    const res = await axios.post(route('tenant.taller.ordenes_trabajo.update', id), formData);
 
                     if (res.data.success) {
                         toastr.success(res.data.message, 'OPERACIÓN COMPLETADA');
-                        redirect('tenant.taller.cotizaciones.index');
+                        redirect('tenant.taller.ordenes_trabajo.index');
                     } else {
                         toastr.error(res.data.message, 'ERROR EN EL SERVIDOR');
                         Swal.close();
@@ -450,9 +479,12 @@
             if (item && item.sale_price) {
                 document.querySelector('#product_price').value = item.sale_price;
             }
+            if (item && item.stock) {
+                document.querySelector('#product_stock').value = item.stock;
+            }
         }
 
-        function actionAddProduct() {
+        async function actionAddProduct() {
 
             toastr.clear();
             const productSelected = getProductSelected();
@@ -460,7 +492,7 @@
                 return null;
             }
 
-            const validation = validationAddProduct(productSelected, lstProducts);
+            const validation = await validationAddProduct(productSelected, lstProducts);
             if (!validation) {
                 return;
             }
@@ -468,7 +500,7 @@
             addItem(productSelected, lstProducts);
             dtProducts = destroyDataTable(dtProducts);
             clearTable('dt-quotes-products');
-            paintQuoteProducts(lstProducts);
+            paintOrderProducts(lstProducts);
             dtProducts = loadDataTableSimple('dt-quotes-products');
 
             calculateAmounts();
@@ -476,6 +508,7 @@
             toastr.success('PRODUCTO AGREGADO AL DETALLE DE PRODUCTOS');
 
         }
+
 
         function getProductSelected() {
 
@@ -491,6 +524,7 @@
             const productSelected = window.productSelect.options[id];
 
             const product = {
+                warehouse_id: productSelected.warehouse_id,
                 id,
                 name: productSelected.name,
                 category_name: productSelected.category_name,
@@ -522,12 +556,19 @@
             return true;
         }
 
-        function validationAddProduct(productSelected, lstItems) {
+        async function validationAddProduct(productSelected, lstItems) {
+
             const indexExists = lstItems.findIndex((i) => i.id == productSelected.id);
             if (indexExists != -1) {
                 toastr.error(`${lstItems[indexExists].name} YA EXISTE EN EL DETALLE DE PRODUCTOS`);
                 return false;
             }
+
+            const validationStock = await validatedProductStock(productSelected);
+            if (!validationStock) {
+                return false;
+            }
+
             return true;
         }
 
@@ -535,7 +576,7 @@
             lstItems.push(itemSelected);
         }
 
-        function paintQuoteProducts(lstItems) {
+        function paintOrderProducts(lstItems) {
             const tbody = document.querySelector('#dt-quotes-products tbody');
             let rows = ``;
 
@@ -578,7 +619,7 @@
 
             dtProducts = destroyDataTable(dtProducts);
             clearTable('dt-quotes-products');
-            paintQuoteProducts(lstItems);
+            paintOrderProducts(lstItems);
             dtProducts = loadDataTableSimple('dt-quotes-products');
 
             calculateAmounts();
@@ -612,7 +653,7 @@
             addItem(serviceSelected, lstServices);
             dtServices = destroyDataTable(dtServices);
             clearTable('dt-quotes-services');
-            paintQuoteServices(lstServices);
+            paintOrderServices(lstServices);
             dtServices = loadDataTableSimple('dt-quotes-services');
 
             calculateAmounts();
@@ -673,7 +714,7 @@
             return true;
         }
 
-        function paintQuoteServices(lstItems) {
+        function paintOrderServices(lstItems) {
             const tbody = document.querySelector('#dt-quotes-services tbody');
             let rows = ``;
 
@@ -715,7 +756,7 @@
 
             dtServices = destroyDataTable(dtServices);
             clearTable('dt-quotes-services');
-            paintQuoteServices(lstItems);
+            paintOrderServices(lstItems);
             dtServices = loadDataTableSimple('dt-quotes-services');
 
             calculateAmounts();
@@ -789,29 +830,127 @@
             });
         }
 
-        function actionChangeVehicle(value) {
-            document.querySelector('#plate').value = '';
+        async function actionChangeVehicle(value) {
 
             if (!value) return;
-            const vehicle = window.vehicleSelect.options[value];
-            console.log(vehicle);
-            document.querySelector('#plate').value = vehicle.text;
+
+            //========= TRAER CLIENTES ==========
+            mostrarAnimacion1();
+            try {
+
+                const res = await axios.get(route('tenant.utils.searchCustomer', {
+                    q: '',
+                    vehicle_id: value
+                }));
+
+                if (res.data.success) {
+                    toastr.info(res.data.message, 'OPERACIÓN COMPLETADA');
+                    setCustomerOfVehicle(res.data.data);
+                }
+
+            } catch (error) {
+                toastr.error(error, 'ERROR AL CARGAR CLIENTE DEL VEHÍCULO');
+                return;
+            } finally {
+                ocultarAnimacion1();
+            }
+        }
+
+        function setCustomerOfVehicle(customer) {
+            window.clientSelect.clear();
+            window.clientSelect.clearOptions();
+
+            customer.forEach(v => {
+                window.clientSelect.addOption({
+                    id: v.id,
+                    full_name: v.full_name,
+                    email: v.email
+                });
+            });
+
+            if (customer.length > 0) {
+                window.clientSelect.off('change');
+                window.clientSelect.setValue(customer[0].id);
+                window.clientSelect.on('change', actionChangeClient);
+
+            }
+        }
+
+        function loadFilePound() {
+            document.querySelectorAll('.filepond-input').forEach(input => {
+                FilePond.create(input, {
+                    allowImagePreview: true,
+                    imagePreviewHeight: 120,
+                    imageCropAspectRatio: '1:1',
+                    styleLayout: 'compact',
+                    stylePanelAspectRatio: 0.5,
+                    storeAsFile: true,
+                });
+            });
         }
 
         function loadPreviewData() {
 
+            //====== PRODUCTS
             dtProducts = destroyDataTable(dtProducts);
             clearTable('dt-quotes-products');
-            paintQuoteProducts(lstProducts);
+            paintOrderProducts(lstProducts);
             dtProducts = loadDataTableSimple('dt-quotes-products');
 
+            //======= SERVICES =======
             dtServices = destroyDataTable(dtServices);
             clearTable('dt-quotes-services');
-            paintQuoteServices(lstServices);
+            paintOrderServices(lstServices);
             dtServices = loadDataTableSimple('dt-quotes-services');
 
             calculateAmounts();
             paintAmounts();
+
+            //========= INVENTORY =========
+            const lstInventory = @json($lst_inventory);
+            lstInventory.forEach((i) => {
+                const check = document.querySelector(`#inv_item_${i}`);
+                check.checked = true;
+            })
+
+            //======= TECHNICIANS ========
+            const lstTechnicians = @json($lst_technicians);
+            window.techniciansSelect.setValue(lstTechnicians);
+
+            //======== IMAGES =======
+            const lstImages = @json($lst_images);
+            const inputs = document.querySelectorAll('.filepond-input');
+            inputs.forEach((input, index) => {
+                let pond = FilePond.find(input);
+
+                if (lstImages[index]) {
+                    pond.addFile(lstImages[index].img_route);
+                }
+            });
+        }
+
+        async function validatedProductStock(item) {
+            mostrarAnimacion1();
+            try {
+                const res = await axios.get(route('tenant.utils.validatedProductStock', {
+                    work_order_id:@json($work_order->id),
+                    warehouse_id: item.warehouse_id,
+                    product_id: item.id,
+                    quantity: item.quantity
+                }));
+
+                if (res.data.success) {
+                    return res.data;
+                }
+
+                toastr.error(res.data.message, 'ERROR EN EL SERVIDOR');
+                return null;
+            } catch (error) {
+                toastr.error('ERROR EN LA PETICIÓN VALIDAR STOCK');
+                return null;
+            } finally {
+                ocultarAnimacion1();
+            }
         }
     </script>
 @endsection

@@ -2,7 +2,9 @@
 
 namespace App\Http\Services\Tenant\WorkShop\Quotes;
 
+use App\Models\Company;
 use App\Models\Tenant\WorkShop\Quote\Quote;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class QuoteService
 {
@@ -23,7 +25,7 @@ class QuoteService
         $dto            =   $this->s_dto->getDtoStore($data);
 
         $quote      =   $this->s_repository->insertQuote($dto);
-        $this->s_repository->insertQuoteDetail($data['lst_products'],$data['lst_services'], $quote);
+        $this->s_repository->insertQuoteDetail($data['lst_products'], $data['lst_services'], $quote);
 
         return $quote;
     }
@@ -32,17 +34,24 @@ class QuoteService
     {
         $data       =   $this->s_validation->validationUpdate($data, $id);
         $dto        =   $this->s_dto->getDtoStore($data);
-    
+
         $quote      =   $this->s_repository->updateQuote($dto, $id);
         return $quote;
     }
 
-    public function destroy(int $id):Quote
+    public function destroy(int $id): Quote
     {
         return $this->s_repository->destroy($id);
     }
 
-    public function getQuote(int $id): Quote
+    public function pdfOne(int $id)
+    {
+        $data_quote =   $this->getQuote($id);
+        $company    =   Company::findOrFail(1);
+        return $pdf = Pdf::loadView('workshop.quotes.reports.pdf_quote', compact('data_quote', 'company'));
+    }
+
+    public function getQuote(int $id): array
     {
         return $this->s_repository->getQuote($id);
     }

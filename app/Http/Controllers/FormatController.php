@@ -69,6 +69,7 @@ class FormatController extends Controller
 
         foreach ($items as $item) {
             $formatted[] = [
+                'warehouse_id'=>$item['warehouse_id'],
                 'id' => $item['product_id'],
                 'name' => $item['product_name'],
                 'category_name' => $item['category_name'],
@@ -82,7 +83,7 @@ class FormatController extends Controller
         return $formatted;
     }
 
-      public static function formatLstServices(array $items): array
+    public static function formatLstServices(array $items): array
     {
         $formatted = [];
 
@@ -96,6 +97,38 @@ class FormatController extends Controller
             ];
         }
 
+        return $formatted;
+    }
+
+    public static function formatLstInventory(array $items): array
+    {
+        $formatted = [];
+        foreach ($items as $item) {
+            $formatted[]    =   $item['inventory_id'];
+        }
+        return $formatted;
+    }
+
+    public static function formatLstTechnicians(array $items): array
+    {
+        $formatted = [];
+        foreach ($items as $item) {
+            $formatted[]    =   $item['technical_id'];
+        }
+        return $formatted;
+    }
+
+    public static function formatLstImages(array $items): array
+    {
+        $formatted = [];
+        foreach ($items as $item) {
+            $formatted[] = [
+                'id' => $item['id'],
+                'work_order_id' => $item['work_order_id'],
+                'img_route' => asset($item['img_route']),
+                'img_name' => $item['img_name'],
+            ];
+        }
         return $formatted;
     }
 }

@@ -121,11 +121,11 @@ array:17 [ // app\Http\Controllers\Tenant\WorkShop\QuoteController.php:91
 
         return view(
             'workshop.quotes.edit',
-            compact('igv', 'warehouses', 'quote', 'customer_formatted','vehicle_formatted','lst_products','lst_services')
+            compact('igv', 'warehouses', 'quote', 'customer_formatted', 'vehicle_formatted', 'lst_products', 'lst_services')
         );
     }
 
-/*
+    /*
 array:17 [ // app\Http\Controllers\Tenant\WorkShop\QuoteController.php:145
   "_token" => "dmJ2sDFFwSLunK4KEKQdm6Wkn6XbriZ10upcdNKx"
   "_method" => "PUT"
@@ -162,7 +162,6 @@ array:17 [ // app\Http\Controllers\Tenant\WorkShop\QuoteController.php:145
         }
     }
 
-
     public function destroy(int $id)
     {
         DB::beginTransaction();
@@ -176,6 +175,18 @@ array:17 [ // app\Http\Controllers\Tenant\WorkShop\QuoteController.php:145
         } catch (Throwable $th) {
             DB::rollBack();
             return response()->json(['success' => false, 'message' => $th->getMessage()]);
+        }
+    }
+
+    public function pdfOne(int $id)
+    {
+        try {
+            $pdf    =   $this->s_quote->pdfOne($id);
+
+            return $pdf->stream("cotizacion_$id.pdf");
+        } catch (Throwable $th) {
+            Session::flash('message_error', $th->getMessage());
+            return back();
         }
     }
 

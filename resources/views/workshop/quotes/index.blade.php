@@ -5,7 +5,7 @@
 @endsection
 
 @section('content')
-    @include('workshop.years.modals.mdl_edit_year')
+    @include('workshop.quotes.modals.mdl_show_quote')
 
     <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
@@ -160,6 +160,18 @@
                                     </button>
                                     <ul class="dropdown-menu dropdown-menu-end">
                                         <li>
+                                            <a class="dropdown-item generarPDF"
+                                                href="${route('tenant.taller.cotizaciones.pdfOne', data.id)}" target="_blank"
+                                                title="PDF" role="button" aria-label="Generar PDF">
+                                                <i class="fas fa-file-pdf me-2 text-danger"></i> PDF
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" href="#" onclick="openMdlShowQuote(${data.id})">
+                                                <i class="fa fa-eye me-2"></i> Ver
+                                            </a>
+                                        </li>
+                                        <li>
                                             <a class="dropdown-item modificarDetalle" href="#" onclick="redirectParams('tenant.taller.cotizaciones.edit', ${data.id})">
                                                 <i class="fa fa-edit me-2"></i> Modificar
                                             </a>
@@ -273,11 +285,11 @@
                     cancelButton: 'btn btn-danger',
                     actions: 'd-flex justify-content-center gap-2 mt-3'
                 },
-                buttonsStyling: false // Necesario para que Bootstrap controle el estilo
+                buttonsStyling: false
             });
 
             swalWithBootstrapButtons.fire({
-                title: '¿Desea eliminar el vehículo?',
+                title: '¿Desea eliminar la cotización?',
                 html: `${htmlVehicleInfo}`,
                 icon: 'question',
                 showCancelButton: true,
@@ -308,7 +320,7 @@
                             toastr.error(res.data.message, 'ERROR EN EL SERVIDOR');
                         }
                     } catch (error) {
-                        toastr.error(error, 'ERROR EN LA PETICIÓN ELIMINAR VEHÍCULO');
+                        toastr.error(error, 'ERROR EN LA PETICIÓN ELIMINAR COTIZACIÓN');
                     } finally {
                         Swal.close();
                     }

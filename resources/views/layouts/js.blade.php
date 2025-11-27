@@ -31,10 +31,10 @@
 {{-- <script src="https://code.jquery.com/jquery-3.7.0.js"></script> --}}
 
 <!-- JQUERY -->
-<script src="{{asset('assets/jquery/jquery.js')}}"></script>
+<script src="{{ asset('assets/jquery/jquery.js') }}"></script>
 
 <!-- DATATABLES -->
-<script src="{{asset('assets/datatable/datatables.min.js')}}"></script>
+<script src="{{ asset('assets/datatable/datatables.min.js') }}"></script>
 
 {{-- <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
@@ -44,6 +44,41 @@
 <!-- Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.full.min.js"></script>
 
-<script src="{{asset('assets/js/utils.js')}}"></script>
+<script src="{{ asset('assets/js/utils.js') }}"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        mostrarSessionMessages();
+    })
+
+    function mostrarSessionMessages() {
+        const messageSuccess = "{{ Session::get('message_success') }}";
+        const messageError = "{{ Session::get('message_error') }}";
+
+        console.log(messageSuccess);
+        if (messageSuccess) {
+            Swal.fire({
+                icon: 'success',
+                title: 'OPERACIÓN COMPLETADA',
+                text: messageSuccess,
+                customClass: {
+                    confirmButton: 'btn-primary'
+                },
+            });
+        }
+
+        if (messageError) {
+            Swal.fire({
+                icon: 'error',
+                title: 'ERROR EN LA OPERACIÓN',
+                text: messageError,
+                customClass: {
+                    confirmButton: 'btn-primary'
+                },
+            });
+        }
+
+    }
+</script>
 
 @yield('js')

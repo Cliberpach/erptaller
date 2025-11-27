@@ -297,10 +297,11 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
 Route::group(["prefix" => "utils"], function () {
     Route::get('service-search', [ServiceController::class, 'searchService'])->name('tenant.utils.searchService');
     Route::get('product-search', [ProductController::class, 'searchProduct'])->name('tenant.utils.searchProduct');
+    Route::get('product-search/stock', [ProductController::class, 'searchProductStock'])->name('tenant.utils.searchProductStock');
     Route::get('model-search', [ModelController::class, 'searchModel'])->name('tenant.utils.searchModel');
     Route::get('customer-search', [CustomerController::class, 'searchCustomer'])->name('tenant.utils.searchCustomer');
     Route::get('vehicle-search', [VehicleController::class, 'searchVehicle'])->name('tenant.utils.searchVehicle');
     Route::get('get-years/{model}', [YearController::class, 'getYearsModel'])->name('tenant.utils.getYearsModel');
     Route::get('serch-plate/{placa}', [VehicleController::class, 'searchPlate'])->name('tenant.utils.searchPlate');
-
+    Route::get('validated-product/stock', [ProductController::class, 'validatedProductStock'])->name('tenant.utils.validatedProductStock');
 });

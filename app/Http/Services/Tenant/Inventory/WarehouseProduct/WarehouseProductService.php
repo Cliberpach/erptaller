@@ -49,24 +49,29 @@ class WarehouseProductService
     public function getProductStock(int $warehouse_id, int $product_id)
     {
         $product_stock  =   DB::select(
-            'SELECT
-                            p.id,
-                            p.name AS product_name,
-                            c.id AS category_id,
-                            b.id AS brand_id,
-                            c.name AS category_name,
-                            b.name AS brand_name,
-                            p.sale_price,
-                            wp.stock
-                            FROM products AS p
-                            JOIN brands AS b ON b.id = p.brand_id
-                            JOIN categories AS c ON c.id = p.category_id
-                            JOIN warehouse_products AS wp ON wp.product_id = p.id
-                            WHERE
-                            p.id = ?
-                            AND wp.warehouse_id = ?',
-            [$product_id, $warehouse_id]
-        );
-        return $product_stock;
+                                'SELECT
+                                                p.id,
+                                                p.name AS product_name,
+                                                c.id AS category_id,
+                                                b.id AS brand_id,
+                                                c.name AS category_name,
+                                                b.name AS brand_name,
+                                                p.sale_price,
+                                                wp.stock
+                                                FROM products AS p
+                                                JOIN brands AS b ON b.id = p.brand_id
+                                                JOIN categories AS c ON c.id = p.category_id
+                                                JOIN warehouse_products AS wp ON wp.product_id = p.id
+                                                WHERE
+                                                p.id = ?
+                                                AND wp.warehouse_id = ?',
+                                [$product_id, $warehouse_id]
+                            );
+
+        if(count($product_stock) === 0){
+            return null;
+        }
+
+        return $product_stock[0];
     }
 }

@@ -2,7 +2,7 @@
 
 namespace App\Http\Services\Tenant\WorkShop\WorkOrders;
 
-use App\Models\Tenant\WorkShop\Quote\Quote;
+use App\Http\Services\Tenant\Inventory\WarehouseProduct\WarehouseProductService;
 use App\Models\Tenant\WorkShop\WorkOrder\WorkOrder;
 use App\Models\Tenant\WorkShop\WorkOrder\WorkOrderImage;
 use App\Models\Tenant\WorkShop\WorkOrder\WorkOrderInventory;
@@ -12,12 +12,15 @@ use App\Models\Tenant\WorkShop\WorkOrder\WorkOrderTechnical;
 
 class WorkOrderRepository
 {
-
     private WorkOrderDto $s_dto;
+    private WorkOrderValidation $s_validation;
+    private WarehouseProductService $s_warehouse_product;
 
     public function __construct()
     {
         $this->s_dto    =   new WorkOrderDto();
+        $this->s_validation =   new WorkOrderValidation();
+        $this->s_warehouse_product  =   new WarehouseProductService();
     }
 
     public function insertWorkOrder(array $dto): WorkOrder
@@ -28,6 +31,8 @@ class WorkOrderRepository
     public function insertWorkOrderDetail(array $lst_products, array $lst_services, WorkOrder $work_order)
     {
         foreach ($lst_products as $item) {
+            $this->s_validation->validationProduct($item);
+            $this->s_warehouse_product->decreaseStock($item->warehouse_id,$item->id,$item->quantity);
             $dto_item = $this->s_dto->getDtoOrderProduct($item, $work_order);
             WorkOrderProduct::create($dto_item);
         }
@@ -47,34 +52,65 @@ class WorkOrderRepository
         WorkOrderTechnical::insert($dto);
     }
 
-      public function insertWorkImages(array $dto)
+    public function insertWorkImages(array $dto)
     {
         WorkOrderImage::insert($dto);
     }
 
-    public function updateQuote(array $dto, int $id): Quote
+    public function updateWorkOrder(array $dto, int $id): WorkOrder
     {
-        $quote    =   Quote::findOrFail($id);
-        $quote->update($dto);
-        return $quote;
+        $work_order    =   WorkOrder::findOrFail($id);
+        $work_order->update($dto);
+        return $work_order;
     }
 
-    public function destroy(int $id): Quote
+    public function destroy(int $id): WorkOrder
     {
-        $quote            =   Quote::findOrFail($id);
-        $quote->status    =   'INACTIVE';
-        $quote->save();
-        return $quote;
+        $work_order            =   WorkOrder::findOrFail($id);
+        $work_order->status    =   'ANULADO';
+        $work_order->save();
+        return $work_order;
+    }
+
+    public function deleteDetailProduct(int $id)
+    {
+        WorkOrderProduct::where('work_order_id', $id)->delete();
+    }
+
+    public function deleteDetailService(int $id)
+    {
+        WorkOrderService::where('work_order_id', $id)->delete();
+    }
+
+    public function deleteDetailInventory(int $id)
+    {
+        WorkOrderInventory::where('work_order_id', $id)->delete();
+    }
+
+    public function deleteDetailTechnical(int $id)
+    {
+        WorkOrderTechnical::where('work_order_id', $id)->delete();
+    }
+
+    public function deleteWorkImage(int $id)
+    {
+
+        WorkOrderImage::where('id', $id)->delete();
+    }
+
+    public function getWorkImageDetail(int $id)
+    {
+        return WorkOrderImage::where('work_order_id', $id)->get();
     }
 
     public function getWorkOrder(int $id): array
     {
         $order          =   WorkOrder::findOrFail($id);
-        $products       =   WorkOrderProduct::where('work_order_id',$id)->get();
-        $services       =   WorkOrderService::where('work_order_id',$id)->get();
-        $inventory      =   WorkOrderInventory::where('work_order_id',$id)->get();
-        $technicians    =   WorkOrderTechnical::where('work_order_id',$id)->get();
-        $images         =   WorkOrderImage::where('work_order_id',$id)->get();
+        $products       =   WorkOrderProduct::where('work_order_id', $id)->get();
+        $services       =   WorkOrderService::where('work_order_id', $id)->get();
+        $inventory      =   WorkOrderInventory::where('work_order_id', $id)->get();
+        $technicians    =   WorkOrderTechnical::where('work_order_id', $id)->get();
+        $images         =   WorkOrderImage::where('work_order_id', $id)->get();
 
         $data   =   [
             'order' =>  $order,
@@ -86,5 +122,19 @@ class WorkOrderRepository
         ];
 
         return $data;
+    }
+
+    public function countWorkImage(int $id)
+    {
+        return WorkOrderImage::where('work_order_id', $id)->count();
+    }
+
+    public function insertWorkImage(array $dto)
+    {
+        WorkOrderImage::create($dto);
+    }
+
+    public function getWorkProducts(int $id){
+        return WorkOrderProduct::where('work_order_id',$id)->get();
     }
 }

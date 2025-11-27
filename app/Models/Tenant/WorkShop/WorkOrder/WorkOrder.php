@@ -30,6 +30,7 @@ class WorkOrder extends Model
         'status',
         'created_at',
         'updated_at',
+        'plate'
     ];
 
     protected static function boot()

@@ -1,5 +1,5 @@
 <!-- Modal para visualizar orden de trabajo -->
-<div class="modal fade" id="mdl_show_order" tabindex="-1" aria-labelledby="mdl_show_order_label" aria-hidden="true">
+<div class="modal fade" id="mdl_show_quote" tabindex="-1" aria-labelledby="mdl_show_quote_label" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content">
 
@@ -7,9 +7,9 @@
             <div class="modal-header">
                 <i class="fa fa-cogs text-primary me-2"></i>
                 <div>
-                    <h5 class="modal-title mb-0" id="mdl_show_order_label">Orden de Trabajo #<span
+                    <h5 class="modal-title mb-0" id="mdl_show_quote_label">Cotización #<span
                             id="show_order_id"></span></h5>
-                    <small class="text-muted">Detalles completos de la orden</small>
+                    <small class="text-muted">Detalles completos de la cotización</small>
                 </div>
                 <button type="button" class="btn-close ms-auto" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
@@ -90,55 +90,6 @@
                     </div>
                 </div>
 
-                <hr>
-
-                <!-- Sección Técnicos -->
-                <div class="mb-4">
-                    <h6 class="text-primary"><i class="fa fa-user-cog me-1"></i> Técnicos</h6>
-                    <div class="table-responsive">
-                        <table class="table-sm table-bordered table">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>ID Técnico</th>
-                                    <th>Nombre</th>
-                                </tr>
-                            </thead>
-                            <tbody id="show_technicians_body">
-                                <!-- Se llenará dinámicamente -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <hr>
-
-                <!-- Sección Inventario -->
-                <div class="mb-4">
-                    <h6 class="text-primary"><i class="fa fa-clipboard-list me-1"></i> Inventario</h6>
-                    <div class="table-responsive">
-                        <table class="table-sm table-bordered table">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>#</th>
-                                    <th>Nombre</th>
-                                </tr>
-                            </thead>
-                            <tbody id="show_inventory_body">
-                                <!-- Se llenará dinámicamente -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- Sección Imágenes -->
-                <div class="mb-4">
-                    <h6 class="text-primary"><i class="fa fa-image me-1"></i> Imágenes</h6>
-                    <div class="row" id="show_images_body">
-                        <!-- Se llenará dinámicamente -->
-                    </div>
-                </div>
-
-
             </div>
 
             <!-- Footer -->
@@ -159,28 +110,25 @@
 </style>
 
 <script>
-    const paramsMdlShowOrder = {
+    const paramsMdlShowQuote = {
         id: null
     };
 
-    async function openMdlShowOrder(id) {
-        paramsMdlShowOrder.id = id;
-        await getWorkOrder(id);
-        const modal = new bootstrap.Modal(document.getElementById('mdl_show_order'));
+    async function openMdlShowQuote(id) {
+        paramsMdlShowQuote.id = id;
+        await getQuote(id);
+        const modal = new bootstrap.Modal(document.getElementById('mdl_show_quote'));
         modal.show();
     }
 
-    async function getWorkOrder(id) {
+    async function getQuote(id) {
         try {
             mostrarAnimacion1();
-            const res = await axios.get(route('tenant.taller.ordenes_trabajo.getWorkOrder', id));
+            const res = await axios.get(route('tenant.taller.cotizaciones.getQuote', id));
             if (res.data.success) {
-                paintOrderMaster(res.data.data.order);
+                paintQuoteMaster(res.data.data.quote);
                 paintOrderProducts(res.data.data.products);
                 paintOrderServices(res.data.data.services);
-                paintOrderTechnicians(res.data.data.technicians);
-                paintOrderInventory(res.data.data.inventory);
-                paintOrderImages(res.data.data.images);
             } else {
                 toastr.error(res.data.message, 'ERROR EN EL SERVIDOR');
             }
@@ -191,7 +139,7 @@
         }
     }
 
-    function paintOrderMaster(order) {
+    function paintQuoteMaster(order) {
         document.getElementById('show_order_id').innerText = order.id;
 
         document.getElementById('show_warehouse_name').innerText = order.warehouse_name;
@@ -245,57 +193,6 @@
         `;
 
             tbody.appendChild(tr);
-        });
-    }
-
-    function paintOrderTechnicians(technicians) {
-        const tbody = document.getElementById('show_technicians_body');
-        tbody.innerHTML = ''; // Limpiar tabla
-
-        technicians.forEach(tech => {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-            <td>${tech.technical_id}</td>
-            <td>${tech.technical_name}</td>
-        `;
-            tbody.appendChild(tr);
-        });
-    }
-
-    function paintOrderInventory(inventory) {
-        const tbody = document.getElementById('show_inventory_body');
-        tbody.innerHTML = '';
-
-        inventory.forEach((item, index) => {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-            <td>${index + 1}</td>
-            <td>${item.inventory_name}</td>
-        `;
-            tbody.appendChild(tr);
-        });
-    }
-
-    function paintOrderImages(images) {
-        const container = document.getElementById('show_images_body');
-        container.innerHTML = '';
-
-        images.forEach(img => {
-            const col = document.createElement('div');
-            col.classList.add('col-6', 'col-md-3', 'mb-3');
-
-            const imgUrl = "{{ asset('') }}" + img.img_route;
-
-            col.innerHTML = `
-                <div class="card h-100 shadow-sm">
-                    <img src="${imgUrl}" class="card-img-top" alt="${img.img_name}" style="object-fit: cover; height:150px;">
-                    <div class="card-body p-2 text-center">
-                        <p class="mb-1 small text-truncate" title="${img.img_name}">${img.img_name}</p>
-                    </div>
-                </div>
-            `;
-
-            container.appendChild(col);
         });
     }
 

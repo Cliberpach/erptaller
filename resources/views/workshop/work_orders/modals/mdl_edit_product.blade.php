@@ -37,13 +37,15 @@
 
 <script>
     const paramsMdlEditProduct = {
-        id: null
+        id: null,
+        warehouse_id:null
     };
 
     async function openMdlEditProduct(productId) {
         paramsMdlEditProduct.id = productId;
 
         const productEdit = lstProducts.find((item) => item.id == productId);
+        paramsMdlEditProduct.warehouse_id = productEdit.warehouse_id;
         paintProductEdit(productEdit);
 
         $('#mdl_edit_product').modal('show');
@@ -57,8 +59,8 @@
     }
 
     function paintProductEdit(item) {
-        document.querySelector('#product_price_edit').value = item.sale_price;
-        document.querySelector('#product_quantity_edit').value = item.quantity;
+        document.querySelector('#product_price_edit').value = parseFloat(item.sale_price).toFixed(2);
+        document.querySelector('#product_quantity_edit').value = formatQuantity(item.quantity);
         document.querySelector('#product_name_edit').textContent = item.name;
         document.querySelector('#product_category_edit').textContent = item.category_name;
         document.querySelector('#product_brand_edit').textContent = item.brand_name;
@@ -66,30 +68,24 @@
 
     }
 
-    function pintarModeloEdit(year) {
-        console.log(year);
-        document.querySelector('#description_edit').value = year.description;
-
-        if (!window.modalEditSelect.options[year.model_id]) {
-            const text = `${year.model.brand.description} - ${year.model.description}`;
-            window.modalEditSelect.addOption({
-                id: year.model_id,
-                text: text
-            });
-        }
-
-        window.modalEditSelect.setValue(year.model_id, true);
-
-    }
-
-    function updateItemProduct() {
+    async function updateItemProduct() {
 
         toastr.clear();
         const product = getFormProductEdit();
-        setProductEdit(product, lstProducts);
+        if(!product){
+            return;
+        }
+
+        const validationStock = await validatedProductStock(product);
+        if (!validationStock) {
+            return false;
+        }
+
+        saveProductEdit(product, lstProducts);
+
         dtProducts = destroyDataTable(dtProducts);
         clearTable('dt-quotes-products');
-        paintQuoteProducts(lstProducts);
+        paintOrderProducts(lstProducts);
         dtProducts = loadDataTableSimple('dt-quotes-products');
 
         calculateAmounts();
@@ -108,10 +104,11 @@
 
         const validation = validationFormProduct(id, quantity, salePrice);
         if (!validation) {
-            return null;
+            return false;
         };
 
         const product = {
+            warehouse_id:paramsMdlEditProduct.warehouse_id,
             id,
             sale_price: salePrice,
             quantity,
@@ -122,7 +119,7 @@
 
     }
 
-    function setProductEdit(product, lstItems) {
+    function saveProductEdit(product, lstItems) {
         const index = lstItems.findIndex((i) => i.id == product.id);
 
         lstItems[index].sale_price = product.sale_price;

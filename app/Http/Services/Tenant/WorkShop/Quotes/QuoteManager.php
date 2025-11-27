@@ -18,7 +18,7 @@ class QuoteManager
         return $this->s_quote->store($datos);
     }
 
-    public function getQuote(int $id): Quote
+    public function getQuote(int $id): array
     {
         return $this->s_quote->getQuote($id);
     }
@@ -32,5 +32,11 @@ class QuoteManager
     {
         $this->s_quote->destroy($id);
     }
+
+    public function pdfOne(int $id)
+    {
+        return $this->s_quote->pdfOne($id);
+    }
+
 
 }

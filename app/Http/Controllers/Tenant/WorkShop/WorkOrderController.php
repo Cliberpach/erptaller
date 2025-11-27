@@ -5,13 +5,9 @@ namespace App\Http\Controllers\Tenant\WorkShop;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\FormatController;
 use App\Http\Controllers\UtilController;
-use App\Http\Requests\Tenant\WorkShop\Quote\QuoteStoreRequest;
 use App\Http\Services\Tenant\WorkShop\WorkOrders\WorkOrderManager;
 use App\Models\Company;
 use App\Models\Tenant\Warehouse;
-use App\Models\Tenant\WorkShop\Quote\Quote;
-use App\Models\Tenant\WorkShop\Quote\QuoteProduct;
-use App\Models\Tenant\WorkShop\Quote\QuoteService;
 use Illuminate\Http\Request;
 use Yajra\DataTables\DataTables;
 use Illuminate\Support\Facades\DB;
@@ -65,14 +61,14 @@ class WorkOrderController extends Controller
 
     public function create(Request $request)
     {
-        $igv        =   round(Company::find(1)->igv, 2);
-        $warehouses =   Warehouse::where('estado', 'ACTIVO')->get();
-        $checks_inventory_vehicle = UtilController::getInventoryVehicleChecks();
-        $technicians    =   UtilController::getTechnicians();
-        return view('workshop.work_orders.create', compact('igv', 'warehouses','checks_inventory_vehicle','technicians'));
+        $igv                        =   round(Company::find(1)->igv, 2);
+        $warehouses                 =   Warehouse::where('estado', 'ACTIVO')->get();
+        $checks_inventory_vehicle   =   UtilController::getInventoryVehicleChecks();
+        $technicians                =   UtilController::getTechnicians();
+        return view('workshop.work_orders.create', compact('igv', 'warehouses', 'checks_inventory_vehicle', 'technicians'));
     }
 
-/*
+    /*
 array:18 [ // app\Http\Controllers\Tenant\WorkShop\WorkOrderController.php:102
   "_token" => "EAIxRCarInINDg0PeQVtzkSpimjPtaszEuWLeARl"
   "_method" => "POST"
@@ -123,22 +119,43 @@ array:18 [ // app\Http\Controllers\Tenant\WorkShop\WorkOrderController.php:102
 
     public function edit(int $id)
     {
-        $igv        =   round(Company::find(1)->igv, 2);
-        $warehouses =   Warehouse::where('estado', 'ACTIVO')->get();
-        $quote      =   Quote::findOrFail($id);
+        $igv                        =   round(Company::find(1)->igv, 2);
+        $warehouses                 =   Warehouse::where('estado', 'ACTIVO')->get();
+        $checks_inventory_vehicle   =   UtilController::getInventoryVehicleChecks();
+        $technicians                =   UtilController::getTechnicians();
 
-        $customer_formatted = FormatController::getFormatInitialCustomer($quote->customer_id);
-        $vehicle_formatted = FormatController::getFormatInitialVehicle($quote->vehicle_id);
-        $lst_products =   FormatController::formatLstProducts(QuoteProduct::where('quote_id', $id)->get()->toArray());
-        $lst_services =   FormatController::formatLstServices(QuoteService::where('quote_id', $id)->get()->toArray());
+        $order                      =   $this->s_order->getWorkOrder($id);
+        $work_order                 =   $order['order'];
+
+        $customer_formatted         =   FormatController::getFormatInitialCustomer($work_order->customer_id);
+        $vehicle_formatted          =   FormatController::getFormatInitialVehicle($work_order->vehicle_id);
+
+        $lst_products               =   FormatController::formatLstProducts($order['products']->toArray());
+        $lst_services               =   FormatController::formatLstServices($order['services']->toArray());
+        $lst_inventory              =   FormatController::formatLstInventory($order['inventory']->toArray());
+        $lst_technicians            =   FormatController::formatLstTechnicians($order['technicians']->toArray());
+        $lst_images                 =   FormatController::formatLstImages($order['images']->toArray());
 
         return view(
-            'workshop.quotes.edit',
-            compact('igv', 'warehouses', 'quote', 'customer_formatted','vehicle_formatted','lst_products','lst_services')
+            'workshop.work_orders.edit',
+            compact(
+                'igv',
+                'warehouses',
+                'work_order',
+                'customer_formatted',
+                'vehicle_formatted',
+                'lst_products',
+                'lst_services',
+                'checks_inventory_vehicle',
+                'technicians',
+                'lst_inventory',
+                'lst_technicians',
+                'lst_images'
+            )
         );
     }
 
-/*
+    /*
 array:17 [ // app\Http\Controllers\Tenant\WorkShop\QuoteController.php:145
   "_token" => "dmJ2sDFFwSLunK4KEKQdm6Wkn6XbriZ10upcdNKx"
   "_method" => "PUT"
@@ -157,6 +174,9 @@ array:17 [ // app\Http\Controllers\Tenant\WorkShop\QuoteController.php:145
   "dt-quotes-services_length" => "10"
   "lst_products" => "[{"id":1,"name":"BUJÍA 20 MM","category_name":"BUJÍAS","brand_name":"ASUS","sale_price":"14.990000","quantity":"3.000000","total":"44.970000"}]"
   "lst_services" => "[{"id":1,"name":"LAVADO DE AUTOS","sale_price":"30.000000","quantity":"1.000000","total":"30.000000"}]"
+  "vehicle_images" => array:2 [
+    0 =>Illuminate\Http\UploadedFile {#2238}
+    4 =>Illuminate\Http\UploadedFile {#2243}
 ]
 */
     public function update(Request $request, int $id)
@@ -164,11 +184,12 @@ array:17 [ // app\Http\Controllers\Tenant\WorkShop\QuoteController.php:145
         DB::beginTransaction();
         try {
 
-            $quote  =   $this->s_order->update($request->toArray(), $id);
+            $work_order  =   $this->s_order->update($request->toArray(), $id);
 
+            Session::flash('message_success','ORDEND DE TRABAJO ACTUALIZADA CON ÉXITO');
             DB::commit();
 
-            return response()->json(['success' => true, 'message' => 'COTIZACIÓN ACTUALIZADA CON ÉXITO']);
+            return response()->json(['success' => true, 'message' => 'ORDEN DE TRABAJO ACTUALIZADA CON ÉXITO']);
         } catch (Throwable $th) {
             DB::rollBack();
             return response()->json(['success' => false, 'message' => $th->getMessage()]);
@@ -181,15 +202,26 @@ array:17 [ // app\Http\Controllers\Tenant\WorkShop\QuoteController.php:145
         DB::beginTransaction();
         try {
 
-            $service  =   $this->s_order->destroy($id);
+            $work_order  =   $this->s_order->destroy($id);
 
             DB::commit();
 
-            return response()->json(['success' => true, 'message' => 'SERVICIO ELIMINADO CON ÉXITO']);
+            return response()->json(['success' => true, 'message' => 'ORDEN DE TRABAJO ELIMINADA CON ÉXITO']);
         } catch (Throwable $th) {
             DB::rollBack();
             return response()->json(['success' => false, 'message' => $th->getMessage()]);
         }
     }
 
+    public function pdfOne(int $id)
+    {
+        try {
+            $pdf    =   $this->s_order->pdfOne($id);
+
+            return $pdf->stream("orden_trabajo_$id.pdf");
+        } catch (Throwable $th) {
+            Session::flash('message_error', $th->getMessage());
+            return back();
+        }
+    }
 }

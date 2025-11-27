@@ -128,11 +128,12 @@ class WorkOrderDto
 
         $dtoImages = [];
 
+        $count  =   0;
         foreach ($lst_items as $index => $file) {
             if ($file instanceof UploadedFile && $file->isValid()) {
 
                 $extension = $file->getClientOriginalExtension();
-                $filename = $work_order->id . '_' . $index . '.' . $extension;
+                $filename = $work_order->id . '_' . $count . '.' . $extension;
                 $file->move($path, $filename);
 
                 $dtoImages[] = [
@@ -140,10 +141,19 @@ class WorkOrderDto
                     'img_route'     => "storage/{$carpet_company}/work_orders/images/{$filename}",
                     'img_name'      => $filename,
                 ];
+                $count++;
             }
         }
 
         return $dtoImages;
+    }
+
+    public function getDtoWorkImage(int $id,array $data){
+        return [
+                    'work_order_id' => $id,
+                    'img_name'      => $data['name'],
+                    'img_route'     => $data['route'],
+        ];
     }
 
     public function calculateAmounts(array $lst_products, array $lst_services): array

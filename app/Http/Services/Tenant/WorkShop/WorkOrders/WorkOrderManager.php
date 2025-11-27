@@ -24,14 +24,18 @@ class WorkOrderManager
         return $this->s_order->getWorkOrder($id);
     }
 
-    public function update(array $data, int $id): Quote
+    public function update(array $data, int $id): WorkOrder
     {
         return $this->s_order->update($data, $id);
     }
 
-    public function destroy(int $id)
+    public function destroy(int $id):WorkOrder
     {
-        $this->s_order->destroy($id);
+        return $this->s_order->destroy($id);
+    }
+
+    public function pdfOne(int $id){
+        return $this->s_order->pdfOne($id);
     }
 
 }

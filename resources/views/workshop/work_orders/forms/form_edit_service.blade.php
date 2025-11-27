@@ -41,7 +41,4 @@
         </div>
     </div>
 
-    <p class="text-muted mb-2">
-        <span class="text-danger">*</span> Los campos marcados son obligatorios.
-    </p>
 </form>

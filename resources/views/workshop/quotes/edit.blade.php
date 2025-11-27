@@ -841,6 +841,7 @@
 
         function loadPreviewData() {
 
+            //========= PRODUCTS AND SERVICES =========
             dtProducts = destroyDataTable(dtProducts);
             clearTable('dt-quotes-products');
             paintQuoteProducts(lstProducts);
@@ -853,6 +854,7 @@
 
             calculateAmounts();
             paintAmounts();
+
         }
     </script>
 @endsection

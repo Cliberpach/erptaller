@@ -1,4 +1,4 @@
-<form id="form-create-quote" method="POST">
+<form id="form-edit-order" method="POST">
     @csrf
     @method('POST')
 
@@ -90,7 +90,7 @@
                 </div>
 
                 <!-- CANTIDAD -->
-                <div class="col-lg-2 col-md-3 col-sm-6 col-xs-12">
+                <div class="col-lg-2 col-md-4 col-sm-6 col-xs-12">
                     <label class="form-label fw-bold">Cantidad:</label>
                     <input type="text" class="form-control inputDecimalPositivo" id="product_quantity"
                         name="product_quantity" placeholder="0.00">
@@ -98,7 +98,7 @@
                 </div>
 
                 <!-- PRECIO -->
-                <div class="col-lg-2 col-md-3 col-sm-6 col-xs-12">
+                <div class="col-lg-2 col-md-4 col-sm-6 col-xs-12">
                     <label class="form-label fw-bold">Precio:</label>
                     <input type="text" class="form-control inputDecimalPositivo" id="product_price"
                         name="product_price" placeholder="0.00">
@@ -135,7 +135,7 @@
         <div class="card-body">
             <div class="row g-3 mb-3 pt-3">
 
-                <div class="col-lg-6 col-md-6 col-sm-12">
+                <div class="col-lg-6 col-md-8 col-sm-12">
                     <label class="form-label fw-bold">Servicio:</label><i class="fas fa-plus btn btn-warning btn-sm"
                         onclick="openMdlNewVehicle();" style="margin-left:4px;"></i>
                     <select class="form-control" id="service_id" name="service_id">
@@ -145,7 +145,7 @@
                 </div>
 
                 <!-- CANTIDAD -->
-                <div class="col-lg-2 col-md-3 col-sm-6 col-xs-12">
+                <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
                     <label class="form-label fw-bold">Cantidad:</label>
                     <input type="text" class="form-control inputDecimalPositivo" id="service_quantity"
                         name="service_quantity" placeholder="0.00">
@@ -153,18 +153,15 @@
                 </div>
 
                 <!-- PRECIO -->
-                <div class="col-lg-2 col-md-3 col-sm-6 col-xs-12">
+                <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
                     <label class="form-label fw-bold">Precio:</label>
                     <input type="text" class="form-control inputDecimalPositivo" id="service_price"
                         name="service_price" placeholder="0.00">
                     <p class="service_price_error msgError mb-0"></p>
                 </div>
 
-                <div class="col-lg-2 col-md-4 col-sm-6 col-xs-12">
-                </div>
-
                 <!-- AGREGAR -->
-                <div class="col-lg-2 col-md-4 col-sm-6 col-xs-12">
+                <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
                     <button class="btn btn-primary btn-add-service" type="button">AGREGAR <i class="fas fa-plus"
                             style="margin-left:4px;"></i></button>
                 </div>

@@ -12,6 +12,9 @@ use App\Http\Requests\Tenant\Inventory\Product\ProductUpdateRequest;
 use App\Http\Services\Tenant\Inventory\Product\ProductManager;
 use App\Imports\Inventory\Producto\ProductoImport;
 use App\Models\Product;
+use App\Models\Tenant\WarehouseProduct;
+use App\Models\Tenant\WorkShop\WorkOrder\WorkOrderProduct;
+use Exception;
 use Illuminate\Support\Facades\File;
 use Throwable;
 use Yajra\DataTables\Facades\DataTables;
@@ -238,7 +241,7 @@ array:1 [ // app\Http\Controllers\Tenant\ProductController.php:190
     }
 
     /**
-     * Buscar clientes (para TomSelect server-side)
+     * Buscar productos ignorar stock (para TomSelect server-side)
      */
     public function searchProduct(Request $request)
     {
@@ -257,12 +260,14 @@ array:1 [ // app\Http\Controllers\Tenant\ProductController.php:190
                     ->orWhere('b.name', 'LIKE', "%{$query}%");
             })->limit(20)
             ->get(
-                ['p.id',
-                'b.name as brand_name',
-                'p.name',
-                'c.name as category_name',
-                'p.sale_price'
-            ]);
+                [
+                    'p.id',
+                    'b.name as brand_name',
+                    'p.name',
+                    'c.name as category_name',
+                    'p.sale_price'
+                ]
+            );
 
         $data = $products->map(fn($p) => [
             'id' => $p->id,
@@ -275,5 +280,130 @@ array:1 [ // app\Http\Controllers\Tenant\ProductController.php:190
         ]);
 
         return response()->json(['data' => $data]);
+    }
+
+    public function searchProductStock(Request $request)
+    {
+        try {
+            $query          =   trim($request->get('q', ''));
+            $warehouse_id   =   $request->get('warehouse_id');
+
+            if (empty($query)) {
+                return response()->json(['data' => []]);
+            }
+
+            $products = Product::from('products as p')
+                ->join('warehouse_products as wp', 'wp.product_id', 'p.id')
+                ->join('categories as c', 'c.id', 'p.category_id')
+                ->join('brands as b', 'b.id', 'p.brand_id')
+                ->where('wp.warehouse_id', $warehouse_id)
+                ->where('wp.stock', '>', 0)
+                ->where(function ($q) use ($query) {
+                    $q->where('p.name', 'LIKE', "%{$query}%")
+                        ->orWhere('c.name', 'LIKE', "%{$query}%")
+                        ->orWhere('b.name', 'LIKE', "%{$query}%");
+                })->limit(20)
+                ->get(
+                    [
+                        'wp.warehouse_id',
+                        'p.id',
+                        'b.name as brand_name',
+                        'p.name',
+                        'c.name as category_name',
+                        'p.sale_price',
+                        'wp.stock'
+                    ]
+                );
+
+            $data = $products->map(fn($p) => [
+                'warehouse_id'  =>  $p->warehouse_id,
+                'id' => $p->id,
+                'text' => "{$p->name}",
+                'subtext' => "{$p->category_name}-{$p->brand_name}",
+                'sale_price' =>  $p->sale_price,
+                'name'  =>  $p->name,
+                'category_name' =>  $p->category_name,
+                'brand_name'    =>  $p->brand_name,
+                'stock'         =>  $p->stock
+            ]);
+
+            return response()->json(['success' => true, 'message' => 'PRODUCTOS OBTENIDOS', 'data' => $data]);
+        } catch (Throwable $th) {
+            return response()->json(['success' => false, 'message' => $th->getMessage()]);
+        }
+    }
+
+    public function validatedProductStock(Request $request)
+    {
+        try {
+
+            $warehouse_id   = $request->get('warehouse_id');
+            $product_id     = $request->get('product_id');
+            $quantity       = (float) $request->get('quantity');
+            $work_order_id  = $request->get('work_order_id');
+
+            $item = WarehouseProduct::where('warehouse_id', $warehouse_id)
+                ->where('product_id', $product_id)
+                ->select('stock')
+                ->first();
+
+            if (!$item) {
+                throw new Exception("Producto no encontrado en almacén.");
+            }
+
+            $stock_actual = (float) $item->stock;
+
+            if (!$work_order_id) {
+
+                if ($quantity > $stock_actual) {
+                    throw new Exception("STOCK INSUFICIENTE (Stock: $stock_actual, Requiere: $quantity)");
+                }
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'VALIDACIÓN COMPLETADA'
+                ]);
+            }
+
+            $item_bd = WorkOrderProduct::where('work_order_id', $work_order_id)
+                ->where('product_id', $product_id)
+                ->first();
+
+            if (!$item_bd) {
+
+                if ($quantity > $stock_actual) {
+                    throw new Exception("STOCK INSUFICIENTE (Stock: $stock_actual, Requiere: $quantity)");
+                }
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'VALIDACIÓN COMPLETADA (Nuevo item)'
+                ]);
+            }
+
+            $cantidad_anterior = (float) $item_bd->quantity;
+            $diferencia = $quantity - $cantidad_anterior;
+
+            if ($diferencia <= 0) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'VALIDACIÓN COMPLETADA (Cantidad reducida o igual)'
+                ]);
+            }
+
+            if ($diferencia > $stock_actual) {
+                throw new Exception("STOCK INSUFICIENTE (Stock: $stock_actual, Requiere adicional: $diferencia)");
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'VALIDACIÓN COMPLETADA (Actualización con diferencia)'
+            ]);
+        } catch (Throwable $th) {
+            return response()->json([
+                'success' => false,
+                'message' => $th->getMessage()
+            ]);
+        }
     }
 }

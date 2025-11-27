@@ -22,6 +22,7 @@ Route::group(["prefix" => "taller"], function () {
         Route::get('getWorkOrder/{id}', [WorkOrderController::class, 'getWorkOrder'])->name('tenant.taller.ordenes_trabajo.getWorkOrder');
         Route::put('update/{id}', [WorkOrderController::class, 'update'])->name('tenant.taller.ordenes_trabajo.update');
         Route::delete('destroy/{id}', [WorkOrderController::class, 'destroy'])->name('tenant.taller.ordenes_trabajo.destroy');
+        Route::get('pdf/{id}', [WorkOrderController::class, 'pdfOne'])->name('tenant.taller.ordenes_trabajo.pdfOne');
     });
 
     Route::group(["prefix" => "cotizaciones"], function () {
@@ -31,9 +32,11 @@ Route::group(["prefix" => "taller"], function () {
         Route::get('edit/{id}', [QuoteController::class, 'edit'])->name('tenant.taller.cotizaciones.edit');
         Route::get('getQuotes', [QuoteController::class, 'getQuotes'])->name('tenant.taller.cotizaciones.getQuotes');
         Route::post('store', [QuoteController::class, 'store'])->name('tenant.taller.cotizaciones.store');
-        Route::get('getQuote/{id}', [QuoteController::class, 'getService'])->name('tenant.taller.cotizaciones.getQuote');
+        Route::get('getQuote/{id}', [QuoteController::class, 'getQuote'])->name('tenant.taller.cotizaciones.getQuote');
         Route::put('update/{id}', [QuoteController::class, 'update'])->name('tenant.taller.cotizaciones.update');
         Route::delete('destroy/{id}', [QuoteController::class, 'destroy'])->name('tenant.taller.cotizaciones.destroy');
+        Route::get('pdf/{id}', [QuoteController::class, 'pdfOne'])->name('tenant.taller.cotizaciones.pdfOne');
+
     });
 
     Route::group(["prefix" => "servicios"], function () {

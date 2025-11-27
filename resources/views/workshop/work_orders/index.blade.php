@@ -154,12 +154,19 @@
                                                 </button>
                                                 <ul class="dropdown-menu dropdown-menu-end">
                                                     <li>
+                                                        <a class="dropdown-item generarPDF"
+                                                           href="${route('tenant.taller.ordenes_trabajo.pdfOne', data.id)}" target="_blank"
+                                                            title="PDF" role="button" aria-label="Generar PDF">
+                                                            <i class="fas fa-file-pdf me-2 text-danger"></i> PDF
+                                                        </a>
+                                                    </li>
+                                                    <li>
                                                         <a class="dropdown-item" href="#" onclick="openMdlShowOrder(${data.id})">
                                                             <i class="fa fa-eye me-2"></i> Ver
                                                         </a>
                                                     </li>
                                                     <li>
-                                                        <a class="dropdown-item modificarDetalle" href="#" onclick="redirectParams('tenant.taller.cotizaciones.edit', ${data.id})">
+                                                        <a class="dropdown-item modificarDetalle" href="#" onclick="redirectParams('tenant.taller.ordenes_trabajo.edit', ${data.id})">
                                                             <i class="fa fa-edit me-2"></i> Modificar
                                                         </a>
                                                     </li>
@@ -223,49 +230,37 @@
 
         function eliminar(id) {
             const fila = getRowById(dtOrders, id);
-            const htmlVehicleInfo = `
-            <div class="card shadow-sm border-0">
-                <div class="card-body p-2" style="font-size: 1.2rem;">
+            const htmlInfo = `
+                <div class="card shadow-sm border-0">
+                    <div class="card-body p-2" style="font-size: 1.2rem;">
 
-                    <div class="mb-1">
-                        <i class="fas fa-user text-primary me-1 small"></i>
-                        <span class="fw-bold small">Cliente:</span><br>
-                        <span class="text-muted small">${fila.customer_name}</span>
+                        <div class="mb-1">
+                            <i class="fas fa-hashtag text-dark me-1 small"></i>
+                            <span class="fw-bold small">N° Orden:</span><br>
+                            <span class="text-muted small">${fila.id}</span>
+                        </div>
+
+                        <div class="mb-1">
+                            <i class="fas fa-user text-primary me-1 small"></i>
+                            <span class="fw-bold small">Cliente:</span><br>
+                            <span class="text-muted small">${fila.customer_name}</span>
+                        </div>
+
+                        <div class="mb-1">
+                            <i class="fas fa-car text-info me-1 small"></i>
+                            <span class="fw-bold small">Placa:</span><br>
+                            <span class="text-muted small">${fila.plate}</span>
+                        </div>
+
+                         <div class="mb-1">
+                            <i class="fas fa-coins text-warning me-1 small"></i>
+                            <span class="fw-bold small">Total:</span><br>
+                            <span class="text-muted small">S/ ${formatSoles(fila.total)}</span>
+                        </div>
+
                     </div>
-
-                    <div class="mb-1">
-                        <i class="fas fa-car text-info me-1 small"></i>
-                        <span class="fw-bold small">Placa:</span><br>
-                        <span class="text-muted small">${fila.plate}</span>
-                    </div>
-
-                    <div class="mb-1">
-                        <i class="fas fa-flag text-success me-1 small"></i>
-                        <span class="fw-bold small">Marca:</span><br>
-                        <span class="text-muted small">${fila.brand_name}</span>
-                    </div>
-
-                    <div class="mb-1">
-                        <i class="fas fa-tag text-warning me-1 small"></i>
-                        <span class="fw-bold small">Modelo:</span><br>
-                        <span class="text-muted small">${fila.model_name}</span>
-                    </div>
-
-                    <div class="mb-1">
-                        <i class="fas fa-calendar-alt text-primary me-1 small"></i>
-                        <span class="fw-bold small">Año:</span><br>
-                        <span class="text-muted small">${fila.year_name}</span>
-                    </div>
-
-                    <div class="mb-0">
-                        <i class="fas fa-palette text-danger me-1 small"></i>
-                        <span class="fw-bold small">Color:</span><br>
-                        <span class="text-muted small">${fila.color_name}</span>
-                    </div>
-
                 </div>
-            </div>
-        `;
+            `;
 
             const swalWithBootstrapButtons = Swal.mixin({
                 customClass: {
@@ -273,12 +268,12 @@
                     cancelButton: 'btn btn-danger',
                     actions: 'd-flex justify-content-center gap-2 mt-3'
                 },
-                buttonsStyling: false // Necesario para que Bootstrap controle el estilo
+                buttonsStyling: false
             });
 
             swalWithBootstrapButtons.fire({
-                title: '¿Desea eliminar el vehículo?',
-                html: `${htmlVehicleInfo}`,
+                title: '¿Desea eliminar la orden?',
+                html: `${htmlInfo}`,
                 icon: 'question',
                 showCancelButton: true,
                 confirmButtonText: 'Sí, eliminar',
@@ -288,7 +283,7 @@
             }).then(async (result) => {
                 if (result.isConfirmed) {
                     Swal.fire({
-                        title: 'Eliminando vehículo...',
+                        title: 'Eliminando orden...',
                         html: `
                             <div style="display:flex; align-items:center; justify-content:center; flex-direction:column;">
                                 <i class="fa fa-spinner fa-spin fa-3x text-primary mb-3"></i>
@@ -300,7 +295,7 @@
                     });
 
                     try {
-                        const res = await axios.delete(route('tenant.taller.vehiculos.destroy', id));
+                        const res = await axios.delete(route('tenant.taller.ordenes_trabajo.destroy', id));
                         if (res.data.success) {
                             toastr.success(res.data.message, 'OPERACIÓN COMPLETADA');
                             dtOrders.ajax.reload();
@@ -308,7 +303,7 @@
                             toastr.error(res.data.message, 'ERROR EN EL SERVIDOR');
                         }
                     } catch (error) {
-                        toastr.error(error, 'ERROR EN LA PETICIÓN ELIMINAR VEHÍCULO');
+                        toastr.error(error, 'ERROR EN LA PETICIÓN ELIMINAR ORDEN');
                     } finally {
                         Swal.close();
                     }

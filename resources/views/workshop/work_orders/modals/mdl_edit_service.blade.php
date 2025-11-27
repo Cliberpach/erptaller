@@ -44,7 +44,7 @@
         paramsMdlEditService.id = serviceId;
 
         const serviceEdit = lstServices.find((item) => item.id == serviceId);
-        paintserviceEdit(serviceEdit);
+        paintServiceEdit(serviceEdit);
 
         $('#mdl_edit_service').modal('show');
     }
@@ -56,9 +56,9 @@
         })
     }
 
-    function paintserviceEdit(item) {
-        document.querySelector('#service_price_edit').value = item.sale_price;
-        document.querySelector('#service_quantity_edit').value = item.quantity;
+    function paintServiceEdit(item) {
+        document.querySelector('#service_price_edit').value = parseFloat(item.sale_price).toFixed(2);
+        document.querySelector('#service_quantity_edit').value = formatQuantity(item.quantity);
         document.querySelector('#service_name_edit').textContent = item.name;
         document.querySelector('#service_original_price_edit').textContent = item.sale_price;
 
@@ -71,7 +71,7 @@
         setServiceEdit(service, lstServices);
         dtServices = destroyDataTable(dtServices);
         clearTable('dt-quotes-services');
-        paintQuoteServices(lstServices);
+        paintOrderServices(lstServices);
         dtServices = loadDataTableSimple('dt-quotes-services');
 
         calculateAmounts();
