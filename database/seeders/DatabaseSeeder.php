@@ -2,38 +2,36 @@
 
 namespace Database\Seeders;
 
-use App\Models\Tenant\Configuration;
-use App\Models\Tenant\DocumentSerialization;
-use Database\Seeders\Landlord\BrandSeeder as LandlordBrandSeeder;
+use Database\Seeders\landlord\BrandSeeder as LandlordBrandSeeder;
 use Illuminate\Database\Seeder;
 use Spatie\Multitenancy\Models\Tenant;
-use Database\Seeders\Landlord\ModuleSeeder;
-use Database\Seeders\Landlord\PermissionSeeder;
-use Database\Seeders\Landlord\PlanSeeder;
-use Database\Seeders\Landlord\RoleSeeder;
-use Database\Seeders\Landlord\UserSeeder;
-use Database\Seeders\Tenant\BankSeeder;
-use Database\Seeders\Tenant\BrandSeeder;
-use Database\Seeders\Tenant\CategorySeeder;
-use Database\Seeders\Landlord\CustomerSeeder;
-use Database\Seeders\Landlord\GeneralTableSeeder;
-use Database\Seeders\Landlord\IdentityDocumentSeeder;
-use Database\Seeders\Landlord\ModelSeeder;
-use Database\Seeders\Landlord\YearSeeder;
-use Database\Seeders\Tenant\ConfigurationSeeder;
-use Database\Seeders\Tenant\DepartmentSeeder;
-use Database\Seeders\Tenant\DistrictSeeder;
-use Database\Seeders\Tenant\DocumentTypeSeeder;
-use Database\Seeders\Tenant\PaymentMethodSeeder;
-use Database\Seeders\Tenant\PettyCashSeeder;
-use Database\Seeders\Tenant\PositionSeeder;
-use Database\Seeders\Tenant\ProofPaymentSeeder;
-use Database\Seeders\Tenant\ProvinceSeeder;
-use Database\Seeders\Tenant\ShiftSeeder;
-use Database\Seeders\Tenant\SupplierSeeder;
-use Database\Seeders\Tenant\TypeFieldSeeder;
-use Database\Seeders\Tenant\TypeIdentityDocumentSeeder;
-use Database\Seeders\Tenant\WarehouseSeeder;
+use Database\Seeders\landlord\PermissionSeeder;
+use Database\Seeders\landlord\PlanSeeder;
+use Database\Seeders\landlord\RoleSeeder;
+use Database\Seeders\landlord\UserSeeder;
+use Database\Seeders\landlord\BrandSeeder;
+use Database\Seeders\landlord\CustomerSeeder;
+use Database\Seeders\landlord\GeneralTableSeeder;
+use Database\Seeders\landlord\IdentityDocumentSeeder;
+use Database\Seeders\landlord\ModelSeeder;
+use Database\Seeders\landlord\ModuleSeeder;
+use Database\Seeders\landlord\YearSeeder;
+use Database\Seeders\tenant\BankSeeder;
+use Database\Seeders\tenant\CategorySeeder;
+use Database\Seeders\tenant\ConfigurationSeeder;
+use Database\Seeders\tenant\DepartmentSeeder;
+use Database\Seeders\tenant\DistrictSeeder;
+use Database\Seeders\tenant\DocumentTypeSeeder;
+use Database\Seeders\tenant\PaymentMethodSeeder;
+use Database\Seeders\tenant\PettyCashSeeder;
+use Database\Seeders\tenant\PositionSeeder;
+use Database\Seeders\tenant\ProofPaymentSeeder;
+use Database\Seeders\tenant\ProvinceSeeder;
+use Database\Seeders\tenant\ShiftSeeder;
+use Database\Seeders\tenant\SupplierSeeder;
+use Database\Seeders\tenant\TypeFieldSeeder;
+use Database\Seeders\tenant\TypeIdentityDocumentSeeder;
+use Database\Seeders\tenant\WarehouseSeeder;
 
 class DatabaseSeeder extends Seeder
 {

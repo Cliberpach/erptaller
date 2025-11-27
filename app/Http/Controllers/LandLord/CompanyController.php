@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\LandLord;
 
-
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CompanyStoreRequest;
 use App\Models\Company;

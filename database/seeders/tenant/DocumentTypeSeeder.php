@@ -1,6 +1,6 @@
 <?php
 
-namespace Database\Seeders\Tenant;
+namespace Database\Seeders\tenant;
 
 use App\Models\DocumentType;
 use App\Models\Tenant\DocumentSerialization;

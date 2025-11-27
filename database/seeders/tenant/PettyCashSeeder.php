@@ -1,6 +1,6 @@
 <?php
 
-namespace Database\Seeders\Tenant;
+namespace Database\Seeders\tenant;
 
 use Illuminate\Database\Seeder;
 use App\Models\PettyCash;

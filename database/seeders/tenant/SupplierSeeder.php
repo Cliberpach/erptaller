@@ -1,6 +1,6 @@
 <?php
 
-namespace Database\Seeders\Tenant;
+namespace Database\Seeders\tenant;
 
 use App\Models\Supplier;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;

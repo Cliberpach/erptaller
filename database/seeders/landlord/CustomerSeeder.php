@@ -1,6 +1,6 @@
 <?php
 
-namespace Database\Seeders\Landlord;
+namespace Database\Seeders\landlord;
 
 use App\Models\Landlord\Customer;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;

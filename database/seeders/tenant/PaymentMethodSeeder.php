@@ -1,6 +1,6 @@
 <?php
 
-namespace Database\Seeders\Tenant;
+namespace Database\Seeders\tenant;
 
 use Illuminate\Database\Seeder;
 use App\Models\Tenant\PaymentMethod;
@@ -12,7 +12,7 @@ class PaymentMethodSeeder extends Seeder
      */
     public function run(): void
     {
-        
+
         PaymentMethod::create([
             'description' => 'EFECTIVO',
         ]);
