@@ -26,6 +26,7 @@ class UserSeeder extends Seeder
         $collaborator->rest_days        =   20;
         $collaborator->monthly_salary   =   12000;
         $collaborator->daily_salary     =   400;
+        $collaborator->position_id      =   1;
         $collaborator->save();
 
         $user                       =   new User();
