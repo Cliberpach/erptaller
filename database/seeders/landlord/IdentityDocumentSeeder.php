@@ -2,10 +2,8 @@
 
 namespace Database\Seeders\Landlord;
 
-use App\Models\Herramientas\TipoDocumento;
 use App\Models\Landlord\GeneralTable\GeneralTable;
 use App\Models\Landlord\GeneralTable\GeneralTableDetail;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class IdentityDocumentSeeder extends Seeder
