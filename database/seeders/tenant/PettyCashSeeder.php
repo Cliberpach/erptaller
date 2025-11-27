@@ -14,7 +14,7 @@ class PettyCashSeeder extends Seeder
     {
 
         PettyCash::create([
-            'name' => 'CAJA PRINCIPAL',
+            'name' =>'CAJA PRINCIPAL',
         ]);
 
 
