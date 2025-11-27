@@ -1,6 +1,6 @@
 <?php
 
-namespace Database\Seeders\tenant;
+namespace Database\Seeders\Tenant;
 
 use App\Models\Tenant\TypeIdentityDocument;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -26,7 +26,7 @@ class TypeIdentityDocumentSeeder extends Seeder
         $type               =   new TypeIdentityDocument();
         $type->name         =   'DOCUMENTO NACIONAL DE IDENTIDAD';
         $type->abbreviation =   'DNI';
-        $type->code         =   '01';   
+        $type->code         =   '01';
         $type->save();
 
         $type               =   new TypeIdentityDocument();

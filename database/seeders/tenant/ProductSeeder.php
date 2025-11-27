@@ -1,6 +1,6 @@
 <?php
 
-namespace Database\Seeders\tenant;
+namespace Database\Seeders\Tenant;
 
 use App\Models\Product;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -14,7 +14,7 @@ class ProductSeeder extends Seeder
     public function run(): void
     {
         Product::updateOrCreate(
-            ['id' => 9999], 
+            ['id' => 9999],
             [
                 'category_id'    => 5,
                 'brand_id'       => 5,

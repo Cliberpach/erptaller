@@ -1,6 +1,6 @@
 <?php
 
-namespace Database\Seeders\tenant;
+namespace Database\Seeders\Tenant;
 
 use App\Models\Tenant\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -15,7 +15,7 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-         
+
             $user                   =   new User();
             $user->name             =   'SUPERADMIN';
             $user->email            =   'admin@gmail.com';
@@ -25,6 +25,6 @@ class UserSeeder extends Seeder
 
             $role = Role::where('name', 'admin')->first();
             $user->assignRole($role);
-        
+
     }
 }
