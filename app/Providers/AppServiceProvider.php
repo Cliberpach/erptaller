@@ -24,10 +24,10 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
 
-        /*$databaseConnection = (parse_url(config("app.url"), PHP_URL_HOST) === request()->getHost()) ? 'landlord' : 'tenant';
+        $databaseConnection = (parse_url(config("app.url"), PHP_URL_HOST) === request()->getHost()) ? 'landlord' : 'tenant';
         config(['database.default' => $databaseConnection]);
 
-        $base = ($databaseConnection === 'landlord') ? 'landlord' : 'tenant';
+        /*$base = ($databaseConnection === 'landlord') ? 'landlord' : 'tenant';
         $modules = Module::where('show', $base)
             ->with(['children' => function ($query) use ($base) {
                 $query->where('show', $base);
