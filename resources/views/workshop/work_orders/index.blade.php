@@ -144,7 +144,7 @@
                         searchable: false,
                         orderable: false,
                         data: null,
-                        className: "text-center",
+                         className: "text-center",
                         render: function(data) {
 
                             let actions = `
