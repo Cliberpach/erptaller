@@ -17,7 +17,7 @@ class UserSeeder extends Seeder
     public function run(): void
     {
         $collaborator                   =   new Collaborator();
-        $collaborator->full_name             =   'LUIS DANIEL ALVA LUJAN';
+        $collaborator->full_name        =   'LUIS DANIEL ALVA LUJAN';
         $collaborator->document_type_id =   39;
         $collaborator->document_number  =   77412431;
         $collaborator->address          =   'AV HUSARES 123';

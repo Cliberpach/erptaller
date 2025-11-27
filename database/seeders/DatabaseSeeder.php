@@ -31,6 +31,7 @@ use Database\Seeders\tenant\ShiftSeeder;
 use Database\Seeders\tenant\SupplierSeeder;
 use Database\Seeders\tenant\TypeFieldSeeder;
 use Database\Seeders\tenant\TypeIdentityDocumentSeeder;
+use Database\Seeders\tenant\UserSeeder as TenantUserSeeder;
 use Database\Seeders\tenant\WarehouseSeeder;
 
 class DatabaseSeeder extends Seeder
@@ -69,7 +70,7 @@ class DatabaseSeeder extends Seeder
         $this->call(ProofPaymentSeeder::class);
         $this->call(TypeFieldSeeder::class);
 
-        $this->call(UserSeeder::class);
+        $this->call(TenantUserSeeder::class);
     }
 
     public function runLandlordSpecificSeeders()
