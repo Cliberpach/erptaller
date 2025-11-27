@@ -3,7 +3,7 @@
 namespace Database\Seeders\tenant;
 
 use App\Models\Tenant\Maintenance\Collaborator\Collaborator;
-use App\Models\Tenant\User;
+use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;

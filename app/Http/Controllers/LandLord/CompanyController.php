@@ -270,7 +270,7 @@ class CompanyController extends Controller
         ]);
 
         //========= CREANDO USUARIO PARA EL TENANT ========
-        /*$user                       =   new User();
+        /*$user                     =   new User();
         $user->name                 =   'SUPERADMIN';
         $user->email                =   $request->get("correo");
         $user->password             =   Hash::make($request->get("password"));
