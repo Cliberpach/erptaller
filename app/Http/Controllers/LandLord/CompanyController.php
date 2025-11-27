@@ -270,7 +270,7 @@ class CompanyController extends Controller
         ]);
 
         //========= CREANDO USUARIO PARA EL TENANT ========
-        $user                       =   new User();
+        /*$user                       =   new User();
         $user->name                 =   'SUPERADMIN';
         $user->email                =   $request->get("correo");
         $user->password             =   Hash::make($request->get("password"));
@@ -278,7 +278,7 @@ class CompanyController extends Controller
         $user->save();
 
         $role = Role::where('name', 'admin')->first();
-        $user->assignRole($role);
+        $user->assignRole($role);*/
 
         DB::table("document_serializations")->insert([
             // ['company_id' => $company->id, 'document_type_id' => '01', 'serie' => 'F001', 'number_limit' => 8, 'destiny' => 'VENTAS', 'default' => 'NO', 'final_number' => 0],
