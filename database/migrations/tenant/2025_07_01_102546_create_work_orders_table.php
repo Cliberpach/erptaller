@@ -27,6 +27,8 @@ return new class extends Migration
             $table->unsignedBigInteger('vehicle_id')->nullable();
             $table->foreign('vehicle_id')->references('id')->on('vehicles');
 
+            $table->string('plate', 8);
+
             $table->decimal('total', 16, 6)->unsigned();
             $table->decimal('subtotal', 16, 6)->unsigned();
             $table->decimal('igv', 16, 6)->unsigned();

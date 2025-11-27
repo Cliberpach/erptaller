@@ -26,6 +26,7 @@ use Database\Seeders\Tenant\DistrictSeeder;
 use Database\Seeders\Tenant\DocumentTypeSeeder;
 use Database\Seeders\Tenant\PaymentMethodSeeder;
 use Database\Seeders\Tenant\PettyCashSeeder;
+use Database\Seeders\Tenant\PositionSeeder;
 use Database\Seeders\Tenant\ProofPaymentSeeder;
 use Database\Seeders\Tenant\ProvinceSeeder;
 use Database\Seeders\Tenant\ShiftSeeder;
@@ -48,6 +49,7 @@ class DatabaseSeeder extends Seeder
     {
         // example: $this->call(TipoDocumentoSeeder::class);
         // note: no olvida llamar al seeder en use part
+        $this->call(PositionSeeder::class);
         $this->call(ConfigurationSeeder::class);
         $this->call(GeneralTableSeeder::class);
         $this->call(IdentityDocumentSeeder::class);
@@ -69,7 +71,7 @@ class DatabaseSeeder extends Seeder
         $this->call(ProofPaymentSeeder::class);
         $this->call(TypeFieldSeeder::class);
 
-        //$this->call(UserSeeder::class);
+        $this->call(UserSeeder::class);
     }
 
     public function runLandlordSpecificSeeders()
