@@ -50,8 +50,6 @@ class DatabaseSeeder extends Seeder
         // note: no olvida llamar al seeder en use part
         $this->call(PositionSeeder::class);
         $this->call(ConfigurationSeeder::class);
-        $this->call(GeneralTableSeeder::class);
-        $this->call(IdentityDocumentSeeder::class);
         $this->call(PaymentMethodSeeder::class);
         $this->call(WarehouseSeeder::class);
         $this->call(TypeIdentityDocumentSeeder::class);
@@ -86,5 +84,7 @@ class DatabaseSeeder extends Seeder
         $this->call(YearSeeder::class);
         $this->call(LandlordBrandSeeder::class);
         $this->call(ModelSeeder::class);
+        $this->call(GeneralTableSeeder::class);
+        $this->call(IdentityDocumentSeeder::class);
     }
 }
