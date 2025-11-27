@@ -17,6 +17,6 @@ class ConfigurationSeeder extends Seeder
         $configuration->description =   'TURNO NOCHE RESERVAS';
         $configuration->property    =   '19:00';
         $configuration->save();
-       
+
     }
 }
