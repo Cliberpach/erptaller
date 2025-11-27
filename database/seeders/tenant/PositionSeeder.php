@@ -17,7 +17,7 @@ class PositionSeeder extends Seeder
         $position->save();
 
         $position           =   new Position();
-        $position->name     =    'CONTADOR';
+        $position->name     =   'CONTADOR';
         $position->save();
     }
 }
