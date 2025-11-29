@@ -56,8 +56,7 @@ class VehicleController extends Controller
                 'y.description as year_name',
                 'c.description as color_name',
                 'v.observation'
-            )->where('v.status', 'ACTIVE');
-
+            )->where('v.status', 'ACTIVO');
 
         return DataTables::of($vehicles)
             ->filterColumn('customer_name', function ($query, $keyword) {
