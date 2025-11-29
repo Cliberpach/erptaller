@@ -3,6 +3,7 @@
 namespace App\Http\Services\Tenant\WorkShop\Quotes;
 
 use App\Models\Tenant\WorkShop\Quote\Quote;
+use Illuminate\Contracts\View\View;
 
 class QuoteManager
 {
@@ -38,5 +39,8 @@ class QuoteManager
         return $this->s_quote->pdfOne($id);
     }
 
+    public function convertOrderCreate(int $id):View{
+        return $this->s_quote->convertOrderCreate($id);
+    }
 
 }

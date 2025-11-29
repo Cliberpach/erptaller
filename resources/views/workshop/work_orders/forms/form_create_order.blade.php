@@ -6,6 +6,18 @@
         <span class="text-danger">*</span> Los campos marcados son obligatorios.
     </p>
 
+    @if (isset($quote))
+        <div class="mb-3">
+            <label class="fw-bold text-primary small me-2">
+                <i class="fas fa-file-alt me-1"></i> COTIZACIÓN:
+            </label>
+
+            <span class="badge bg-secondary">
+                CO-{{ $quote->id }}
+            </span>
+        </div>
+    @endif
+
     <!-- ==========================
          SECCIÓN PRINCIPAL / CLIENTE
     =========================== -->
@@ -114,7 +126,7 @@
                 <!-- TABLA -->
                 <div class="col-12 mt-3">
                     <div class="table-responsive">
-                        @include('workshop.quotes.tables.tbl_list_quotes_products')
+                        @include('workshop.work_orders.tables.tbl_list_orders_products')
                     </div>
                 </div>
 
@@ -171,7 +183,7 @@
 
                 <div class="col-12">
                     <div class="table-responsive">
-                        @include('workshop.quotes.tables.tbl_list_quotes_services')
+                        @include('workshop.work_orders.tables.tbl_list_orders_services')
                     </div>
                 </div>
 

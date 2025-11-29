@@ -3,9 +3,9 @@
         <a href="{{ route('tenant.home') }}" class="app-brand-link">
             <span class="app-brand-logo demo">
                 {{-- <img src="#" alt="logo" class="w-px-40 h-auto rounded-circle"> --}}
-                <img src="{{asset('assets/img/logo.png')}}" alt="" width="35">
+                <img src="{{asset('assets/img/logo.jpeg')}}" alt="" width="35">
             </span>
-            <span class="app-brand-text demo  menu-text fw-bolder ms-2">ERPDeportivo</span>
+            <span class="app-brand-text demo  menu-text fw-bolder ms-2">TallerSuite</span>
         </a>
 
         <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto d-block d-xl-none">

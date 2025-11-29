@@ -56,8 +56,8 @@
     <script src="https://unpkg.com/justgage@latest/dist/justgage.umd.js"></script>
 
     <script>
-        const lstProducts = [];
-        const lstServices = [];
+        let lstProducts = [];
+        let lstServices = [];
         let dtProducts = null;
         let dtServices = null;
         const amounts = {
@@ -79,12 +79,13 @@
 
 
         document.addEventListener('DOMContentLoaded', () => {
-            dtProducts = loadDataTableSimple('dt-quotes-products');
-            dtServices = loadDataTableSimple('dt-quotes-services');
+            dtProducts = loadDataTableSimple('dt-orders-products');
+            dtServices = loadDataTableSimple('dt-orders-services');
 
             loadTomSelect();
             loadFilePound();
             events();
+            setQuote();
 
         })
 
@@ -490,9 +491,9 @@
 
             addItem(productSelected, lstProducts);
             dtProducts = destroyDataTable(dtProducts);
-            clearTable('dt-quotes-products');
-            paintQuoteProducts(lstProducts);
-            dtProducts = loadDataTableSimple('dt-quotes-products');
+            clearTable('dt-orders-products');
+            paintOrderProducts(lstProducts);
+            dtProducts = loadDataTableSimple('dt-orders-products');
 
             calculateAmounts();
             paintAmounts();
@@ -514,7 +515,7 @@
             const productSelected = window.productSelect.options[id];
 
             const product = {
-                warehouse_id:productSelected.warehouse_id,
+                warehouse_id: productSelected.warehouse_id,
                 id,
                 name: productSelected.name,
                 category_name: productSelected.category_name,
@@ -548,8 +549,8 @@
 
         async function validationAddProduct(productSelected, lstItems) {
 
-            const validationStock   =   await validatedProductStock(productSelected);
-            if(!validationStock){
+            const validationStock = await validatedProductStock(productSelected);
+            if (!validationStock) {
                 return false;
             }
 
@@ -565,8 +566,8 @@
             lstItems.push(itemSelected);
         }
 
-        function paintQuoteProducts(lstItems) {
-            const tbody = document.querySelector('#dt-quotes-products tbody');
+        function paintOrderProducts(lstItems) {
+            const tbody = document.querySelector('#dt-orders-products tbody');
             let rows = ``;
 
             lstItems.forEach((item) => {
@@ -583,9 +584,9 @@
                         <td>${item.name}</td>
                         <td>${item.category_name}</td>
                         <td>${item.brand_name}</td>
-                        <td>${item.quantity}</td>
-                        <td>${item.sale_price}</td>
-                        <td>${item.total}</td>
+                        <td>${formatQuantity(item.quantity)}</td>
+                        <td>${formatSoles(item.sale_price)}</td>
+                        <td>${formatSoles(item.total)}</td>
                     </tr>
                 `;
             });
@@ -607,9 +608,9 @@
             lstItems.splice(indexItem, 1);
 
             dtProducts = destroyDataTable(dtProducts);
-            clearTable('dt-quotes-products');
-            paintQuoteProducts(lstItems);
-            dtProducts = loadDataTableSimple('dt-quotes-products');
+            clearTable('dt-orders-products');
+            paintOrderProducts(lstItems);
+            dtProducts = loadDataTableSimple('dt-orders-products');
 
             calculateAmounts();
             paintAmounts();
@@ -641,9 +642,9 @@
 
             addItem(serviceSelected, lstServices);
             dtServices = destroyDataTable(dtServices);
-            clearTable('dt-quotes-services');
-            paintQuoteServices(lstServices);
-            dtServices = loadDataTableSimple('dt-quotes-services');
+            clearTable('dt-orders-services');
+            paintOrderServices(lstServices);
+            dtServices = loadDataTableSimple('dt-orders-services');
 
             calculateAmounts();
             paintAmounts();
@@ -703,8 +704,8 @@
             return true;
         }
 
-        function paintQuoteServices(lstItems) {
-            const tbody = document.querySelector('#dt-quotes-services tbody');
+        function paintOrderServices(lstItems) {
+            const tbody = document.querySelector('#dt-orders-services tbody');
             let rows = ``;
 
             lstItems.forEach((item) => {
@@ -719,9 +720,9 @@
                             </button>
                         </td>
                         <td>${item.name}</td>
-                        <td>${item.quantity}</td>
-                        <td>${item.sale_price}</td>
-                        <td>${item.total}</td>
+                        <td>${formatQuantity(item.quantity)}</td>
+                        <td>${formatSoles(item.sale_price)}</td>
+                        <td>${formatSoles(item.total)}</td>
                     </tr>
                 `;
             });
@@ -744,9 +745,9 @@
             lstItems.splice(indexItem, 1);
 
             dtServices = destroyDataTable(dtServices);
-            clearTable('dt-quotes-services');
-            paintQuoteServices(lstItems);
-            dtServices = loadDataTableSimple('dt-quotes-services');
+            clearTable('dt-orders-services');
+            paintOrderServices(lstItems);
+            dtServices = loadDataTableSimple('dt-orders-services');
 
             calculateAmounts();
             paintAmounts();
@@ -878,28 +879,55 @@
             });
         }
 
-        async function validatedProductStock(item){
+        async function validatedProductStock(item) {
             mostrarAnimacion1();
             try {
-                const res = await axios.get(route('tenant.utils.validatedProductStock',{
-                    warehouse_id:item.warehouse_id,
-                    product_id:item.id,
-                    quantity:item.quantity
+                const res = await axios.get(route('tenant.utils.validatedProductStock', {
+                    warehouse_id: item.warehouse_id,
+                    product_id: item.id,
+                    quantity: item.quantity
                 }));
 
-                if(res.data.success){
+                if (res.data.success) {
                     return res.data;
                 }
 
-                toastr.error(res.data.message,'ERROR EN EL SERVIDOR');
+                toastr.error(res.data.message, 'ERROR EN EL SERVIDOR');
                 return null;
             } catch (error) {
                 toastr.error('ERROR EN LA PETICIÓN VALIDAR STOCK');
                 return null;
-            }finally{
+            } finally {
                 ocultarAnimacion1();
             }
         }
 
+        function setQuote() {
+            const quote = @json($quote??null);
+            if (quote) {
+
+                //====== PRODUCTS =========
+                const lstProductsBD = @json($lst_products??null);
+                lstProducts = [...lstProductsBD];
+
+                dtProducts = destroyDataTable(dtProducts);
+                clearTable('dt-orders-products');
+                paintOrderProducts(lstProducts);
+                dtProducts = loadDataTableSimple('dt-orders-products');
+
+                //======= SERVICES =======
+                const lstServicesBD = @json($lst_services??null);
+                lstServices = [...lstServicesBD];
+
+                dtServices = destroyDataTable(dtServices);
+                clearTable('dt-orders-services');
+                paintOrderServices(lstServices);
+                dtServices = loadDataTableSimple('dt-orders-services');
+
+                calculateAmounts();
+                paintAmounts();
+
+            }
+        }
     </script>
 @endsection

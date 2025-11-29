@@ -8,7 +8,7 @@
 @endsection
 
 @section('content')
-    <div class="row"> 
+    <div class="row">
         <form action="{{ route('landlord.mantenimientos.empresas.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
             <div class="nav-align-top mb-4">
@@ -178,7 +178,8 @@
                                         </button>
                                     </label>
                                     <div class="input-group">
-                                        <select name="plan_id" id="plan_id" class="form-select @error('plan_id') is-invalid @enderror">
+                                        <select name="plan_id" id="plan_id"
+                                            class="@error('plan_id') is-invalid @enderror form-select">
                                             <option value="">Seleccione ...</option>
                                             @foreach ($plans as $plan)
                                                 <option value="{{ $plan->id }}">{{ $plan->description }}</option>
@@ -324,50 +325,57 @@
     <script>
         $(document).on('click', '#btn_consulta_sunat', function() {
             const user_ruc = $('#ruc').val();
-            if (user_ruc.length == 11) {
-                Swal.fire({
-                    title: 'Consultar',
-                    text: "¿Desea consultar RUC a Sunat?",
-                    icon: 'question',
-                    showCancelButton: true,
-                    confirmButtonColor: "#696cff",
-                    confirmButtonText: 'Si, Confirmar',
-                    cancelButtonText: "No, Cancelar",
-                    showLoaderOnConfirm: true,
-                    preConfirm: function() {
-                        var url = '/landlord/ruc/' + user_ruc;
-                        return $.ajax({
-                            url: url,
-                            type: 'GET',
-                            dataType: 'json'
-                        });
-                    },
-                    allowOutsideClick: function() {
-                        return !Swal.isLoading();
-                    }
-                }).then(function(data) {
-                    if (data.value.success === false) {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Oops...',
-                            text: 'RUC inválido o no existe!'
-                        });
-                        $('#estado').val(data.value.message);
-                        $('#razon_social').val('');
-                        $('#razon_social_abreviada').val('');
-                    } else {
-                        $('#estado').val(data.value.data.estado);
-                        $('#razon_social').val(data.value.data.nombre_o_razon_social);
-                        $('#razon_social_abreviada').val(data.value.data.nombre_o_razon_social);
-                    }
-                });
-            } else {
+
+            if (user_ruc.length !== 11) {
                 Swal.fire({
                     icon: 'error',
                     title: 'Oops...',
                     text: 'El RUC debe contener 11 dígitos'
                 });
+                return;
             }
+
+            Swal.fire({
+                title: 'Consultando RUC...',
+                text: 'Por favor, espere',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            const url = '/landlord/ruc/' + user_ruc;
+
+            $.ajax({
+                url: url,
+                type: 'GET',
+                dataType: 'json',
+                success: function(data) {
+                    Swal.close();
+                    if (data.success === false) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: 'RUC inválido o no existe!'
+                        });
+                        $('#estado').val(data.message);
+                        $('#razon_social').val('');
+                        $('#razon_social_abreviada').val('');
+                    } else {
+                        $('#estado').val(data.data.estado);
+                        $('#razon_social').val(data.data.nombre_o_razon_social);
+                        $('#razon_social_abreviada').val(data.data.nombre_o_razon_social);
+                    }
+                },
+                error: function() {
+                    Swal.close(); 
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: 'Error al consultar Sunat'
+                    });
+                }
+            });
         });
     </script>
 

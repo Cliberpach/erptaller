@@ -2,18 +2,26 @@
 
 namespace App\Http\Services\Tenant\WorkShop\Quotes;
 
+use App\Http\Services\Tenant\Inventory\WarehouseProduct\WarehouseProductService;
 use App\Models\Tenant\WorkShop\Quote\Quote;
 use Exception;
 
 class QuoteValidation
 {
 
-    public function validationStore(array $data):array
+    private WarehouseProductService $s_warehouse_product;
+
+    public function __construct(WarehouseProductService $s_warehouse_product)
+    {
+        $this->s_warehouse_product = $s_warehouse_product;
+    }
+
+    public function validationStore(array $data): array
     {
         $lst_products  =  json_decode($data['lst_products']);
         $lst_services  =  json_decode($data['lst_services']);
 
-        if(count($lst_products) === 0 && count($lst_services) === 0){
+        if (count($lst_products) === 0 && count($lst_services) === 0) {
             throw new Exception("DEBE INGRESAR POR LO MENOS UN PRODUCTO O SERVICIO A LA COTIZACIÓN");
         }
 
@@ -23,21 +31,38 @@ class QuoteValidation
         return $data;
     }
 
-    public function validationUpdate(array $data,int $id):array
+    public function validationUpdate(array $data, int $id): array
     {
         $data = $this->validationStore($data);
 
         $quote  =   Quote::findOrFail($id);
-        if($quote->status === 'ANULADO'){
+        if ($quote->status === 'ANULADO') {
             throw new Exception("NO SE PUEDE MODIFICAR UNA COTIZACIÓN ANULADA");
         }
 
-        if($quote->status === 'EXPIRADO'){
+        if ($quote->status === 'EXPIRADO') {
             throw new Exception("NO SE PUEDE MODIFICAR UNA COTIZACIÓN EXPIRADA");
         }
 
         return $data;
-
     }
 
+    public function validationConvertOrderCreate(array $data)
+    {
+        $products                   =   $data['products'];
+        $services                   =   $data['services'];
+
+        $lst_products_validated     =   collect($this->s_warehouse_product->validatedStock($products->toArray()));
+        $count_products_validated   =   $lst_products_validated->where('valid', true)->count();
+
+        if($count_products_validated === 0 && count($services) === 0){
+            throw new Exception("NO EXISTEN PRODUCTOS Y SERVICIOS EN LA COTIZACIÓN");
+        }
+
+        $data_validated=    [
+            'products_validated'    =>  $lst_products_validated->where('valid',true)->toArray()
+        ];
+
+        return $data_validated;
+    }
 }

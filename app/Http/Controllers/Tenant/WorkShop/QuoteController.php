@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Tenant\WorkShop;
 
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\FormatController;
+use App\Http\Controllers\UtilController;
 use App\Http\Requests\Tenant\WorkShop\Quote\QuoteStoreRequest;
 use App\Http\Services\Tenant\WorkShop\Quotes\QuoteManager;
 use App\Models\Company;
@@ -190,4 +191,17 @@ array:17 [ // app\Http\Controllers\Tenant\WorkShop\QuoteController.php:145
         }
     }
 
+
+    public function convertOrderCreate(int $id)
+    {
+        try {
+
+            $view   =   $this->s_quote->convertOrderCreate($id);
+            return $view;
+
+        } catch (Throwable $th) {
+            Session::flash('message_error', $th->getMessage());
+            return back();
+        }
+    }
 }

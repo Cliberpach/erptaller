@@ -177,6 +177,11 @@
                                             </a>
                                         </li>
                                         <li>
+                                            <a class="dropdown-item" href="#" onclick="redirectParams('tenant.taller.cotizaciones.convertOrderCreate', ${data.id})">
+                                                <i class="fas fa-clipboard-list me-2"></i> Orden
+                                            </a>
+                                        </li>
+                                        <li>
                                             <a class="dropdown-item text-danger" href="#" onclick="eliminar(${data.id})">
                                                 <i class="fa fa-trash me-2"></i> Eliminar
                                             </a>

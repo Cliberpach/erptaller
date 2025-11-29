@@ -36,6 +36,7 @@ Route::group(["prefix" => "taller"], function () {
         Route::put('update/{id}', [QuoteController::class, 'update'])->name('tenant.taller.cotizaciones.update');
         Route::delete('destroy/{id}', [QuoteController::class, 'destroy'])->name('tenant.taller.cotizaciones.destroy');
         Route::get('pdf/{id}', [QuoteController::class, 'pdfOne'])->name('tenant.taller.cotizaciones.pdfOne');
+        Route::get('convert-order/{id}', [QuoteController::class, 'convertOrderCreate'])->name('tenant.taller.cotizaciones.convertOrderCreate');
 
     });
 

@@ -3,7 +3,9 @@
 namespace App\Http\Services\Tenant\Inventory\WarehouseProduct;
 
 use App\Models\Tenant\NoteIncome;
+use App\Models\Tenant\WarehouseProduct;
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Support\Facades\DB;
 
 class WarehouseProductService
@@ -49,7 +51,7 @@ class WarehouseProductService
     public function getProductStock(int $warehouse_id, int $product_id)
     {
         $product_stock  =   DB::select(
-                                'SELECT
+            'SELECT
                                                 p.id,
                                                 p.name AS product_name,
                                                 c.id AS category_id,
@@ -65,13 +67,40 @@ class WarehouseProductService
                                                 WHERE
                                                 p.id = ?
                                                 AND wp.warehouse_id = ?',
-                                [$product_id, $warehouse_id]
-                            );
+            [$product_id, $warehouse_id]
+        );
 
-        if(count($product_stock) === 0){
+        if (count($product_stock) === 0) {
             return null;
         }
 
         return $product_stock[0];
+    }
+
+    public function validatedStock(array $lst_items):array
+    {
+        $lst_items_validated    =   [];
+        foreach ($lst_items as $item) {
+
+            $item_bd    =   WarehouseProduct::where('warehouse_id', $item['warehouse_id'])
+                ->where('product_id', $item['product_id'])
+                ->select('stock')
+                ->first();
+
+            if (!$item_bd) {
+                throw new Exception("PRODUCTO NO EXISTE EN EL ALMACÉN, ERROR AL VALIDAR STOCK");
+            }
+
+            if ((float)$item_bd->stock < (float)$item['quantity']) {
+                $item['valid']  =   false;
+                $item['stock']  =   $item_bd->stock;
+            } else {
+                $item['valid']  =   true;
+                $item['stock']  =   $item_bd->stock;
+            }
+
+            $lst_items_validated[]  =   $item;
+        }
+        return $lst_items_validated;
     }
 }

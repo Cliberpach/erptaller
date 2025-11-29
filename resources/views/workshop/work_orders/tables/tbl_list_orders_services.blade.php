@@ -1,4 +1,4 @@
-<table class="table-striped table-bordered table-hover table" style="text-transform:uppercase" id="dt-quotes-services">
+<table class="table-striped table-bordered table-hover table" style="text-transform:uppercase" id="dt-orders-services">
     <thead>
         <tr>
             <th class="text-center">#</th>
