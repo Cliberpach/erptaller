@@ -43,7 +43,7 @@
                                     <input type="text" class="form-control @error('domain') is-invalid @enderror"
                                         placeholder="Nombre del dominio" id="domain" name="domain"
                                         value="{{ old('domain') }}">
-                                    <span class="input-group-text">.eldeportivo.online</span>
+                                    <span class="input-group-text">.tallersuite.store</span>
                                     <br>
                                 </div>
                                 @error('domain')
@@ -368,7 +368,7 @@
                     }
                 },
                 error: function() {
-                    Swal.close(); 
+                    Swal.close();
                     Swal.fire({
                         icon: 'error',
                         title: 'Oops...',
