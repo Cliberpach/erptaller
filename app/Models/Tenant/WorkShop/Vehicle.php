@@ -67,7 +67,7 @@ class Vehicle extends Model
             }
 
             if (empty($vehicle->status)) {
-                $vehicle->status = 'ACTIVE';
+                $vehicle->status = 'ACTIVO';
             }
         });
 
@@ -76,7 +76,7 @@ class Vehicle extends Model
                 $vehicle->editor_user_id = auth()->id();
                 $vehicle->editor_user_name = auth()->user()->name;
             }
-            if ($vehicle->isDirty('status') && $vehicle->status === 'INACTIVE') {
+            if ($vehicle->isDirty('status') && $vehicle->status === 'ANULADO') {
                 if (auth()->check()) {
                     $vehicle->delete_user_id = auth()->id();
                     $vehicle->delete_user_name = auth()->user()->name;

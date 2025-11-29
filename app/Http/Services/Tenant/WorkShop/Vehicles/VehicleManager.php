@@ -2,11 +2,7 @@
 
 namespace App\Http\Services\Tenant\WorkShop\Vehicles;
 
-use App\Almacenes\Producto;
-use App\Models\Tenant\WorkShop\Brand;
-use App\Models\Tenant\WorkShop\Color;
 use App\Models\Tenant\WorkShop\Vehicle;
-use Illuminate\Support\Collection;
 
 class VehicleManager
 {
@@ -20,8 +16,6 @@ class VehicleManager
         return $this->s_vehicle->store($datos);
     }
 
-    public function getMarca(int $id):Vehicle{
-    }
 
     public function update (array $data,int $id):Vehicle{
         return $this->s_vehicle->update($data,$id);
