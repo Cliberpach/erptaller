@@ -3,7 +3,7 @@
     content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 <meta name="description" content="">
 <meta name="csrf-token" content="{{ csrf_token() }}">
-<title>ERP Deportivo | @yield('title') </title>
+<title>TallerSuite | @yield('title') </title>
 <link rel="icon" type="image/png" href="{{ asset('loginn/img/icono.png') }}">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
