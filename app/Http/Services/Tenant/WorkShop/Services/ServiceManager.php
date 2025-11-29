@@ -2,12 +2,7 @@
 
 namespace App\Http\Services\Tenant\WorkShop\Services;
 
-use App\Almacenes\Producto;
-use App\Models\Tenant\WorkShop\Brand;
-use App\Models\Tenant\WorkShop\Color;
 use App\Models\Tenant\WorkShop\Service;
-use App\Models\Tenant\WorkShop\Vehicle;
-use Illuminate\Support\Collection;
 
 class ServiceManager
 {

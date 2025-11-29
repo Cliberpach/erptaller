@@ -21,6 +21,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 use Spatie\Permission\Models\Role;
@@ -51,18 +52,27 @@ class CompanyController extends Controller
     }
 
 
-    public function getCompanies(Request $request){
+    public function getCompanies(Request $request)
+    {
 
         $companies = DB::table('companies as e')
             ->join('tenants as t', 'e.tenant_id', 't.id')
-            ->join('plans as p','p.id','e.plan')
-            ->select('e.id', 'e.ruc', 'e.business_name', 'e.created_at', 't.id', 't.domain',
-            'p.description as plan_name','e.email','e.invoicing_status')
-            ->where('status','1')
+            ->join('plans as p', 'p.id', 'e.plan')
+            ->select(
+                'e.id',
+                'e.ruc',
+                'e.business_name',
+                'e.created_at',
+                't.id',
+                't.domain',
+                'p.description as plan_name',
+                'e.email',
+                'e.invoicing_status'
+            )
+            ->where('status', '1')
             ->get();
 
         return DataTables::of($companies)->make(true);
-
     }
 
 
@@ -80,7 +90,8 @@ class CompanyController extends Controller
         return view('company.create', compact('all_modules', 'plans'));
     }
 
-    public function edit($id):View{
+    public function edit($id): View
+    {
 
         $all_modules    =   Module::with('children.grandchildren')->get();
 
@@ -89,31 +100,39 @@ class CompanyController extends Controller
                             t.database
                             from tenants as t
                             inner join companies as c on c.tenant_id = t.id
-                            where c.id = ?',[$id])[0];
+                            where c.id = ?', [$id])[0];
 
         $tenant_modules =   DB::table("$tenant_data->database.modules as m")
-                            ->select('m.id')
-                            ->get();
+            ->select('m.id')
+            ->get();
 
         $tenant_modules_children    =   DB::table("$tenant_data->database.module_children as mc")
-                                        ->select('mc.id')
-                                        ->get();
+            ->select('mc.id')
+            ->get();
 
         $tenant_modules_grand_children   =   DB::table("$tenant_data->database.module_grand_children as mgc")
-                                            ->select('mgc.id')
-                                            ->get();
+            ->select('mgc.id')
+            ->get();
 
         $user   =   DB::table("$tenant_data->database.users as u")
-                    ->select('u.*')
-                    ->where('u.id',1)
-                    ->get()[0];
+            ->select('u.*')
+            ->where('u.id', 1)
+            ->get()[0];
 
         $company        =   DB::table("companies as c")
-                            ->join('tenants as t', 't.id', '=', 'c.tenant_id')
-                            ->select('c.id','t.domain','c.ruc','c.business_name','c.abbreviated_business_name','zip_code',
-                            'fiscal_address','c.plan')
-                            ->where('c.id',$id)
-                            ->get()[0];
+            ->join('tenants as t', 't.id', '=', 'c.tenant_id')
+            ->select(
+                'c.id',
+                't.domain',
+                'c.ruc',
+                'c.business_name',
+                'c.abbreviated_business_name',
+                'zip_code',
+                'fiscal_address',
+                'c.plan'
+            )
+            ->where('c.id', $id)
+            ->get()[0];
 
         $plans = Plan::select(
             'id',
@@ -123,11 +142,18 @@ class CompanyController extends Controller
         )->get();
 
 
-        return view('company.edit_company_landlord',compact('all_modules', 'plans','company',
-        'tenant_modules','tenant_modules_children','tenant_modules_grand_children','user'));
+        return view('company.edit_company_landlord', compact(
+            'all_modules',
+            'plans',
+            'company',
+            'tenant_modules',
+            'tenant_modules_children',
+            'tenant_modules_grand_children',
+            'user'
+        ));
     }
 
-    public function store(CompanyStoreRequest $request): RedirectResponse
+    public function store(CompanyStoreRequest $request)
     {
         try {
 
@@ -206,10 +232,12 @@ class CompanyController extends Controller
                 dd('Error al generar el certificado subdmonio', $output, $resultCode);
             }*/
 
-            return to_route("landlord.mantenimientos.empresa");
-        } catch (\Exception $ex) {
+            Session::flash('message_success','EMPRESA REGISTRADA CON ÉXITO');
+            return response()->json(['success' => true, 'message' => 'EMPRESA REGISTRADA CON ÉXITO']);
+        } catch (Exception $ex) {
             DB::rollback();
-            return redirect()->back()->with("error", $ex->getMessage());
+            Session::flash('message_error', $ex->getMessage());
+            return response()->json(['success' => false, 'message' => $ex->getMessage()]);
         }
     }
 
@@ -342,7 +370,7 @@ class CompanyController extends Controller
         ]);
     }
 
-/*
+    /*
 array:17 [▼ // app\Http\Controllers\LandLord\CompanyController.php:315
   "_token"          => "KpM9ktljkPhZJY7m8wwMzd91rXMIXg2U6WZl2dD6"
   "_method"         => "PUT"
@@ -374,7 +402,8 @@ array:17 [▼ // app\Http\Controllers\LandLord\CompanyController.php:315
   --- aveces llega grand_child_id ---
 ]
 */
-    public function update(CompanyStoreRequest $request,$id){
+    public function update(CompanyStoreRequest $request, $id)
+    {
         try {
 
             DB::beginTransaction();
@@ -385,7 +414,7 @@ array:17 [▼ // app\Http\Controllers\LandLord\CompanyController.php:315
                                 t.database
                                 from tenants as t
                                 inner join companies as c on c.tenant_id = t.id
-                                where c.id = ?',[$id])[0];
+                                where c.id = ?', [$id])[0];
 
 
             //========== ACTUALIZAR DATOS DE LA EMPRESA TENANT =======
@@ -418,14 +447,14 @@ array:17 [▼ // app\Http\Controllers\LandLord\CompanyController.php:315
 
 
             //======== ACTUALIZAR MÓDULOS DE LA EMPRESA TENANT =======
-            $module_array       = $request->module_id??[];
-            $child_array        = $request->child_id??[];
-            $grandchild_array   = $request->grandchild_id??[];
+            $module_array       = $request->module_id ?? [];
+            $child_array        = $request->child_id ?? [];
+            $grandchild_array   = $request->grandchild_id ?? [];
 
 
-            $this->modules          = count($module_array)>0?Module::whereIn('id', $module_array)->get():[];
-            $this->children         = count($child_array)>0?ModuleChild::whereIn('id', $child_array)->get():[];
-            $this->grand_children   = count($grandchild_array)>0?ModuleGrandChild::whereIn('id', $grandchild_array)->get():[];
+            $this->modules          = count($module_array) > 0 ? Module::whereIn('id', $module_array)->get() : [];
+            $this->children         = count($child_array) > 0 ? ModuleChild::whereIn('id', $child_array)->get() : [];
+            $this->grand_children   = count($grandchild_array) > 0 ? ModuleGrandChild::whereIn('id', $grandchild_array)->get() : [];
 
             DB::table("$tenant_data->database.modules")->delete();
 
@@ -437,79 +466,82 @@ array:17 [▼ // app\Http\Controllers\LandLord\CompanyController.php:315
 
             foreach ($this->modules as $module) {
                 DB::table("$tenant_data->database.modules")
-                ->insert([
-                    'id'            => $module->id,
-                    'description'   => $module->description,
-                    'order'         => $module->order,
-                    'created_at'    => Carbon::now(),
-                    'updated_at'    => Carbon::now(),
-                ]);
+                    ->insert([
+                        'id'            => $module->id,
+                        'description'   => $module->description,
+                        'order'         => $module->order,
+                        'created_at'    => Carbon::now(),
+                        'updated_at'    => Carbon::now(),
+                    ]);
             }
 
             foreach ($this->children as $children) {
                 DB::table("$tenant_data->database.module_children")
-                ->insert([
-                    'id'            => $children->id,
-                    'module_id'     => $children->module_id,
-                    'description'   => $children->description,
-                    'route_name'    => $children->route_name,
-                    'order'         => $children->order,
-                    'created_at'    => Carbon::now(),
-                    'updated_at'    => Carbon::now(),
-                ]);
+                    ->insert([
+                        'id'            => $children->id,
+                        'module_id'     => $children->module_id,
+                        'description'   => $children->description,
+                        'route_name'    => $children->route_name,
+                        'order'         => $children->order,
+                        'created_at'    => Carbon::now(),
+                        'updated_at'    => Carbon::now(),
+                    ]);
             }
 
             foreach ($this->grand_children as $grand_children) {
                 DB::table("$tenant_data->database.module_grand_children")
-                ->insert([
-                    'id' => $grand_children->id,
-                    'module_child_id' => $grand_children->module_child_id,
-                    'description' => $grand_children->description,
-                    'route_name' => $grand_children->route_name,
-                    'order' => $grand_children->order,
-                    'created_at'    => Carbon::now(),
-                    'updated_at'    => Carbon::now(),
-                ]);
+                    ->insert([
+                        'id' => $grand_children->id,
+                        'module_child_id' => $grand_children->module_child_id,
+                        'description' => $grand_children->description,
+                        'route_name' => $grand_children->route_name,
+                        'order' => $grand_children->order,
+                        'created_at'    => Carbon::now(),
+                        'updated_at'    => Carbon::now(),
+                    ]);
             }
 
             //======== ACTUALIZAR PLAN DE LA EMPRESA TENANT =======
             $this->plan             = Plan::findOrFail($company->plan);
 
             DB::table("$tenant_data->database.plans")
-            ->insert([
-                'id'                => $this->plan->id,
-                'description'       => $this->plan->description,
-                'number_fields'     => $this->plan->number_fields,
-                'price'             => $this->plan->price,
-                'created_at'    => Carbon::now(),
-                'updated_at'    => Carbon::now(),
-            ]);
+                ->insert([
+                    'id'                => $this->plan->id,
+                    'description'       => $this->plan->description,
+                    'number_fields'     => $this->plan->number_fields,
+                    'price'             => $this->plan->price,
+                    'created_at'    => Carbon::now(),
+                    'updated_at'    => Carbon::now(),
+                ]);
 
             //======== ACTUALIZAR CORREO Y CONTRASEÑA DEL TENANT ========
             DB::table("$tenant_data->database.users as u")
-            ->where('u.id', '1')
-            ->update(
-                ['u.password'           =>  Hash::make($request->get('password')),
-                'u.password_visible'    =>  $request->get('password'),
-                'u.email'               =>  $request->get("correo")]
-            );
+                ->where('u.id', '1')
+                ->update(
+                    [
+                        'u.password'           =>  Hash::make($request->get('password')),
+                        'u.password_visible'    =>  $request->get('password'),
+                        'u.email'               =>  $request->get("correo")
+                    ]
+                );
 
             DB::commit();
 
             return to_route("landlord.mantenimientos.empresa");
         } catch (\Exception $ex) {
             DB::rollback();
-            return redirect()->back()->with("error", $ex->getMessage().'-LINE:'.$ex->getLine());
+            return redirect()->back()->with("error", $ex->getMessage() . '-LINE:' . $ex->getLine());
         }
     }
 
 
-/*
+    /*
 array:1 [ // app\Http\Controllers\LandLord\CompanyController.php:263
   "company_id" => "1"
 ]
 */
-    public function resetearClave(Request $request){
+    public function resetearClave(Request $request)
+    {
         DB::beginTransaction();
         try {
 
@@ -520,29 +552,30 @@ array:1 [ // app\Http\Controllers\LandLord\CompanyController.php:263
                                 t.database
                                 from tenants as t
                                 inner join companies as c on c.tenant_id = t.id
-                                where c.id = ?',[$company_id])[0];
+                                where c.id = ?', [$company_id])[0];
 
 
             DB::table("$tenant_data->database.users as u")
-            ->where('u.id', '1')
-            ->update(['u.password' => Hash::make($tenant_data->ruc)]);
+                ->where('u.id', '1')
+                ->update(['u.password' => Hash::make($tenant_data->ruc)]);
 
             DB::commit();
-            return response()->json(['success'=>true,'message'=>'CLAVE RESETEADA CON ÉXITO!!!']);
+            return response()->json(['success' => true, 'message' => 'CLAVE RESETEADA CON ÉXITO!!!']);
         } catch (\Throwable $th) {
             DB::rollBack();
-            return response()->json(['success'=>false,'message'=>$th->getMessage()]);
+            return response()->json(['success' => false, 'message' => $th->getMessage()]);
         }
     }
 
-    public function deleteTenant($id){
+    public function deleteTenant($id)
+    {
 
         try {
 
             //====== OBTENER EMPRESA =======
             $company = LandlordCompany::find($id);
 
-            if(!$company){
+            if (!$company) {
                 throw new Exception("NO EXISTE LA EMPRESA EN LA BD!!");
             }
 
@@ -552,7 +585,7 @@ array:1 [ // app\Http\Controllers\LandLord\CompanyController.php:263
                                             t.database
                                             from tenants as t
                                             inner join companies as c on c.tenant_id = t.id
-                                            where c.id = ?',[$id])[0];
+                                            where c.id = ?', [$id])[0];
 
             //======== VERIFICAR SI EXISTE LA BD DEL TENANT =======
             $exists = DB::select("SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = ?", [$tenant_data->database]);
@@ -564,7 +597,7 @@ array:1 [ // app\Http\Controllers\LandLord\CompanyController.php:263
             DB::statement("DROP DATABASE IF EXISTS {$tenant_data->database}");
 
             //======= ELIMINAR ARCHIVOS DEL TENANT ======
-            $path_directory_tenant = public_path('storage/'.$company->files_route);
+            $path_directory_tenant = public_path('storage/' . $company->files_route);
             if (File::exists($path_directory_tenant) && File::isDirectory($path_directory_tenant)) {
                 File::deleteDirectory($path_directory_tenant);
             }
@@ -573,10 +606,9 @@ array:1 [ // app\Http\Controllers\LandLord\CompanyController.php:263
             $company->status = '0';
             $company->update();
 
-            return response()->json(['success'=>true,'message'=>'EMPRESA ELIMINADA!!!']);
-
+            return response()->json(['success' => true, 'message' => 'EMPRESA ELIMINADA!!!']);
         } catch (\Throwable $th) {
-            return response()->json(['success'=>false,'message'=>$th->getMessage()]);
+            return response()->json(['success' => false, 'message' => $th->getMessage()]);
         }
     }
 }

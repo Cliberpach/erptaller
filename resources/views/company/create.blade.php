@@ -9,7 +9,8 @@
 
 @section('content')
     <div class="row">
-        <form action="{{ route('landlord.mantenimientos.empresas.store') }}" method="POST" enctype="multipart/form-data">
+        <form id="form-empresa-store" action="{{ route('landlord.mantenimientos.empresas.store') }}" method="POST"
+            enctype="multipart/form-data">
             @csrf
             <div class="nav-align-top mb-4">
                 <ul class="nav nav-pills mb-3" role="tablist">
@@ -46,9 +47,7 @@
                                     <span class="input-group-text">.tallersuite.store</span>
                                     <br>
                                 </div>
-                                @error('domain')
-                                    <p style="color: red; margin-top: -10px;">* {{ $message }}</p>
-                                @enderror
+                                <p class="domain_error msgError mb-0"></p>
                                 <div class="row mb-3">
                                     <div class="col-6">
                                         <label class="form-label" for="ruc">RUC:</label>
@@ -60,6 +59,7 @@
                                                 style="padding-right: 10px; padding-left: 10px;"><i
                                                     class="bx bx-search"></i> Sunat</button>
                                         </div>
+                                        <p class="ruc_error msgError mb-0"></p>
                                     </div>
 
                                     <div class="col-6">
@@ -77,6 +77,7 @@
                                     <input type="text" class="form-control @error('razon_social') is-invalid @enderror"
                                         id="razon_social" name="razon_social" value="{{ old('razon_social') }}">
                                 </div>
+                                <p class="razon_social_error msgError mb-0"></p>
                                 @error('razon_social')
                                     <p style="color: red; margin-top: -10px;">* {{ $message }}</p>
                                 @enderror
@@ -89,6 +90,7 @@
                                             class="form-control @error('razon_social_abreviada') is-invalid @enderror"
                                             id="razon_social_abreviada" name="razon_social_abreviada"
                                             value="{{ old('razon_social_abreviada') }}">
+                                        <p class="razon_social_abreviada_error msgError mb-0"></p>
                                     </div>
                                     <div class="col-6">
                                         <label class="form-label" for="ubigeo">Ubigeo:</label>
@@ -190,6 +192,7 @@
                                 @error('plan_id')
                                     <p style="color: red; margin-top: -10px;">* {{ $message }}</p>
                                 @enderror
+                                <p class="plan_id_error msgError mb-0"></p>
 
                             </div>
                         </div>
@@ -365,6 +368,8 @@
                         $('#estado').val(data.data.estado);
                         $('#razon_social').val(data.data.nombre_o_razon_social);
                         $('#razon_social_abreviada').val(data.data.nombre_o_razon_social);
+                        $('#direccion_fiscal').val(data.data.direccion_completa);
+                        $('#ubigeo').val(data.data.ubigeo_sunat);
                     }
                 },
                 error: function() {
@@ -521,5 +526,71 @@
                 },
             });
         });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            events();
+        })
+
+        function events() {
+            document.querySelector('#form-empresa-store').addEventListener('submit', (e) => {
+                e.preventDefault();
+                storeEmpresa(e.target);
+            })
+        }
+
+        function storeEmpresa(formCompanyStore) {
+            Swal.fire({
+                title: '¿Registrar empresa?',
+                text: "¡Se crearán un tenant!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Sí',
+                cancelButtonText: 'Cancelar',
+                reverseButtons: true,
+                customClass: {
+                    confirmButton: 'btn btn-primary',
+                    cancelButton: 'btn btn-secondary'
+                },
+                buttonsStyling: false
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    try {
+
+                        clearValidationErrors('msgError');
+
+                        Swal.fire({
+                            title: 'Registrando empresa...',
+                            html: 'Por favor, espera',
+                            allowOutsideClick: false,
+                            didOpen: () => {
+                                Swal.showLoading();
+                            }
+                        });
+
+                        const formData = new FormData(formCompanyStore);
+                        const res = await axios.post(route('landlord.mantenimientos.empresas.store'), formData);
+                        if (res.data.success) {
+                            toastr.success(res.data.message, 'OPERACIÓN COMPLETADA');
+                            redirect("landlord.mantenimientos.empresa");
+                        } else {
+                            toastr.error(res.data.message, 'ERROR EN EL SERVIDOR');
+                            Swal.close();
+                        }
+                    } catch (error) {
+                        Swal.close();
+                        if (error.response && error.response.status === 422) {
+                            const errors = error.response.data.errors;
+                            paintValidationErrors(errors, 'error');
+                            toastr.error('ERRORES DE VALIDACIÓN EN EL FORMULARIO');
+                            return;
+                        } else {
+                            toastr.error(error, 'ERROR LA PETICIÓN REGISTRAR EMPRESA');
+                        }
+                    }
+                }
+            });
+        }
     </script>
 @endsection

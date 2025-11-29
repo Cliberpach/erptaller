@@ -30,7 +30,7 @@ class ServiceService
     public function store(array $data): Service
     {
         $dto        =   $this->s_dto->getDtoStore($data);
-        dd($dto);
+
         $service    =   $this->s_repository->insertService($dto);
         return $service;
     }
