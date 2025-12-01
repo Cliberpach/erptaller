@@ -2,7 +2,7 @@
 <html lang="en" class="light-style layout-menu-fixed" dir="ltr" data-theme="theme-default"
     data-assets-path="{{ asset('assets') }}" data-template="vertical-menu-template-free">
 
-<link rel="icon" type="image/x-icon" href="{{ asset('assets/favicon.ico') }}">
+<link rel="icon" type="image/x-icon" href="{{ asset('assets/favicon.ico') }}?v={{ time() }}">
 
 <head>
     <!-- Scripts -->
