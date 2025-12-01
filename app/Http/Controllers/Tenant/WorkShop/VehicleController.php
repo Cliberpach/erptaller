@@ -237,7 +237,7 @@ array:8 [ // app\Http\Controllers\Tenant\WorkShop\VehicleController.php:159
             return $res;
         } catch (Throwable $th) {
             DB::connection('landlord')->rollBack();
-            return response()->json(['success' => false, 'message' => $th->getMessage()]);
+            return response()->json(['success' => false, 'message' => $th->getMessage(),'line'=>$th->getLine(),'file'=>$th->getFile()]);
         }
     }
 
