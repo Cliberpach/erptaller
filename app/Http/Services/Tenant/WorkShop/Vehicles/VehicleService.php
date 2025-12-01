@@ -41,7 +41,7 @@ class VehicleService
         if ($vehicle) {
             return response()->json(['success' => true, 'data' => $vehicle, 'message' => 'CONSULTA COMPLETADA', 'origin' => 'BD']);
         }
-
+        dd('y dale u');
         $res    =   UtilController::apiPlaca($placa);
         $_res   =   json_decode($res->getContent());
 

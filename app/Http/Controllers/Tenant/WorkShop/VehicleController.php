@@ -231,7 +231,7 @@ array:8 [ // app\Http\Controllers\Tenant\WorkShop\VehicleController.php:159
     {
         DB::connection('landlord')->beginTransaction();
         try {
-            dd('avion');
+          
             $res    =   $this->s_vehicle->searchPlate($placa);
             DB::connection('landlord')->commit();
             return $res;
