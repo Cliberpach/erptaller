@@ -51,6 +51,8 @@
 
     function eventsMdlCreateCustomer() {
         iniciarSelect2();
+        setDefaultData();
+
         document.querySelector('#formStoreCustomer').addEventListener('submit', (e) => {
             e.preventDefault();
             storeCustomer();
@@ -126,20 +128,6 @@
                 $('#type_identity_document').val('3').trigger('change');
                 document.querySelector('#nro_document').value = customerParameters.documentSearchCustomer;
             }
-        }
-
-        const department_id = @json($company_invoice->department_id);
-        const province_id = @json($company_invoice->province_id);
-        const district_id = @json($company_invoice->district_id);
-
-        if (department_id && province_id && district_id) {
-            $('#department').val(department_id).trigger('change');
-            changeDepartment(department_id);
-
-            $('#province').val(province_id).trigger('change');
-            changeProvince(province_id);
-
-            $('#district').val(district_id).trigger('change');
         }
 
         $('#mdlCreateCustomer').modal('show');
@@ -418,5 +406,21 @@
 
         window.clientSelect.setValue(option.id);
 
+    }
+
+    function setDefaultData() {
+        const department_id = parseInt(@json($company_invoice->department_id));
+        const province_id = parseInt(@json($company_invoice->province_id));
+        const district_id = parseInt(@json($company_invoice->district_id));
+
+        if (department_id && province_id && district_id) {
+            $('#department').val(department_id).trigger('change');
+            changeDepartment(department_id);
+
+            $('#province').val(province_id).trigger('change');
+            changeProvince(province_id);
+
+            $('#district').val(district_id).trigger('change');
+        }
     }
 </script>

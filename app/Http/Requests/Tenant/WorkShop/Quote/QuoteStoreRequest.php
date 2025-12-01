@@ -28,7 +28,7 @@ class QuoteStoreRequest extends FormRequest
             ],
 
             'plate' => [
-                'required',
+                'nullable',
                 'string',
                 'min:6',
                 'max:8',
@@ -50,7 +50,6 @@ class QuoteStoreRequest extends FormRequest
 
             'vehicle_id.exists'  => 'El vehículo seleccionado no existe o no está activo.',
 
-            'plate.required' => 'La placa es obligatoria.',
             'plate.min'      => 'La placa debe tener al menos 6 caracteres.',
             'plate.max'      => 'La placa no debe exceder los 8 caracteres.',
 

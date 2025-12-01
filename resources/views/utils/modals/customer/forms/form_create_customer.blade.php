@@ -10,7 +10,11 @@
                     <select required name="type_identity_document" required class="form-select select2_form_customer" id="type_identity_document" data-placeholder="Seleccionar" onchange="changeTypeIdentityDocument(this.value)">
                         <option></option>
                         @foreach ($types_identity_documents as $document_identity)
-                            <option value="{{$document_identity->id}}">{{$document_identity->abbreviation}}</option>
+                            <option
+                            @if ($document_identity->id == 1)
+                                selected
+                            @endif
+                            value="{{$document_identity->id}}">{{$document_identity->abbreviation}}</option>
                         @endforeach
                     </select>
                     <span class="type_identity_document_error_customer msgErrorCustomer"  style="color:red;"></span>
@@ -18,14 +22,15 @@
 
                 <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12 mb-2">
                     <label class="required_field" for="nro_document" style="font-weight: bold;">N° DOCUMENTO</label>
-                    
+
                     <div class="input-group">
-                        <input disabled id="nro_document" name="nro_document" required type="text" class="form-control" placeholder="N° DOCUMENTO" aria-label="Recipient's username" aria-describedby="button-addon2">
-                        <button class="btn btn-primary d-none" type="button" id="btn_search_nro_document">
+                        <input id="nro_document" name="nro_document" required type="text" class="form-control" placeholder="N° DOCUMENTO" aria-label="Recipient's username" aria-describedby="button-addon2">
+                        <button
+                        class="btn btn-primary" type="button" id="btn_search_nro_document">
                             <i class="fas fa-search"></i>
                         </button>
                     </div>
- 
+
                     <span class="nro_document_error_customer msgErrorCustomer"  style="color:red;"></span>
                 </div>
 
@@ -51,7 +56,7 @@
                     <span class="address_error_customer msgErrorCustomer"  style="color:red;"></span>
                 </div>
             </div>
-          
+
         </div>
 
         <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 mb-2">

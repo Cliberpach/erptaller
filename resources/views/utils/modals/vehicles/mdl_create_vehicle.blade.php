@@ -36,6 +36,7 @@
 
 <script>
     function openMdlCreateVehicle() {
+        setDefaultMdlVehicle();
         $('#mdlCreateVehicle').modal('show');
     }
 
@@ -222,7 +223,7 @@
         const dataApi = res.data.data.data;
         const model = res.data.model;
         const color = res.data.color;
-        console.log('dataApi',dataApi)
+        console.log('dataApi', dataApi)
 
         const mensaje = dataApi.mensaje;
         if (mensaje == 'No encontrado') {
@@ -348,4 +349,15 @@
         window.colorSelect.clear();
         document.querySelector('observation_mdlvehicle').textContent = '';
     }
+
+    function setDefaultMdlVehicle() {
+        window.clientMdlVehicleSelect.clear();
+
+        const clientId = window.clientSelect.getValue();
+        if(!clientId)return;
+        const clientItem = window.clientSelect.options[clientId];
+        window.clientMdlVehicleSelect.addOption(clientItem);
+        window.clientMdlVehicleSelect.setValue(clientId);
+    }
+
 </script>

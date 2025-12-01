@@ -71,7 +71,6 @@
 
             iniciarTomSelect();
             events();
-
         })
 
         function events() {
@@ -136,8 +135,11 @@
                 }
             });
 
+            const initialCustomer = @json($customer_formatted);
             window.clientSelect = new TomSelect('#client_id', {
                 valueField: 'id',
+                options: [initialCustomer],
+                items: [initialCustomer.id],
                 labelField: 'full_name',
                 searchField: ['full_name'],
                 plugins: ['clear_button'],
@@ -683,7 +685,7 @@
         }
 
         async function actionChangeClient(value) {
-            
+
             if (!value) return;
 
             mostrarAnimacion1();

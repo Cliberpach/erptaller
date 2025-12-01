@@ -59,16 +59,16 @@
                 </div>
 
                 <!-- Placa -->
-                <div class="col-lg-4 col-md-6 col-sm-12">
-                    <label class="form-label fw-bold required_field">Placa:</label>
+                <div class="col-lg-6 col-md-6 col-sm-12">
+                    <label class="form-label fw-bold">Placa:</label>
                     <input type="text" class="form-control text-uppercase" id="plate" name="plate"
                         maxlength="8" minlength="6" placeholder="Ej: ABC123" required>
                     <p class="plate_error msgError mb-0"></p>
                 </div>
 
                 <!-- Fecha Expiración -->
-                <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
-                    <label class="form-label fw-bold required_field">Fecha Expiración:</label>
+                <div class="col-lg-6 col-md-4 col-sm-6 col-xs-12">
+                    <label class="form-label fw-bold">Fecha Expiración cotización:</label>
                     <input type="date" class="form-control" id="expiration_date" name="expiration_date">
                     <p class="expiration_date_error msgError mb-0"></p>
                 </div>
