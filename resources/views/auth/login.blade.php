@@ -34,7 +34,7 @@
 
             <div class="flex items-center justify-end mt-4">
                 @if (Route::has('password.request'))
-                    
+
                 @endif
 
                 <x-button class="ml-4">
