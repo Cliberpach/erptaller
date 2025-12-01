@@ -79,7 +79,9 @@ class QuoteController extends Controller
         $districts                  =   District::all();
         $provinces                  =   Province::all();
         $company_invoice            =   CompanyInvoice::find(1);
-        $years                      =   Year::where('status', 'ACTIVE')->get();
+        $years = Year::where('status', 'ACTIVE')
+            ->orderBy('id', 'asc')
+            ->get();
         $colors                     =   Color::where('status', 'ACTIVE')->get();
 
         return view('workshop.quotes.create', compact(

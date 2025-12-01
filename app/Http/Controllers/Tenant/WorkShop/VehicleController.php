@@ -77,7 +77,9 @@ class VehicleController extends Controller
         $districts                  =   District::all();
         $provinces                  =   Province::all();
         $company_invoice            =   CompanyInvoice::find(1);
-        $years                      =   Year::where('status', 'ACTIVE')->get();
+        $years = Year::where('status', 'ACTIVE')
+            ->orderBy('id', 'asc')
+            ->get();
         $colors                     =   Color::where('status', 'ACTIVE')->get();
 
         return view(
@@ -86,7 +88,7 @@ class VehicleController extends Controller
         );
     }
 
-/*
+    /*
 array:7 [ // app\Http\Controllers\Tenant\WorkShop\VehicleController.php:81
   "_token" => "gvszdFqMWspbR6jfBvQlpAnHEoPLYYHZCir3uY0A"
   "_method" => "POST"
@@ -107,7 +109,7 @@ array:7 [ // app\Http\Controllers\Tenant\WorkShop\VehicleController.php:81
             Session::flash('message_success', 'VEHÍCULO REGISTRADO CON ÉXITO');
 
             DB::commit();
-            return response()->json(['success' => true, 'message' => 'VEHÍCULO REGISTRADO CON ÉXITO','vehicle'=>$vehicle]);
+            return response()->json(['success' => true, 'message' => 'VEHÍCULO REGISTRADO CON ÉXITO', 'vehicle' => $vehicle]);
         } catch (Throwable $th) {
             DB::rollBack();
 
