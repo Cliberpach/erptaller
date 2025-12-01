@@ -288,69 +288,6 @@
             $("#modal_file").modal("show");
         });
 
-        async function accionBuscarPlaca() {
-            const placa = document.querySelector('#plate').value.trim();
-
-            if (placa.length < 6 || placa.length > 8) {
-                toastr.error('LA PLACA DEBE TENER ENTRE 6 Y 8 CARACTERES');
-                return;
-            }
-
-            searchPlate(placa);
-
-        }
-
-        async function searchPlate(placa) {
-            mostrarAnimacion1();
-            try {
-                toastr.clear();
-                const res = await axios.get(route('tenant.utils.searchPlate', placa));
-                if (res.data.success) {
-
-                    if (res.data.origin == 'BD') {
-                        toastr.error('VEHICULO YA EXISTE EN BD');
-                        return;
-                    }
-
-                    const dataApi = res.data.data;
-                    if (dataApi.mensaje == 'SUCCESS') {
-                        toastr.info(dataApi.mensaje);
-                        setDataApi(dataApi.data, res.data.model);
-                    }
-                } else {
-                    toastr.error(res.data.message, 'ERROR EN EL SERVIDOR');
-                }
-            } catch (error) {
-                toastr.error(error, 'ERROR EN LA PETICIÓN CONSULTAR PLACA');
-            } finally {
-                ocultarAnimacion1();
-            }
-        }
-
-        function setDataApi(data, model) {
-
-            const mensaje = data.mensaje;
-            if (mensaje == 'No encontrado') {
-                toastr.error(mensaje);
-                return;
-            }
-
-            window.modelSelect.clear();
-            window.modelSelect.clearOptions();
-
-            const marca = data.marca;
-            const modelo = data.modelo;
-
-            const text = `${marca} - ${modelo}`;
-
-            window.modelSelect.addOption({
-                id: model.id,
-                text
-            });
-
-            window.modelSelect.setValue(model.id);
-        }
-
         function validationStoreQuote() {
             if (lstProducts.length === 0 && lstServices.length === 0) {
                 toastr.error('DEBE AGREGAR AL MENOS UN PRODUCTO O SERVICIO A LA COTIZACIÓN');
