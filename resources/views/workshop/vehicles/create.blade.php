@@ -267,7 +267,7 @@
 
             const colorItem = {
                 id: color.id,
-                text: `${dataApi.color}`
+                description: `${dataApi.color}`
             };
             addColorSelect(colorItem);
 

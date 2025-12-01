@@ -222,6 +222,7 @@
         const dataApi = res.data.data.data;
         const model = res.data.model;
         const color = res.data.color;
+        console.log('dataApi',dataApi)
 
         const mensaje = dataApi.mensaje;
         if (mensaje == 'No encontrado') {
@@ -237,7 +238,7 @@
 
         const colorItem = {
             id: color.id,
-            text: `${dataApi.color}`
+            description: `${dataApi.color}`
         };
         addColorSelect(colorItem);
 
