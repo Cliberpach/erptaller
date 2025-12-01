@@ -9,7 +9,7 @@ class VehicleRepository
 
     public function findPlate(string $placa): ?Vehicle
     {
-        return Vehicle::where('plate', $placa)->where('status', 'ACTIVE')->first();
+        return Vehicle::where('plate', $placa)->where('status', 'ACTIVO')->first();
     }
 
     public function insertVehicle(array $dto): Vehicle

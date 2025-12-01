@@ -64,6 +64,7 @@ class UtilController extends Controller
         try {
 
             $token  =   Company::find(1)->token_placa;
+            dd($token);
 
             $url = "https://multijc.com/api/queryplaca/" . $placa . "/" . $token;
 
