@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Landlord\Company;
 use App\Models\Landlord\TypeIdentityDocument;
+use App\Models\Landlord\Year;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -183,5 +184,15 @@ class UtilController extends Controller
             )
             ->get();
         return $technicians;
+    }
+
+    public static function getYears()
+    {
+        $currentYear = date('Y');
+        $years  =   Year::where('status', 'ACTIVE')
+            ->where('description', '<=', $currentYear)
+            ->orderByRaw('CAST(description AS UNSIGNED) DESC')
+            ->get();
+        return $years;
     }
 }

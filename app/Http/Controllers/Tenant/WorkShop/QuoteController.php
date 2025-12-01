@@ -79,7 +79,7 @@ class QuoteController extends Controller
         $districts                  =   District::all();
         $provinces                  =   Province::all();
         $company_invoice            =   CompanyInvoice::find(1);
-        $years                      =   Year::where('status', 'ACTIVE')->orderBy('id', 'asc')->get();
+        $years                      =   UtilController::getYears();
         $colors                     =   Color::where('status', 'ACTIVE')->get();
         $customer_formatted         =   FormatController::getFormatInitialCustomer(1);
 

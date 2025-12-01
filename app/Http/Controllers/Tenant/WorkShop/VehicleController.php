@@ -77,9 +77,7 @@ class VehicleController extends Controller
         $districts                  =   District::all();
         $provinces                  =   Province::all();
         $company_invoice            =   CompanyInvoice::find(1);
-        $years = Year::where('status', 'ACTIVE')
-            ->orderBy('id', 'asc')
-            ->get();
+        $years                      =   UtilController::getYears();
         $colors                     =   Color::where('status', 'ACTIVE')->get();
 
         return view(
@@ -138,7 +136,7 @@ array:7 [ // app\Http\Controllers\Tenant\WorkShop\VehicleController.php:81
         $districts                  =   District::all();
         $provinces                  =   Province::all();
         $company_invoice            =   CompanyInvoice::find(1);
-        $years                      =   Year::where('status', 'ACTIVE')->get();
+        $years                      =   UtilController::getYears();
         $colors                     =   Color::where('status', 'ACTIVE')->get();
 
         return view(
