@@ -27,7 +27,7 @@ return new class extends Migration
 
             $table->unsignedBigInteger('color_id');
 
-            $table->string('observation', 300);
+            $table->string('observation', 300)->nullable();
 
             $table->enum('status', ['ACTIVO', 'ANULADO'])->default('ACTIVO');
 

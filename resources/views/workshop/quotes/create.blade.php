@@ -220,7 +220,10 @@
                 load: async (query, callback) => {
                     if (!query.length) return callback();
                     try {
-                        const url = `{{ route('tenant.utils.searchProduct') }}?q=${encodeURIComponent(query)}`;
+                        const url = route('tenant.utils.searchProduct', {
+                            q: query,
+                            warehouse_id: window.warehouseSelect.getValue()
+                        });
                         const response = await fetch(url);
                         if (!response.ok) throw new Error('Error al buscar productos');
                         const data = await response.json();

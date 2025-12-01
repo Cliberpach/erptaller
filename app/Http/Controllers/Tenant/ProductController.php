@@ -246,12 +246,14 @@ array:1 [ // app\Http\Controllers\Tenant\ProductController.php:190
     public function searchProduct(Request $request)
     {
         $query = trim($request->get('q', ''));
+        $warehouse_id   =   $request->get('warehouse_id');
 
         if (empty($query)) {
             return response()->json(['data' => []]);
         }
 
         $products = Product::from('products as p')
+            ->leftjoin('warehouse_products as wp', 'wp.product_id', 'p.id')
             ->join('categories as c', 'c.id', 'p.category_id')
             ->join('brands as b', 'b.id', 'p.brand_id')
             ->where(function ($q) use ($query) {
@@ -261,17 +263,19 @@ array:1 [ // app\Http\Controllers\Tenant\ProductController.php:190
             })->limit(20)
             ->get(
                 [
+                    'wp.warehouse_id',
                     'p.id',
                     'b.name as brand_name',
                     'p.name',
                     'c.name as category_name',
-                    'p.sale_price'
+                    'p.sale_price',
+                    DB::raw('COALESCE(wp.stock, 0) as stock')
                 ]
             );
 
         $data = $products->map(fn($p) => [
             'id' => $p->id,
-            'text' => "{$p->name}",
+            'text' => "{$p->name} - ($p->stock)",
             'subtext' => "{$p->category_name}-{$p->brand_name}",
             'sale_price' =>  $p->sale_price,
             'name'  =>  $p->name,
