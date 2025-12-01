@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Landlord\Company;
+use App\Models\Landlord\TypeIdentityDocument;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -153,10 +154,8 @@ class UtilController extends Controller
 
     public static function getIdentityDocuments()
     {
-        $tipos_documento    =   DB::connection('landlord')
-            ->table('general_table_details as gtd')
-            ->where('gtd.status', 'ACTIVO')
-            ->where('gtd.general_table_id', 2)
+        $tipos_documento    =   TypeIdentityDocument::where('status', 'ACTIVO')
+            ->whereIn('id', [1, 3, 6])
             ->get();
 
         return $tipos_documento;

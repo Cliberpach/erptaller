@@ -14,7 +14,8 @@ class VehicleRepository
 
     public function insertVehicle(array $dto): Vehicle
     {
-        return Vehicle::create($dto);
+        $vehicle    =   Vehicle::create($dto);
+        return $vehicle->load(['brand', 'model']);
     }
 
     public function updateVehicle(array $dto,int $id): Vehicle

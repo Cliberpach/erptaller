@@ -14,6 +14,18 @@ class VehicleStoreRequest extends FormRequest
         return true;
     }
 
+    protected function prepareForValidation()
+    {
+        $this->merge([
+            'plate'     => $this->input('plate') ?? $this->input('plate_mdlvehicle'),
+            'model_id'  => $this->input('model_id') ?? $this->input('model_id_mdlvehicle'),
+            'year_id'   => $this->input('year_id') ?? $this->input('year_id_mdlvehicle'),
+            'client_id' => $this->input('client_id') ?? $this->input('client_id_mdlvehicle'),
+            'color_id' => $this->input('color_id') ?? $this->input('color_id_mdlvehicle'),
+            'observation' => $this->input('observation') ?? $this->input('observation_mdlvehicle'),
+        ]);
+    }
+
     public function rules(): array
     {
         return [

@@ -114,7 +114,7 @@
     }
 
     function openMdlNewCustomer() {
-        console.log(customerParameters);
+
         if (!isNaN(parseInt(customerParameters.documentSearchCustomer))) {
             //====== DNI ======
             if (customerParameters.documentSearchCustomer.length === 8) {
@@ -127,8 +127,6 @@
                 document.querySelector('#nro_document').value = customerParameters.documentSearchCustomer;
             }
         }
-
-        console.log(@json($company_invoice));
 
         const department_id = @json($company_invoice->department_id);
         const province_id = @json($company_invoice->province_id);
@@ -407,7 +405,7 @@
 
     function setCustomerNew(customerNew) {
         console.log(customerNew);
-        
+
         const option = {
             id: customerNew.id,
             full_name: `${customerNew.type_document_abbreviation}:${customerNew.document_number} - ${customerNew.name}`,

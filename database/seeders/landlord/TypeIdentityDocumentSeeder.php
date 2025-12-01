@@ -1,9 +1,8 @@
 <?php
 
-namespace Database\Seeders\tenant;
+namespace Database\Seeders\landlord;
 
-use App\Models\Tenant\TypeIdentityDocument;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\Landlord\TypeIdentityDocument;
 use Illuminate\Database\Seeder;
 
 class TypeIdentityDocumentSeeder extends Seeder

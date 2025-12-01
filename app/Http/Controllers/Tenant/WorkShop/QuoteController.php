@@ -8,6 +8,12 @@ use App\Http\Controllers\UtilController;
 use App\Http\Requests\Tenant\WorkShop\Quote\QuoteStoreRequest;
 use App\Http\Services\Tenant\WorkShop\Quotes\QuoteManager;
 use App\Models\Company;
+use App\Models\CompanyInvoice;
+use App\Models\Department;
+use App\Models\District;
+use App\Models\Landlord\Color;
+use App\Models\Landlord\Year;
+use App\Models\Province;
 use App\Models\Tenant\Warehouse;
 use App\Models\Tenant\WorkShop\Quote\Quote;
 use App\Models\Tenant\WorkShop\Quote\QuoteProduct;
@@ -66,9 +72,27 @@ class QuoteController extends Controller
 
     public function create(Request $request)
     {
-        $igv        =   round(Company::find(1)->igv, 2);
-        $warehouses =   Warehouse::where('estado', 'ACTIVO')->get();
-        return view('workshop.quotes.create', compact('igv', 'warehouses'));
+        $igv                        =   round(Company::find(1)->igv, 2);
+        $warehouses                 =   Warehouse::where('estado', 'ACTIVO')->get();
+        $types_identity_documents   =   UtilController::getIdentityDocuments();
+        $departments                =   Department::all();
+        $districts                  =   District::all();
+        $provinces                  =   Province::all();
+        $company_invoice            =   CompanyInvoice::find(1);
+        $years                      =   Year::where('status', 'ACTIVE')->get();
+        $colors                     =   Color::where('status', 'ACTIVE')->get();
+
+        return view('workshop.quotes.create', compact(
+            'igv',
+            'warehouses',
+            'types_identity_documents',
+            'departments',
+            'districts',
+            'provinces',
+            'company_invoice',
+            'years',
+            'colors'
+        ));
     }
 
     /*
@@ -198,7 +222,6 @@ array:17 [ // app\Http\Controllers\Tenant\WorkShop\QuoteController.php:145
 
             $view   =   $this->s_quote->convertOrderCreate($id);
             return $view;
-
         } catch (Throwable $th) {
             Session::flash('message_error', $th->getMessage());
             return back();

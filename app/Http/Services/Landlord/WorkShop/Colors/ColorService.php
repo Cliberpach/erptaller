@@ -6,12 +6,16 @@ use App\Models\Landlord\Color;
 
 class ColorService
 {
+    private ColorRepository $s_repository;
+
+    public function __construct()
+    {
+        $this->s_repository =   new ColorRepository();
+    }
+
     public function store(array $datos): Color
     {
-        $color              =   new Color();
-        $color->description =   mb_strtoupper($datos['description'], 'UTF-8');
-        $color->codigo      =   $datos['codigo'] ?? null;
-        $color->save();
+        $color =    $this->s_repository->insertColor($datos);
 
         return $color;
     }
@@ -45,5 +49,16 @@ class ColorService
         $color->update();
 
         return $color;
+    }
+
+    public function insertIfNotExists(string $description)
+    {
+        $color_exists   =   $this->s_repository->findColor($description);
+        if (!$color_exists) {
+            $data   =   ['description' => $description, 'codigo' => "#FFFFFF"];
+            $color  =   $this->store($data);
+            return ['color_insert' => true, 'color' => $color];
+        }
+        return ['color_insert' => false, 'color' => $color_exists];
     }
 }

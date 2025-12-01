@@ -5,7 +5,8 @@
 @endsection
 
 @section('content')
-    {{-- @include('utils.modals.customer.mdl_create_customer') --}}
+    @include('utils.modals.customer.mdl_create_customer')
+    @include('utils.modals.vehicles.mdl_create_vehicle')
     @include('workshop.quotes.modals.mdl_edit_product')
     @include('workshop.quotes.modals.mdl_edit_service')
 
@@ -74,9 +75,10 @@
         })
 
         function events() {
-            //eventsMdlCreateCustomer();
+            eventsMdlCreateCustomer();
             eventsMdlEditProduct();
             eventsMdlEditService();
+            eventsMdlVehicle();
 
             document.querySelector('#form-create-quote').addEventListener('submit', (e) => {
                 e.preventDefault();

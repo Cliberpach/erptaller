@@ -235,7 +235,7 @@
                     const dataApi = res.data.data;
                     if (dataApi.mensaje == 'SUCCESS') {
                         toastr.info(dataApi.mensaje);
-                        setDataApi(dataApi.data, res.data.model);
+                        setDataApi(res);
                     }
                 } else {
                     toastr.error(res.data.message, 'ERROR EN EL SERVIDOR');
@@ -247,28 +247,43 @@
             }
         }
 
-        function setDataApi(data, model) {
+        function setDataApi(res) {
 
-            const mensaje = data.mensaje;
-            if(mensaje == 'No encontrado'){
+            const dataApi   =   res.data.data.data;
+            const model     =   res.data.model;
+            const color     =   res.data.color;
+
+            const mensaje = dataApi.mensaje;
+            if (mensaje == 'No encontrado') {
                 toastr.error(mensaje);
                 return;
             }
 
+            const modelItem = {
+                id: model.id,
+                text: `${dataApi.marca}-${dataApi.modelo}`
+            };
+            addModelSelect(modelItem);
+
+            const colorItem = {
+                id: color.id,
+                text: `${dataApi.color}`
+            };
+            addColorSelect(colorItem);
+
+        }
+
+        function addModelSelect(item) {
             window.modelSelect.clear();
             window.modelSelect.clearOptions();
+            window.modelSelect.addOption(item);
+            window.modelSelect.setValue(item.id);
+        }
 
-            const marca = data.marca;
-            const modelo = data.modelo;
-
-            const text = `${marca} - ${modelo}`;
-
-            window.modelSelect.addOption({
-                id: model.id,
-                text
-            });
-
-            window.modelSelect.setValue(model.id);
+        function addColorSelect(item) {
+            window.colorSelect.addOption(item);
+            window.colorSelect.setValue(item.id);
+            window.colorSelect.refreshOptions(false);
         }
 
         async function storeVehicle(formCreateVehicle) {

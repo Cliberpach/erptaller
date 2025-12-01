@@ -2,14 +2,11 @@
 
 namespace App\Http\Services\Tenant\WorkShop\Vehicles;
 
-use App\Almacenes\Producto;
 use App\Http\Controllers\UtilController;
 use App\Http\Services\Landlord\WorkShop\Brands\BrandService;
+use App\Http\Services\Landlord\WorkShop\Colors\ColorService;
 use App\Http\Services\Landlord\WorkShop\Models\ModelService;
-use App\Models\Tenant\WorkShop\Brand;
-use App\Models\Tenant\WorkShop\Color;
 use App\Models\Tenant\WorkShop\Vehicle;
-use Illuminate\Support\Collection;
 
 class VehicleService
 {
@@ -17,6 +14,7 @@ class VehicleService
     private BrandService $s_brand;
     private ModelService $s_model;
     private VehicleDto $s_dto;
+    private ColorService $s_color;
 
     public function __construct()
     {
@@ -24,6 +22,7 @@ class VehicleService
         $this->s_brand      =   new BrandService();
         $this->s_model      =   new ModelService();
         $this->s_dto        =   new VehicleDto();
+        $this->s_color      =   new ColorService();
     }
 
     public function store(array $data): Vehicle
@@ -41,7 +40,7 @@ class VehicleService
         if ($vehicle) {
             return response()->json(['success' => true, 'data' => $vehicle, 'message' => 'CONSULTA COMPLETADA', 'origin' => 'BD']);
         }
-  
+
         $res    =   UtilController::apiPlaca($placa);
         $_res   =   json_decode($res->getContent());
 
@@ -53,6 +52,11 @@ class VehicleService
                 $res_model          =   $this->s_model->insertIfNotExists($data_api->modelo, $data_api->marca);
                 $_res->model_insert =   $res_model['model_insert'];
                 $_res->model        =   $res_model['model'];
+
+                $res_color          =   $this->s_color->insertIfNotExists($data_api->color);
+                $_res->color_insert =   $res_color['color_insert'];
+                $_res->color        =   $res_color['color'];
+
                 $res->setContent(json_encode($_res));
             }
         }

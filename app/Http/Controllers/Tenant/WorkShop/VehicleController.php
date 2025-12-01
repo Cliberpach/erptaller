@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Tenant\WorkShop;
 use App\Exports\Tenant\Inventory\Brand\BrandFormatExport;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\UtilController;
 use App\Http\Requests\Tenant\WorkShop\VehicleStoreRequest;
 use App\Http\Requests\Tenant\WorkShop\VehicleUpdateRequest;
 use App\Http\Services\Tenant\WorkShop\Vehicles\VehicleManager;
@@ -16,9 +17,9 @@ use App\Models\Landlord\Brand;
 use App\Models\Landlord\Color;
 use App\Models\Landlord\Customer;
 use App\Models\Landlord\ModelV;
+use App\Models\Landlord\TypeIdentityDocument;
 use App\Models\Landlord\Year;
 use App\Models\Province;
-use App\Models\Tenant\TypeIdentityDocument;
 use App\Models\Tenant\WorkShop\Vehicle;
 use Illuminate\Support\Facades\Session;
 use Throwable;
@@ -71,7 +72,7 @@ class VehicleController extends Controller
     public function create(Request $request)
     {
 
-        $types_identity_documents   =   TypeIdentityDocument::where('status', 'ACTIVO')->get();
+        $types_identity_documents   =   UtilController::getIdentityDocuments();
         $departments                =   Department::all();
         $districts                  =   District::all();
         $provinces                  =   Province::all();
@@ -85,7 +86,7 @@ class VehicleController extends Controller
         );
     }
 
-    /*
+/*
 array:7 [ // app\Http\Controllers\Tenant\WorkShop\VehicleController.php:81
   "_token" => "gvszdFqMWspbR6jfBvQlpAnHEoPLYYHZCir3uY0A"
   "_method" => "POST"
@@ -105,8 +106,8 @@ array:7 [ // app\Http\Controllers\Tenant\WorkShop\VehicleController.php:81
 
             Session::flash('message_success', 'VEHÍCULO REGISTRADO CON ÉXITO');
 
-            DB::commit();
-            return response()->json(['success' => true, 'message' => 'VEHÍCULO REGISTRADO CON ÉXITO']);
+            //DB::commit();
+            return response()->json(['success' => true, 'message' => 'VEHÍCULO REGISTRADO CON ÉXITO','vehicle'=>$vehicle]);
         } catch (Throwable $th) {
             DB::rollBack();
 
@@ -130,7 +131,7 @@ array:7 [ // app\Http\Controllers\Tenant\WorkShop\VehicleController.php:81
             'text'  =>  $brand->description . ' - ' . $model->description
         ];
 
-        $types_identity_documents   =   TypeIdentityDocument::where('status', 'ACTIVO')->get();
+        $types_identity_documents   =   UtilController::getIdentityDocuments();
         $departments                =   Department::all();
         $districts                  =   District::all();
         $provinces                  =   Province::all();
@@ -231,13 +232,13 @@ array:8 [ // app\Http\Controllers\Tenant\WorkShop\VehicleController.php:159
     {
         DB::connection('landlord')->beginTransaction();
         try {
-          
+
             $res    =   $this->s_vehicle->searchPlate($placa);
             DB::connection('landlord')->commit();
             return $res;
         } catch (Throwable $th) {
             DB::connection('landlord')->rollBack();
-            return response()->json(['success' => false, 'message' => $th->getMessage(),'line'=>$th->getLine(),'file'=>$th->getFile()]);
+            return response()->json(['success' => false, 'message' => $th->getMessage(), 'line' => $th->getLine(), 'file' => $th->getFile()]);
         }
     }
 
@@ -254,7 +255,7 @@ array:8 [ // app\Http\Controllers\Tenant\WorkShop\VehicleController.php:159
                 ->join('erptaller.models as m', 'm.id', 'v.model_id')
                 ->join('erptaller.brandsv as b', 'b.id', 'v.brand_id');
 
-            if($query){
+            if ($query) {
                 $vehicles->where('v.plate', 'LIKE', "%{$query}%");
             }
 
@@ -263,7 +264,7 @@ array:8 [ // app\Http\Controllers\Tenant\WorkShop\VehicleController.php:159
             }
 
             $vehicles = $vehicles->limit(20)
-                        ->get(['v.id', 'm.description as model_name', 'v.plate', 'b.description as brand_name']);
+                ->get(['v.id', 'm.description as model_name', 'v.plate', 'b.description as brand_name']);
 
             $data = $vehicles->map(fn($v) => [
                 'id' => $v->id,
@@ -271,7 +272,7 @@ array:8 [ // app\Http\Controllers\Tenant\WorkShop\VehicleController.php:159
                 'subtext' => "{$v->brand_name}-{$v->model_name}",
             ]);
 
-            return response()->json(['success' => true, 'data' => $data,'message'=>'VEHÍCULOS OBTENIDOS']);
+            return response()->json(['success' => true, 'data' => $data, 'message' => 'VEHÍCULOS OBTENIDOS']);
         } catch (Throwable $th) {
             return response()->json(['success' => false, 'message' => $th->getMessage()]);
         }
