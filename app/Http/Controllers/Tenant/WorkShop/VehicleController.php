@@ -106,7 +106,7 @@ array:7 [ // app\Http\Controllers\Tenant\WorkShop\VehicleController.php:81
 
             Session::flash('message_success', 'VEHÍCULO REGISTRADO CON ÉXITO');
 
-            //DB::commit();
+            DB::commit();
             return response()->json(['success' => true, 'message' => 'VEHÍCULO REGISTRADO CON ÉXITO','vehicle'=>$vehicle]);
         } catch (Throwable $th) {
             DB::rollBack();
