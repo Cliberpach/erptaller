@@ -180,7 +180,7 @@
     }
 
     async function accionBuscarPlaca() {
-        const placa = document.querySelector('#plate').value.trim();
+        const placa = document.querySelector('#plate_mdlvehicle').value.trim();
 
         if (placa.length < 6 || placa.length > 8) {
             toastr.error('LA PLACA DEBE TENER ENTRE 6 Y 8 CARACTERES');
@@ -188,7 +188,6 @@
         }
 
         searchPlate(placa);
-
     }
 
     async function searchPlate(placa) {
@@ -342,7 +341,7 @@
 
     function clearMdlVehicle() {
         window.clientMdlVehicleSelect.clear();
-        document.querySelector('#plate_mdlvehicle').value = '';
+        document.querySelector('#plate_mdlvehicle_mdlvehicle').value = '';
         window.modelSelect.clear();
         window.yearSelect.clear();
         window.colorSelect.clear();
