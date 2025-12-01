@@ -63,8 +63,7 @@ class UtilController extends Controller
     {
         try {
 
-            $token  =   Company::find(1)->token_placa;
-            dd($token);
+            $token = Company::first()->token_placa;
 
             $url = "https://multijc.com/api/queryplaca/" . $placa . "/" . $token;
 
@@ -82,7 +81,7 @@ class UtilController extends Controller
 
             return response()->json(['success' => true, 'data' => $data, 'origin' => 'API']);
         } catch (Throwable $th) {
-            return response()->json(['success' => false, 'message' => $th->getMessage()]);
+            return response()->json(['success' => false, 'message' => $th->getMessage(), 'line' => $th->getLine(), 'file' => $th->getFile()]);
         }
     }
 
@@ -152,35 +151,38 @@ class UtilController extends Controller
         return array_values($groupedByCategoryId);
     }
 
-    public static function getIdentityDocuments(){
+    public static function getIdentityDocuments()
+    {
         $tipos_documento    =   DB::connection('landlord')
-                                ->table('general_table_details as gtd')
-                                ->where('gtd.status','ACTIVO')
-                                ->where('gtd.general_table_id',2)
-                                ->get();
+            ->table('general_table_details as gtd')
+            ->where('gtd.status', 'ACTIVO')
+            ->where('gtd.general_table_id', 2)
+            ->get();
 
-       return $tipos_documento;
+        return $tipos_documento;
     }
 
-    public static function getPositions(){
+    public static function getPositions()
+    {
         $cargos    =   DB::table('positions as p')
-                                ->where('p.status','ACTIVO')
-                                ->get();
+            ->where('p.status', 'ACTIVO')
+            ->get();
 
-       return $cargos;
+        return $cargos;
     }
 
-    public static function getTechnicians(){
+    public static function getTechnicians()
+    {
 
         $technicians   =   DB::table('users as u')
-                        ->join('model_has_roles as mhr','mhr.model_id','u.id')
-                        ->join('roles as r','r.id','mhr.role_id')
-                        ->where('r.name','TECNICO')
-                        ->select(
-                            'u.id',
-                            'u.name'
-                        )
-                        ->get();
+            ->join('model_has_roles as mhr', 'mhr.model_id', 'u.id')
+            ->join('roles as r', 'r.id', 'mhr.role_id')
+            ->where('r.name', 'TECNICO')
+            ->select(
+                'u.id',
+                'u.name'
+            )
+            ->get();
         return $technicians;
     }
 }
