@@ -9,11 +9,9 @@
     @php
         $host = request()->getHost();
         $hostParts = explode('.', $host);
-        $isSubdomain = count($hostParts) >= 2; // Si hay más de dos partes, es un subdominio
-    print_r($hostParts);
-
+        $isSubdomain = count($hostParts) > 2; // Si hay más de dos partes, es un subdominio
     @endphp
-    {{$host}}
+
     @if ($isSubdomain)
         <div class="d-flex align-items-center me-auto">
             <!-- Botón Nueva Reserva -->
