@@ -2,6 +2,8 @@
 
 namespace App\Http\Services\Tenant\Inventory\Product;
 
+use App\Models\Product;
+
 class ProductManager
 {
     protected ProductService $s_product;
@@ -14,7 +16,7 @@ class ProductManager
         return $this->s_product->getProduct($producto_id);
     }
 
-    public function store(array $data){
-        $this->s_product->store($data);
+    public function store(array $data):Product{
+        return $this->s_product->store($data);
     }
 }

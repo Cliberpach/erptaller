@@ -2,9 +2,7 @@
 
 namespace App\Http\Services\Tenant\Inventory\Product;
 
-use App\Http\Services\Tenant\Inventory\NoteIncome\NoteIncomeManager;
 use App\Http\Services\Tenant\Inventory\NoteIncome\NoteIncomeService;
-use App\Http\Services\Tenant\Inventory\WarehouseProduct\WarehouseProductManager;
 use App\Http\Services\Tenant\Inventory\WarehouseProduct\WarehouseProductService;
 use App\Models\Company;
 use App\Models\Product;
@@ -15,10 +13,12 @@ class ProductService
 {
     private NoteIncomeService $s_note_income;
     private WarehouseProductService $s_warehouse_product;
+    private ProductRepository $s_repository;
 
     public function __construct() {
         $this->s_note_income        =   new NoteIncomeService();
         $this->s_warehouse_product  =   new WarehouseProductService();
+        $this->s_repository         =   new ProductRepository();
     }
 
     public function getProduct(int $product_id)
@@ -38,11 +38,10 @@ class ProductService
         return $product;
     }
 
-    public function store(array $data)
+    public function store(array $data):Product
     {
-
         //======== REGISTRAR PRODUCTO =======
-        $product    =   Product::create($data);
+        $product    =   $this->s_repository->insertProduct($data);
 
         //======= CREAR NOTA INGRESO O REGISTRAR PRODUCTO CON STOCK 0 ======
         if($product->stock == 0){
@@ -53,6 +52,8 @@ class ProductService
 
         //====== GUARDAR IMG =======
         $this->saveImagePublic($data['image']??null, $product);
+
+        return $product;
     }
 
     public function saveImagePublic($file_img, $product)

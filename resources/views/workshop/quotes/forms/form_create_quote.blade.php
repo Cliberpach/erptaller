@@ -24,11 +24,8 @@
                     <select class="form-control" id="warehouse_id" name="warehouse_id" required>
                         <option value="">Seleccionar</option>
                         @foreach ($warehouses as $warehouse)
-                            <option
-                            @if ($warehouse->id == 1)
-                                selected
-                            @endif
-                            value="{{ $warehouse->id }}">{{ $warehouse->descripcion }}</option>
+                            <option @if ($warehouse->id == 1) selected @endif value="{{ $warehouse->id }}">
+                                {{ $warehouse->descripcion }}</option>
                         @endforeach
                     </select>
                     <p class="warehouse_id_error msgError mb-0"></p>
@@ -78,7 +75,6 @@
         </div>
     </div>
 
-
     <!-- ==========================
          SECCIÓN PRODUCTOS
     =========================== -->
@@ -93,6 +89,8 @@
                 <!-- PRODUCTO -->
                 <div class="col-lg-6 col-md-8 col-sm-12">
                     <label class="form-label fw-bold">Producto:</label>
+                    <i class="fas fa-plus btn btn-warning btn-sm" onclick="openMdlCreateService();"
+                        style="margin-left:4px;"></i>
                     <select class="form-control" id="product_id" name="product_id">
                         <option value="">Seleccionar</option>
                     </select>
@@ -147,6 +145,8 @@
 
                 <div class="col-lg-6 col-md-8 col-sm-12">
                     <label class="form-label fw-bold">Servicio:</label>
+                     <i class="fas fa-plus btn btn-warning btn-sm" onclick="openMdlCreateService();"
+                        style="margin-left:4px;"></i>
                     <select class="form-control" id="service_id" name="service_id">
                         <option value="">Seleccionar</option>
                     </select>

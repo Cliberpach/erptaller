@@ -86,17 +86,15 @@ array:12 [ // app\Http\Controllers\Tenant\ProductController.php:74
         try {
 
             $data       =   $request->validated();
-
-            $this->s_product->store($data);
+            $product    =   $this->s_product->store($data);
 
             DB::commit();
-            return response()->json(['success' => true, 'message' => 'PRODUCTO REGISTRADO CON ÉXITO']);
+            return response()->json(['success' => true, 'message' => 'PRODUCTO REGISTRADO CON ÉXITO','product'=>$product]);
         } catch (Throwable $th) {
             DB::rollBack();
             return response()->json(['success' => false, 'message' => $th->getMessage(), 'line' => $th->getLine()]);
         }
     }
-
 
     public function deleteImagePublic($name)
     {

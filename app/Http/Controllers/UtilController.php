@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Brand;
+use App\Models\Category;
 use App\Models\Landlord\Company;
 use App\Models\Landlord\TypeIdentityDocument;
 use App\Models\Landlord\Year;
@@ -194,5 +196,15 @@ class UtilController extends Controller
             ->orderByRaw('CAST(description AS UNSIGNED) DESC')
             ->get();
         return $years;
+    }
+
+    public static function getCategoriesProducts(){
+        $categories =   Category::where('status','ACTIVE')->get();
+        return $categories;
+    }
+
+    public static function getBrandsProducts(){
+        $brands =   Brand::where('status','ACTIVE')->get();
+        return $brands;
     }
 }

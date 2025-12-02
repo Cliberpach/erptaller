@@ -18,13 +18,13 @@ return new class extends Migration
             $table->unsignedBigInteger('brand_id');
             $table->foreign('brand_id')->references('id')->on('brands')->onDelete('cascade');
             $table->string('name');
-            $table->string('description');
+            $table->string('description')->nullable();
             $table->decimal('sale_price',10,2);
             $table->decimal('purchase_price',10,2);
             $table->integer('stock');
             $table->integer('stock_min');
-            $table->string('code_factory');
-            $table->string('code_bar');
+            $table->string('code_factory')->nullable();
+            $table->string('code_bar')->nullable();
             $table->string('image')->nullable();
             $table->enum('status',['ACTIVE','INACTIVE'])->default('ACTIVE');
             $table->timestamps();

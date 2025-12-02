@@ -7,6 +7,8 @@
 @section('content')
     @include('utils.modals.customer.mdl_create_customer')
     @include('utils.modals.vehicles.mdl_create_vehicle')
+    @include('utils.modals.products.mdl_create_product')
+    @include('utils.modals.services.mdl_create_service')
     @include('workshop.quotes.modals.mdl_edit_product')
     @include('workshop.quotes.modals.mdl_edit_service')
 
@@ -78,6 +80,8 @@
             eventsMdlEditProduct();
             eventsMdlEditService();
             eventsMdlVehicle();
+            eventsMdlProduct();
+            eventsMdlService();
 
             document.querySelector('#form-create-quote').addEventListener('submit', (e) => {
                 e.preventDefault();
@@ -243,7 +247,6 @@
                     item: (item, escape) => `<div>${escape(item.text)}</div>`
                 }
             });
-
 
             window.serviceSelect = new TomSelect('#service_id', {
                 valueField: 'id',
@@ -526,9 +529,8 @@
             if (!value) return;
 
             const item = serviceSelect.options[value];
-
             if (item && item.sale_price) {
-                document.querySelector('#service_price').value = item.sale_price;
+                document.querySelector('#service_price').value = parseFloat(item.sale_price);
             }
         }
 

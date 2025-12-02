@@ -2,14 +2,14 @@
 
 namespace App\Http\Services\Tenant\Inventory\Product;
 
+use App\Models\Product;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 
 class ProductRepository
 {
 
-    public function __construct() {
-    }
+    public function __construct() {}
 
     public function getProduct(int $product_id)
     {
@@ -28,4 +28,10 @@ class ProductRepository
         return $product;
     }
 
+    public function insertProduct(array $data)
+    {
+        $product    =   Product::create($data);
+        $product->load(['brand', 'category']);
+        return $product;
+    }
 }

@@ -3,8 +3,6 @@
 namespace App\Http\Controllers\Tenant\WorkShop;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Landlord\Year\YearStoreRequest;
-use App\Http\Requests\Landlord\Year\YearUpdateRequest;
 use App\Http\Requests\Tenant\WorkShop\Service\ServiceStoreRequest;
 use App\Http\Requests\Tenant\WorkShop\Service\ServiceUpdateRequest;
 use App\Http\Services\Tenant\WorkShop\Services\ServiceManager;
@@ -74,7 +72,7 @@ array:5 [ // app\Http\Controllers\Tenant\WorkShop\ServiceController.php:70
             $service  =   $this->s_service->store($request->toArray());
 
             DB::commit();
-            return response()->json(['success' => true, 'message' => 'SERVICIO REGISTRADO CON ÉXITO']);
+            return response()->json(['success' => true, 'message' => 'SERVICIO REGISTRADO CON ÉXITO','service'=>$service]);
         } catch (Throwable $th) {
             DB::rollBack();
             return response()->json(['success' => false, 'message' => $th->getMessage()]);
@@ -162,7 +160,7 @@ array:5 [ // app\Http\Controllers\Tenant\WorkShop\ServiceController.php:94
             'id' => $s->id,
             'text' => "{$s->name}",
             'subtext' => "S/ " . number_format($s->price, 2),
-            'sale_price' => number_format($s->price, 2),
+            'sale_price' => $s->price,
             'name'  =>  $s->name
         ]);
 

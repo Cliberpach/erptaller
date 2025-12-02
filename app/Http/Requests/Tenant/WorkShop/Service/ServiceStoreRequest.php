@@ -14,6 +14,21 @@ class ServiceStoreRequest extends FormRequest
         return true;
     }
 
+    protected function prepareForValidation()
+    {
+        $this->replace(
+            collect($this->all())->mapWithKeys(function ($value, $key) {
+
+                if (str_ends_with($key, '_mdlservice')) {
+                    $newKey = str_replace('_mdlservice', '', $key);
+                    return [$newKey => $value];
+                }
+
+                return [$key => $value];
+            })->toArray()
+        );
+    }
+
     public function rules(): array
     {
         return [

@@ -17,6 +17,21 @@ class ProductStoreRequest extends FormRequest
         return true;
     }
 
+    protected function prepareForValidation()
+    {
+        $this->replace(
+            collect($this->all())->mapWithKeys(function ($value, $key) {
+
+                if (str_ends_with($key, '_mdlproduct')) {
+                    $newKey = str_replace('_mdlproduct', '', $key);
+                    return [$newKey => $value];
+                }
+
+                return [$key => $value];
+            })->toArray()
+        );
+    }
+
     /**
      * Get the validation rules that apply to the request.
      *
@@ -33,10 +48,10 @@ class ProductStoreRequest extends FormRequest
                 Rule::unique('products', 'name')->where('status', 'ACTIVE'),
             ],
             'description' => 'nullable|string|max:200',
-            'sale_price' => 'required|numeric|min:1|max:99999999',
-            'purchase_price' => 'required|numeric|min:1|max:99999999',
-            'stock' => 'required|integer|min:0|max:99999999',
-            'stock_min' => 'required|integer|min:0|max:99999999',
+            'sale_price' => 'required|numeric|min:1|max:999999',
+            'purchase_price' => 'required|numeric|min:1|max:999999',
+            'stock' => 'required|integer|min:0|max:9999',
+            'stock_min' => 'required|integer|min:0|max:9999',
             'code_factory' => 'nullable|alpha_num|size:10',
             'code_bar' => 'nullable|alpha_num|min:6|max:20',
             'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',

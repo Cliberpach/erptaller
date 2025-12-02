@@ -83,6 +83,9 @@ class QuoteController extends Controller
         $colors                     =   Color::where('status', 'ACTIVE')->get();
         $customer_formatted         =   FormatController::getFormatInitialCustomer(1);
 
+        $categories                 =   UtilController::getCategoriesProducts();
+        $brands                     =   UtilController::getBrandsProducts();
+
         return view('workshop.quotes.create', compact(
             'igv',
             'warehouses',
@@ -93,7 +96,9 @@ class QuoteController extends Controller
             'company_invoice',
             'years',
             'colors',
-            'customer_formatted'
+            'customer_formatted',
+            'categories',
+            'brands'
         ));
     }
 
