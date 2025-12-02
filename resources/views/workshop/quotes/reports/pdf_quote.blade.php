@@ -160,19 +160,13 @@
         </table>
 
 
-        <!-- Segunda tabla: Información adicional -->
-        <table class="info-table-custom">
+        <!-- DATOS DE LA ORDEN -->
+        <table class="info-table-custom" style="margin-top: 20px;">
 
             <tr>
                 <td class="label">FECHA IMPRESIÓN:</td>
                 <td>{{ now()->format('Y-m-d H:i:s') }}</td>
             </tr>
-
-        </table>
-
-        <!-- DATOS DE LA ORDEN -->
-        <table class="info-table-custom" style="margin-top: 20px;">
-
             <tr>
                 <td class="label">FECHA REGISTRO:</td>
                 <td>{{ $data_quote['quote']->created_at }}</td>
