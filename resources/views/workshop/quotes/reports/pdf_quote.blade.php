@@ -123,7 +123,7 @@
 
                 <!-- COLUMNA 1: LOGO -->
                 <td style="width: 20%; text-align: left; vertical-align: top;">
-                    <img src="{{ public_path($company->logo_url) }}"  alt="Logo"
+                    <img src="{{ public_path($company->logo_url) }}" alt="Logo"
                         style="height: 100px; object-fit: contain; max-width: 120px;">
                 </td>
 
@@ -225,12 +225,13 @@
             <table class="tbl-report-sale">
                 <thead>
                     <tr>
-                        <th>PRODUCTO</th>
-                        <th>CATEGORÍA</th>
-                        <th>MARCA</th>
                         <th>CANT</th>
+                        <th>PRODUCTO</th>
                         <th>PREC VENTA</th>
                         <th>MONTO</th>
+
+                        {{-- <th>CATEGORÍA</th>
+                        <th>MARCA</th> --}}
                     </tr>
                 </thead>
 
@@ -238,16 +239,15 @@
                     @foreach ($data_quote['products'] as $item)
                         <tr>
 
-                            <td>{{ $item->product_name }}</td>
-                            <td>{{ $item->category_name }}</td>
-                            <td>{{ $item->brand_name }}</td>
-
                             <!-- Cantidad con 2 decimales -->
-                            <td style="text-align:right;">
+                            <td style="text-align:left;">
                                 {{ number_format(round($item->quantity, 2), 2, '.', ',') }}
                             </td>
 
-                            <!-- Precio venta con formato -->
+                            <td style="text-align:left;">
+                                {{ $item->product_name }}</style=>
+
+                                <!-- Precio venta con formato -->
                             <td style="text-align:right;">
                                 {{ number_format(round($item->price_sale, 2), 2, '.', ',') }}
                             </td>
@@ -256,6 +256,10 @@
                             <td style="text-align:right;">
                                 {{ number_format(round($item->amount, 2), 2, '.', ',') }}
                             </td>
+
+                            {{-- <td>{{ $item->category_name }}</td>
+                            <td>{{ $item->brand_name }}</td> --}}
+
                         </tr>
                     @endforeach
                 </tbody>
@@ -268,8 +272,8 @@
             <table class="tbl-report-sale">
                 <thead>
                     <tr>
-                        <th>SERVICIO</th>
                         <th>CANT</th>
+                        <th>SERVICIO</th>
                         <th>PREC VENTA</th>
                         <th>MONTO</th>
                     </tr>
@@ -279,12 +283,14 @@
                     @foreach ($data_quote['services'] as $srv)
                         <tr>
 
-                            <!-- Nombre del servicio -->
-                            <td>{{ $srv->service_name }}</td>
-
                             <!-- Cantidad -->
-                            <td style="text-align:right;">
+                            <td style="text-align:left;">
                                 {{ number_format(round($srv->quantity, 2), 2, '.', ',') }}
+                            </td>
+
+                            <!-- Nombre del servicio -->
+                            <td style="text-align:left;">
+                                {{ $srv->service_name }}
                             </td>
 
                             <!-- Precio venta -->

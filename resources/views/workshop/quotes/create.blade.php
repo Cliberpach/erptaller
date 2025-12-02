@@ -349,6 +349,7 @@
                     const res = await axios.post(route('tenant.taller.cotizaciones.store'), formData);
 
                     if (res.data.success) {
+                        window.open(res.data.pdf_url, '_blank');
                         toastr.success(res.data.message, 'OPERACIÓN COMPLETADA');
                         redirect('tenant.taller.cotizaciones.index');
                     } else {

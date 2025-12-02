@@ -12,7 +12,6 @@ use App\Models\CompanyInvoice;
 use App\Models\Department;
 use App\Models\District;
 use App\Models\Landlord\Color;
-use App\Models\Landlord\Year;
 use App\Models\Province;
 use App\Models\Tenant\Warehouse;
 use App\Models\Tenant\WorkShop\Quote\Quote;
@@ -40,9 +39,10 @@ class QuoteController extends Controller
 
     public function getQuotes(Request $request)
     {
-        $quotes = DB::connection('tenant')
+        $quotes =   DB::connection('tenant')
             ->table('quotes as q')
             ->select(
+                DB::raw('CONCAT("COT-",q.id) as code'),
                 'q.id',
                 DB::raw('CONCAT(q.customer_type_document_abbreviation,":",q.customer_document_number,"-",q.customer_name) as customer_name'),
                 'q.plate',
@@ -55,7 +55,11 @@ class QuoteController extends Controller
             )
             ->where('q.status', '<>', 'ANULADO');
 
-        return DataTables::of($quotes)->toJson();
+        return DataTables::of($quotes)
+            ->filterColumn('code', function ($query, $keyword) {
+                $query->whereRaw("CONCAT('COT-', q.id) LIKE ?", ["%{$keyword}%"]);
+            })
+            ->toJson();
     }
 
     public function getQuote(int $id)
@@ -130,10 +134,11 @@ array:17 [ // app\Http\Controllers\Tenant\WorkShop\QuoteController.php:91
         try {
 
             $quote  =   $this->s_quote->store($request->toArray());
+            $pdf_url   =   route('tenant.taller.cotizaciones.pdfOne', $quote->id);
 
             Session::flash('success', 'COTIZACIÓN REGISTRADA CON ÉXITO');
             DB::commit();
-            return response()->json(['success' => true, 'message' => 'COTIZACIÓN REGISTRADA CON ÉXITO']);
+            return response()->json(['success' => true, 'message' => 'COTIZACIÓN REGISTRADA CON ÉXITO', 'pdf_url' => $pdf_url]);
         } catch (Throwable $th) {
             DB::rollBack();
             return response()->json(['success' => false, 'message' => $th->getMessage(), 'file' => $th->getFile(), 'line' => $th->getLine()]);
@@ -221,7 +226,6 @@ array:17 [ // app\Http\Controllers\Tenant\WorkShop\QuoteController.php:145
             return back();
         }
     }
-
 
     public function convertOrderCreate(int $id)
     {
