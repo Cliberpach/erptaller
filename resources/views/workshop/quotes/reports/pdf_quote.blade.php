@@ -118,36 +118,51 @@
     <div class="container">
 
         <!-- Encabezado con logo e información de la company -->
-        <table class="header-table">
+        <table class="header-table" style="width:100%; border-collapse: collapse;">
             <tr>
-                <!-- Columna 1: Imagen -->
-                <td style="width: 20%; text-align: left;">
-                    <img src="{{ $company->logo_ruta }}" alt="Logo"
+
+                <!-- COLUMNA 1: LOGO -->
+                <td style="width: 20%; text-align: left; vertical-align: top;">
+                    <img src="{{ public_path($company->logo_url) }}"  alt="Logo"
                         style="height: 100px; object-fit: contain; max-width: 120px;">
                 </td>
 
-                <!-- Columna 2: Información de la company -->
-                <td style="width: 80%; text-align: left;">
-                    <h2 style="margin: 0; font-size: 14px; color: #3a6ea5;">{{ $company->business_name }}</h2>
-                    <p style="margin: 0; font-size: 14px; color: #555;">RUC: {{ $company->ruc }}</p>
-                    <p style="margin: 0; font-size: 14px; color: #555;">{{ $company->fiscal_address }}</p>
-                    <p style="margin: 0; font-size: 14px; color: #555;">Teléfono: {{ $company->phone }}</p>
-                    <p style="margin: 0; font-size: 14px; color: #555;">EMAIL: {{ $company->email }}</p>
+                <!-- COLUMNA 2: INFO DE LA EMPRESA -->
+                <td style="width: 60%; text-align: left; vertical-align: top;">
+                    <h2 style="margin: 0; font-size: 14px; color: #3a6ea5;">
+                        {{ $company->business_name }}
+                    </h2>
+                    <p style="margin: 0; font-size: 12px; color: #555;">RUC: {{ $company->ruc }}</p>
+                    <p style="margin: 0; font-size: 12px; color: #555;">{{ $company->fiscal_address }}</p>
+                    <p style="margin: 0; font-size: 12px; color: #555;">Teléfono: {{ $company->phone }}</p>
+                    <p style="margin: 0; font-size: 12px; color: #555;">Email: {{ $company->email }}</p>
                 </td>
+
+                <!-- COLUMNA 3: RECUADRO COTIZACIÓN -->
+                <td style="width: 20%; text-align: center; vertical-align: top;">
+                    <div
+                        style="
+                        border: 1px solid #000;
+                        padding: 10px 5px;
+                        font-size: 12px;
+                        font-weight: bold;
+                        display: inline-block;
+                        width: 100%;
+                    ">
+                        COTIZACIÓN<br>
+                        <span style="font-size: 14px;">
+                            COT-{{ str_pad($data_quote['quote']->id, 8, '0', STR_PAD_LEFT) }}
+                        </span>
+                    </div>
+                </td>
+
             </tr>
         </table>
 
-        <div style="text-align: right; font-size: 14px; font-weight: bold; margin-top: 20px; margin-bottom: 10px;">
-            COTIZACIÓN N°{{ $data_quote['quote']->id }}
-        </div>
 
         <!-- Segunda tabla: Información adicional -->
         <table class="info-table-custom">
 
-            <tr>
-                <td class="label">USUARIO IMPRESIÓN:</td>
-                <td>{{ Auth::user()->name }}</td>
-            </tr>
             <tr>
                 <td class="label">FECHA IMPRESIÓN:</td>
                 <td>{{ now()->format('Y-m-d H:i:s') }}</td>

@@ -55,6 +55,7 @@ class QuoteService
     {
         $data_quote =   $this->getQuote($id);
         $company    =   Company::findOrFail(1);
+
         return $pdf = Pdf::loadView('workshop.quotes.reports.pdf_quote', compact('data_quote', 'company'));
     }
 
