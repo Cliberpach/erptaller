@@ -184,7 +184,7 @@
                 <td>{{ $data_quote['quote']->create_user_name }}</td>
             </tr>
 
-            <tr>
+            {{-- <tr>
                 <td class="label">ESTADO:</td>
                 <td>{{ $data_quote['quote']->status }}</td>
             </tr>
@@ -201,94 +201,102 @@
                 <td style="text-align: right; font-weight:bold;">
                     {{ number_format(round($data_quote['quote']->igv, 2), 2, '.', ',') }}
                 </td>
-            </tr>
+            </tr> --}}
 
+        </table>
+
+        @if (count($data_quote['products']) > 0)
+            <!-- Tercera tabla: Reporte Productos -->
+            <table class="tbl-report-sale">
+                <thead>
+                    <tr>
+                        <th>PRODUCTO</th>
+                        <th>CATEGORÍA</th>
+                        <th>MARCA</th>
+                        <th>CANT</th>
+                        <th>PREC VENTA</th>
+                        <th>MONTO</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @foreach ($data_quote['products'] as $item)
+                        <tr>
+
+                            <td>{{ $item->product_name }}</td>
+                            <td>{{ $item->category_name }}</td>
+                            <td>{{ $item->brand_name }}</td>
+
+                            <!-- Cantidad con 2 decimales -->
+                            <td style="text-align:right;">
+                                {{ number_format(round($item->quantity, 2), 2, '.', ',') }}
+                            </td>
+
+                            <!-- Precio venta con formato -->
+                            <td style="text-align:right;">
+                                {{ number_format(round($item->price_sale, 2), 2, '.', ',') }}
+                            </td>
+
+                            <!-- Monto total -->
+                            <td style="text-align:right;">
+                                {{ number_format(round($item->amount, 2), 2, '.', ',') }}
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        @endif
+
+
+        @if (count($data_quote['services']) > 0)
+            <!-- Cuarta tabla: Reporte Servicios -->
+            <table class="tbl-report-sale">
+                <thead>
+                    <tr>
+                        <th>SERVICIO</th>
+                        <th>CANT</th>
+                        <th>PREC VENTA</th>
+                        <th>MONTO</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @foreach ($data_quote['services'] as $srv)
+                        <tr>
+
+                            <!-- Nombre del servicio -->
+                            <td>{{ $srv->service_name }}</td>
+
+                            <!-- Cantidad -->
+                            <td style="text-align:right;">
+                                {{ number_format(round($srv->quantity, 2), 2, '.', ',') }}
+                            </td>
+
+                            <!-- Precio venta -->
+                            <td style="text-align:right;">
+                                {{ number_format(round($srv->price_sale, 2), 2, '.', ',') }}
+                            </td>
+
+                            <!-- Importe -->
+                            <td style="text-align:right;">
+                                {{ number_format(round($srv->amount, 2), 2, '.', ',') }}
+                            </td>
+
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        @endif
+
+        <table style="width: 100%; margin-top: 20px;">
             <tr>
-                <td class="label" style="font-weight:bold;">TOTAL:</td>
-                <td style="text-align: right; font-weight:bold;">
-                    {{ number_format(round($data_quote['quote']->total, 2), 2, '.', ',') }}
+                <td style="text-align: right; font-weight: bold; font-size: 14px;">
+                    TOTAL: S/ {{ number_format(round($data_quote['quote']->total, 2), 2, '.', ',') }}
                 </td>
             </tr>
         </table>
 
 
-        <!-- Tercera tabla: Reporte Productos -->
-        <table class="tbl-report-sale">
-            <thead>
-                <tr>
-                    <th>PRODUCTO</th>
-                    <th>CATEGORÍA</th>
-                    <th>MARCA</th>
-                    <th>CANT</th>
-                    <th>PREC VENTA</th>
-                    <th>MONTO</th>
-                </tr>
-            </thead>
-
-            <tbody>
-                @foreach ($data_quote['products'] as $item)
-                    <tr>
-
-                        <td>{{ $item->product_name }}</td>
-                        <td>{{ $item->category_name }}</td>
-                        <td>{{ $item->brand_name }}</td>
-
-                        <!-- Cantidad con 2 decimales -->
-                        <td style="text-align:right;">
-                            {{ number_format(round($item->quantity, 2), 2, '.', ',') }}
-                        </td>
-
-                        <!-- Precio venta con formato -->
-                        <td style="text-align:right;">
-                            {{ number_format(round($item->price_sale, 2), 2, '.', ',') }}
-                        </td>
-
-                        <!-- Monto total -->
-                        <td style="text-align:right;">
-                            {{ number_format(round($item->amount, 2), 2, '.', ',') }}
-                        </td>
-                    </tr>
-                @endforeach
-            </tbody>
-        </table>
-
-        <!-- Cuarta tabla: Reporte Servicios -->
-        <table class="tbl-report-sale">
-            <thead>
-                <tr>
-                    <th>SERVICIO</th>
-                    <th>CANT</th>
-                    <th>PREC VENTA</th>
-                    <th>MONTO</th>
-                </tr>
-            </thead>
-
-            <tbody>
-                @foreach ($data_quote['services'] as $srv)
-                    <tr>
-
-                        <!-- Nombre del servicio -->
-                        <td>{{ $srv->service_name }}</td>
-
-                        <!-- Cantidad -->
-                        <td style="text-align:right;">
-                            {{ number_format(round($srv->quantity, 2), 2, '.', ',') }}
-                        </td>
-
-                        <!-- Precio venta -->
-                        <td style="text-align:right;">
-                            {{ number_format(round($srv->price_sale, 2), 2, '.', ',') }}
-                        </td>
-
-                        <!-- Importe -->
-                        <td style="text-align:right;">
-                            {{ number_format(round($srv->amount, 2), 2, '.', ',') }}
-                        </td>
-
-                    </tr>
-                @endforeach
-            </tbody>
-        </table>
 
         <!-- Footer -->
         <footer>

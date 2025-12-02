@@ -20,7 +20,7 @@ class ServiceUpdateRequest extends FormRequest
             'name_edit' => [
                 'required',
                 'string',
-                'max:160',
+                'max:500',
                 Rule::unique('services', 'name')
                     ->where('status', 'ACTIVE')
                     ->ignore($this->route('id'))

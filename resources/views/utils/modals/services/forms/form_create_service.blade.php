@@ -7,7 +7,7 @@
         <!-- Nombre -->
         <div class="col-12">
             <label for="name_mdlservice" class="form-label fw-bold required_field">Nombre:</label>
-            <input type="text" class="form-control" id="name_mdlservice" name="name_mdlservice" maxlength="160"
+            <input type="text" class="form-control" id="name_mdlservice" name="name_mdlservice" maxlength="500"
                 value="{{ old('name') }}" required>
             <div class="invalid-feedback">Este campo es obligatorio.</div>
             <p class="name_mdlservice_error msgError mb-0"></p>

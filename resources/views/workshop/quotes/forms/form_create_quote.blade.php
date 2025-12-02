@@ -59,7 +59,7 @@
                 <div class="col-lg-6 col-md-6 col-sm-12">
                     <label class="form-label fw-bold">Placa:</label>
                     <input type="text" class="form-control text-uppercase" id="plate" name="plate"
-                        maxlength="8" minlength="6" placeholder="Ej: ABC123" required>
+                        maxlength="8" minlength="6" placeholder="Ej: ABC123" >
                     <p class="plate_error msgError mb-0"></p>
                 </div>
 
@@ -89,7 +89,7 @@
                 <!-- PRODUCTO -->
                 <div class="col-lg-6 col-md-8 col-sm-12">
                     <label class="form-label fw-bold">Producto:</label>
-                    <i class="fas fa-plus btn btn-warning btn-sm" onclick="openMdlCreateService();"
+                    <i class="fas fa-plus btn btn-warning btn-sm" onclick="openMdlCreateProduct();"
                         style="margin-left:4px;"></i>
                     <select class="form-control" id="product_id" name="product_id">
                         <option value="">Seleccionar</option>
@@ -129,8 +129,6 @@
             </div>
         </div>
     </div>
-
-
 
     <!-- ==========================
          SECCIÓN SERVICIOS

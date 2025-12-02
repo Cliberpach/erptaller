@@ -35,7 +35,7 @@ class ServiceStoreRequest extends FormRequest
             'name' => [
                 'required',
                 'string',
-                'max:160',
+                'max:500',
                 Rule::unique('services', 'name')
                     ->where('status', 'ACTIVE'),
             ],

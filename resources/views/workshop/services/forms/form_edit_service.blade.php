@@ -6,7 +6,7 @@
         <!-- Nombre -->
         <div class="col-12">
             <label for="name_edit" class="form-label fw-bold required_field">Nombre:</label>
-            <input type="text" class="form-control" name="name_edit" id="name_edit" maxlength="160"
+            <input type="text" class="form-control" name="name_edit" id="name_edit" maxlength="500"
                 value="{{ old('name') }}" required>
             <div class="invalid-feedback">
                 Por favor, ingresa un nombre válido.
