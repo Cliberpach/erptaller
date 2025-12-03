@@ -3,6 +3,7 @@
 namespace App\Http\Services\Tenant\WorkShop\WorkOrders;
 
 use App\Http\Services\Tenant\Inventory\WarehouseProduct\WarehouseProductService;
+use App\Models\Tenant\WorkShop\Quote\Quote;
 use App\Models\Tenant\WorkShop\WorkOrder\WorkOrder;
 use Exception;
 
@@ -21,7 +22,15 @@ class WorkOrderValidation
         $lst_services  =  json_decode($data['lst_services']);
 
         if (count($lst_products) === 0 && count($lst_services) === 0) {
-            throw new Exception("DEBE INGRESAR POR LO MENOS UN PRODUCTO O SERVICIO A LA COTIZACIÓN");
+            throw new Exception("DEBE INGRESAR POR LO MENOS UN PRODUCTO O SERVICIO A LA ORDEN DE TRABAJO");
+        }
+
+        $quote_id   =   $data['quote_id'];
+        if($quote_id){
+            $quote  =   Quote::findOrFail($quote_id);
+            if($quote->order_id){
+                throw new Exception("LA COTIZACIÓN YA FUE CONVERTIDA EN LA ORDEN OT-".$quote->order_id);
+            }
         }
 
         $data['lst_products'] =   $lst_products;
@@ -62,6 +71,6 @@ class WorkOrderValidation
                     . "Cantidad solicitada: " . round($item->quantity, 2)
             );
         }
-  
+
     }
 }

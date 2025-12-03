@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use Database\Seeders\landlord\BankSeeder;
 use Database\Seeders\landlord\BrandSeeder as LandlordBrandSeeder;
 use Illuminate\Database\Seeder;
 use Spatie\Multitenancy\Models\Tenant;
@@ -17,7 +18,6 @@ use Database\Seeders\landlord\ModelSeeder;
 use Database\Seeders\landlord\ModuleSeeder;
 use Database\Seeders\landlord\TypeIdentityDocumentSeeder;
 use Database\Seeders\landlord\YearSeeder;
-use Database\Seeders\tenant\BankSeeder;
 use Database\Seeders\tenant\CategorySeeder;
 use Database\Seeders\tenant\ConfigurationSeeder;
 use Database\Seeders\tenant\DepartmentSeeder;
@@ -52,7 +52,6 @@ class DatabaseSeeder extends Seeder
         $this->call(ConfigurationSeeder::class);
         $this->call(PaymentMethodSeeder::class);
         $this->call(WarehouseSeeder::class);
-        $this->call(BankSeeder::class);
         $this->call(BrandSeeder::class);
         $this->call(CategorySeeder::class);
         $this->call(DocumentTypeSeeder::class);
@@ -86,5 +85,6 @@ class DatabaseSeeder extends Seeder
         $this->call(GeneralTableSeeder::class);
         $this->call(IdentityDocumentSeeder::class);
         $this->call(TypeIdentityDocumentSeeder::class);
+        $this->call(BankSeeder::class);
     }
 }

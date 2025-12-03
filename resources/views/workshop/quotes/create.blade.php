@@ -66,6 +66,7 @@
             tax: 0,
             totalPay: 0
         }
+        let lastCustomerQuery = null;
 
         document.addEventListener('DOMContentLoaded', () => {
             dtProducts = loadDataTableSimple('dt-quotes-products');
@@ -151,14 +152,22 @@
                 maxOptions: 20,
                 create: false,
                 preload: false,
+                onType: (str) => {
+                    lastCustomerQuery = str;
+                },
                 load: async (query, callback) => {
-                    if (!query.length) return callback();
+                    if (query.length < 3) return callback();
                     try {
                         const url = `{{ route('tenant.utils.searchCustomer') }}?q=${encodeURIComponent(query)}`;
                         const response = await fetch(url);
                         if (!response.ok) throw new Error('Error al buscar clientes');
                         const data = await response.json();
-                        callback(data.data ?? []);
+                        const results = data.data ?? [];
+                        callback(results);
+                        if (results.length === 0) {
+                            customerParams.documentSearchCustomer = lastCustomerQuery;
+                            console.log("No se encontró en BD. Guardado:", window.typedCustomer);
+                        }
                     } catch (error) {
                         console.error('Error cargando clientes:', error);
                         callback();
@@ -166,11 +175,11 @@
                 },
                 render: {
                     option: (item, escape) => `
-                <div>
-                    <strong>${escape(item.full_name)}</strong><br>
-                    <small>${escape(item.email ?? '')}</small>
-                </div>
-            `,
+                        <div>
+                            <strong>${escape(item.full_name)}</strong><br>
+                            <small>${escape(item.email ?? '')}</small>
+                        </div>
+                    `,
                     item: (item, escape) => `<div>${escape(item.full_name)}</div>`
                 }
             });
@@ -292,10 +301,6 @@
             buttonsStyling: false
         })
 
-        $(".btn-modal-file").on('click', function() {
-            $("#modal_file").modal("show");
-        });
-
         function validationStoreQuote() {
             if (lstProducts.length === 0 && lstServices.length === 0) {
                 toastr.error('DEBE AGREGAR AL MENOS UN PRODUCTO O SERVICIO A LA COTIZACIÓN');
@@ -389,6 +394,7 @@
 
             if (item && item.sale_price) {
                 document.querySelector('#product_price').value = item.sale_price;
+                document.querySelector('#product_quantity').value = 1;
             }
         }
 
@@ -532,6 +538,7 @@
             const item = serviceSelect.options[value];
             if (item && item.sale_price) {
                 document.querySelector('#service_price').value = parseFloat(item.sale_price);
+                document.querySelector('#service_quantity').value = 1;
             }
         }
 

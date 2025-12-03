@@ -6,6 +6,8 @@ use App\Http\Controllers\FormatController;
 use App\Http\Controllers\UtilController;
 use App\Http\Services\Tenant\Inventory\WarehouseProduct\WarehouseProductService;
 use App\Models\Company;
+use App\Models\Tenant\Configuration;
+use App\Models\Tenant\Maintenance\BankAccount\BankAccount;
 use App\Models\Tenant\Warehouse;
 use App\Models\Tenant\WorkShop\Quote\Quote;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -55,8 +57,18 @@ class QuoteService
     {
         $data_quote =   $this->getQuote($id);
         $company    =   Company::findOrFail(1);
-
-        return $pdf = Pdf::loadView('workshop.quotes.reports.pdf_quote', compact('data_quote', 'company'));
+        $bank_accounts  =   BankAccount::where('status', 'ACTIVO')->get();
+        $configuration  =   Configuration::findOrFail(1);
+     
+        return $pdf = Pdf::loadView(
+            'workshop.quotes.reports.pdf_quote',
+            compact(
+                'data_quote',
+                'company',
+                'bank_accounts',
+                'configuration'
+            )
+        );
     }
 
     public function getQuote(int $id): array
@@ -76,8 +88,11 @@ class QuoteService
         $checks_inventory_vehicle   =   UtilController::getInventoryVehicleChecks();
         $technicians                =   UtilController::getTechnicians();
 
-        $lst_products               =   FormatController::formatLstProducts($data_validated['products_validated']);
+        $lst_products               =   FormatController::formatLstProducts($data_validated['valid_products']);
         $lst_services               =   FormatController::formatLstServices($quote_data['services']->toArray());
+
+        $customer_formatted         =   FormatController::getFormatInitialCustomer($quote->customer_id);
+        $vehicle_formatted          =   FormatController::getFormatInitialVehicle($quote->vehicle_id);
 
         return view(
             'workshop.work_orders.create',
@@ -88,7 +103,9 @@ class QuoteService
                 'technicians',
                 'quote',
                 'lst_products',
-                'lst_services'
+                'lst_services',
+                'customer_formatted',
+                'vehicle_formatted'
             )
         );
     }

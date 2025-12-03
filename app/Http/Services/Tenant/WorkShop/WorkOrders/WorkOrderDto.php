@@ -35,12 +35,16 @@ class WorkOrderDto
         $dto['vehicle_id']  =   $data['vehicle_id'];
         $vehicle            =   Vehicle::findOrFail($dto['vehicle_id']);
         $dto['plate']       =   $vehicle->plate;
+        $dto['fuel_level']  =   $data['fuel_level'];
 
         //======== AMOUNTS ======
         $dto_amounts        =   $this->calculateAmounts($data['lst_products'], $data['lst_services']);
         $dto['total']       =   $dto_amounts['total'];
         $dto['subtotal']    =   $dto_amounts['subtotal'];
         $dto['igv']         =   $dto_amounts['igv'];
+
+        //======= QUOTE ==========
+         $dto['quote_id']    =   $data['quote_id'];
 
         return $dto;
     }

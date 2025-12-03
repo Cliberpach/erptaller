@@ -254,7 +254,7 @@ function formatQuantity(valor) {
 
     return numero.toLocaleString('en-US', {
         minimumFractionDigits: 0,
-        maximumFractionDigits: 2 
+        maximumFractionDigits: 2
     });
 }
 
@@ -282,7 +282,9 @@ function redirectParams(routeName, id) {
     window.location.href = route(routeName, id);
 }
 
-
+function isNumeric(value) {
+    return Number.isInteger(Number(value));
+}
 
 
 

@@ -3,6 +3,7 @@
         <tr>
             <th class="text-center">ID</th>
             <th class="text-center">#</th>
+            <th class="text-center">OT</th>
             <th class="text-center">CLIENTE</th>
             <th class="text-center">PLACA</th>
             <th class="text-center">ALMACÉN</th>

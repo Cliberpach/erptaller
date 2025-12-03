@@ -159,7 +159,6 @@
             </tr>
         </table>
 
-
         <!-- DATOS DE LA ORDEN -->
         <table class="info-table-custom" style="margin-top: 20px;">
 
@@ -311,7 +310,22 @@
             </tr>
         </table>
 
-
+        @if ($configuration->property == 1 && count($bank_accounts) > 0)
+            <table style="width: 100%; margin-top: 5px; border-collapse: collapse;">
+                <tbody>
+                    @foreach ($bank_accounts as $account)
+                        <tr>
+                            <td style="text-align: left; font-size: 11px; padding: 3px 0;">
+                                <strong>{{ $account->bank_name }}</strong>
+                                {{ $account->currency }}
+                                <strong>N°</strong>: {{ $account->account_number }} -
+                                <strong>CCI</strong>: {{ $account->cci }}
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        @endif
 
         <!-- Footer -->
         <footer>

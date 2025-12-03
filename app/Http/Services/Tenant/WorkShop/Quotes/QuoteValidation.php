@@ -54,13 +54,13 @@ class QuoteValidation
 
         $lst_products_validated     =   collect($this->s_warehouse_product->validatedStock($products->toArray()));
         $count_products_validated   =   $lst_products_validated->where('valid', true)->count();
-
+       
         if($count_products_validated === 0 && count($services) === 0){
             throw new Exception("NO EXISTEN PRODUCTOS Y SERVICIOS EN LA COTIZACIÓN");
         }
 
         $data_validated=    [
-            'products_validated'    =>  $lst_products_validated->where('valid',true)->toArray()
+            'valid_products'    =>  $lst_products_validated->where('valid',true)->toArray()
         ];
 
         return $data_validated;

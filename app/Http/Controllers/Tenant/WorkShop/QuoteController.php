@@ -41,6 +41,7 @@ class QuoteController extends Controller
     {
         $quotes =   DB::connection('tenant')
             ->table('quotes as q')
+            ->leftJoin('work_orders as wo', 'wo.quote_id', 'q.id')
             ->select(
                 DB::raw('CONCAT("COT-",q.id) as code'),
                 'q.id',
@@ -51,13 +52,18 @@ class QuoteController extends Controller
                 'q.create_user_name',
                 'q.status',
                 'q.expiration_date',
-                'q.created_at'
+                'q.created_at',
+                'wo.id as work_order_id',
+                DB::raw('CONCAT("OT-",wo.id) as work_order_code')
             )
             ->where('q.status', '<>', 'ANULADO');
 
         return DataTables::of($quotes)
             ->filterColumn('code', function ($query, $keyword) {
                 $query->whereRaw("CONCAT('COT-', q.id) LIKE ?", ["%{$keyword}%"]);
+            })
+            ->filterColumn('work_order_code', function ($query, $keyword) {
+                $query->whereRaw("CONCAT('OT-', wo.id) LIKE ?", ["%{$keyword}%"]);
             })
             ->toJson();
     }

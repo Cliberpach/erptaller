@@ -57,9 +57,23 @@
                 "ajax": '{{ route('tenant.taller.ordenes_trabajo.getWorkOrders') }}',
                 "columns": [{
                         data: 'id',
+                        name: 'o.id',
                         className: "text-center",
                         "visible": false,
                         "searchable": false
+                    },
+                    {
+                        data: 'code',
+                        className: "text-center",
+                        "visible": true,
+                        "searchable": true,
+                        "orderable": true
+                    },
+                    {
+                        data: 'quote_code',
+                        className: "text-center",
+                        "searchable": true,
+                        "orderable": true
                     },
                     {
                         data: 'customer_name',
@@ -70,14 +84,14 @@
                     },
                     {
                         data: 'plate',
-                        name: 'q.plate',
+                        name: 'o.plate',
                         searchable: true,
                         orderable: true,
                         className: "text-center"
                     },
                     {
                         data: 'warehouse_name',
-                        name: 'q.warehouse_name',
+                        name: 'o.warehouse_name',
                         searchable: true,
                         orderable: true,
                         visible: false,
@@ -85,7 +99,7 @@
                     },
                     {
                         data: 'total',
-                        name: 'q.total',
+                        name: 'o.total',
                         searchable: false,
                         orderable: false,
                         className: "text-center",
@@ -95,14 +109,14 @@
                     },
                     {
                         data: 'create_user_name',
-                        name: 'q.create_user_name',
+                        name: 'o.create_user_name',
                         searchable: true,
                         orderable: true,
                         className: "text-center"
                     },
                     {
                         data: 'status',
-                        name: 'q.status',
+                        name: 'o.status',
                         searchable: false,
                         orderable: false,
                         className: "text-center",
@@ -135,7 +149,7 @@
                     },
                     {
                         data: 'created_at',
-                        name: 'q.created_at',
+                        name: 'o.created_at',
                         searchable: false,
                         orderable: false,
                         className: "text-center"
@@ -144,7 +158,7 @@
                         searchable: false,
                         orderable: false,
                         data: null,
-                         className: "text-center",
+                        className: "text-center",
                         render: function(data) {
 
                             let actions = `

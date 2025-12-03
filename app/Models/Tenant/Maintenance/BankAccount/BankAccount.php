@@ -1,40 +1,34 @@
 <?php
 
-namespace App\Models\Tenant\WorkShop\WorkOrder;
+namespace App\Models\Tenant\Maintenance\BankAccount;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class WorkOrder extends Model
+class BankAccount extends Model
 {
     use HasFactory;
-    protected $table = 'work_orders';
+    protected $table = 'bank_accounts';
 
     protected $fillable = [
-        'warehouse_id',
-        'warehouse_name',
-        'customer_id',
-        'customer_name',
-        'customer_type_document_abbreviation',
-        'customer_document_number',
-        'vehicle_id',
-        'total',
-        'subtotal',
-        'igv',
 
-        'plate',
-        'fuel_level',
-        'quote_id',
+        'bank_id',
+        'bank_name',
+        'account_number',
+        'cci',
+        'phone',
+        'holder',
+        'currency',
 
         'creator_user_id',
         'editor_user_id',
         'delete_user_id',
+
         'delete_user_name',
         'editor_user_name',
-        'create_user_name',
+        'creator_user_name',
+
         'status',
-        'created_at',
-        'updated_at'
     ];
 
     protected static function boot()
@@ -44,7 +38,7 @@ class WorkOrder extends Model
         static::creating(function ($model) {
             if (auth()->check()) {
                 $model->creator_user_id = auth()->id();
-                $model->create_user_name = auth()->user()->name;
+                $model->creator_user_name = auth()->user()->name;
             }
         });
 

@@ -34,17 +34,27 @@ class WorkOrderController extends Controller
             ->table('work_orders as o')
             ->select(
                 'o.id',
+                DB::raw('CONCAT("OT-",o.id) as code'),
                 DB::raw('CONCAT(o.customer_type_document_abbreviation,":",o.customer_document_number,"-",o.customer_name) as customer_name'),
                 'o.plate',
                 'o.warehouse_name',
                 'o.total',
                 'o.create_user_name',
                 'o.status',
-                'o.created_at'
+                'o.created_at',
+                'o.quote_id',
+                DB::raw('CONCAT("COT-",o.quote_id) as quote_code')
             )
             ->where('o.status', '<>', 'ANULADO');
 
-        return DataTables::of($quotes)->toJson();
+        return DataTables::of($quotes)
+            ->filterColumn('code', function ($query, $keyword) {
+                $query->whereRaw("CONCAT('OT-', o.id) LIKE ?", ["%{$keyword}%"]);
+            })
+            ->filterColumn('quote_code', function ($query, $keyword) {
+                $query->whereRaw("CONCAT('COT-', o.quote_id) LIKE ?", ["%{$keyword}%"]);
+            })
+            ->toJson();
     }
 
     public function getWorkOrder(int $id)
@@ -65,7 +75,15 @@ class WorkOrderController extends Controller
         $warehouses                 =   Warehouse::where('estado', 'ACTIVO')->get();
         $checks_inventory_vehicle   =   UtilController::getInventoryVehicleChecks();
         $technicians                =   UtilController::getTechnicians();
-        return view('workshop.work_orders.create', compact('igv', 'warehouses', 'checks_inventory_vehicle', 'technicians'));
+        $customer_formatted         =   FormatController::getFormatInitialCustomer(1);
+
+        return view('workshop.work_orders.create', compact(
+            'igv',
+            'warehouses',
+            'checks_inventory_vehicle',
+            'technicians',
+            'customer_formatted'
+        ));
     }
 
     /*
@@ -83,6 +101,7 @@ array:18 [ // app\Http\Controllers\Tenant\WorkShop\WorkOrderController.php:102
     4 => "22"
     5 => "23"
   ]
+  "fuel_level" => "-1"
   "technicians" => "1"
   "product_id" => "1"
   "product_quantity" => "2"
@@ -107,10 +126,11 @@ array:18 [ // app\Http\Controllers\Tenant\WorkShop\WorkOrderController.php:102
         try {
 
             $order  =   $this->s_order->store($request->toArray());
+            $pdf_url   =   route('tenant.taller.ordenes_trabajo.pdfOne', $order->id);
 
             Session::flash('success', 'ORDEN DE TRABAJO REGISTRADA CON ÉXITO');
             DB::commit();
-            return response()->json(['success' => true, 'message' => 'ORDEN DE TRABAJO REGISTRADA CON ÉXITO']);
+            return response()->json(['success' => true, 'message' => 'ORDEN DE TRABAJO REGISTRADA CON ÉXITO', 'pdf_url' => $pdf_url]);
         } catch (Throwable $th) {
             DB::rollBack();
             return response()->json(['success' => false, 'message' => $th->getMessage(), 'file' => $th->getFile(), 'line' => $th->getLine()]);
@@ -186,7 +206,7 @@ array:17 [ // app\Http\Controllers\Tenant\WorkShop\QuoteController.php:145
 
             $work_order  =   $this->s_order->update($request->toArray(), $id);
 
-            Session::flash('message_success','ORDEND DE TRABAJO ACTUALIZADA CON ÉXITO');
+            Session::flash('message_success', 'ORDEND DE TRABAJO ACTUALIZADA CON ÉXITO');
             DB::commit();
 
             return response()->json(['success' => true, 'message' => 'ORDEN DE TRABAJO ACTUALIZADA CON ÉXITO']);

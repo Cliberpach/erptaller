@@ -46,6 +46,36 @@
             e.preventDefault();
             storeProduct(e.target);
         })
+
+        $('#mdlCreateProduct').on('hidden.bs.modal', function() {
+            clearMdlCreateProduct();
+        });
+
+        document.querySelector('#image_mdlproduct').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            const reader = new FileReader();
+            if (file) {
+
+                reader.onload = function(e) {
+                    document.getElementById('img_vista_previa').src = e.target.result;
+                };
+
+                reader.readAsDataURL(file);
+            } else {
+                document.getElementById('img_vista_previa').src = @json(asset('assets/img/products/img_default.png'));
+            }
+        });
+
+        document.addEventListener('click', (e) => {
+            //======== LIMPIAR IMAGEN =======
+            if (e.target.closest('.btnSetImgDefault')) {
+                const inputImgPreview = document.querySelector('#img_vista_previa');
+                inputImgPreview.src = @json(asset('assets/img/products/img_default.png'));
+
+                const inputCargarImg = document.querySelector('#image_mdlproduct');
+                inputCargarImg.value = '';
+            }
+        })
     }
 
     function loadSelectMdlProduct() {
@@ -56,6 +86,7 @@
                 valueField: 'id',
                 labelField: 'description',
                 searchField: ['description', 'id'],
+                placeholder: 'Seleccionar',
                 create: false,
                 sortField: {
                     field: 'id',
@@ -81,6 +112,7 @@
                 valueField: 'id',
                 labelField: 'description',
                 searchField: ['description', 'id'],
+                placeholder: 'Seleccionar',
                 create: false,
                 sortField: {
                     field: 'id',
@@ -180,17 +212,31 @@
     function setNewProduct(product) {
         window.productSelect.clear();
 
-        const item  =   {
-            id:product.id,
-            text:`${product.name} - (${product.stock})`,
-            subtext:`${product.category.name}-${product.brand.name}`,
-            sale_price:product.sale_price,
-            name:product.name,
-            category_name:product.category.name,
-            brand_name:product.brand.name
+        const item = {
+            id: product.id,
+            text: `${product.name} - (${product.stock})`,
+            subtext: `${product.category.name}-${product.brand.name}`,
+            sale_price: product.sale_price,
+            name: product.name,
+            category_name: product.category.name,
+            brand_name: product.brand.name
         }
 
         window.productSelect.addOption(item);
         window.productSelect.setValue(item.id);
+    }
+
+    function clearMdlCreateProduct() {
+        document.querySelector('#name_mdlproduct').value = '';
+        document.querySelector('#description_mdlproduct').value = '';
+        document.querySelector('#sale_price_mdlproduct').value = '';
+        document.querySelector('#purchase_price_mdlproduct').value = '';
+        document.querySelector('#stock_mdlproduct').value = '';
+        document.querySelector('#stock_min_mdlproduct').value = '';
+        document.querySelector('#code_factory_mdlproduct').value = '';
+        document.querySelector('#code_bar_mdlproduct').value = '';
+        window.categorySelect.clear();
+        window.brandSelect.clear();
+        document.querySelector('.btnSetImgDefault').click();
     }
 </script>

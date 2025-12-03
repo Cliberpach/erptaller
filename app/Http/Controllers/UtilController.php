@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Landlord\Company;
+use App\Models\Landlord\GeneralTable\GeneralTableDetail;
 use App\Models\Landlord\TypeIdentityDocument;
 use App\Models\Landlord\Year;
 use App\Models\User;
@@ -206,5 +207,10 @@ class UtilController extends Controller
     public static function getBrandsProducts(){
         $brands =   Brand::where('status','ACTIVE')->get();
         return $brands;
+    }
+
+    public static function getBanks(){
+        $banks  =   GeneralTableDetail::where('general_table_id',3)->where('status','ACTIVO')->get();
+        return $banks;
     }
 }

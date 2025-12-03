@@ -45,6 +45,10 @@
             e.preventDefault();
             storeService(e.target);
         })
+
+        $('#mdlCreateService').on('hidden.bs.modal', function() {
+            clearMdlCreateService();
+        });
     }
 
     function storeService(formStoreService) {
@@ -126,15 +130,21 @@
     function setNewService(service) {
         window.serviceSelect.clear();
 
-        const item  =   {
-            id:service.id,
-            text:`${service.name}`,
-            subtext:`S/ ${formatSoles(service.price)}`,
-            sale_price:service.price,
-            name:service.name,
+        const item = {
+            id: service.id,
+            text: `${service.name}`,
+            subtext: `S/ ${formatSoles(service.price)}`,
+            sale_price: service.price,
+            name: service.name,
         }
 
         window.serviceSelect.addOption(item);
         window.serviceSelect.setValue(item.id);
+    }
+
+    function clearMdlCreateService() {
+        document.querySelector('#name_mdlservice').value = '';
+        document.querySelector('#price_mdlservice').value = '';
+        document.querySelector('#description_mdlservice').value = '';
     }
 </script>

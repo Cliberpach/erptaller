@@ -77,7 +77,6 @@
             gaugeWidthScale: 0.7
         });
 
-
         document.addEventListener('DOMContentLoaded', () => {
             dtProducts = loadDataTableSimple('dt-orders-products');
             dtServices = loadDataTableSimple('dt-orders-services');
@@ -160,9 +159,12 @@
                 }
             });
 
+            const initialCustomer = @json($customer_formatted);
             window.clientSelect = new TomSelect('#client_id', {
                 valueField: 'id',
                 labelField: 'full_name',
+                options: [initialCustomer],
+                items: [initialCustomer.id],
                 searchField: ['full_name'],
                 plugins: ['clear_button'],
                 placeholder: 'Seleccione un cliente',
@@ -193,10 +195,15 @@
                 }
             });
 
+            const initialVehicle = @json($vehicle_formatted ?? null);
+            const options = initialVehicle ? [initialVehicle] : [];
+            const items = initialVehicle ? [initialVehicle.id] : [];
             window.vehicleSelect = new TomSelect('#vehicle_id', {
                 valueField: 'id',
                 labelField: 'text',
                 searchField: ['text'],
+                options: options,
+                items: items,
                 plugins: ['clear_button'],
                 placeholder: 'Seleccione un vehículo',
                 maxOptions: 20,
@@ -428,9 +435,13 @@
                     formData.append('lst_products', JSON.stringify(lstProducts));
                     formData.append('lst_services', JSON.stringify(lstServices));
 
+                    const quoteId = @json($quote->id ?? null);
+                    formData.append('quote_id', quoteId)
+
                     const res = await axios.post(route('tenant.taller.ordenes_trabajo.store'), formData);
 
                     if (res.data.success) {
+                        window.open(res.data.pdf_url, '_blank');
                         toastr.success(res.data.message, 'OPERACIÓN COMPLETADA');
                         redirect('tenant.taller.ordenes_trabajo.index');
                     } else {
@@ -903,11 +914,11 @@
         }
 
         function setQuote() {
-            const quote = @json($quote??null);
+            const quote = @json($quote ?? null);
             if (quote) {
 
                 //====== PRODUCTS =========
-                const lstProductsBD = @json($lst_products??null);
+                const lstProductsBD = @json($lst_products ?? null);
                 lstProducts = [...lstProductsBD];
 
                 dtProducts = destroyDataTable(dtProducts);
@@ -916,7 +927,7 @@
                 dtProducts = loadDataTableSimple('dt-orders-products');
 
                 //======= SERVICES =======
-                const lstServicesBD = @json($lst_services??null);
+                const lstServicesBD = @json($lst_services ?? null);
                 lstServices = [...lstServicesBD];
 
                 dtServices = destroyDataTable(dtServices);

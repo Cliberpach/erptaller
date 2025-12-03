@@ -309,6 +309,14 @@ class ModuleSeeder extends Seeder
 
         ModuleChild::create([
             'module_id' => $maintenance->id,
+            'description' => 'Cuentas',
+            'route_name' => 'mantenimientos.cuentas.index',
+            'order' => '2',
+            'show' => 'tenant'
+        ]);
+
+        ModuleChild::create([
+            'module_id' => $maintenance->id,
             'description' => 'Planes',
             'route_name' => 'mantenimientos.plan',
             'order' => '2',

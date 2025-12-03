@@ -39,3 +39,5 @@
 <link href="{{ asset('assets/css/utils.css') }}" rel="stylesheet" />
 
 @yield('css')
+@stack('styles')
+

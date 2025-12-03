@@ -3,6 +3,7 @@
 use App\Http\Controllers\Tenant\BookController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Tenant\CompanyController;
+use App\Http\Controllers\Tenant\Maintenance\BankAccountController;
 use App\Http\Controllers\Tenant\Maintenance\CollaboratorController;
 use App\Http\Controllers\Tenant\Maintenance\ConfigurationController;
 use App\Http\Controllers\Tenant\Maintenance\PositionController;
@@ -11,6 +12,14 @@ use App\Http\Controllers\Tenant\RoleController;
 use App\Http\Controllers\Tenant\UserController;
 
 Route::group(["prefix" => "mantenimiento"], function () {
+
+    Route::group(["prefix" => "cuentas"], function () {
+        Route::get('index', [BankAccountController::class, 'index'])->name('tenant.mantenimientos.cuentas.index');
+        Route::get('getCuentas', [BankAccountController::class,'getBankAccounts'])->name('tenant.mantenimiento.cuentas.getBankAccounts');
+        Route::post('store',[BankAccountController::class,'store'])->name('tenant.mantenimiento.cuentas.store');
+        Route::put('update/{id}', [BankAccountController::class,'update'])->name('tenant.mantenimiento.cuentas.update');
+        Route::delete('/destroy/{id}', [BankAccountController::class, 'destroy'])->name('tenant.mantenimiento.cuentas.destroy');
+    });
 
     Route::group(["prefix" => "empresa"], function () {
         Route::get('empresa', [CompanyController::class, 'index'])->name('tenant.mantenimientos.empresa');
@@ -39,7 +48,6 @@ Route::group(["prefix" => "mantenimiento"], function () {
         Route::delete('destroy/{id}', [CollaboratorController::class, 'destroy'])->name('tenant.mantenimientos.colaboradores.destroy');
         Route::get('create', [CollaboratorController::class, 'create'])->name('tenant.mantenimientos.colaboradores.create');
         Route::post('store', [CollaboratorController::class, 'store'])->name('tenant.mantenimientos.colaboradores.store');
-
     });
 
     Route::group(["prefix" => "plan"], function () {

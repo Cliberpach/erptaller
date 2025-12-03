@@ -51,6 +51,11 @@
             e.preventDefault();
             storeVehicle(e.target);
         })
+
+        $('#mdlCreateVehicle').on('hidden.bs.modal', function() {
+            clearMdlCreateVehicle();
+        });
+
     }
 
     function loadSelectMdlVehicle() {
@@ -100,7 +105,7 @@
                 preload: false,
                 maxItems: 1,
                 create: false,
-                plugins: ['remove_button'], // agrega la X
+                plugins: ['remove_button'], 
                 load: function(query, callback) {
                     if (!query.length) return callback();
                     axios.get(route('tenant.utils.searchModel'), {
@@ -219,7 +224,6 @@
         const dataApi = res.data.data.data;
         const model = res.data.model;
         const color = res.data.color;
-        console.log('dataApi', dataApi)
 
         const mensaje = dataApi.mensaje;
         if (mensaje == 'No encontrado') {
@@ -350,10 +354,18 @@
         window.clientMdlVehicleSelect.clear();
 
         const clientId = window.clientSelect.getValue();
-        if(!clientId)return;
+        if (!clientId) return;
         const clientItem = window.clientSelect.options[clientId];
         window.clientMdlVehicleSelect.addOption(clientItem);
         window.clientMdlVehicleSelect.setValue(clientId);
     }
 
+    function clearMdlCreateVehicle(){
+        window.clientMdlVehicleSelect.clear();
+        document.querySelector('#plate_mdlvehicle').value   =   '';
+        window.modelSelect.clear();
+        window.yearSelect.clear();
+        window.colorSelect.clear();
+        document.querySelector('#observation_mdlvehicle').textContent   =   '';
+    }
 </script>

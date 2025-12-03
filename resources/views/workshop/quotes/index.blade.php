@@ -54,11 +54,11 @@
             dtQuotes = new DataTable('#dt-quotes', {
                 "serverSide": true,
                 "processing": true,
-                responsive:true,
+                responsive: true,
                 "ajax": '{{ route('tenant.taller.cotizaciones.getQuotes') }}',
-                "columns": [
-                    {
+                "columns": [{
                         data: 'id',
+                        name: 'q.id',
                         className: "text-center",
                         "visible": false,
                         "searchable": false
@@ -67,6 +67,12 @@
                         data: 'code',
                         className: "text-center",
                         "visible": true,
+                        "searchable": true,
+                        "orderable": true
+                    },
+                    {
+                        data: 'work_order_code',
+                        className: "text-center",
                         "searchable": true,
                         "orderable": true
                     },

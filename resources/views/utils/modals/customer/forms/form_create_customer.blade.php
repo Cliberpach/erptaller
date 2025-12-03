@@ -24,7 +24,7 @@
                     <label class="required_field" for="nro_document" style="font-weight: bold;">N° DOCUMENTO</label>
 
                     <div class="input-group">
-                        <input id="nro_document" name="nro_document" required type="text" class="form-control" placeholder="N° DOCUMENTO" aria-label="Recipient's username" aria-describedby="button-addon2">
+                        <input maxlength="8" id="nro_document" name="nro_document" required type="text" class="form-control inputEnteroPositivo" placeholder="N° DOCUMENTO" aria-label="Recipient's username" aria-describedby="button-addon2">
                         <button
                         class="btn btn-primary" type="button" id="btn_search_nro_document">
                             <i class="fas fa-search"></i>

@@ -25,7 +25,6 @@ class ConfigurationRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'configuration_1' => ['required', 'date_format:H:i'],
         ];
     }
 
@@ -37,8 +36,6 @@ class ConfigurationRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'configuration_1.required'      => 'El turno noche reservas es obligatorio.',
-            'configuration_1.date_format'   => 'El turno noche reservas debe estar en formato de hora HH:MM:SS.',
         ];
     }
 

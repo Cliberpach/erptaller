@@ -35,7 +35,7 @@
 </div>
 
 <script>
-    let customerParameters = {
+    let customerParams = {
         documentSearchCustomer: null
     };
 
@@ -47,7 +47,6 @@
             dropdownParent: $('#mdlCreateCustomer'),
         });
     }
-
 
     function eventsMdlCreateCustomer() {
         iniciarSelect2();
@@ -71,10 +70,9 @@
             $('#province').empty().trigger('change');
             $('#district').empty().trigger('change');
 
-            document.querySelector('#btn_search_nro_document').classList.add('d-none');
-            document.querySelector('#nro_document').disabled = true;
+            $('#type_identity_document').val('1').trigger('change');
 
-
+            customerParams.documentSearchCustomer   =   null;
             clearValidationErrors('msgErrorCustomer');
 
         });
@@ -117,16 +115,16 @@
 
     function openMdlNewCustomer() {
 
-        if (!isNaN(parseInt(customerParameters.documentSearchCustomer))) {
+        if (isNumeric(customerParams.documentSearchCustomer) && customerParams.documentSearchCustomer) {
             //====== DNI ======
-            if (customerParameters.documentSearchCustomer.length === 8) {
+            if (customerParams.documentSearchCustomer.length === 8) {
                 $('#type_identity_document').val('1').trigger('change');
-                document.querySelector('#nro_document').value = customerParameters.documentSearchCustomer;
+                document.querySelector('#nro_document').value = customerParams.documentSearchCustomer;
             }
             //========= RUC ========
-            if (customerParameters.documentSearchCustomer.length === 11) {
+            if (customerParams.documentSearchCustomer.length === 11) {
                 $('#type_identity_document').val('3').trigger('change');
-                document.querySelector('#nro_document').value = customerParameters.documentSearchCustomer;
+                document.querySelector('#nro_document').value = customerParams.documentSearchCustomer;
             }
         }
 
@@ -157,7 +155,6 @@
                 }
 
                 if (type_identity_document == 3) {
-                    //console.log(res);
                     setDataRuc(res.data);
                 }
 
@@ -243,7 +240,6 @@
     }
 
     function changeDepartment(department_id) {
-        console.log('CHANGE DEPARTMENT')
 
         const lstProvinces = @json($provinces);
         const lstDistricts = @json($districts);
@@ -252,12 +248,10 @@
         if (department_id) {
 
             department_id = String(department_id).padStart(2, '0');
-            console.log('department_id', department_id);
 
             lstProvincesFiltered = lstProvinces.filter((province) => {
                 return province.department_id == department_id;
             })
-            console.log('PROVINCIAS FILTRADAS', lstProvincesFiltered);
             $('#province').empty().trigger('change');
 
             lstProvincesFiltered.forEach((province) => {
@@ -374,7 +368,6 @@
                     }
 
                 } catch (error) {
-                    console.log(error);
                     toastr.error(error, 'ERROR EN LA PETICIÓN REGISTRAR CLIENTE');
                     Swal.close();
                 }
@@ -392,8 +385,6 @@
 
 
     function setCustomerNew(customerNew) {
-        console.log(customerNew);
-
         const option = {
             id: customerNew.id,
             full_name: `${customerNew.type_document_abbreviation}:${customerNew.document_number} - ${customerNew.name}`,
