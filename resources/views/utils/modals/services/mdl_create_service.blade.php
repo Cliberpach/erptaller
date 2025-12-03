@@ -35,7 +35,12 @@
 </div>
 
 <script>
+    const serviceParams = {
+        name: null
+    }
+
     function openMdlCreateService() {
+        document.querySelector('#name_mdlservice').value = serviceParams.name;
         $('#mdlCreateService').modal('show');
     }
 

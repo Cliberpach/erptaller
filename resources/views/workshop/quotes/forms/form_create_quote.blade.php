@@ -59,14 +59,15 @@
                 <div class="col-lg-6 col-md-6 col-sm-12">
                     <label class="form-label fw-bold">Placa:</label>
                     <input type="text" class="form-control text-uppercase" id="plate" name="plate"
-                        maxlength="8" minlength="6" placeholder="Ej: ABC123" >
+                        maxlength="8" minlength="6" placeholder="Ej: ABC123">
                     <p class="plate_error msgError mb-0"></p>
                 </div>
 
                 <!-- Fecha Expiración -->
                 <div class="col-lg-6 col-md-4 col-sm-6 col-xs-12">
                     <label class="form-label fw-bold">Fecha Expiración cotización:</label>
-                    <input type="date" class="form-control" id="expiration_date" name="expiration_date">
+                    <input type="date" class="form-control" id="expiration_date" name="expiration_date"
+                        value="<?= date('Y-m-d', strtotime('+10 days')) ?>">
                     <p class="expiration_date_error msgError mb-0"></p>
                 </div>
 
@@ -143,7 +144,7 @@
 
                 <div class="col-lg-6 col-md-8 col-sm-12">
                     <label class="form-label fw-bold">Servicio:</label>
-                     <i class="fas fa-plus btn btn-warning btn-sm" onclick="openMdlCreateService();"
+                    <i class="fas fa-plus btn btn-warning btn-sm" onclick="openMdlCreateService();"
                         style="margin-left:4px;"></i>
                     <select class="form-control" id="service_id" name="service_id">
                         <option value="">Seleccionar</option>

@@ -35,7 +35,12 @@
 </div>
 
 <script>
+    const productParams = {
+        name: null
+    }
+
     function openMdlCreateProduct() {
+        document.querySelector('#name_mdlproduct').value = productParams.name;
         $('#mdlCreateProduct').modal('show');
     }
 
@@ -95,13 +100,17 @@
                 plugins: ['clear_button'],
                 render: {
                     option: (item, escape) => `
-                            <div>
-                                ${escape(item.description)}
-                            </div>
-                        `,
+                        <div>
+                            <i class="fas fa-tags" style="margin-right:6px; color:#28a745;"></i>
+                            ${escape(item.description)}
+                        </div>
+                    `,
                     item: (item, escape) => `
-                            <div>${escape(item.description)}</div>
-                        `
+                        <div>
+                            <i class="fas fa-tags" style="margin-right:6px; color:#28a745;"></i>
+                            ${escape(item.description)}
+                        </div>
+                    `
                 }
             });
         }
@@ -121,13 +130,17 @@
                 plugins: ['clear_button'],
                 render: {
                     option: (item, escape) => `
-                            <div>
-                                ${escape(item.description)}
-                            </div>
-                        `,
-                    item: (item, escape) => `
-                            <div>${escape(item.description)}</div>
-                        `
+                        <div>
+                            <i class="fas fa-bullseye" style="margin-right:6px; color:#0d6efd;"></i>
+                            ${escape(item.description)}
+                        </div>
+                    `,
+                                        item: (item, escape) => `
+                        <div>
+                            <i class="fas fa-bullseye" style="margin-right:6px; color:#0d6efd;"></i>
+                            ${escape(item.description)}
+                        </div>
+                    `,
                 }
             });
         }
@@ -231,8 +244,8 @@
         document.querySelector('#description_mdlproduct').value = '';
         document.querySelector('#sale_price_mdlproduct').value = '';
         document.querySelector('#purchase_price_mdlproduct').value = '';
-        document.querySelector('#stock_mdlproduct').value = '';
-        document.querySelector('#stock_min_mdlproduct').value = '';
+        document.querySelector('#stock_mdlproduct').value = '0';
+        document.querySelector('#stock_min_mdlproduct').value = '1';
         document.querySelector('#code_factory_mdlproduct').value = '';
         document.querySelector('#code_bar_mdlproduct').value = '';
         window.categorySelect.clear();

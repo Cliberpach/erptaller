@@ -156,6 +156,15 @@ array:17 [ // app\Http\Controllers\Tenant\WorkShop\QuoteController.php:91
         $igv        =   round(Company::find(1)->igv, 2);
         $warehouses =   Warehouse::where('estado', 'ACTIVO')->get();
         $quote      =   Quote::findOrFail($id);
+        $types_identity_documents   =   UtilController::getIdentityDocuments();
+        $departments                =   Department::all();
+        $districts                  =   District::all();
+        $provinces                  =   Province::all();
+        $company_invoice            =   CompanyInvoice::find(1);
+        $years                      =   UtilController::getYears();
+        $colors                     =   Color::where('status', 'ACTIVE')->get();
+        $categories                 =   UtilController::getCategoriesProducts();
+        $brands                     =   UtilController::getBrandsProducts();
 
         $customer_formatted = FormatController::getFormatInitialCustomer($quote->customer_id);
         $vehicle_formatted = FormatController::getFormatInitialVehicle($quote->vehicle_id);
@@ -164,7 +173,24 @@ array:17 [ // app\Http\Controllers\Tenant\WorkShop\QuoteController.php:91
 
         return view(
             'workshop.quotes.edit',
-            compact('igv', 'warehouses', 'quote', 'customer_formatted', 'vehicle_formatted', 'lst_products', 'lst_services')
+            compact(
+                'igv',
+                'warehouses',
+                'quote',
+                'customer_formatted',
+                'vehicle_formatted',
+                'lst_products',
+                'lst_services',
+                'types_identity_documents',
+                'departments',
+                'districts',
+                'provinces',
+                'company_invoice',
+                'years',
+                'colors',
+                'categories',
+                'brands'
+            )
         );
     }
 

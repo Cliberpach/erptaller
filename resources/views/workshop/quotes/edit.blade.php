@@ -5,7 +5,10 @@
 @endsection
 
 @section('content')
-    {{-- @include('utils.modals.customer.mdl_create_customer') --}}
+    @include('utils.modals.customer.mdl_create_customer')
+    @include('utils.modals.vehicles.mdl_create_vehicle')
+    @include('utils.modals.products.mdl_create_product')
+    @include('utils.modals.services.mdl_create_service')
     @include('workshop.quotes.modals.mdl_edit_product')
     @include('workshop.quotes.modals.mdl_edit_service')
 
@@ -63,6 +66,9 @@
             tax: 0,
             totalPay: 0
         }
+        let lastCustomerQuery = null;
+        let lastProductQuery = null;
+        let lastServiceQuery = null;
 
         document.addEventListener('DOMContentLoaded', () => {
             dtProducts = loadDataTableSimple('dt-quotes-products');
@@ -75,9 +81,12 @@
         })
 
         function events() {
-            //eventsMdlCreateCustomer();
+            eventsMdlCreateCustomer();
             eventsMdlEditProduct();
             eventsMdlEditService();
+            eventsMdlVehicle();
+            eventsMdlProduct();
+            eventsMdlService();
 
             document.querySelector('#form-edit-quote').addEventListener('submit', (e) => {
                 e.preventDefault();
@@ -147,14 +156,24 @@
                 maxOptions: 20,
                 create: false,
                 preload: false,
+                onType: (str) => {
+                    lastCustomerQuery = str;
+                },
                 load: async (query, callback) => {
-                    if (!query.length) return callback();
+                    if (query.length < 3) return callback();
                     try {
-                        const url = `{{ route('tenant.utils.searchCustomer') }}?q=${encodeURIComponent(query)}`;
+                        const url = route('tenant.utils.searchCustomer', {
+                            q: query
+                        });
                         const response = await fetch(url);
                         if (!response.ok) throw new Error('Error al buscar clientes');
                         const data = await response.json();
-                        callback(data.data ?? []);
+                        const results = data.data ?? [];
+                        callback(results);
+                        if (results.length === 0) {
+                            customerParams.documentSearchCustomer = lastCustomerQuery;
+                            console.log("No se encontró en BD. Guardado:", window.typedCustomer);
+                        }
                     } catch (error) {
                         console.error('Error cargando clientes:', error);
                         callback();
@@ -162,12 +181,20 @@
                 },
                 render: {
                     option: (item, escape) => `
-                <div>
-                    <strong>${escape(item.full_name)}</strong><br>
-                    <small>${escape(item.email ?? '')}</small>
-                </div>
-            `,
-                    item: (item, escape) => `<div>${escape(item.full_name)}</div>`
+                        <div>
+                            <strong>${escape(item.full_name)}</strong><br>
+                            <small>${escape(item.email ?? '')}</small>
+                        </div>
+                    `,
+                    item: (item, escape) => `<div>${escape(item.full_name)}</div>`,
+                    no_results: function(data, escape) {
+                        return `
+                            <div class="no-results">
+                                <i class="fas fa-search" style="margin-right:6px; color:#17a2b8;"></i>
+                                Sin resultados
+                            </div>
+                        `;
+                    }
                 }
             });
 
@@ -203,11 +230,25 @@
                 render: {
                     option: (item, escape) => `
                         <div>
+                            <i class="fas fa-car" style="margin-right:6px; color:#0d6efd;"></i>
                             <strong>${escape(item.text)}</strong><br>
                             <small>${escape(item.subtext ?? '')}</small>
                         </div>
                     `,
-                    item: (item, escape) => `<div>${escape(item.text)}</div>`
+                    item: (item, escape) => `
+                            <div>
+                                <i class="fas fa-car" style="margin-right:6px; color:#0d6efd;"></i>
+                                ${escape(item.text)}
+                            </div>
+                        `,
+                    no_results: function(data, escape) {
+                        return `
+                            <div class="no-results">
+                                <i class="fas fa-search" style="margin-right:6px; color:#17a2b8;"></i>
+                                Sin resultados
+                            </div>
+                        `;
+                    }
                 }
             });
 
@@ -220,6 +261,9 @@
                 create: false,
                 preload: false,
                 plugins: ['clear_button'],
+                onType: (str) => {
+                    lastProductQuery = str;
+                },
                 load: async (query, callback) => {
                     if (!query.length) return callback();
                     try {
@@ -227,7 +271,11 @@
                         const response = await fetch(url);
                         if (!response.ok) throw new Error('Error al buscar productos');
                         const data = await response.json();
-                        callback(data.data ?? []);
+                        const results = data.data ?? [];
+                        callback(results);
+                        if (results.length === 0) {
+                            productParams.name = lastProductQuery;
+                        }
                     } catch (error) {
                         console.error('Error cargando productos:', error);
                         callback();
@@ -235,15 +283,22 @@
                 },
                 render: {
                     option: (item, escape) => `
-                <div>
-                    <strong>${escape(item.text)}</strong><br>
-                    <small>${escape(item.subtext ?? '')}</small>
-                </div>
-            `,
-                    item: (item, escape) => `<div>${escape(item.text)}</div>`
+                        <div>
+                            <strong>${escape(item.text)}</strong><br>
+                            <small>${escape(item.subtext ?? '')}</small>
+                        </div>
+                    `,
+                    item: (item, escape) => `<div>${escape(item.text)}</div>`,
+                    no_results: function(data, escape) {
+                        return `
+                            <div class="no-results">
+                                <i class="fas fa-search" style="margin-right:6px; color:#17a2b8;"></i>
+                                Sin resultados
+                            </div>
+                        `;
+                    }
                 }
             });
-
 
             window.serviceSelect = new TomSelect('#service_id', {
                 valueField: 'id',
@@ -254,6 +309,9 @@
                 create: false,
                 preload: false,
                 plugins: ['clear_button'],
+                onType: (str) => {
+                    lastServiceQuery = str;
+                },
                 load: async (query, callback) => {
                     if (!query.length) return callback();
                     try {
@@ -261,7 +319,12 @@
                         const response = await fetch(url);
                         if (!response.ok) throw new Error('Error al buscar servicios');
                         const data = await response.json();
-                        callback(data.data ?? []);
+                        const results = data.data ?? [];
+                        callback(results);
+                        if (results.length === 0) {
+                            serviceParams.name = lastServiceQuery;
+                            console.log("No se encontró en BD. Guardado:", window.typedCustomer);
+                        }
                     } catch (error) {
                         console.error('Error cargando servicios:', error);
                         callback();
@@ -269,16 +332,22 @@
                 },
                 render: {
                     option: (item, escape) => `
-                <div>
-                    <strong>${escape(item.text)}</strong><br>
-                    <small>${escape(item.subtext ?? '')}</small>
-                </div>
-            `,
-                    item: (item, escape) => `<div>${escape(item.text)}</div>`
+                        <div>
+                            <strong>${escape(item.text)}</strong><br>
+                            <small>${escape(item.subtext ?? '')}</small>
+                        </div>
+                    `,
+                    item: (item, escape) => `<div>${escape(item.text)}</div>`,
+                    no_results: function(data, escape) {
+                        return `
+                            <div class="no-results">
+                                <i class="fas fa-search" style="margin-right:6px; color:#17a2b8;"></i>
+                                Sin resultados
+                            </div>
+                        `;
+                    }
                 }
             });
-
-
         }
 
         const swalWithBootstrapButtons = Swal.mixin({
@@ -288,10 +357,6 @@
             },
             buttonsStyling: false
         })
-
-        $(".btn-modal-file").on('click', function() {
-            $("#modal_file").modal("show");
-        });
 
         async function accionBuscarPlaca() {
             const placa = document.querySelector('#plate').value.trim();

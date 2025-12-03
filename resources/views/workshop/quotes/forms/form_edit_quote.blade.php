@@ -24,11 +24,8 @@
                     <select class="form-control" id="warehouse_id" name="warehouse_id" required>
                         <option value="">Seleccionar</option>
                         @foreach ($warehouses as $warehouse)
-                            <option
-                            @if ($warehouse->id == $quote->warehouse_id)
-                                selected
-                            @endif
-                            value="{{ $warehouse->id }}">{{ $warehouse->descripcion }}</option>
+                            <option @if ($warehouse->id == $quote->warehouse_id) selected @endif value="{{ $warehouse->id }}">
+                                {{ $warehouse->descripcion }}</option>
                         @endforeach
                     </select>
                     <p class="warehouse_id_error msgError mb-0"></p>
@@ -49,7 +46,7 @@
                 <!-- Vehículo -->
                 <div class="col-lg-6 col-md-8 col-sm-12">
                     <label class="form-label fw-bold">Vehículo:</label>
-                    <i class="fas fa-plus btn btn-warning btn-sm" onclick="openMdlNewVehicle();"
+                    <i class="fas fa-plus btn btn-warning btn-sm" onclick="openMdlCreateVehicle();"
                         style="margin-left:4px;"></i>
 
                     <select class="form-control" id="vehicle_id" name="vehicle_id">
@@ -62,14 +59,15 @@
                 <div class="col-lg-4 col-md-6 col-sm-12">
                     <label class="form-label fw-bold required_field">Placa:</label>
                     <input type="text" class="form-control text-uppercase" id="plate" name="plate"
-                        maxlength="8" minlength="6" placeholder="Ej: ABC123" required value="{{$quote->plate}}">
+                        maxlength="8" minlength="6" placeholder="Ej: ABC123" required value="{{ $quote->plate }}">
                     <p class="plate_error msgError mb-0"></p>
                 </div>
 
                 <!-- Fecha Expiración -->
                 <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
                     <label class="form-label fw-bold required_field">Fecha Expiración:</label>
-                    <input value="{{$quote->expiration_date}}" type="date" class="form-control" id="expiration_date" name="expiration_date">
+                    <input value="{{ $quote->expiration_date }}" type="date" class="form-control"
+                        id="expiration_date" name="expiration_date">
                     <p class="expiration_date_error msgError mb-0"></p>
                 </div>
 
@@ -93,6 +91,8 @@
                 <!-- PRODUCTO -->
                 <div class="col-lg-6 col-md-8 col-sm-12">
                     <label class="form-label fw-bold">Producto:</label>
+                    <i class="fas fa-plus btn btn-warning btn-sm" onclick="openMdlCreateProduct();"
+                        style="margin-left:4px;"></i>
                     <select class="form-control" id="product_id" name="product_id">
                         <option value="">Seleccionar</option>
                     </select>
@@ -147,6 +147,8 @@
 
                 <div class="col-lg-6 col-md-8 col-sm-12">
                     <label class="form-label fw-bold">Servicio:</label>
+                    <i class="fas fa-plus btn btn-warning btn-sm" onclick="openMdlCreateService();"
+                        style="margin-left:4px;"></i>
                     <select class="form-control" id="service_id" name="service_id">
                         <option value="">Seleccionar</option>
                     </select>

@@ -67,6 +67,8 @@
             totalPay: 0
         }
         let lastCustomerQuery = null;
+        let lastProductQuery = null;
+        let lastServiceQuery = null;
 
         document.addEventListener('DOMContentLoaded', () => {
             dtProducts = loadDataTableSimple('dt-quotes-products');
@@ -180,7 +182,15 @@
                             <small>${escape(item.email ?? '')}</small>
                         </div>
                     `,
-                    item: (item, escape) => `<div>${escape(item.full_name)}</div>`
+                    item: (item, escape) => `<div>${escape(item.full_name)}</div>`,
+                    no_results: function(data, escape) {
+                        return `
+                            <div class="no-results">
+                                <i class="fas fa-search" style="margin-right:6px; color:#17a2b8;"></i>
+                                Sin resultados
+                            </div>
+                        `;
+                    }
                 }
             });
 
@@ -213,11 +223,25 @@
                 render: {
                     option: (item, escape) => `
                         <div>
+                            <i class="fas fa-car" style="margin-right:6px; color:#0d6efd;"></i>
                             <strong>${escape(item.text)}</strong><br>
                             <small>${escape(item.subtext ?? '')}</small>
                         </div>
                     `,
-                    item: (item, escape) => `<div>${escape(item.text)}</div>`
+                    item: (item, escape) => `
+                            <div>
+                                <i class="fas fa-car" style="margin-right:6px; color:#0d6efd;"></i>
+                                ${escape(item.text)}
+                            </div>
+                        `,
+                    no_results: function(data, escape) {
+                        return `
+                            <div class="no-results">
+                                <i class="fas fa-search" style="margin-right:6px; color:#17a2b8;"></i>
+                                Sin resultados
+                            </div>
+                        `;
+                    }
                 }
             });
 
@@ -230,6 +254,9 @@
                 create: false,
                 preload: false,
                 plugins: ['clear_button'],
+                onType: (str) => {
+                    lastProductQuery = str;
+                },
                 load: async (query, callback) => {
                     if (!query.length) return callback();
                     try {
@@ -240,7 +267,11 @@
                         const response = await fetch(url);
                         if (!response.ok) throw new Error('Error al buscar productos');
                         const data = await response.json();
-                        callback(data.data ?? []);
+                        const results = data.data ?? [];
+                        callback(results);
+                        if (results.length === 0) {
+                            productParams.name = lastProductQuery;
+                        }
                     } catch (error) {
                         console.error('Error cargando productos:', error);
                         callback();
@@ -248,12 +279,20 @@
                 },
                 render: {
                     option: (item, escape) => `
-                <div>
-                    <strong>${escape(item.text)}</strong><br>
-                    <small>${escape(item.subtext ?? '')}</small>
-                </div>
-            `,
-                    item: (item, escape) => `<div>${escape(item.text)}</div>`
+                        <div>
+                            <strong>${escape(item.text)}</strong><br>
+                            <small>${escape(item.subtext ?? '')}</small>
+                        </div>
+                    `,
+                    item: (item, escape) => `<div>${escape(item.text)}</div>`,
+                    no_results: function(data, escape) {
+                        return `
+                            <div class="no-results">
+                                <i class="fas fa-search" style="margin-right:6px; color:#17a2b8;"></i>
+                                Sin resultados
+                            </div>
+                        `;
+                    }
                 }
             });
 
@@ -266,6 +305,9 @@
                 create: false,
                 preload: false,
                 plugins: ['clear_button'],
+                onType: (str) => {
+                    lastServiceQuery = str;
+                },
                 load: async (query, callback) => {
                     if (!query.length) return callback();
                     try {
@@ -273,7 +315,12 @@
                         const response = await fetch(url);
                         if (!response.ok) throw new Error('Error al buscar servicios');
                         const data = await response.json();
-                        callback(data.data ?? []);
+                        const results = data.data ?? [];
+                        callback(results);
+                        if (results.length === 0) {
+                            serviceParams.name = lastServiceQuery;
+                            console.log("No se encontró en BD. Guardado:", window.typedCustomer);
+                        }
                     } catch (error) {
                         console.error('Error cargando servicios:', error);
                         callback();
@@ -281,15 +328,22 @@
                 },
                 render: {
                     option: (item, escape) => `
-                <div>
-                    <strong>${escape(item.text)}</strong><br>
-                    <small>${escape(item.subtext ?? '')}</small>
-                </div>
-            `,
-                    item: (item, escape) => `<div>${escape(item.text)}</div>`
+                        <div>
+                            <strong>${escape(item.text)}</strong><br>
+                            <small>${escape(item.subtext ?? '')}</small>
+                        </div>
+                    `,
+                    item: (item, escape) => `<div>${escape(item.text)}</div>`,
+                    no_results: function(data, escape) {
+                        return `
+                            <div class="no-results">
+                                <i class="fas fa-search" style="margin-right:6px; color:#17a2b8;"></i>
+                                Sin resultados
+                            </div>
+                        `;
+                    }
                 }
             });
-
 
         }
 
