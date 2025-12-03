@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests;
 use Illuminate\Contracts\Validation\Validator as BaseValidator;
-use Illuminate\Validation\ValidationException; 
+use Illuminate\Validation\ValidationException;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Contracts\Validation\Validator;
@@ -43,15 +43,11 @@ class CashRequest extends FormRequest
         ];
     }
 
-    protected function failedValidation(Validator $validator) {
-        $errors = $validator->errors()->toArray();
-    
-        // Lanzar una respuesta JSON con los mensajes de error originales
-        throw new HttpResponseException(response()->json(
-            [
-                'type' => 'error',
-                'errors' => $errors,
-            ], 422));
+    protected function failedValidation(Validator $validator)
+    {
+        throw new ValidationException($validator, response()->json([
+            'errors' => $validator->errors()
+        ], 422));
     }
 
 }

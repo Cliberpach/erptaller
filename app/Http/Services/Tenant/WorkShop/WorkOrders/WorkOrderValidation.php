@@ -25,7 +25,7 @@ class WorkOrderValidation
             throw new Exception("DEBE INGRESAR POR LO MENOS UN PRODUCTO O SERVICIO A LA ORDEN DE TRABAJO");
         }
 
-        $quote_id   =   $data['quote_id'];
+        $quote_id   =   $data['quote_id']??null;
         if($quote_id){
             $quote  =   Quote::findOrFail($quote_id);
             if($quote->order_id){

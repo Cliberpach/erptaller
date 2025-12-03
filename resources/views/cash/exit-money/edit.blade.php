@@ -125,7 +125,7 @@
                     <div class="text-end mt-4 p-5">
                         <strong>Total acumulado: <span id="total-del-egreso">0.00</span></strong>
                     </div>
-                    
+
                 </div>
             </div>
         </form>
@@ -137,8 +137,8 @@
         })
     </script>
 
-    @include('exit-money.create-supplier-modal')
-    @include('exit-money.create-proof-payment-modal')
+    @include('cash.exit-money.create-supplier-modal')
+    @include('cash.exit-money.create-proof-payment-modal')
 @endsection
 
 
@@ -151,8 +151,8 @@
             let totalAcumulado = document.getElementById('total-del-egreso');
 
             document.querySelectorAll('input[name="total[]"]').forEach(function(input) {
-            const valor = parseFloat(input.value) || 0;  
-            total += valor; 
+            const valor = parseFloat(input.value) || 0;
+            total += valor;
             });
 
             totalAcumulado.innerText = total.toFixed(2);

@@ -4,6 +4,7 @@ namespace Database\Seeders\tenant;
 
 use Illuminate\Database\Seeder;
 use App\Models\Category;
+
 class CategorySeeder extends Seeder
 {
     /**
@@ -11,23 +12,13 @@ class CategorySeeder extends Seeder
      */
     public function run(): void
     {
-        //
         Category::create([
-            'name' => 'GASEOSAS',
-        ]);
-        Category::create([
-            'name' => 'AGUA',
-        ]);
-        Category::create([
-            'name' => 'SNACKS',
-        ]);
-        Category::create([
-            'name' => 'CERVEZAS',
+            'name'      =>  'CATEGORIA',
+            'status'    =>  'INACTIVE'
         ]);
 
         Category::create([
-            'name' => 'CREDITOS',
+            'name' => 'RESPUESTO',
         ]);
-
     }
 }

@@ -229,11 +229,25 @@
                 render: {
                     option: (item, escape) => `
                         <div>
+                            <i class="fas fa-car" style="margin-right:6px; color:#0d6efd;"></i>
                             <strong>${escape(item.text)}</strong><br>
                             <small>${escape(item.subtext ?? '')}</small>
                         </div>
                     `,
-                    item: (item, escape) => `<div>${escape(item.text)}</div>`
+                    item: (item, escape) => `
+                            <div>
+                                <i class="fas fa-car" style="margin-right:6px; color:#0d6efd;"></i>
+                                ${escape(item.text)}
+                            </div>
+                        `,
+                    no_results: function(data, escape) {
+                        return `
+                            <div class="no-results">
+                                <i class="fas fa-search" style="margin-right:6px; color:#17a2b8;"></i>
+                                Sin resultados
+                            </div>
+                        `;
+                    }
                 }
             });
 
@@ -436,7 +450,9 @@
                     formData.append('lst_services', JSON.stringify(lstServices));
 
                     const quoteId = @json($quote->id ?? null);
-                    formData.append('quote_id', quoteId)
+                    if (quoteId !== null) {
+                        formData.append('quote_id', quoteId);
+                    }
 
                     const res = await axios.post(route('tenant.taller.ordenes_trabajo.store'), formData);
 

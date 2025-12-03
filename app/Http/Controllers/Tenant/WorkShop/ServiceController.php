@@ -104,7 +104,6 @@ array:5 [ // app\Http\Controllers\Tenant\WorkShop\ServiceController.php:94
         }
     }
 
-
     public function destroy(int $id)
     {
         DB::beginTransaction();

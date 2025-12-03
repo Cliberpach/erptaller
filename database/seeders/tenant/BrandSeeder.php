@@ -12,27 +12,13 @@ class BrandSeeder extends Seeder
      */
     public function run(): void
     {
-        //
         Brand::create([
-            'name' => 'COCA COLA',
+            'name' => 'MARCA',
+            'status' => 'INACTIVE'
         ]);
+
         Brand::create([
-            'name' => 'SAN MATEO',
-        ]);
-        Brand::create([
-            'name' => 'LAYS',
-        ]);
-        Brand::create([
-            'name' => 'SUBLIME',
-        ]);
-        Brand::create([
-            'name' => 'PILSEN CALLAO',
-        ]);
-        Brand::create([
-            'name' => 'PILSEN TRUJILLO',
-        ]);
-        Brand::create([
-            'name' => 'CREDITOS',
+            'name' => 'NACIONAL'
         ]);
     }
 }

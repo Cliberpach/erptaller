@@ -89,7 +89,7 @@ array:12 [ // app\Http\Controllers\Tenant\ProductController.php:74
             $product    =   $this->s_product->store($data);
 
             DB::commit();
-            return response()->json(['success' => true, 'message' => 'PRODUCTO REGISTRADO CON ÉXITO','product'=>$product]);
+            return response()->json(['success' => true, 'message' => 'PRODUCTO REGISTRADO CON ÉXITO', 'product' => $product]);
         } catch (Throwable $th) {
             DB::rollBack();
             return response()->json(['success' => false, 'message' => $th->getMessage(), 'line' => $th->getLine()]);
@@ -258,18 +258,19 @@ array:1 [ // app\Http\Controllers\Tenant\ProductController.php:190
                 $q->where('p.name', 'LIKE', "%{$query}%")
                     ->orWhere('c.name', 'LIKE', "%{$query}%")
                     ->orWhere('b.name', 'LIKE', "%{$query}%");
-            })->limit(20)
-            ->get(
-                [
-                    'wp.warehouse_id',
-                    'p.id',
-                    'b.name as brand_name',
-                    'p.name',
-                    'c.name as category_name',
-                    'p.sale_price',
-                    DB::raw('COALESCE(wp.stock, 0) as stock')
-                ]
-            );
+            })
+            ->where('wp.warehouse_id',$warehouse_id)
+            ->orWhereNull('wp.warehouse_id')
+            ->limit(20)
+            ->select(
+                'wp.warehouse_id',
+                'p.id',
+                'b.name as brand_name',
+                'p.name',
+                'c.name as category_name',
+                'p.sale_price',
+                DB::raw('COALESCE(wp.stock, 0) as stock')
+            )->get();
 
         $data = $products->map(fn($p) => [
             'id' => $p->id,

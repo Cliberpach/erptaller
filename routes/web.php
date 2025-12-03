@@ -5,8 +5,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Tenant\UserController;
 use App\Http\Controllers\Tenant\BookController;
 use App\Http\Controllers\Tenant\BrandController;
+use App\Http\Controllers\Tenant\Cash\PettyCashController;
 use App\Http\Controllers\Tenant\CategoryController;
-use App\Http\Controllers\Tenant\PettyCashController;
 use App\Http\Controllers\Tenant\FieldController;
 use App\Http\Controllers\Tenant\Consultas\ConsultasCreditosController;
 use App\Http\Controllers\Tenant\Consultas\QueryReservationController;
@@ -20,12 +20,10 @@ use App\Http\Controllers\Tenant\PettyCashBookController;
 use App\Http\Controllers\Tenant\ProductController;
 use App\Http\Controllers\Tenant\Purchase\PurchaseDocumentoController;
 use App\Http\Controllers\Tenant\PurchaseController;
-use App\Http\Controllers\Tenant\SaleController;
 use App\Http\Controllers\Tenant\Reports\ReportContableController;
 use App\Http\Controllers\Tenant\Reports\ReportFieldController;
 use App\Http\Controllers\Tenant\Reports\ReportSaleController;
 use App\Http\Controllers\Tenant\Reports\ReservationDocumentController;
-use App\Http\Controllers\Tenant\Sales\PaymentMethodController;
 use App\Http\Controllers\Tenant\SupplierController;
 use App\Http\Controllers\Tenant\ValuedKardexController;
 use App\Http\Controllers\Tenant\WorkShop\ModelController;
@@ -61,24 +59,6 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::get('/dashboard', [ModuleController::class, 'home'])->name('tenant.home');
 
 
-    Route::group(["prefix" => "cajas"], function () {
-        Route::get('caja', [PettyCashController::class, 'index'])->name('tenant.cajas.caja');
-        Route::post('registrarCaja', [PettyCashController::class, 'store'])->name('tenant.cajas.store');
-        Route::post('actualizarCaja', [PettyCashController::class, 'update'])->name('tenant.cajas.update');
-        Route::post('eliminarCaja', [PettyCashController::class, 'destroy'])->name('tenant.cajas.destroy');
-        Route::get('apertura-cierre', [PettyCashBookController::class, 'index'])->name('tenant.cajas.apertura_cierre');
-        Route::get('caja/{id}/venta', [PettyCashBookController::class, 'showPDF'])->middleware('verificar.caja')->name('tenant.cajas.venta');
-        Route::post('abrirCaja', [PettyCashBookController::class, 'openPettyCash'])->name('tenant.cajas.apertura_cierre.abrirCaja');
-        Route::get('egreso', [PettyCashController::class, 'exitMoney'])->name('tenant.cajas.egreso');
-        Route::get('egreso/registrar', [PettyCashController::class, 'createExit'])->middleware('verificar.caja')->name('tenant.egreso.create');
-        Route::post('egreso/guardar', [PettyCashController::class, 'storeExit'])->middleware('verificar.caja')->name('tenant.egreso.store');
-        Route::get('/egreso/{id}/pdf', [PettyCashController::class, 'showPDF'])->name('tenant.egreso.pdf');
-        Route::post('proveedor/guardar', [PettyCashController::class, 'supplierStore'])->middleware('verificar.caja')->name('tenant.supplier.store');
-        Route::get('egreso/{id}/editar', [PettyCashController::class, 'editExit'])->middleware('verificar.caja')->name('tenant.egreso.edit');
-        Route::put('egreso/{id}/actualizar', [PettyCashController::class, 'updateExit'])->middleware('verificar.caja')->name('tenant.egreso.update');
-        Route::delete('egreso/{id}/anular', [PettyCashController::class, 'cancelExit'])->middleware('verificar.caja')->name('tenant.egreso.cancel');
-        Route::post('comprobante-pago/guardar', [PettyCashController::class, 'proofPaymentStore'])->name('tenant.proof-payment.store');
-    });
 
     // Route::group(["prefix" => "cajas"], function () {
     //     Route::get('caja', [PettyCashController::class, 'pettyCash'])->name('tenant.cajas.caja');
@@ -108,40 +88,6 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
             // Route::get('/creditos/excel', [ConsultasCreditosController::class, 'exportExcel'])->name('tenant.consultas.creditos.excel');
             Route::post('/creditos/generar-documento', [QueryReservationController::class, 'generarDocumento'])->name('tenant.consultas.reservas.generar-documento');
         });
-    });
-
-    Route::group(["prefix" => "ventas"], function () {
-
-        Route::get('comprobante_venta', [SaleController::class, 'index'])->name('tenant.ventas.comprobante_venta')->middleware('validar.plan:ventas');
-        Route::get('create', [SaleController::class, 'create'])->name('tenant.ventas.comprobante_venta.create')->middleware('validar.plan:ventas');
-        Route::get('getProductos', [SaleController::class, 'getProductos'])->name('tenant.ventas.comprobante_venta.getProductos')->middleware('validar.plan:ventas');
-        Route::get('validateStock', [SaleController::class, 'validateStock'])->name('tenant.ventas.comprobante_venta.validateStock')->middleware('validar.plan:ventas');
-        Route::post('store', [SaleController::class, 'store'])->name('tenant.ventas.comprobante_venta.store')->middleware('validar.plan:ventas');
-        Route::post('send_sunat', [SaleController::class, 'send_sunat'])->name('tenant.ventas.comprobante_venta.send_sunat')->middleware('validar.plan:ventas');
-        Route::get('getSales', [SaleController::class, 'getSales'])->name('tenant.ventas.comprobante_venta.getSales')->middleware('validar.plan:ventas');
-        Route::get('pdf_voucher/{id}', [SaleController::class, 'pdf_voucher'])->name('tenant.ventas.comprobante_venta.pdf_voucher')->middleware('validar.plan:ventas');
-        Route::get('downloadXml/{id}', [SaleController::class, 'downloadXml'])->name('tenant.ventas.comprobante_venta.downloadXml')->middleware('validar.plan:ventas');
-        Route::get('downloadCdr/{id}', [SaleController::class, 'downloadCdr'])->name('tenant.ventas.comprobante_venta.downloadCdr')->middleware('validar.plan:ventas');
-
-
-        Route::get('comprobante-electronico', [SaleController::class, 'electronicReceipt'])->name('tenant.ventas.comprobante_electronico');
-        Route::get('cotizacion', [SaleController::class, 'quotation'])->name('tenant.ventas.cotizacion');
-
-        Route::get('cliente', [CustomerController::class, 'index'])->name('tenant.ventas.cliente');
-        Route::get('nuevo-cliente/registrar', [CustomerController::class, 'create'])->name('tenant.ventas.cliente.create');
-        Route::post('nuevo-cliente/guardar', [CustomerController::class, 'store'])->name('tenant.ventas.cliente.store');
-        Route::get('editar-cliente/{id}/editar', [CustomerController::class, 'edit'])->name('tenant.ventas.cliente.edit');
-        Route::put('editar-cliente/{id}/actualizar', [CustomerController::class, 'update'])->name('tenant.ventas.cliente.update');
-        Route::delete('cliente/{id}/eliminar', [CustomerController::class, 'destroy'])->name('tenant.ventas.cliente.delete');
-        Route::get('consult_document', [CustomerController::class, 'consult_document'])->name('tenant.ventas.cliente.consult_document');
-        Route::get('getListCustomers', [CustomerController::class, 'getListCustomers'])->name('tenant.ventas.cliente.getListCustomers');
-
-
-        //======= MÉTODOS DE PAGO =======
-        Route::get('metodo_pago/index', [PaymentMethodController::class, 'index'])->name('tenant.ventas.metodo_pago');
-        Route::post('metodo_pago/store', [PaymentMethodController::class, 'store'])->name('tenant.ventas.metodo_pago.store');
-        Route::put('metodo_pago/update/{id}', [PaymentMethodController::class, 'update'])->name('tenant.ventas.metodo_pago.update');
-        Route::get('metodo_pago/getPaymentMethods', [PaymentMethodController::class, 'getPaymentMethods'])->name('tenant.ventas.metodo_pago.getPaymentMethods');
     });
 
     Route::group(["prefix" => "inventarios", 'middleware' => 'validar.plan:inventario'], function () {
@@ -284,6 +230,8 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
 
     require __DIR__ . '/tenant/taller/web.php';
     require __DIR__ . '/tenant/mantenimiento/web.php';
+    require __DIR__ . '/tenant/cash/web.php';
+    require __DIR__ . '/tenant/sales/web.php';
 
 
     Route::get("landlord/ruc/{ruc}", [ApiController::class, 'apiRuc']);
@@ -295,6 +243,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
 });
 
 Route::group(["prefix" => "utils"], function () {
+    Route::get('cash-available-search', [PettyCashController::class, 'searchCashAvailable'])->name('tenant.utils.searchCashAvailable');
     Route::get('service-search', [ServiceController::class, 'searchService'])->name('tenant.utils.searchService');
     Route::get('product-search', [ProductController::class, 'searchProduct'])->name('tenant.utils.searchProduct');
     Route::get('product-search/stock', [ProductController::class, 'searchProductStock'])->name('tenant.utils.searchProductStock');

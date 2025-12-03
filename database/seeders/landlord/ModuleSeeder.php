@@ -272,22 +272,8 @@ class ModuleSeeder extends Seeder
 
         ModuleChild::create([
             'module_id'     => $report->id,
-            'description'   => 'Reporte de Campos',
-            'route_name'    => 'reportes.reporte_campo',
-            'order'         => '2'
-        ]);
-
-        ModuleChild::create([
-            'module_id'     => $report->id,
             'description'   => 'Reporte Contable',
             'route_name'    => 'reportes.reporte_contable',
-            'order'         => '2'
-        ]);
-
-        ModuleChild::create([
-            'module_id'     => $report->id,
-            'description'   => 'Comprobantes Reserva',
-            'route_name'    => 'reportes.comprobantes_reservas',
             'order'         => '2'
         ]);
 
@@ -383,11 +369,6 @@ class ModuleSeeder extends Seeder
             'order' => '2'
         ]);
 
-        ModuleChild::create([
-            'module_id' => $consultas->id,
-            'description' => 'Reservas',
-            'route_name' => 'consultas.reservas',
-            'order' => '3'
-        ]);
+
     }
 }

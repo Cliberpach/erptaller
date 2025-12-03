@@ -44,7 +44,7 @@ class WorkOrderDto
         $dto['igv']         =   $dto_amounts['igv'];
 
         //======= QUOTE ==========
-         $dto['quote_id']    =   $data['quote_id'];
+         $dto['quote_id']    =   $data['quote_id']??null;
 
         return $dto;
     }

@@ -204,10 +204,6 @@
             buttonsStyling: false
         })
 
-        $(".btn-modal-file").on('click', function() {
-            $("#modal_file").modal("show");
-        });
-
         async function accionBuscarPlaca() {
             const placa = document.querySelector('#plate').value.trim();
 

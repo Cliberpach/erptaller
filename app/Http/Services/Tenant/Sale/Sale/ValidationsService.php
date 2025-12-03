@@ -4,6 +4,7 @@ namespace App\Http\Services\Tenant\Sale\Sale;
 
 use App\Models\Company;
 use App\Models\Product;
+use App\Models\User;
 use Exception;
 use Illuminate\Support\Facades\DB;
 
@@ -40,16 +41,9 @@ class ValidationsService
     {
 
         //====== VALIDANDO USUARIO REGISTRADOR DEBE EXISTIR ======
-        $user_recorder  =   DB::select(
-            'select
-                            u.id,
-                            u.name
-                            from users as u
-                            where u.id = ?',
-            [$data['user_recorder_id']]
-        );
+        $user_recorder  =   User::findOrFail($data['user_recorder_id']);
 
-        if (count($user_recorder) === 0) {
+        if (!$user_recorder) {
             throw new Exception("EL USUARIO REGISTRADOR NO EXISTE EN LA BD!!!");
         }
 
@@ -65,8 +59,8 @@ class ValidationsService
                                 inner join petty_cashes as pc on pc.id = pcb.petty_cash_id
                                 where
                                 pcb.user_id = ?
-                                and pcb.status = "open"',
-            [$user_recorder[0]->id]
+                                and pcb.status = "ABIERTO"',
+            [$user_recorder->id]
         );
 
         if (count($user_in_petty_cash) === 0) {
@@ -122,13 +116,13 @@ class ValidationsService
 
         return (object)[
             'customer'          =>  $customer[0],
-            'user_recorder'     =>  $user_recorder[0],
+            'user_recorder'     =>  $user_recorder,
             'petty_cash'        =>  $user_in_petty_cash[0],
             'type_sale_code'    =>  $type_sale,
             'type_sale_name'    =>  $type_sale_name,
             'igv_percentage'    =>  $data['igv_percentage'],
             'lstSale'           =>  $lstSale,
-            'type'              =>  $data['type']
+            'type'              =>  $data['type_sale']
         ];
     }
 

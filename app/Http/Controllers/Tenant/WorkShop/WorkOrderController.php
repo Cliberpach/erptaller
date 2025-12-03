@@ -7,6 +7,7 @@ use App\Http\Controllers\FormatController;
 use App\Http\Controllers\UtilController;
 use App\Http\Services\Tenant\WorkShop\WorkOrders\WorkOrderManager;
 use App\Models\Company;
+use App\Models\Tenant\Configuration;
 use App\Models\Tenant\Warehouse;
 use Illuminate\Http\Request;
 use Yajra\DataTables\DataTables;
@@ -76,13 +77,15 @@ class WorkOrderController extends Controller
         $checks_inventory_vehicle   =   UtilController::getInventoryVehicleChecks();
         $technicians                =   UtilController::getTechnicians();
         $customer_formatted         =   FormatController::getFormatInitialCustomer(1);
+        $validate_stock             =   Configuration::findOrFail(2)->property;
 
         return view('workshop.work_orders.create', compact(
             'igv',
             'warehouses',
             'checks_inventory_vehicle',
             'technicians',
-            'customer_formatted'
+            'customer_formatted',
+            'validate_stock'
         ));
     }
 

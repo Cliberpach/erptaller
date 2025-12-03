@@ -2,7 +2,6 @@
 
 namespace App\Http\Services\Tenant\Sale\Sale;
 
-use App\Models\Product;
 use App\Models\Tenant\Sale;
 
 class SaleManager
