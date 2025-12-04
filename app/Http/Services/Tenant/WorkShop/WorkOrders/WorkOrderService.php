@@ -2,6 +2,7 @@
 
 namespace App\Http\Services\Tenant\WorkShop\WorkOrders;
 
+use App\Http\Services\Tenant\Accounts\CustomerAccount\CustomerAccountService;
 use App\Http\Services\Tenant\Inventory\WarehouseProduct\WarehouseProductService;
 use App\Http\Services\Tenant\WorkShop\WorkOrders\WorkOrderDto;
 use App\Http\Services\Tenant\WorkShop\WorkOrders\WorkOrderRepository;
@@ -18,6 +19,7 @@ class WorkOrderService
     private WorkOrderDto $s_dto;
     private WorkOrderValidation $s_validation;
     private WarehouseProductService $s_warehouse_product;
+    private CustomerAccountService $s_customer_account;
 
     public function __construct()
     {
@@ -25,6 +27,7 @@ class WorkOrderService
         $this->s_dto        =   new WorkOrderDto();
         $this->s_validation =   new WorkOrderValidation();
         $this->s_warehouse_product  =   new WarehouseProductService();
+        $this->s_customer_account   =   new CustomerAccountService();
     }
 
     public function store(array $data): WorkOrder
@@ -40,6 +43,9 @@ class WorkOrderService
         $this->s_repository->insertWorkOrderDetail($data['lst_products'], $data['lst_services'], $work_order);
         $this->s_repository->insertWorkInventory($dto_inventory);
         $this->s_repository->insertWorkTechnicians($dto_technicians);
+
+        //======= CUENTA CLIENTE =======
+        $this->s_customer_account->store(['work_order_id'=>$work_order->id]);
 
         $dto_images =   $this->s_dto->getDtoOrderImages($data['vehicle_images']??[], $work_order);
         $this->s_repository->insertWorkImages($dto_images);

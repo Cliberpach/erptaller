@@ -118,6 +118,8 @@ class ModuleSeeder extends Seeder
         ]);
 
 
+
+
         // ModuleChild::create([
         //     'module_id' => $sale->id,
         //     'description' => 'Comprobante Electrónico',
@@ -142,6 +144,25 @@ class ModuleSeeder extends Seeder
             'module_id'     => $sale->id,
             'description'   => 'Métodos Pago',
             'route_name'    => 'ventas.metodo_pago',
+            'order'         => '2'
+        ]);
+
+        $accounts = Module::create([
+            'description' => 'Cuentas',
+            'order' => '1'
+        ]);
+
+        ModuleChild::create([
+            'module_id'     => $accounts->id,
+            'description'   => 'Cuentas Cliente',
+            'route_name'    => 'cuentas.cliente.index',
+            'order'         => '2'
+        ]);
+
+        ModuleChild::create([
+            'module_id'     => $accounts->id,
+            'description'   => 'Cuentas Proveedor',
+            'route_name'    => 'cuentas.proveedor.index',
             'order'         => '2'
         ]);
 
@@ -368,7 +389,5 @@ class ModuleSeeder extends Seeder
             'route_name' => 'consultas.creditos',
             'order' => '2'
         ]);
-
-
     }
 }

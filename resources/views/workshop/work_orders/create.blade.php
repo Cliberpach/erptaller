@@ -5,7 +5,10 @@
 @endsection
 
 @section('content')
-    {{-- @include('utils.modals.customer.mdl_create_customer') --}}
+    @include('utils.modals.customer.mdl_create_customer')
+    @include('utils.modals.vehicles.mdl_create_vehicle')
+    @include('utils.modals.products.mdl_create_product')
+    @include('utils.modals.services.mdl_create_service')
     @include('workshop.work_orders.modals.mdl_edit_product')
     @include('workshop.work_orders.modals.mdl_edit_service')
 
@@ -89,9 +92,12 @@
         })
 
         function events() {
-            //eventsMdlCreateCustomer();
+              eventsMdlCreateCustomer();
             eventsMdlEditProduct();
             eventsMdlEditService();
+               eventsMdlVehicle();
+            eventsMdlProduct();
+            eventsMdlService();
 
             document.getElementById("fuelSelect").addEventListener("change", function() {
                 gauge.refresh(this.value);
@@ -226,7 +232,7 @@
                         callback();
                     }
                 },
-                render: {
+               render: {
                     option: (item, escape) => `
                         <div>
                             <i class="fas fa-car" style="margin-right:6px; color:#0d6efd;"></i>

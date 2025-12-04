@@ -7,6 +7,7 @@ use App\Http\Controllers\LandLord\ApiController;
 use App\Http\Requests\Customer\CustomerStoreRequest;
 use App\Http\Requests\CustomerRequest;
 use App\Models\Landlord\Customer;
+use App\Models\Landlord\TypeIdentityDocument;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -63,15 +64,7 @@ class CustomerController extends Controller
             $customer->phone                        =   $request->get('phone');
 
             //======== GRABANDO EL TIPO DE DOCUMENTO DE IDENTIDAD ========
-            $type_identity_document =   DB::select(
-                'select
-                                        tid.name,
-                                        tid.abbreviation ,
-                                        tid.code
-                                        from types_identity_documents as tid
-                                        where tid.id = ?',
-                [$request->get('type_identity_document')]
-            )[0];
+            $type_identity_document                 =   TypeIdentityDocument::findOrFail($request->get('type_identity_document'));
 
             $customer->type_identity_document_id    =   $request->get('type_identity_document');
             $customer->type_document_name           =   $type_identity_document->name;

@@ -58,7 +58,7 @@
                 <!-- Vehículo -->
                 <div class="col-lg-6 col-md-8 col-sm-12">
                     <label class="form-label fw-bold">Vehículo:</label>
-                    <i class="fas fa-plus btn btn-warning btn-sm" onclick="openMdlNewVehicle();"
+                    <i class="fas fa-plus btn btn-warning btn-sm" onclick="openMdlCreateVehicle();"
                         style="margin-left:4px;"></i>
 
                     <select class="form-control" id="vehicle_id" name="vehicle_id">
@@ -149,7 +149,7 @@
 
                 <div class="col-lg-6 col-md-6 col-sm-12">
                     <label class="form-label fw-bold">Servicio:</label><i class="fas fa-plus btn btn-warning btn-sm"
-                        onclick="openMdlNewVehicle();" style="margin-left:4px;"></i>
+                        onclick="openMdlCreateService();" style="margin-left:4px;"></i>
                     <select class="form-control" id="service_id" name="service_id">
                         <option value="">Seleccionar</option>
                     </select>

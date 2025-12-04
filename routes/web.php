@@ -232,6 +232,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     require __DIR__ . '/tenant/mantenimiento/web.php';
     require __DIR__ . '/tenant/cash/web.php';
     require __DIR__ . '/tenant/sales/web.php';
+    require __DIR__ . '/tenant/accounts/web.php';
 
 
     Route::get("landlord/ruc/{ruc}", [ApiController::class, 'apiRuc']);

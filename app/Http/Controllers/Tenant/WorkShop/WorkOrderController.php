@@ -7,6 +7,11 @@ use App\Http\Controllers\FormatController;
 use App\Http\Controllers\UtilController;
 use App\Http\Services\Tenant\WorkShop\WorkOrders\WorkOrderManager;
 use App\Models\Company;
+use App\Models\CompanyInvoice;
+use App\Models\Department;
+use App\Models\District;
+use App\Models\Landlord\Color;
+use App\Models\Province;
 use App\Models\Tenant\Configuration;
 use App\Models\Tenant\Warehouse;
 use Illuminate\Http\Request;
@@ -78,6 +83,15 @@ class WorkOrderController extends Controller
         $technicians                =   UtilController::getTechnicians();
         $customer_formatted         =   FormatController::getFormatInitialCustomer(1);
         $validate_stock             =   Configuration::findOrFail(2)->property;
+        $types_identity_documents   =   UtilController::getIdentityDocuments();
+        $departments                =   Department::all();
+        $districts                  =   District::all();
+        $provinces                  =   Province::all();
+        $company_invoice            =   CompanyInvoice::find(1);
+        $years                      =   UtilController::getYears();
+        $colors                     =   Color::where('status', 'ACTIVE')->get();
+        $categories                 =   UtilController::getCategoriesProducts();
+        $brands                     =   UtilController::getBrandsProducts();
 
         return view('workshop.work_orders.create', compact(
             'igv',
@@ -85,7 +99,16 @@ class WorkOrderController extends Controller
             'checks_inventory_vehicle',
             'technicians',
             'customer_formatted',
-            'validate_stock'
+            'validate_stock',
+            'types_identity_documents',
+            'departments',
+            'provinces',
+            'districts',
+            'company_invoice',
+            'years',
+            'colors',
+            'categories',
+            'brands'
         ));
     }
 

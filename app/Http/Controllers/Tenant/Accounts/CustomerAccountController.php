@@ -1,0 +1,121 @@
+<?php
+
+namespace App\Http\Controllers\Tenant\Accounts;
+
+use App\Http\Controllers\Controller;
+use App\Http\Services\Tenant\Accounts\CustomerAccount\CustomerAccountManager;
+use App\Models\Tenant\Accounts\CustomerAccountDetail;
+use App\Models\Tenant\PaymentMethod;
+use Exception;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Throwable;
+use Yajra\DataTables\DataTables;
+
+class CustomerAccountController extends Controller
+{
+    private CustomerAccountManager $s_account;
+
+    public function __construct()
+    {
+        $this->s_account    =   new CustomerAccountManager();
+    }
+
+    public function index()
+    {
+        $payment_methods    =   PaymentMethod::where('estado', 'ACTIVO')->get();
+
+        return view('accounts.customer_accounts.index', compact('payment_methods'));
+    }
+
+    public function getCustomerAccounts(Request $request)
+    {
+
+        $customer_id =   $request->get('customer');
+        $status     =   $request->get('status');
+
+        $customer_accounts    =   DB::table('customer_accounts as ca')
+            ->leftJoin('work_orders as sd', 'sd.id', 'ca.work_order_id')
+            ->select(
+                'ca.id',
+                'ca.document_number',
+                'sd.customer_name',
+                'ca.document_date',
+                'ca.amount',
+                'ca.agreement',
+                'ca.balance',
+                'ca.status'
+            )
+            ->where('ca.status', '<>', 'ANULADO');
+
+        if ($customer_id) {
+            $customer_accounts->where('sd.customer_id', $customer_id);
+        }
+        if ($status) {
+            $customer_accounts->where('ca.status', $status);
+        }
+
+        return DataTables::of($customer_accounts)->make(true);
+    }
+
+    public function store(Request $request)
+    {
+        DB::beginTransaction();
+        try {
+            $this->s_account->store($request->toArray());
+        } catch (Throwable $th) {
+            DB::rollBack();
+            return response()->json(['success' => false, 'message' => $th->getMessage()]);
+        }
+    }
+
+    public function getCustomerAccount(int $id)
+    {
+        try {
+
+            $cuenta =   DB::table('customer_accounts as ca')
+                ->leftJoin('work_orders as wo', 'wo.id', 'ca.work_order_id')
+                ->select(
+                    'ca.id',
+                    'ca.document_number',
+                    'wo.customer_name',
+                    'ca.amount',
+                    'ca.balance',
+                    'ca.status',
+                    'ca.work_order_id'
+                )
+                ->where('ca.id', $id)
+                ->first();
+
+            if (!$cuenta) {
+                throw new Exception("CUENTA CLIENTE NO EXISTE EN LA BD");
+            }
+
+            $detalle    =   CustomerAccountDetail::where('customer_account_id', $id)
+                ->orderByDesc('id')
+                ->get();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'CUENTA CLIENTE OBTENIDA',
+                'data' => [
+                    'cuenta' => $cuenta,
+                    'detalle' => $detalle
+                ]
+            ]);
+        } catch (Throwable $th) {
+            return response()->json(['success' => false, 'message' => $th->getMessage()]);
+        }
+    }
+
+    public function storePago(Request $request)
+    {
+        DB::beginTransaction();
+        try {
+            $this->s_account->storePago($request->toArray());
+        } catch (Throwable $th) {
+            DB::rollBack();
+            return response()->json(['success' => false, 'message' => $th->getMessage()]);
+        }
+    }
+}
