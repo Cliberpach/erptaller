@@ -16,6 +16,8 @@ return new class extends Migration
 
             $table->unsignedBigInteger('bank_id')->comment('Banco ID');
             $table->string('bank_name', 160)->comment('Nombre del banco');
+            $table->string('bank_abbreviation', 120)->comment('Sigla del banco');
+
             $table->string('account_number', 100)->comment('Número de cuenta');
             $table->string('cci', 100)->nullable()->comment('CCI');
             $table->string('phone', 20)->nullable()->comment('Celular');

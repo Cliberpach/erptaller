@@ -316,7 +316,7 @@
                     @foreach ($bank_accounts as $account)
                         <tr>
                             <td style="text-align: left; font-size: 11px; padding: 3px 0;">
-                                <strong>{{ $account->bank_name }}</strong>
+                                <strong>{{ $account->bank_abbreviation }}</strong>
                                 {{ $account->currency }}
                                 <strong>N°</strong>: {{ $account->account_number }} -
                                 <strong>CCI</strong>: {{ $account->cci }}

@@ -58,7 +58,11 @@ array:7 [ // app\Http\Controllers\Tenant\Maintenance\BankAccountController.php:5
             $data                   =   $request->validated();
             $data['holder']        =   mb_strtoupper($data['holder'], 'UTF-8');
             $data['currency']         =   mb_strtoupper($data['currency'], 'UTF-8');
-            $data['bank_name']   =   GeneralTableDetail::findOrFail($request->get('bank_id'))->name;
+
+            $bank = GeneralTableDetail::findOrFail($request->get('bank_id'));
+            $data['bank_name']      =   $bank->name;
+            $data['bank_abbreviation']      =   $bank->symbol;
+
             $data['editable']       =   1;
 
             BankAccount::create($data);
@@ -88,10 +92,12 @@ array:5 [
             $data                   =   $request->validated();
             $data['holder']        =   mb_strtoupper($data['holder'], 'UTF-8');
             $data['currency']         =   mb_strtoupper($data['currency'], 'UTF-8');
-            $data['bank_name']   =   GeneralTableDetail::findOrFail($request->get('bank_id'))->name;
-            $data['editable']       =
+            $bank = GeneralTableDetail::findOrFail($request->get('bank_id'));
+            $data['bank_name']      =   $bank->name;
+            $data['bank_abbreviation']      =   $bank->symbol;
+            $data['editable']       = 1;
 
-            $bank_account              =   BankAccount::findOrFail($id);
+                $bank_account              =   BankAccount::findOrFail($id);
             $bank_account->update($data);
 
             DB::commit();

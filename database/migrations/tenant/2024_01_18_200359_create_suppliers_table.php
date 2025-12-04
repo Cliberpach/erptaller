@@ -15,7 +15,6 @@ return new class extends Migration
             $table->id();
 
             $table->unsignedBigInteger('type_identity_document_id');
-            $table->foreign('type_identity_document_id')->references('id')->on('types_identity_documents');
 
             $table->string('type_document_name',100); 
             $table->string('type_document_abbreviation',20); 

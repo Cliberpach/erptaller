@@ -14,6 +14,8 @@ class BankAccount extends Model
 
         'bank_id',
         'bank_name',
+        'bank_abbreviation',
+
         'account_number',
         'cci',
         'phone',
