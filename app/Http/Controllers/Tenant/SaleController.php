@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Tenant;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\UtilController;
 use App\Http\Requests\Sale\SaleStoreRequest;
 use App\Http\Services\Tenant\Sale\Sale\SaleManager;
 use App\Models\Company;
@@ -68,10 +69,8 @@ class SaleController extends Controller
         $brands     =   DB::select('select * from brands');
         $customers  =   Customer::where('status', 'ACTIVO')->get();
         $company    =   Company::find(1);
-        $types_identity_documents   =   DB::select('select
-                                        tid.*
-                                        from types_identity_documents as tid
-                                        where tid.status = "ACTIVO"');
+
+        $types_identity_documents   =   UtilController::getIdentityDocuments();
 
         $departments    =   DB::select('select * from departments');
         $districts      =   DB::select('select * from districts');
@@ -207,7 +206,7 @@ array:3 [ // app\Http\Controllers\Tenant\SaleController.php:119
             ]);
         } catch (Throwable $th) {
             DB::rollBack();
-            return response()->json(['success' => false, 'message' => $th->getMessage(), 'line' => $th->getLine(),'file'=>$th->getFile()]);
+            return response()->json(['success' => false, 'message' => $th->getMessage(), 'line' => $th->getLine(), 'file' => $th->getFile()]);
         }
     }
 

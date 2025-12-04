@@ -31,12 +31,12 @@ class SaleDetailService
             //========= VALIDANDO PRODUCTO ========
             $product_exists =   $this->s_warehouse_product->getProductStock(1, $product->id);
 
-            if (count($product_exists) === 0) {
+            if (!$product_exists) {
                 throw new Exception("EL PRODUCTO NO EXISTE EN EL ALMACÉN!!!");
             }
 
-            if ($product_exists[0]->stock < $product->cant) {
-                throw new Exception("EL STOCK (" . $product_exists[0]->stock . "), " . "ES MENOR A LA CANTIDAD (" . $product->cant . ")");
+            if ($product_exists->stock < $product->cant) {
+                throw new Exception("EL STOCK (" . $product_exists->stock . "), " . "ES MENOR A LA CANTIDAD (" . $product->cant . ")");
             }
 
 
@@ -45,27 +45,27 @@ class SaleDetailService
             $detail->sale_document_id   =   $sale->id;
             $detail->warehouse_id       =   1;
             $detail->product_id         =   $product->id;
-            $detail->product_name       =   $product_exists[0]->product_name;
-            $detail->brand_id           =   $product_exists[0]->brand_id;
-            $detail->brand_name         =   $product_exists[0]->brand_name;
-            $detail->category_id        =   $product_exists[0]->category_id;
-            $detail->category_name      =   $product_exists[0]->category_name;
+            $detail->product_name       =   $product_exists->product_name;
+            $detail->brand_id           =   $product_exists->brand_id;
+            $detail->brand_name         =   $product_exists->brand_name;
+            $detail->category_id        =   $product_exists->category_id;
+            $detail->category_name      =   $product_exists->category_name;
             $detail->quantity           =   $product->cant;
-            $detail->price_sale         =   $product_exists[0]->sale_price;
-            $detail->amount             =   $product->cant * $product_exists[0]->sale_price;
+            $detail->price_sale         =   $product_exists->sale_price;
+            $detail->amount             =   $product->cant * $product_exists->sale_price;
 
             /*====== SUNAT =====*/
-            $detail->product_code           =   'P-' . $product_exists[0]->id . $product_exists[0]->category_id . $product_exists[0]->brand_id;
+            $detail->product_code           =   'P-' . $product_exists->id . $product_exists->category_id . $product_exists->brand_id;
             $detail->product_unit           =   'NIU';
-            $detail->product_description    =   $product_exists[0]->brand_name . '-' . $product_exists[0]->product_name;
-            $detail->mto_valor_unitario     =   (float)($product_exists[0]->sale_price / 1.18);
+            $detail->product_description    =   $product_exists->brand_name . '-' . $product_exists->product_name;
+            $detail->mto_valor_unitario     =   (float)($product_exists->sale_price / 1.18);
             $detail->mto_valor_venta        =   (float)($detail->amount / 1.18);
             $detail->mto_base_igv           =   (float)($detail->amount / 1.18);
             $detail->porcentaje_igv         =   $validated_data->igv_percentage;
             $detail->igv                    =   (float)($detail->amount) - (float)($detail->amount / 1.18);
             $detail->tip_afe_igv            =   10;
             $detail->total_impuestos        =   (float)($detail->amount) - (float)($detail->amount / 1.18);
-            $detail->mto_precio_unitario    =   (float)($product_exists[0]->sale_price);
+            $detail->mto_precio_unitario    =   (float)($product_exists->sale_price);
             $detail->save();
 
             //======= RESTAR STOCK ======

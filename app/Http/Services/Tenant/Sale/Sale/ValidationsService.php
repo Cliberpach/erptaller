@@ -122,7 +122,7 @@ class ValidationsService
             'type_sale_name'    =>  $type_sale_name,
             'igv_percentage'    =>  $data['igv_percentage'],
             'lstSale'           =>  $lstSale,
-            'type'              =>  $data['type_sale']
+            'type'              =>  'PRODUCTOS'
         ];
     }
 

@@ -47,26 +47,27 @@ class SaleService
         $legend                 =       NumberToLettersController::numberToLetters($amounts->total);
 
         //======= GUARDAR MAESTRO VENTA =======
-        $sale   =   $this->saveSale($validated_data,$amounts,$legend,$validated_pays,$data_correlative);
+        $sale   =   $this->saveSale($validated_data, $amounts, $legend, $validated_pays, $data_correlative);
 
         //========= REGISTRAR DETALLE TYPE PRODUCTOS =======
-        if($validated_data->type === 'PRODUCTOS'){
-            $this->s_detail->storeDetail($sale,$validated_data);
+        if ($validated_data->type === 'PRODUCTOS') {
+            $this->s_detail->storeDetail($sale, $validated_data);
         }
 
         //========= REGISTRAR DETALLE TYPE RESERVAS =======
-        if($validated_data->type === 'RESERVAS'){
+        /*if($validated_data->type === 'RESERVAS'){
             $this->s_detail->storeDetailReservations($sale,$validated_data);
-        }
+        }*/
 
         //======= INICIAR FACTURACIÓN =======
-        $this->s_company->startInvoicing(1,$validated_data->type_sale_code);
+        $this->s_company->startInvoicing(1, $validated_data->type_sale_code);
 
         return $sale;
     }
 
-    public function saveSale(object $validated_data,object $amounts,$legend,array $validated_pays,object $data_correlative):Sale{
-         $sale                           =   new Sale();
+    public function saveSale(object $validated_data, object $amounts, $legend, array $validated_pays, object $data_correlative): Sale
+    {
+        $sale                           =   new Sale();
 
         //======= GUARDANDO CLIENTE =======
         $sale->customer_id              =   $validated_data->customer->id;

@@ -696,7 +696,7 @@
     }
 
     function storeSale(){
-
+        clearValidationErrors();
         const swalWithBootstrapButtons = Swal.mixin({
         customClass: {
             confirmButton: "btn btn-success",
@@ -748,7 +748,7 @@
 
                 if(response.status === 422){
                     if('errors' in res){
-                        //pintarErroresValidacion(res.errors);
+                        paintValidationErrors(res.errors);
                     }
                     Swal.close();
                     return;
@@ -772,6 +772,7 @@
 
             } catch (error) {
                 toastr.error(error,'ERROR EN LA PETICIÓN REGISTRAR VENTA');
+                Swal.close();
             }
 
 
