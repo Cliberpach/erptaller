@@ -23,7 +23,7 @@ return new class extends Migration
 
             $table->unsignedBigInteger('model_id');
 
-            $table->unsignedBigInteger('year_id');
+            $table->unsignedBigInteger('year_id')->nullable();
 
             $table->unsignedBigInteger('color_id');
 

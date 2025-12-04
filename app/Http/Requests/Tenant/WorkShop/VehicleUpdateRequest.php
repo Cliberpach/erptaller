@@ -49,7 +49,7 @@ class VehicleUpdateRequest extends FormRequest
 
             // AÑO: obligatorio, debe existir en landlord.years con status ACTIVE
             'year_id' => [
-                'required',
+                'nullable',
                 Rule::exists('landlord.years', 'id')->where(function ($q) {
                     $q->where('status', 'ACTIVE');
                 }),
@@ -83,7 +83,6 @@ class VehicleUpdateRequest extends FormRequest
             'model_id.exists'   => 'El modelo seleccionado no existe o no está activo.',
 
             // year_id
-            'year_id.required' => 'El año es obligatorio.',
             'year_id.exists'   => 'El año seleccionado no existe o no está activo.',
 
             // observation

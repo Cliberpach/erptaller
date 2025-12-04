@@ -52,7 +52,7 @@
         <!-- Año -->
         <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
             <label for="year_id" class="form-label fw-bold required_field">Año:</label>
-            <select class="form-select" id="year_id" name="year_id" required>
+            <select class="form-select" id="year_id" name="year_id">
                 <option value="">Seleccione un Año</option>
                 @foreach ($years as $year)
                     <option @if ($year->id == $vehicle->year_id) selected @endif value="{{ $year->id }}">
