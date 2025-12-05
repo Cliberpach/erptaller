@@ -120,11 +120,13 @@
             if (customerParams.documentSearchCustomer.length === 8) {
                 $('#type_identity_document').val('1').trigger('change');
                 document.querySelector('#nro_document').value = customerParams.documentSearchCustomer;
+                document.querySelector('#btn_search_nro_document').click();
             }
             //========= RUC ========
             if (customerParams.documentSearchCustomer.length === 11) {
                 $('#type_identity_document').val('3').trigger('change');
                 document.querySelector('#nro_document').value = customerParams.documentSearchCustomer;
+                document.querySelector('#btn_search_nro_document').click();
             }
         }
 

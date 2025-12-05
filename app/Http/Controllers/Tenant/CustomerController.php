@@ -177,14 +177,9 @@ class CustomerController extends Controller
             }
 
             //========= VERIFICANDO QUE EXISTA EL TIPO DOC EN LA BD ========
-            $exists_tipo_doc    =   DB::select('select
-                                    tid.id,
-                                    tid.name
-                                    from
-                                    types_identity_documents as tid
-                                    where tid.id = ?', [$type_identity_document]);
+            $exists_tipo_doc    =   TypeIdentityDocument::findOrFail($type_identity_document);
 
-            if (count($exists_tipo_doc) === 0) {
+            if (!$exists_tipo_doc) {
                 throw new Exception("EL TIPO DE DOC NO EXISTE EN LA BD");
             }
 
@@ -246,7 +241,7 @@ class CustomerController extends Controller
                     throw new Exception($res_consult_api->message);
                 }
             }
-        } catch (\Throwable $th) {
+        } catch (Throwable $th) {
             return response()->json(['success' => false, 'message' => $th->getMessage()]);
         }
     }
