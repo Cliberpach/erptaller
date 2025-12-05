@@ -224,6 +224,8 @@
             }
         } catch (error) {
             toastr.error(error, 'ERROR EN LA PETICIÓN CONSULTAR PLACA');
+                    console.log("Stack:", error.stack);
+
         } finally {
             ocultarAnimacion1();
         }

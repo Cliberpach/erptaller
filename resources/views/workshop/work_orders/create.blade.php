@@ -68,6 +68,10 @@
             tax: 0,
             totalPay: 0
         }
+        let lastCustomerQuery = null;
+        let lastProductQuery = null;
+        let lastServiceQuery = null;
+        let lastVehicleQuery = null;
 
         const gauge = new JustGage({
             id: "gauge",
@@ -177,6 +181,9 @@
                 maxOptions: 20,
                 create: false,
                 preload: false,
+                onType: (str) => {
+                    lastCustomerQuery = str;
+                },
                 load: async (query, callback) => {
                     if (!query.length) return callback();
                     try {
@@ -184,7 +191,12 @@
                         const response = await fetch(url);
                         if (!response.ok) throw new Error('Error al buscar clientes');
                         const data = await response.json();
-                        callback(data.data ?? []);
+                        const results = data.data ?? [];
+                        callback(results);
+                        if (results.length === 0) {
+                            customerParams.documentSearchCustomer = lastCustomerQuery;
+                            console.log("No se encontró en BD. Guardado:", window.typedCustomer);
+                        }
                     } catch (error) {
                         console.error('Error cargando clientes:', error);
                         callback();
@@ -214,6 +226,9 @@
                 placeholder: 'Seleccione un vehículo',
                 maxOptions: 20,
                 create: false,
+                onType: (str) => {
+                    lastVehicleQuery = str;
+                },
                 preload: false,
                 load: async (query, callback) => {
                     if (!query.length) return callback();
@@ -225,8 +240,13 @@
 
                         const response = await fetch(url);
                         if (!response.ok) throw new Error('Error al buscar vehiculos');
-                        const data = await response.json();
-                        callback(data.data ?? []);
+                         const data = await response.json();
+                        const results = data.data ?? [];
+                        callback(results);
+                        if (results.length === 0) {
+                            vehicleParams.plateSearchVehicle = lastVehicleQuery;
+                            console.log("No se encontró en BD. Guardado:", window.typedCustomer);
+                        }
                     } catch (error) {
                         console.error('Error cargando vehiculos:', error);
                         callback();
@@ -266,6 +286,9 @@
                 create: false,
                 preload: false,
                 plugins: ['clear_button'],
+                onType: (str) => {
+                    lastProductQuery = str;
+                },
                 load: async (query, callback) => {
                     if (!query.length) return callback();
                     try {
@@ -275,8 +298,12 @@
                         });
                         const response = await fetch(url);
                         if (!response.ok) throw new Error('Error al buscar productos');
-                        const data = await response.json();
-                        callback(data.data ?? []);
+                         const data = await response.json();
+                        const results = data.data ?? [];
+                        callback(results);
+                        if (results.length === 0) {
+                            productParams.name = lastProductQuery;
+                        }
                     } catch (error) {
                         console.error('Error cargando productos:', error);
                         callback();
@@ -302,6 +329,9 @@
                 create: false,
                 preload: false,
                 plugins: ['clear_button'],
+                  onType: (str) => {
+                    lastServiceQuery = str;
+                },
                 load: async (query, callback) => {
                     if (!query.length) return callback();
                     try {
@@ -309,7 +339,12 @@
                         const response = await fetch(url);
                         if (!response.ok) throw new Error('Error al buscar servicios');
                         const data = await response.json();
-                        callback(data.data ?? []);
+                        const results = data.data ?? [];
+                        callback(results);
+                        if (results.length === 0) {
+                            serviceParams.name = lastServiceQuery;
+                            console.log("No se encontró en BD. Guardado:", window.typedCustomer);
+                        }
                     } catch (error) {
                         console.error('Error cargando servicios:', error);
                         callback();
@@ -336,73 +371,6 @@
             },
             buttonsStyling: false
         })
-
-        $(".btn-modal-file").on('click', function() {
-            $("#modal_file").modal("show");
-        });
-
-        async function accionBuscarPlaca() {
-            const placa = document.querySelector('#plate').value.trim();
-
-            if (placa.length < 6 || placa.length > 8) {
-                toastr.error('LA PLACA DEBE TENER ENTRE 6 Y 8 CARACTERES');
-                return;
-            }
-
-            searchPlate(placa);
-
-        }
-
-        async function searchPlate(placa) {
-            mostrarAnimacion1();
-            try {
-                toastr.clear();
-                const res = await axios.get(route('tenant.utils.searchPlate', placa));
-                if (res.data.success) {
-
-                    if (res.data.origin == 'BD') {
-                        toastr.error('VEHICULO YA EXISTE EN BD');
-                        return;
-                    }
-
-                    const dataApi = res.data.data;
-                    if (dataApi.mensaje == 'SUCCESS') {
-                        toastr.info(dataApi.mensaje);
-                        setDataApi(dataApi.data, res.data.model);
-                    }
-                } else {
-                    toastr.error(res.data.message, 'ERROR EN EL SERVIDOR');
-                }
-            } catch (error) {
-                toastr.error(error, 'ERROR EN LA PETICIÓN CONSULTAR PLACA');
-            } finally {
-                ocultarAnimacion1();
-            }
-        }
-
-        function setDataApi(data, model) {
-
-            const mensaje = data.mensaje;
-            if (mensaje == 'No encontrado') {
-                toastr.error(mensaje);
-                return;
-            }
-
-            window.modelSelect.clear();
-            window.modelSelect.clearOptions();
-
-            const marca = data.marca;
-            const modelo = data.modelo;
-
-            const text = `${marca} - ${modelo}`;
-
-            window.modelSelect.addOption({
-                id: model.id,
-                text
-            });
-
-            window.modelSelect.setValue(model.id);
-        }
 
         function validationStoreQuote() {
             if (lstProducts.length === 0 && lstServices.length === 0) {
