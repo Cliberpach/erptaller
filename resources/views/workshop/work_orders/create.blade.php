@@ -96,10 +96,10 @@
         })
 
         function events() {
-              eventsMdlCreateCustomer();
+            eventsMdlCreateCustomer();
             eventsMdlEditProduct();
             eventsMdlEditService();
-               eventsMdlVehicle();
+            eventsMdlVehicle();
             eventsMdlProduct();
             eventsMdlService();
 

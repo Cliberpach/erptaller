@@ -13,16 +13,16 @@ class ApiController extends Controller
         $client = new \GuzzleHttp\Client(['verify' => false]);
         $token = 'c36358c49922c564f035d4dc2ff3492fbcfd31ee561866960f75b79f7d645d7d';
         $response = $client->get($url, [
+            'http_errors' => false,
             'headers' => [
                 'Content-Type' => 'application/json',
                 'Accept' => 'application/json',
                 'Authorization' => "Bearer {$token}",
             ],
         ]);
-
+   
         $estado = $response->getStatusCode();
         $data = $response->getBody()->getContents();
-
         return $data;
     }
 

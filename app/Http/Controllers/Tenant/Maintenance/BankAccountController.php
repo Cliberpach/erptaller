@@ -8,6 +8,7 @@ use App\Http\Requests\Tenant\Maintenance\BankAccount\BankAccountStoreRequest;
 use App\Http\Requests\Tenant\Maintenance\BankAccount\BankAccountUpdateRequest;
 use App\Models\Landlord\GeneralTable\GeneralTableDetail;
 use App\Models\Tenant\Maintenance\BankAccount\BankAccount;
+use App\Models\Tenant\Sale\PaymentMethodAccount;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Throwable;
@@ -97,7 +98,7 @@ array:5 [
             $data['bank_abbreviation']      =   $bank->symbol;
             $data['editable']       = 1;
 
-                $bank_account              =   BankAccount::findOrFail($id);
+            $bank_account              =   BankAccount::findOrFail($id);
             $bank_account->update($data);
 
             DB::commit();
@@ -120,6 +121,24 @@ array:5 [
             return response()->json(['success' => true, 'message' => 'CUENTA ELIMINADA']);
         } catch (Throwable $th) {
             DB::rollBack();
+            return response()->json(['success' => false, 'message' => $th->getMessage()]);
+        }
+    }
+
+    public function getListBankAccounts(Request $request)
+    {
+        try {
+            $payment_method_id  =   $request->get('payment_method_id');
+            $bank_accounts  =   PaymentMethodAccount::from('payment_method_accounts as pma')
+                                ->join('bank_accounts as ba','ba.id','pma.bank_account_id')
+                                ->select(
+                                    'pma.bank_account_id as id',
+                                    DB::raw('CONCAT(ba.bank_abbreviation,":",ba.account_number,"-",ba.phone) as text')
+                                )
+                                ->where('payment_method_id', $payment_method_id)->get();
+
+            return response()->json(['success' => true, 'message' => 'CUENTAS OBTENIDAS', 'bank_accounts' => $bank_accounts]);
+        } catch (Throwable $th) {
             return response()->json(['success' => false, 'message' => $th->getMessage()]);
         }
     }

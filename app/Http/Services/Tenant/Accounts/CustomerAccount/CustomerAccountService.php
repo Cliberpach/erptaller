@@ -3,17 +3,23 @@
 namespace App\Http\Services\Tenant\Accounts\CustomerAccount;
 
 use App\Http\Services\Tenant\Accounts\CustomerAccount\CustomerAccountDto;
+use App\Models\Company;
 use App\Models\Tenant\Accounts\CustomerAccount;
+use App\Models\Tenant\Accounts\CustomerAccountDetail;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\File;
 
 class CustomerAccountService
 {
     private CustomerAccountDto $s_dto;
     private CustomerAccountRepository $s_repository;
+    private CustomerAccountValidation $s_validation;
 
     public function __construct()
     {
-        $this->s_dto    =   new CustomerAccountDto();
         $this->s_repository =   new CustomerAccountRepository();
+        $this->s_dto        =   new CustomerAccountDto($this->s_repository);
+        $this->s_validation =   new CustomerAccountValidation($this->s_repository);
     }
 
     public function store(array $data): CustomerAccount
@@ -24,8 +30,35 @@ class CustomerAccountService
         return $customer_account;
     }
 
-    public function storePago(array $data): CustomerAccount
+    public function storePago(array $data): CustomerAccountDetail
     {
-        dd($data);
+        $data   =   $this->s_validation->validationPayStore($data);
+
+        $customer_account   =   $data['customer_account'];
+        $balance            =   round($customer_account->balance, 2);
+        $amount_pay         =   round($data['cantidad'], 2);
+        $new_balance        =   $balance - $amount_pay;
+        $new_status         =   $new_balance == 0 ? 'PAGADO' : 'PENDIENTE';
+
+        $dto_account        =   ['balance' => $new_balance, 'status' => $new_status];
+        $this->s_repository->updateCustomerAccount($data['id'], $dto_account);
+        $data['balance']    =   $new_balance;
+
+        $dto    =   $this->s_dto->getDtoPay($data);
+        $pay    =   $this->s_repository->insertPay($dto);
+       
+        $carpet_company =   Company::findOrFail(1)->files_route;
+        $path = public_path("storage/{$carpet_company}/customer_accounts/images/");
+        if (!File::exists($path)) {
+            File::makeDirectory($path, 0755, true);
+        }
+
+        $file   =   $data['imagen'];
+
+        if ($file instanceof UploadedFile && $file->isValid()) {
+            $file->move($path, $pay->img_name);
+        }
+
+        return $pay;
     }
 }

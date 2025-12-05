@@ -41,5 +41,8 @@ Route::group(["prefix" => "ventas"], function () {
         Route::post('metodo_pago/store', [PaymentMethodController::class, 'store'])->name('tenant.ventas.metodo_pago.store');
         Route::put('metodo_pago/update/{id}', [PaymentMethodController::class, 'update'])->name('tenant.ventas.metodo_pago.update');
         Route::get('metodo_pago/getPaymentMethods', [PaymentMethodController::class, 'getPaymentMethods'])->name('tenant.ventas.metodo_pago.getPaymentMethods');
+        Route::get('assign-accounts/create/{id}', [PaymentMethodController::class, 'assignAccountsCreate'])->name('tenant.ventas.metodo_pago.assignAccountsCreate');
+        Route::post('assign-accounts/store', [PaymentMethodController::class, 'assignAccountsStore'])->name('tenant.ventas.metodo_pago.assignAccountsStore');
+
     });
 });

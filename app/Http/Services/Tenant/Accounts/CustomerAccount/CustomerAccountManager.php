@@ -3,6 +3,7 @@
 namespace App\Http\Services\Tenant\Accounts\CustomerAccount;
 
 use App\Models\Tenant\Accounts\CustomerAccount;
+use App\Models\Tenant\Accounts\CustomerAccountDetail;
 
 class CustomerAccountManager
 {
@@ -17,7 +18,7 @@ class CustomerAccountManager
         return $this->s_account->store($data);
     }
 
-    public function storePago(array $data):CustomerAccount{
+    public function storePago(array $data):CustomerAccountDetail{
         return $this->s_account->storePago($data);
     }
 

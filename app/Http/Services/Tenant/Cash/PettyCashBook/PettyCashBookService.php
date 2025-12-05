@@ -102,4 +102,10 @@ class PettyCashBookService
 
         return $totales;
     }
+
+    public function getCashBookUser(int $user_id)
+    {
+        return $this->s_repository->getCashBookUser($user_id);
+    }
+
 }

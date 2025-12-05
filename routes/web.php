@@ -13,6 +13,7 @@ use App\Http\Controllers\Tenant\Consultas\QueryReservationController;
 use App\Http\Controllers\Tenant\CustomerController;
 use App\Http\Controllers\Tenant\InventoryController;
 use App\Http\Controllers\Tenant\KardexController;
+use App\Http\Controllers\Tenant\Maintenance\BankAccountController;
 use App\Http\Controllers\Tenant\ModuleController;
 use App\Http\Controllers\Tenant\NoteIncomeController;
 use App\Http\Controllers\Tenant\NoteReleaseController;
@@ -254,4 +255,5 @@ Route::group(["prefix" => "utils"], function () {
     Route::get('get-years/{model}', [YearController::class, 'getYearsModel'])->name('tenant.utils.getYearsModel');
     Route::get('serch-plate/{placa}', [VehicleController::class, 'searchPlate'])->name('tenant.utils.searchPlate');
     Route::get('validated-product/stock', [ProductController::class, 'validatedProductStock'])->name('tenant.utils.validatedProductStock');
+    Route::get('getListBankAccounts', [BankAccountController::class,'getListBankAccounts'])->name('tenant.utils.getListBankAccounts');
 });

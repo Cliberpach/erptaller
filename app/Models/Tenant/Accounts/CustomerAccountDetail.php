@@ -23,5 +23,6 @@ class CustomerAccountDetail extends Model
         'cash',
         'amount',
         'balance',
+        'img_name'
     ];
 }

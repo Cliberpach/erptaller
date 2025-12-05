@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Tenant\Accounts;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Accounts\CustomerAccount\PayStoreRequest;
 use App\Http\Services\Tenant\Accounts\CustomerAccount\CustomerAccountManager;
 use App\Models\Tenant\Accounts\CustomerAccountDetail;
 use App\Models\Tenant\PaymentMethod;
@@ -92,8 +93,8 @@ class CustomerAccountController extends Controller
             }
 
             $detalle    =   CustomerAccountDetail::where('customer_account_id', $id)
-                ->orderByDesc('id')
-                ->get();
+                            ->orderByDesc('id')
+                            ->get();
 
             return response()->json([
                 'success' => true,
@@ -108,11 +109,28 @@ class CustomerAccountController extends Controller
         }
     }
 
-    public function storePago(Request $request)
+    /*
+array:11 [ // app\Http\Controllers\Tenant\Accounts\CustomerAccountController.php:115
+  "_token" => "OUiVLJK4B1xxUcncLt4KMQWShWUygPIGMkm5ZTu4"
+  "pago" => "A CUENTA"
+  "fecha" => "2025-12-05"
+  "cantidad" => "10.00"
+  "observacion" => "test"
+  "efectivo_venta" => "0"
+  "modo_pago" => "3"
+  "cuenta" => "2"
+  "nro_operacion" => "asd123"
+  "importe_venta" => "10"
+  "url_imagen" => null
+]
+*/
+    public function storePago(PayStoreRequest $request)
     {
         DB::beginTransaction();
         try {
-            $this->s_account->storePago($request->toArray());
+            $pay    =   $this->s_account->storePago($request->toArray());
+            DB::commit();
+            return response()->json(['success' => true, 'message' => 'PAGO REGISTRADO CON ÉXITO']);
         } catch (Throwable $th) {
             DB::rollBack();
             return response()->json(['success' => false, 'message' => $th->getMessage()]);

@@ -158,7 +158,6 @@ class CustomerController extends Controller
     //========== CONSULTAR DOCUMENTO ==========
     public function consult_document(Request $request)
     {
-
         try {
             //========= VALIDANDO QUE EL TIPO DOCUMENTO Y N° DOCUMENTO NO SEAN NULL =======
             $type_identity_document =   $request->get('type_identity_document', null);
@@ -228,11 +227,10 @@ class CustomerController extends Controller
             }
 
             if ($type_identity_document == 3) {
-
+                
                 $api_controller     =   new ApiController();
                 $res_consult_api    =   $api_controller->apiRuc($nro_document);
                 $res_consult_api    =   json_decode($res_consult_api);
-
 
                 //======= EN CASO LA CONSULTA FUE EXITOSA =====
                 if ($res_consult_api->success) {

@@ -12,9 +12,7 @@
 
 @include('sales.payment_method.modals.mdl_create_payment_method')
 @include('sales.payment_method.modals.mdl_edit_payment_method')
-{{-- @include('registros.almacenes.modals.modal_create_almacen')
-@include('registros.almacenes.modals.modal_edit_almacen')
-@include('registros.almacenes.modals.modal_asignar_proyecto') --}}
+
 
 <div class="card">
     @csrf
@@ -44,13 +42,6 @@
 <!-- end card -->
 @endsection
 
-@if(Session::has('message_success'))
-<script>
-    var message = "{{ Session::get('message_success') }}";
-    toastr.success(message, 'OPERACIÓN COMPLETADA');
-</script>
-@endif
-
 <script>
     let dtPaymentMethods    =   null;
 
@@ -75,13 +66,13 @@
     }
 
     function iniciarDataTableAlmacenes(){
-        const urlGetAlmacenes = `{{route('tenant.ventas.metodo_pago.getPaymentMethods')}}`;
+        const urlGet = `{{route('tenant.ventas.metodo_pago.getPaymentMethods')}}`;
 
         dtPaymentMethods  =   new DataTable('#tbl_list_payment_methods',{
             serverSide: true,
             processing: true,
             ajax: {
-                url: urlGetAlmacenes,
+                url: urlGet,
                 type: 'GET',
             },
             order: [[0, 'desc']],
@@ -93,6 +84,7 @@
                 {
                     data: null, 
                     render: function(data, type, row) {
+                        const routeAccounts = route('tenant.ventas.metodo_pago.assignAccountsCreate',{id:row.id});
                       
                         return `
                             <div class="btn-group dropdown">
@@ -109,6 +101,11 @@
                                 <li>
                                     <a class="dropdown-item" href="javascript:void(0);" onclick="eliminarAlmacen(${data.id})">
                                         <i class="fa-solid fa-trash"></i> Eliminar
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="${routeAccounts}" >
+                                        <i class="fas fa-piggy-bank"></i> Cuentas
                                     </a>
                                 </li>
                             </ul>

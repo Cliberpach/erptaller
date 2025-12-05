@@ -14,7 +14,7 @@
             </div>
             <div class="modal-footer">
                 <div class="col-md-6 text-right">
-                    <button type="submit" class="btn btn-success btn-sm" id="btn_guardar_detalle" form="frmDetalle">
+                    <button type="submit" class="btn btn-primary btn-sm" id="btn_guardar_detalle" form="frmDetalle">
                         Guardar
                     </button>
                     <button type="button" class="btn btn-danger btn-sm" data-dismiss="modal"><i
@@ -106,114 +106,123 @@
         function pintarCuentaCliente(cuenta) {
             document.querySelector('#cliente').value = cuenta.customer_name;
             document.querySelector('#numero').value = cuenta.document_number;
-            document.querySelector('#monto').value = cuenta.amount;
-            document.querySelector('#saldo').value = cuenta.balance;
+            document.querySelector('#monto').value = formatSoles(cuenta.amount);
+            document.querySelector('#saldo').value = formatSoles(cuenta.balance);
             document.querySelector('#estado').value = cuenta.status;
             document.querySelector('#type_document').value = `ORDEN DE TRABAJO`;
         }
 
-        function pintarDetallePago(detalle) {
-            var table = $(".dataTables-detalle").DataTable();
+      function pintarDetallePago(detalle) {
+            const table = $(".dataTables-detalle").DataTable();
             table.clear().draw();
-            detalle.forEach((value, index, array) => {
-                if (value.ruta_imagen) {
-                    table.row.add([
-                        value.fecha,
-                        value.observacion,
-                        value.monto,
-                        '<a class="btn btn-primary btn-xs" href="/cuentaCliente/imagen/' +
-                        value.id + '"><i class="fa fa-download"></i></a>'
-                    ]).draw(false);
-                } else {
-                    table.row.add([
-                        value.fecha,
-                        value.observacion,
-                        value.monto,
-                        '-'
-                    ]).draw(false);
+
+            const BASE_STORAGE_URL = @json(asset(''));
+
+            detalle.forEach((value) => {
+                let imagenHTML = '-';
+
+                if (value.img_route) {
+                    const link_img = `${BASE_STORAGE_URL}${value.img_route}`;
+
+                    imagenHTML = `
+                        <a href="${link_img}" target="_blank">
+                            <img src="${link_img}" 
+                                style="width:80px; height:80px; object-fit:contain; border-radius:4px; border:1px solid #ddd;" />
+                        </a>
+                    `;
                 }
-            })
+
+                table.row.add([
+                    value.date,
+                    value.observation,
+                    formatSoles(value.total),
+                    imagenHTML
+                ]).draw(false);
+            });
         }
 
         function storePago(formPagar) {
           
+            clearValidationErrors('msgError');
 
-        const swalWithBootstrapButtons = Swal.mixin({
-            customClass: {
-                confirmButton: "btn btn-success",
-                cancelButton: "btn btn-danger"
-            },
-            buttonsStyling: false
-        });
-        swalWithBootstrapButtons.fire({
-            title: "Desea registrar el pago?",
-            html: `Confirmar`,
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonText: "Sí!",
-            cancelButtonText: "No, cancelar!",
-            reverseButtons: true
-        }).then(async (result) => {
-            if (result.isConfirmed) {
+            const swalWithBootstrapButtons = Swal.mixin({
+                customClass: {
+                    confirmButton: "btn btn-primary",
+                    cancelButton: "btn btn-danger"
+                },
+                buttonsStyling: false
+            });
+            swalWithBootstrapButtons.fire({
+                title: "Desea registrar el pago?",
+                html: `Confirmar`,
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonText: "Sí!",
+                cancelButtonText: "No, cancelar!",
+                reverseButtons: true
+            }).then(async (result) => {
+                if (result.isConfirmed) {
 
-                Swal.fire({
-                    title: "Registrando pago...",
-                    text: "Por favor, espere",
-                    icon: "info",
-                    allowOutsideClick: false,
-                    allowEscapeKey: false,
-                    showConfirmButton: false,
-                    didOpen: () => {
-                        Swal.showLoading();
-                    }
-                });
+                    Swal.fire({
+                        title: "Registrando pago...",
+                        text: "Por favor, espere",
+                        icon: "info",
+                        allowOutsideClick: false,
+                        allowEscapeKey: false,
+                        showConfirmButton: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
 
-                try {
-                    toastr.clear();
+                    try {
+                        
+                        toastr.clear();
 
-                    const formData = new FormData(formPagar);
-                    const res = await axios.post(route('tenant.cuentas.cliente.storePago'), formData);
+                        const formData = new FormData(formPagar);
+                         formData.append('id', parametrosMdlPagar.id);
+                        const res = await axios.post(route('tenant.cuentas.cliente.storePago'), formData);
 
-                    if (res.data.success) {
-                        toastr.success(res.data.message, 'OPERACIÓN COMPLETADA');
-                        $('#modal_detalle').modal('hide');
-                        dtCuentasCliente.ajax.reload();
-                    } else {
-                        Swal.close();
-                        toastr.error(res.data.message, 'ERROR EN EL SERVIDOR');
-                    }
-
-                } catch (error) {
-                    if (error.response) {
-                        if (error.response.status === 422) {
-                            const errors = error.response.data.errors;
-                            paintValidationErrors(errors, 'error');
-                            Swal.close();
-                            toastr.error('Errores de validación encontrados.', 'ERROR DE VALIDACIÓN');
+                        if (res.data.success) {
+                            toastr.success(res.data.message, 'OPERACIÓN COMPLETADA');
+                            $('#modal_detalle').modal('hide');
+                            dtCuentasCliente.ajax.reload();
                         } else {
                             Swal.close();
-                            toastr.error(error.response.data.message, 'ERROR EN EL SERVIDOR');
+                            toastr.error(res.data.message, 'ERROR EN EL SERVIDOR');
                         }
-                    } else if (error.request) {
-                        Swal.close();
-                        toastr.error('No se pudo contactar al servidor. Revisa tu conexión a internet.',
-                            'ERROR DE CONEXIÓN');
-                    } else {
-                        Swal.close();
-                        toastr.error(error.message, 'ERROR DESCONOCIDO');
-                    }
-                } finally {
-                    Swal.close();
-                }
 
-            } else if (result.dismiss === Swal.DismissReason.cancel) {
-                swalWithBootstrapButtons.fire({
-                    title: "Operación cancelada",
-                    text: "No se realizaron acciones",
-                    icon: "error"
-                });
-            }
-        });
+                    } catch (error) {
+                        if (error.response) {
+                            if (error.response.status === 422) {
+                                const errors = error.response.data.errors;
+                                paintValidationErrors(errors, 'error');
+                                Swal.close();
+                                toastr.error('Errores de validación encontrados.', 'ERROR DE VALIDACIÓN');
+                            } else {
+                                Swal.close();
+                                toastr.error(error.response.data.message, 'ERROR EN EL SERVIDOR');
+                            }
+                        } else if (error.request) {
+                            Swal.close();
+                            toastr.error('No se pudo contactar al servidor. Revisa tu conexión a internet.',
+                                'ERROR DE CONEXIÓN');
+                        } else {
+                            Swal.close();
+                            toastr.error(error.message, 'ERROR DESCONOCIDO');
+                        }
+                    } finally {
+                        Swal.close();
+                    }
+
+                } else if (result.dismiss === Swal.DismissReason.cancel) {
+                    swalWithBootstrapButtons.fire({
+                        title: "Operación cancelada",
+                        text: "No se realizaron acciones",
+                        icon: "error"
+                    });
+                }
+            });
         }
 
        
@@ -250,35 +259,26 @@
         }
 
         function pintarCuentas(cuentas) {
-            if (window.cuentaSelect) {
-                window.cuentaSelect.destroy();
-            }
-            window.cuentaSelect = new TomSelect("#cuenta", {
-                options: cuentas.map(c => ({
-                    value: c.cuenta_id,
-                    text: c.cuentaLabel
-                })),
-                placeholder: "SELECCIONAR",
-                allowEmptyOption: true,
-                create: false,
-                sortField: {
-                    field: "text",
-                    direction: "asc"
-                },
-                plugins: ['clear_button']
-            });
+            window.cuentaSelect.clear(); 
+
+            window.cuentaSelect.clearOptions(); 
+
+            window.cuentaSelect.addOptions(cuentas);
+
+            window.cuentaSelect.refreshOptions(false);
+
         }
 
         function changeEfectivo() {
-            let efectivo = convertFloat($('#efectivo_venta').val());
-            let importe = convertFloat($('#importe_venta').val());
+            let efectivo = parseFloat($('#efectivo_venta').val());
+            let importe = parseFloat($('#importe_venta').val());
             let suma = efectivo + importe;
             $('#cantidad').val(suma.toFixed(2))
         }
 
         function changeImporte() {
-            let efectivo = convertFloat($('#efectivo_venta').val());
-            let importe = convertFloat($('#importe_venta').val());
+            let efectivo = parseFloat($('#efectivo_venta').val());
+            let importe = parseFloat($('#importe_venta').val());
             let suma = efectivo + importe;
             $('#cantidad').val(suma.toFixed(2));
         }
@@ -330,6 +330,9 @@
                 allowEmptyOption: false,
                 create: false,
                 maxOptions: null,
+                valueField: 'id',
+                labelField: 'text',
+                searchField: ['text'],
                 sortField: {
                     field: "text",
                     direction: "asc"
@@ -350,17 +353,18 @@
 
         async function getCuentasPorMetodoPago(metodoPagoId) {
             try {
-                const res = await axios.get(route('utilidades.getCuentasPorMetodoPago', {
-                    metodo_pago: metodoPagoId
+                const res = await axios.get(route('tenant.utils.getListBankAccounts', {
+                    payment_method_id: metodoPagoId
                 }));
+
                 if (!res.data.success) {
                     toastr.error(res.data.message, 'ERROR EN EL SERVIDOR');
                     return null;
                 }
                 toastr.info(res.data.message, 'OPERACIÓN COMPLETADA');
-                return res.data.data;
+                return res.data.bank_accounts;
             } catch (error) {
-                toastr.error(error, 'ERROR EN LA PETICIÓ OBTENER CUENTAS POR MÉTODO DE PAGO');
+                toastr.error(error, 'ERROR EN LA PETICIÓN OBTENER CUENTAS POR MÉTODO DE PAGO');
                 return null;
             }
         }

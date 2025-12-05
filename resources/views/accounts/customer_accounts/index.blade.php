@@ -114,21 +114,31 @@
                     data: 'document_date',
                     name: 'ca.document_date'
                 },
-                {
+               {
                     searchable: false,
+                    orderable: false,
                     data: 'amount',
-                    name: 'ca.amount'
+                    name: 'ca.amount',
+                    render: function(data) {
+                        return formatSoles(data);
+                    }
                 },
                 {
                     data: 'agreement',
+                    orderable:false,
+                    searchable:false,
                     name: 'ca.agreement'
                 },
                 {
                     searchable: false,
+                    orderable: false,
                     data: 'balance',
-                    name: 'ca.balance'
+                    name: 'ca.balance',
+                    render: function(data) {
+                        return formatSoles(data);
+                    }
                 },
-                 {
+                {
                         data: 'status',
                         name: 'ca.status',
                         searchable: false,
@@ -140,16 +150,14 @@
                             let label = data ?? '';
 
                             switch (data) {
-                                case 'ACTIVO':
+                              
+                                case 'PENDIENTE':
+                                    badgeClass = 'badge bg-danger';
+                                    break;
+                                case 'PAGADO':
                                     badgeClass = 'badge bg-primary';
                                     break;
                                 case 'ANULADO':
-                                    badgeClass = 'badge bg-danger';
-                                    break;
-                                case 'CONVERTIDO':
-                                    badgeClass = 'badge bg-warning';
-                                    break;
-                                case 'EXPIRADO':
                                     badgeClass = 'badge bg-dark';
                                     break;
                                 default:

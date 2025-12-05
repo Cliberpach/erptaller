@@ -86,7 +86,7 @@
                 <!-- PRODUCTO -->
                 <div class="col-lg-6 col-md-8 col-sm-12">
                     <label class="form-label fw-bold">Producto:</label><i class="fas fa-plus btn btn-warning btn-sm"
-                        onclick="openMdlNewVehicle();" style="margin-left:4px;"></i>
+                        onclick="openMdlCreateProduct();" style="margin-left:4px;"></i>
                     <select class="form-control" id="product_id" name="product_id">
                         <option value="">Seleccionar</option>
                     </select>

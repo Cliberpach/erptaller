@@ -4,6 +4,7 @@ namespace App\Http\Services\Tenant\Cash\PettyCashBook;
 
 use App\Models\Tenant\Cash\PettyCash;
 use App\Models\Tenant\Cash\PettyCashBook;
+use Illuminate\Support\Facades\DB;
 
 class PettyCashBookRepository
 {
@@ -55,12 +56,31 @@ class PettyCashBookRepository
         return $query;
     }
 
-    public function pettyCashIsOpen(int $petty_cash_id){
-        $exists =   PettyCashBook::where('petty_cash_id',$petty_cash_id)->where('status','ABIERTO')->exists();
+    public function pettyCashIsOpen(int $petty_cash_id)
+    {
+        $exists =   PettyCashBook::where('petty_cash_id', $petty_cash_id)->where('status', 'ABIERTO')->exists();
         return $exists;
     }
 
-    public function getPettyCashBook(int $id){
+    public function getPettyCashBook(int $id)
+    {
         return PettyCashBook::findOrFail($id);
+    }
+
+    public function getCashBookUser(int $user_id)
+    {
+        $cash_book  =   DB::table('petty_cash_books as pcb')
+            ->join('petty_cashes as pc', 'pc.id', 'pcb.petty_cash_id')
+            ->select(
+                'pc.name',
+                'pcb.id as petty_cash_book_id',
+                'pc.id as petty_cash_id'
+            )->where('pcb.status', 'ABIERTO')
+            ->whereNull('pcb.final_date')
+            ->where('pcb.user_id', $user_id)
+            ->orderBy('pcb.id', 'ASC') 
+            ->first();
+
+            return $cash_book;
     }
 }
