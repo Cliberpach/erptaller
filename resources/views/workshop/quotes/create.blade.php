@@ -69,6 +69,7 @@
         let lastCustomerQuery = null;
         let lastProductQuery = null;
         let lastServiceQuery = null;
+        let lastVehicleQuery = null;
 
         document.addEventListener('DOMContentLoaded', () => {
             dtProducts = loadDataTableSimple('dt-quotes-products');
@@ -203,6 +204,9 @@
                 maxOptions: 20,
                 create: false,
                 preload: false,
+                onType: (str) => {
+                    lastVehicleQuery = str;
+                },
                 load: async (query, callback) => {
                     if (!query.length) return callback();
                     try {
@@ -213,8 +217,13 @@
 
                         const response = await fetch(url);
                         if (!response.ok) throw new Error('Error al buscar vehiculos');
-                        const data = await response.json();
-                        callback(data.data ?? []);
+                       const data = await response.json();
+                        const results = data.data ?? [];
+                        callback(results);
+                        if (results.length === 0) {
+                            vehicleParams.plateSearchVehicle = lastVehicleQuery;
+                            console.log("No se encontró en BD. Guardado:", window.typedCustomer);
+                        }
                     } catch (error) {
                         console.error('Error cargando vehiculos:', error);
                         callback();

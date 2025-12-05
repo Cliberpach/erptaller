@@ -35,9 +35,19 @@
 </div>
 
 <script>
+    let vehicleParams = {
+        plateSearchVehicle: null
+    };
+
     function openMdlCreateVehicle() {
         setDefaultMdlVehicle();
+         if ( typeof vehicleParams.plateSearchVehicle === 'string' 
+         && (vehicleParams.plateSearchVehicle.length === 8 || vehicleParams.plateSearchVehicle.length === 6) ) {
+                document.querySelector('#plate_mdlvehicle').value = vehicleParams.plateSearchVehicle;
+                document.querySelector('#btn_search_plate').click();
+        }
         $('#mdlCreateVehicle').modal('show');
+
     }
 
     function eventsMdlVehicle() {

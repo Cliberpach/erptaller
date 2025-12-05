@@ -49,7 +49,7 @@
 
         <!-- Año -->
         <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
-            <label for="year_id_mdlvehicle" class="form-label fw-bold required_field">Año:</label>
+            <label for="year_id_mdlvehicle" class="form-label fw-bold">Año:</label>
             <select class="form-select" id="year_id_mdlvehicle" name="year_id_mdlvehicle">
                 <option value="">Seleccionar</option>
                 @foreach ($years as $year)
