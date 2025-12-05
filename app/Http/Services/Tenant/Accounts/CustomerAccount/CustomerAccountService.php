@@ -26,6 +26,6 @@ class CustomerAccountService
 
     public function storePago(array $data): CustomerAccount
     {
-        dd($data)
+        dd($data);
     }
 }
