@@ -136,4 +136,13 @@ array:11 [ // app\Http\Controllers\Tenant\Accounts\CustomerAccountController.php
             return response()->json(['success' => false, 'message' => $th->getMessage()]);
         }
     }
+
+    public function pdfOne(int $id){
+        try {
+            $pdf    =   $this->s_account->pdfOne($id);
+            return $pdf;
+        } catch (Throwable $th) {
+            return response()->json(['success' => false, 'message' => $th->getMessage()]);
+        }
+    }
 }

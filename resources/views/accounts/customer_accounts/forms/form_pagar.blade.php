@@ -1,74 +1,87 @@
 <div class="row">
-    <div class="col-md-6">
+    <div class="col-lg-6 col-md-12 col-xs-12 col-sm-12">
 
         <!-- DATOS DEL CLIENTE -->
         <div class="row g-3">
 
-            <div class="col-12">
-                <label for="cliente" class="required fw-bold">CLIENTE</label>
-                <div class="input-group input-group-sm">
-                    <span class="input-group-text bg-light">
-                        <i class="fa fa-user text-primary"></i>
-                    </span>
-                    <input type="text" id="cliente" name="cliente" class="form-control" disabled>
-                </div>
-            </div>
+           <div class="col-12">
+            <!-- Card contenedor -->
+                <div class="card shadow-sm border-0">
+                    <div class="card-header text-white py-2">
+                        <h6 class="mb-0"><i class="fas fa-info-circle me-2"></i>Información</h6>
+                    </div>
 
-            <div class="col-md-6">
-                <label class="required fw-bold" for="numero">DOCUMENTO</label>
-                <div class="input-group input-group-sm">
-                    <span class="input-group-text bg-light">
-                        <i class="fa fa-file-alt text-success"></i>
-                    </span>
-                    <input type="text" id="numero" name="numero" class="form-control" disabled>
-                </div>
-            </div>
+                    <div class="card-body">
+                        <div class="row g-4">
 
-            <div class="col-md-6">
-                <label class="required fw-bold" for="type_document">TIPO DOCUMENTO</label>
-                <div class="input-group input-group-sm">
-                    <span class="input-group-text bg-light">
-                        <i class="fa fa-shopping-cart text-primary"></i>
-                    </span>
-                    <input type="text" id="type_document" name="type_document" class="form-control" disabled>
-                </div>
-            </div>
+                            <!-- Cliente -->
+                            <div class="col-12">
+                                <label class="fw-bold text-muted small">CLIENTE</label>
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-user text-primary me-2"></i>
+                                    <p class="mb-0" id="cliente"></p>
+                                </div>
+                            </div>
 
-            <div class="col-md-6">
-                <label class="required fw-bold" for="monto">MONTO</label>
-                <div class="input-group input-group-sm">
-                    <span class="input-group-text bg-light">
-                        <i class="fas fa-money-bill-wave text-success"></i>
-                    </span>
-                    <input type="text" id="monto" name="monto" class="form-control" disabled>
-                </div>
-            </div>
+                            <!-- Documento -->
+                            <div class="col-md-6">
+                                <label class="fw-bold text-muted small">DOCUMENTO</label>
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-file-alt text-success me-2"></i>
+                                    <p class="mb-0" id="numero"></p>
+                                </div>
+                            </div>
 
-            <div class="col-md-6">
-                <label class="required fw-bold" for="saldo">SALDO</label>
-                <div class="input-group input-group-sm">
-                    <span class="input-group-text bg-light">
-                        <i class="fa fa-balance-scale text-warning"></i>
-                    </span>
-                    <input type="text" id="saldo" name="saldo" class="form-control" disabled>
-                </div>
-            </div>
+                            <!-- Tipo Documento -->
+                            <div class="col-md-6">
+                                <label class="fw-bold text-muted small">TIPO DOCUMENTO</label>
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-shopping-cart text-primary me-2"></i>
+                                    <p class="mb-0" id="type_document"></p>
+                                </div>
+                            </div>
 
-            <div class="col-md-6">
-                <label class="required fw-bold" for="estado">ESTADO</label>
-                <div class="input-group input-group-sm">
-                    <span class="input-group-text bg-light">
-                        <i class="fa fa-info-circle text-primary"></i>
-                    </span>
-                    <input type="text" id="estado" name="estado" class="form-control" disabled>
-                </div>
-            </div>
+                            <!-- Monto -->
+                            <div class="col-md-6">
+                                <label class="fw-bold text-muted small">MONTO</label>
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-money-bill-wave text-success me-2"></i>
+                                    <p class="mb-0" id="monto"></p>
+                                </div>
+                            </div>
 
-            <div class="col-md-6">
-                <a class="btn btn-danger btn-sm" id="btn-detalle" target="_blank">
-                    <i class="fa fa-file-pdf-o"></i>
-                </a>
-            </div>
+                            <!-- Saldo -->
+                            <div class="col-md-6">
+                                <label class="fw-bold text-muted small">SALDO</label>
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-balance-scale text-warning me-2"></i>
+                                    <p class="mb-0" id="saldo"></p>
+                                </div>
+                            </div>
+
+                            <!-- Estado -->
+                            <div class="col-md-6">
+                                <label class="fw-bold text-muted small">ESTADO</label>
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-info-circle text-primary me-2"></i>
+                                    <p class="mb-0" id="estado"></p>
+                                </div>
+                            </div>
+
+                            <!-- PDF -->
+                            <div class="col-md-6 d-flex align-items-end">
+                                <a class="btn btn-danger w-100 btn-sm d-flex justify-content-center align-items-center gap-2 shadow-sm"
+                                id="btn-detalle" target="_blank">
+                                    <i class="fas fa-file-pdf fa-lg"></i>
+                                    <span>PDF</span>
+                                </a>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+           </div>
+
         </div>
 
         <!-- TABLA -->
@@ -92,7 +105,7 @@
     </div>
 
     <!-- FORM DE REGISTRO DE DETALLE -->
-    <div class="col-md-6">
+    <div class="col-lg-6 col-md-12 col-xs-12 col-sm-12">
         <form id="frmDetalle" method="POST" enctype="multipart/form-data">
             {{ csrf_field() }}
 
@@ -186,19 +199,9 @@
             <!-- IMAGEN -->
             <div class="col-12">
                 <label for="imagen" class="fw-bold">IMAGEN</label>
-                <input id="imagen" type="file" name="imagen" class="form-control" accept="image/*">
+                <input  accept="image/*" data-max-files="1" data-allow-reorder="true"
+                                data-max-file-size="3MB" id="imagen" type="file" name="imagen" class="filepond" >
                 <span class="imagen_error msgError"></span>
-            </div>
-
-            <div class="col-12 text-end">
-                <a href="javascript:void(0);" id="limpiar_imagen" class="badge bg-danger">x</a>
-            </div>
-
-            <div class="col-12 text-center">
-                <img class="imagen img-fluid"
-                    style="max-height: 250px; object-fit: contain;"
-                    src="{{ asset('assets/img/img_default.png') }}" alt="">
-                <input id="url_imagen" name="url_imagen" type="hidden">
             </div>
 
         </div>

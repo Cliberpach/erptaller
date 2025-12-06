@@ -92,7 +92,6 @@
             loadFilePound();
             events();
             setQuote();
-
         })
 
         function events() {

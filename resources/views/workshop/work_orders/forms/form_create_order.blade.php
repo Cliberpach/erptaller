@@ -325,12 +325,6 @@
 
     </div>
 
-    <style>
-        .filepond--credits {
-            display: none !important;
-        }
-    </style>
-
     <div class="row">
         <div class="col-12 d-flex justify-content-lg-end">
             <div class="col-12 col-lg-4">

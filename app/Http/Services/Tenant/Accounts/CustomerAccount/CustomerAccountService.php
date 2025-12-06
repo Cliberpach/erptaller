@@ -4,8 +4,11 @@ namespace App\Http\Services\Tenant\Accounts\CustomerAccount;
 
 use App\Http\Services\Tenant\Accounts\CustomerAccount\CustomerAccountDto;
 use App\Models\Company;
+use App\Models\Landlord\Customer;
 use App\Models\Tenant\Accounts\CustomerAccount;
 use App\Models\Tenant\Accounts\CustomerAccountDetail;
+use App\Models\Tenant\WorkShop\WorkOrder\WorkOrder;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\File;
 
@@ -46,7 +49,7 @@ class CustomerAccountService
 
         $dto    =   $this->s_dto->getDtoPay($data);
         $pay    =   $this->s_repository->insertPay($dto);
-       
+
         $carpet_company =   Company::findOrFail(1)->files_route;
         $path = public_path("storage/{$carpet_company}/customer_accounts/images/");
         if (!File::exists($path)) {
@@ -60,5 +63,33 @@ class CustomerAccountService
         }
 
         return $pay;
+    }
+
+    public function pdfOne(int $id)
+    {
+        $cuenta = CustomerAccount::findOrFail($id);
+        $documento =   null;
+        $cliente    =   null;
+
+        if ($cuenta->work_order_id) {
+            $work_order =   WorkOrder::findOrFail($cuenta->work_order_id);
+            $cliente    =   Customer::findOrFail($work_order->customer_id);
+            $documento  =   'OT-' . $work_order->id;
+        }
+
+        $company            = Company::first();
+        $detalle    =   CustomerAccountDetail::where('customer_account_id', $id)
+            ->orderByDesc('id')
+            ->get();
+
+        $pdf = Pdf::loadview('accounts.customer_accounts.reports.pdf-one', [
+            'cuenta' => $cuenta,
+            'detalles' => $cuenta->detalles,
+            'cliente' => $cliente,
+            'company' => $company,
+            'documento' => $documento,
+            'detalle'   => $detalle
+        ])->setPaper('a4');
+        return $pdf->stream('CUENTA-' . $cuenta->id . '.pdf');
     }
 }

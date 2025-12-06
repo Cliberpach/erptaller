@@ -10,3 +10,7 @@
     font-weight: bold;
 }
 
+/*======== QUITAR CREDITOS FILEPOUND ===========*/
+.filepond--credits {
+    display: none !important;
+}

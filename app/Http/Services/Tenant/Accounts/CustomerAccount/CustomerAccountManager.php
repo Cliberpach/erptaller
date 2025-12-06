@@ -22,4 +22,8 @@ class CustomerAccountManager
         return $this->s_account->storePago($data);
     }
 
+    public function pdfOne(int $id){
+        return $this->s_account->pdfOne($id);
+    }
+
 }
