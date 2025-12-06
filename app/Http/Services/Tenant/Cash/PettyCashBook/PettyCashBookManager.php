@@ -21,4 +21,12 @@ class PettyCashBookManager
         return $this->s_cashbook->getPdfOne($data);
     }
 
+    public function getConsolidated(int $id){
+        return $this->s_cashbook->getConsolidated($id);
+    }
+
+    public function closePettyCash(array $data){
+        return $this->s_cashbook->closePettyCash($data);
+    }
+
 }

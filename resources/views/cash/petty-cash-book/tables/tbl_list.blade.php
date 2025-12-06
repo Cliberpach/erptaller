@@ -7,7 +7,6 @@
             <th data-priority="3">FECHA APERTURA</th>
             <th>FECHA CIERRE</th>
             <th>CANT CIERRE</th>
-            <th>VENTA DEL DIA</th>
             <th>ESTADO</th>
             <th data-priority="1"></th>
         </tr>

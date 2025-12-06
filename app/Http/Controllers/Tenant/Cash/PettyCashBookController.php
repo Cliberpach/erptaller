@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\PettyCash;
 use App\Models\PettyCashBook;
 use Illuminate\Support\Facades\Session;
+use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Throwable;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -122,26 +123,44 @@ array:3 [ // app\Http\Controllers\Tenant\Cash\PettyCashBookController.php:112
             ], 404); // Error 404: No encontrado
         }
 
-        // Actualizar el estado a "close"
         try {
             $cashBook->status = $request->status;
             $PcashBook->status = $request->status;
-            $cashBook->final_date = now(); // Actualizar la fecha de cierre a la fecha actual
+            $cashBook->final_date = now();
             $cashBook->save();
             $PcashBook->save();
 
-            // Devolver una respuesta exitosa
             return response()->json([
                 'success' => true,
                 'message' => 'El libro de caja ha sido cerrado exitosamente.',
             ]);
         } catch (\Exception $e) {
-            // Manejar cualquier error que ocurra durante la actualización
             return response()->json([
                 'success' => false,
                 'message' => 'Ocurrió un error al cerrar el libro de caja.',
                 'error' => $e->getMessage(),
-            ], 500); // Error 500: Error interno del servidor
+            ], 500);
+        }
+    }
+
+    public function getConsolidated(Request $request)
+    {
+        try {
+            $consolidated   =   $this->s_pettycashbook->getConsolidated($request->get('id'));
+            return response()->json(['success' => true, 'message' => 'CONSOLIDADO OBTENIDO', 'consolidated' => $consolidated]);
+        } catch (Throwable $th) {
+            return response()->json(['success' => false, 'message' => $th->getMessage()]);
+        }
+    }
+
+    public function closePettyCash(Request $request)
+    {
+        try {
+            $petty_cash_book   =   $this->s_pettycashbook->closePettyCash($request->toArray());
+            DB::commit();
+            return response()->json(['success' => true, 'message' => 'CAJA CERRADA CON ÉXITO']);
+        } catch (Throwable $th) {
+            return response()->json(['success' => false, 'message' => $th->getMessage()]);
         }
     }
 }

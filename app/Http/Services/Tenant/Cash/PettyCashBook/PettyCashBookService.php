@@ -108,4 +108,87 @@ class PettyCashBookService
         return $this->s_repository->getCashBookUser($user_id);
     }
 
+    public function getConsolidated(int $id)
+    {
+        $payment_methods    =   PaymentMethod::where('estado', 'ACTIVO')->get();
+
+        $report_sales       =   $this->getReportSales($payment_methods, $id);
+        $report_expenses    =   $this->getReportExpenses($payment_methods, $id);
+        $petty_cash_book    =   $this->s_repository->getPettyCashBookInfo($id);
+        $amount_close       =   $report_sales['total'] - $report_expenses['total'];
+
+        return [
+            'report_sales' =>    $report_sales,
+            'report_expenses' => $report_expenses,
+            'petty_cash_book'   =>  $petty_cash_book,
+            'amount_close'      =>  $amount_close
+        ];
+    }
+
+    public function getReportSales($payment_methods, int $id)
+    {
+        $sales  =   Sale::where('petty_cash_book_id', $id)->where('estado', '<>', 'ANULADO')->get();
+        $report_sales   =   [];
+        foreach ($payment_methods as $payment_method) {
+            $item   =   [];
+
+            $amount_1   =   $sales->where('method_pay_id_1', $payment_method->id)->sum('amount_pay_1');
+            $amount_2   =   $sales->where('method_pay_id_2', $payment_method->id)->sum('amount_pay_2');
+
+            $item       =   [
+                'payment_method_id' =>  $payment_method->id,
+                'payment_method_name' => $payment_method->description,
+                'amount'            =>  $amount_1 + $amount_2
+            ];
+
+            $report_sales[] =   $item;
+        }
+
+        $total  =   $sales->sum('amount_pay_1') + $sales->sum('amount_pay_2');
+
+        return ['total' => $total, 'report' => $report_sales];
+    }
+
+    public function getReportExpenses($payment_methods, int $id)
+    {
+        $expenses = ExitMoney::where('petty_cash_book_id', $id)
+            ->where('status', '1')
+            ->get();
+
+        $report_expenses = [];
+
+        foreach ($payment_methods as $payment_method) {
+
+            $amount = $expenses
+                ->where('payment_method_id', $payment_method->id)
+                ->sum('total');
+
+            $report_expenses[] = [
+                'payment_method_id'   => $payment_method->id,
+                'payment_method_name' => $payment_method->description,
+                'amount'              => $amount
+            ];
+        }
+
+        $total = $expenses->sum('total');
+
+        return [
+            'total'  => $total,
+            'report' => $report_expenses
+        ];
+    }
+
+    public function closePettyCash(array $data)
+    {
+        $this->s_validation->validationClosePettyCash($data);
+        $consolidated   =   $this->getConsolidated($data['id']);
+
+        $petty_cash_book    =   $this->s_repository->getPettyCashBook($data['id']);
+        $petty_cash_book->status    =   'CERRADO';
+        $petty_cash_book->closing_amount    =   $consolidated['amount_close'];
+        $petty_cash_book->final_date        =   now();
+        $petty_cash_book->save();
+       
+        return $petty_cash_book;
+    }
 }

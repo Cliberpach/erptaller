@@ -17,6 +17,7 @@
 
 @section('content')
     @include('cash.petty-cash-book.modals.mdl_open_cash')
+    @include('cash.petty-cash-book.modals.mdl_close_cash')
 
     <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
@@ -52,6 +53,7 @@
 
         function events() {
             eventsMdlOpenCash();
+            eventsMdlCloseCash();
         }
 
         function iniciarDtCash() {
@@ -100,13 +102,6 @@
                         className: "text-center"
                     },
                     {
-                        data: 'sale_day',
-                        name: 'c.sale_day',
-                        searchable: true,
-                        orderable: true,
-                        className: "text-center"
-                    },
-                    {
                         data: 'status',
                         name: 'c.status',
                         searchable: true,
@@ -142,11 +137,10 @@
 
                             const btnCerrar = data.status === 'ABIERTO' ?
                                 `
-                                    <button data-id="${data.id}"
-                                            data-petty-cash-id="${row.petty_cash_id}"
+                                    <button onclick="openMdlCloseCash(${data.id})" 
                                             type="button"
-                                            class="btn btn-warning btnCerrar eventCerrar">
-                                        <i class="fas fa-lock eventCerrar" style="color: #ffffff;"></i>
+                                            class="btn btn-warning btnCerrar">
+                                        <i class="fas fa-lock" style="color: #ffffff;"></i>
                                         CERRAR
                                     </button>
                                 ` :

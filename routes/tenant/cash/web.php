@@ -17,10 +17,12 @@ Route::group(["prefix" => "cajas"], function () {
     });
 
     Route::group(["prefix" => "movimientos"], function () {
-        Route::get('apertura-cierre', [PettyCashBookController::class, 'index'])->name('tenant.cajas.apertura_cierre');
+        Route::get('apertura-cierre', [PettyCashBookController::class, 'index'])->name('tenant.movimientos_caja.apertura_cierre');
         Route::get('pdf-one', [PettyCashBookController::class, 'showPDF'])->name('tenant.movimientos_caja.pdf');
         Route::post('open-cash', [PettyCashBookController::class, 'openPettyCash'])->name('tenant.movimientos_caja.abrirCaja');
         Route::get('getCashBooks', [PettyCashBookController::class, 'getCashBooks'])->name('tenant.cajas.getCashBooks');
+        Route::get('getConsolidated', [PettyCashBookController::class, 'getConsolidated'])->name('tenant.movimientos_caja.getConsolidated');
+        Route::post('close-cash', [PettyCashBookController::class, 'closePettyCash'])->name('tenant.movimientos_caja.closePettyCash');
     });
 
     Route::group(["prefix" => "egresos"], function () {

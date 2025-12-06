@@ -1,18 +1,18 @@
-<div class="modal fade" id="mdl_edit_cash" tabindex="-1" aria-labelledby="mdl_edit_cash_label" aria-hidden="true">
+<div class="modal fade" id="mdl_close_cash" tabindex="-1" aria-labelledby="mdl_close_cash_label" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
 
             <div class="modal-header">
                 <i class="fa fa-cogs text-primary me-2"></i>
                 <div>
-                    <h5 class="modal-title mb-0" id="mdl_edit_cash_label">Caja</h5>
-                    <small class="text-muted">Editar Caja</small>
+                    <h5 class="modal-title mb-0" id="mdl_close_cash_label">Caja</h5>
+                    <small class="text-muted">Cerrar Caja</small>
                 </div>
                 <button type="button" class="btn-close ms-auto" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
 
             <div class="modal-body">
-                @include('cash.petty-cash.forms.form_edit_cash')
+                @include('cash.petty-cash-book.forms.form_close_cash')
             </div>
 
             <div class="modal-footer d-flex justify-content-between align-items-center flex-wrap">
@@ -21,8 +21,8 @@
                     Los campos marcados con asterisco (<label class="required"></label>) son obligatorios.
                 </div>
                 <div class="mt-sm-0 mt-2 text-end">
-                    <button type="submit" form="form_edit_cash" class="btn btn-primary btn-sm">
-                        <i class="fa fa-save"></i> Actualizar
+                    <button type="button" class="btn btn-primary btn-sm btnCloseCash">
+                        <i class="fa fa-save"></i> Grabar
                     </button>
                     <button type="button" class="btn btn-danger btn-sm" data-bs-dismiss="modal">
                         <i class="fa fa-times"></i> Cancelar
@@ -36,39 +36,90 @@
 
 
 <script>
-    const paramsMdlEditCash = {
+    const paramsMdlCloseCash = {
         id: null
     };
 
-    async function openMdlEditCash(cashId) {
-        paramsMdlEditCash.id = cashId;
+    async function openMdlCloseCash(cashBookId) {
+        paramsMdlCloseCash.id = cashBookId;
 
-        const data = await getCash(cashId);
+        const data = await getConsolidatedCash(cashBookId);
         if (!data) return;
-        paintCashEdit(data);
-        $('#mdl_edit_cash').modal('show');
+        paintConsolidatedCash(data);
+        $('#mdl_close_cash').modal('show');
     }
 
-    function eventsMdlEditCash() {
-        document.querySelector('#form_edit_cash').addEventListener('submit', (e) => {
-            e.preventDefault();
-            updateCash(e.target);
+    function eventsMdlCloseCash() {
+        document.querySelector('.btnCloseCash').addEventListener('click', (e) => {
+            closeCash(e.target);
         })
     }
 
-    function paintCashEdit(service) {
-        document.querySelector('#name_edit').value = service.name;
+    function paintConsolidatedCash(data) {
+        const container = document.getElementById("consolidated_container");
+        container.innerHTML = "";
+
+        const sales = data.report_sales;
+        const expenses = data.report_expenses;
+
+        const pettyCashBook = data.petty_cash_book;
+        document.querySelector('#consolidated_caja').textContent = pettyCashBook.petty_cash_name;
+        document.querySelector('#consolidated_cajero').textContent = pettyCashBook.user_name;
+        document.querySelector('#saldo_inicial_consolidated').textContent = formatSoles(pettyCashBook.initial_amount);
+        document.querySelector('#monto_cierre_consolidated').textContent = formatSoles(data.amount_close);
+
+
+        document.getElementById("total_sales_general").textContent = sales.total.toFixed(2);
+        document.getElementById("total_expenses_general").textContent = expenses.total.toFixed(2);
+
+        sales.report.forEach((item, index) => {
+
+            const expenseItem = expenses.report[index];
+
+            const html = `
+            <div class="col-md-6">
+                <div class="border rounded p-3 bg-light">
+                    <h6 class="fw-bold mb-2">
+                        <i class="fa-solid fa-wallet text-primary me-2"></i>
+                        ${item.payment_method_name}
+                    </h6>
+
+                    <div class="d-flex justify-content-between">
+                        <span>Ventas:</span>
+                        <span class="fw-bold text-success">${item.amount.toFixed(2)}</span>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <span>Egresos:</span>
+                        <span class="fw-bold text-danger">${expenseItem.amount.toFixed(2)}</span>
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-2 pt-2 border-top">
+                        <span class="fw-semibold">Neto:</span>
+                        <span class="fw-bold ${
+                            item.amount - expenseItem.amount >= 0 ? "text-success" : "text-danger"
+                        }">${(item.amount - expenseItem.amount).toFixed(2)}</span>
+                    </div>
+                </div>
+            </div>
+        `;
+
+            container.insertAdjacentHTML("beforeend", html);
+        });
     }
 
-    async function getCash(cashId) {
+
+    async function getConsolidatedCash(cashBookId) {
         try {
             mostrarAnimacion1();
             toastr.clear();
-            const res = await axios.get(route('tenant.cajas.getCash', cashId));
+            const res = await axios.get(route('tenant.movimientos_caja.getConsolidated', {
+                id: cashBookId
+            }));
 
             if (res.data.success) {
                 toastr.info(res.data.message, 'OPERACIÓN COMPLETADA');
-                return res.data.data;
+                return res.data.consolidated;
             } else {
                 return null;
                 toastr.error(res.data.message);
@@ -81,10 +132,8 @@
         }
     }
 
-    function updateCash(formUpdateCash) {
-
-        const serviceName = document.querySelector('#name_edit').value;
-
+    function closeCash() {
+        
         const swalWithBootstrapButtons = Swal.mixin({
             customClass: {
                 confirmButton: "btn btn-success",
@@ -93,14 +142,8 @@
             buttonsStyling: false
         });
         swalWithBootstrapButtons.fire({
-            title: "Desea actualizar la caja?",
-            html: `
-            <div style="text-align: center; margin-top: 10px;">
-                <p style="font-size: 16px; margin-bottom: 10px;">
-                    <strong>Nombre:</strong> ${serviceName}
-                </p>
-            </div>
-        `,
+            title: "Desea cerrar la caja?",
+            message: `OPERACIÓN NO REVERSIBLE`,
             icon: "warning",
             showCancelButton: true,
             confirmButtonText: "Sí!",
@@ -110,7 +153,7 @@
             if (result.isConfirmed) {
 
                 Swal.fire({
-                    title: "Actualizando caja...",
+                    title: "Cerrando caja...",
                     text: "Por favor, espere",
                     icon: "info",
                     allowOutsideClick: false,
@@ -124,15 +167,15 @@
                 try {
                     toastr.clear();
 
-                    const formData = new FormData(formUpdateCash);
-                    formData.append('_method', 'PUT');
+                    const formData = new FormData();
+                    formData.append('id',paramsMdlCloseCash.id);
 
-                    const res = await axios.post(route('tenant.cajas.update', paramsMdlEditCash.id),
+                    const res = await axios.post(route('tenant.movimientos_caja.closePettyCash', paramsMdlCloseCash.id),
                         formData);
 
                     if (res.data.success) {
                         toastr.success(res.data.message, 'OPERCIÓN COMPLETADA');
-                        $('#mdl_edit_cash').modal('hide');
+                        $('#mdl_close_cash').modal('hide');
                         dtCash.ajax.reload();
                     } else {
                         Swal.close();
