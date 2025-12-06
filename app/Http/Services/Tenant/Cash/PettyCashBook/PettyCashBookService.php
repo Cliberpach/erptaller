@@ -115,7 +115,7 @@ class PettyCashBookService
         $report_sales       =   $this->getReportSales($payment_methods, $id);
         $report_expenses    =   $this->getReportExpenses($payment_methods, $id);
         $petty_cash_book    =   $this->s_repository->getPettyCashBookInfo($id);
-        $amount_close       =   $report_sales['total'] - $report_expenses['total'];
+        $amount_close       =   $report_sales['total'] - $report_expenses['total'] + $petty_cash_book->initial_amount;
 
         return [
             'report_sales' =>    $report_sales,
