@@ -3,6 +3,8 @@
 namespace App\Http\Services\Tenant\WorkShop\WorkOrders;
 
 use App\Http\Services\Tenant\Inventory\WarehouseProduct\WarehouseProductService;
+use App\Models\Product;
+use App\Models\Tenant\Configuration;
 use App\Models\Tenant\WorkShop\Quote\Quote;
 use App\Models\Tenant\WorkShop\WorkOrder\WorkOrder;
 use Exception;
@@ -25,16 +27,17 @@ class WorkOrderValidation
             throw new Exception("DEBE INGRESAR POR LO MENOS UN PRODUCTO O SERVICIO A LA ORDEN DE TRABAJO");
         }
 
-        $quote_id   =   $data['quote_id']??null;
-        if($quote_id){
+        $quote_id   =   $data['quote_id'] ?? null;
+        if ($quote_id) {
             $quote  =   Quote::findOrFail($quote_id);
-            if($quote->order_id){
-                throw new Exception("LA COTIZACIÓN YA FUE CONVERTIDA EN LA ORDEN OT-".$quote->order_id);
+            if ($quote->order_id) {
+                throw new Exception("LA COTIZACIÓN YA FUE CONVERTIDA EN LA ORDEN OT-" . $quote->order_id);
             }
         }
 
-        $data['lst_products'] =   $lst_products;
-        $data['lst_services'] =   $lst_services;
+        $data['lst_products']       =   $lst_products;
+        $data['lst_services']       =   $lst_services;
+        $data['validation_stock']   =   Configuration::findOrFail(2)->property === '1' ? true : false;
 
         return $data;
     }
@@ -52,25 +55,28 @@ class WorkOrderValidation
             throw new Exception("NO SE PUEDE MODIFICAR UNA ORDEN DE TRABAJO EXPIRADA");
         }
 
+        $data['validation_stock']           =   Configuration::findOrFail(2)->property === '1' ? true : false;
+        $data['validation_stock_preview']   =   $order->validation_stock?true:false;
+
         return $data;
     }
 
-    public function validationProduct($item)
+    public function validationProduct($item, $validation_stock)
     {
+        if ($validation_stock == '1') {
+            $product_bd =   $this->s_warehouse_product->getProductStock($item->warehouse_id, $item->id);
 
-        $product_bd =   $this->s_warehouse_product->getProductStock($item->warehouse_id, $item->id);
+            if (!$product_bd) {
+                throw new Exception($item->name . ', PRODUCTO NO ENCONTRADO EN BD');
+            }
 
-        if (!$product_bd) {
-            throw new Exception($item->name . ', PRODUCTO NO ENCONTRADO EN BD');
+            if ((float)$item->quantity > (float)$product_bd->stock) {
+                throw new Exception(
+                    "⚠ Stock insuficiente para: {$item->name}\n"
+                        . "Stock disponible: " . round($product_bd->stock, 2) . "\n"
+                        . "Cantidad solicitada: " . round($item->quantity, 2)
+                );
+            }
         }
-
-        if ((float)$item->quantity > (float)$product_bd->stock) {
-            throw new Exception(
-                "⚠ Stock insuficiente para: {$item->name}\n"
-                    . "Stock disponible: " . round($product_bd->stock, 2) . "\n"
-                    . "Cantidad solicitada: " . round($item->quantity, 2)
-            );
-        }
-
     }
 }

@@ -77,7 +77,6 @@
             gaugeWidthScale: 0.7
         });
 
-
         document.addEventListener('DOMContentLoaded', () => {
             dtProducts = loadDataTableSimple('dt-quotes-products');
             dtServices = loadDataTableSimple('dt-quotes-services');
@@ -248,10 +247,18 @@
                 load: async (query, callback) => {
                     if (!query.length) return callback();
                     try {
-                        const url = route('tenant.utils.searchProductStock', {
+
+                        const configuration = @json($configuration->property);
+                        let urlSearchProduct = 'tenant.utils.searchProductStock';
+                        if (configuration == '0') {
+                            urlSearchProduct = 'tenant.utils.searchProduct';
+                        }
+
+                        const url = route(urlSearchProduct, {
                             q: query,
                             warehouse_id: window.warehouseSelect.getValue()
                         });
+
                         const response = await fetch(url);
                         if (!response.ok) throw new Error('Error al buscar productos');
                         const data = await response.json();
@@ -927,13 +934,20 @@
                     pond.addFile(lstImages[index].img_route);
                 }
             });
+
+            //========= FUEL LEVEL =======
+            const workOrder = @json($work_order);
+            const fuelSelect = document.querySelector('#fuelSelect');
+            fuelSelect.value = workOrder.fuel_level;
+            gauge.refresh(fuelSelect.value);
+
         }
 
         async function validatedProductStock(item) {
             mostrarAnimacion1();
             try {
                 const res = await axios.get(route('tenant.utils.validatedProductStock', {
-                    work_order_id:@json($work_order->id),
+                    work_order_id: @json($work_order->id),
                     warehouse_id: item.warehouse_id,
                     product_id: item.id,
                     quantity: item.quantity

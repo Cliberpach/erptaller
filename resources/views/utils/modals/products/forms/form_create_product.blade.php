@@ -74,11 +74,12 @@
             <div class="col-lg-12 col-md-12 mb-3">
                 <label for="category_id_mdlproduct" class="form-label required_field">Categoría</label>
 
-                <select required name="category_id_mdlproduct" style="text-transform: uppercase;" id="category_id_mdlproduct"
-                    class="form-select" aria-label="Default select example">
+                <select required name="category_id_mdlproduct" style="text-transform: uppercase;"
+                    id="category_id_mdlproduct" class="form-select" aria-label="Default select example">
                     <option value=""></option>
                     @foreach ($categories as $category)
-                        <option style="text-transform: uppercase;" value="{{ $category->id }}">
+                        <option @if ($category->is_default) selected @endif style="text-transform: uppercase;"
+                            value="{{ $category->id }}">
                             {{ $category->name }}</option>
                     @endforeach
                 </select>
@@ -87,11 +88,12 @@
             <div class="col-lg-12 col-md-12 mb-3">
 
                 <label for="brand" class="form-label required_field">Marca</label>
-                <select required name="brand_id_mdlproduct" style="text-transform: uppercase;" id="brand_id_mdlproduct"
-                    class="brand form-select" aria-label="Default select example">
+                <select required name="brand_id_mdlproduct" style="text-transform: uppercase;"
+                    id="brand_id_mdlproduct" class="brand form-select" aria-label="Default select example">
                     <option value=""></option>
                     @foreach ($brands as $brand)
-                        <option style="text-transform: uppercase;" value="{{ $brand->id }}">{{ $brand->name }}
+                        <option @if ($brand->is_default) selected @endif style="text-transform: uppercase;"
+                            value="{{ $brand->id }}">{{ $brand->name }}
                         </option>
                     @endforeach
                 </select>

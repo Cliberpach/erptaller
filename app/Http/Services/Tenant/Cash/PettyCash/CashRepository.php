@@ -35,12 +35,12 @@ class CashRepository
     {
         $search = $data['search'] ?? null;
 
-        $query  =   PettyCash::from('petty_cashes as pc')
-            ->leftJoin('petty_cash_books as pcb', 'pc.id', 'pcb.petty_cash_id')
-            ->where('pcb.status', 'CERRADO')
-            ->orWhereNull('pcb.id')
-            ->where('pc.status', 'CERRADO')
-            ->distinct()
+        $query = PettyCash::from('petty_cashes as pc')
+            ->leftJoin('petty_cash_books as pcb', function ($join) {
+                $join->on('pc.id', '=', 'pcb.petty_cash_id')
+                    ->where('pcb.status', 'ABIERTO');
+            })
+            ->whereNull('pcb.id')
             ->when($search, function ($q) use ($search) {
                 $q->where('pc.name', 'like', "%{$search}%");
             })
@@ -49,8 +49,16 @@ class CashRepository
                 'pc.name',
                 'pc.status'
             )
+            ->distinct()
             ->get();
 
         return $query;
+    }
+
+    public function setStatus(int $id, string $status)
+    {
+        $cash   =   PettyCash::findOrFail($id);
+        $cash->status   =   $status;
+        $cash->save();
     }
 }

@@ -218,12 +218,12 @@
                     <div class="col-lg-3 col-md-4 col-sm-12 col-xs-12">
                         <label for="fuelSelect" class="form-check-label text-secondary fw-bold">NIVEL DE
                             GASOLINA:</label>
-                        <select id="fuelSelect" class="form-control">
-                            <option value="0">VACÍO</option>
-                            <option value="25">1/4</option>
-                            <option value="50" selected>1/2</option>
-                            <option value="75">3/4</option>
-                            <option value="100">LLENO</option>
+                        <select id="fuelSelect" class="form-control" name="fuel_level">
+                            <option value="0" >VACÍO</option>
+                            <option value="25" >1/4</option>
+                            <option value="50" >1/2</option>
+                            <option value="75" >3/4</option>
+                            <option value="100" >LLENO</option>
                         </select>
 
                         <div style="width: 250px; margin-bottom: 20px;" class="mt-2">

@@ -2,6 +2,18 @@
     @csrf
     @method('POST')
 
+    <div class="alert alert-info alert-dismissible fade show" role="alert">
+        <strong class="text-dark">Validación de Stock:</strong>
+
+        @if ($configuration->property == 1)
+            <span class="text-success fw-bold">ACTIVADA</span>
+        @else
+            <span class="text-danger fw-bold">DESACTIVADA</span>
+        @endif
+
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
     <p class="text-muted mb-2">
         <span class="text-danger">*</span> Los campos marcados son obligatorios.
     </p>

@@ -8,6 +8,7 @@ use App\Models\Company;
 use App\Models\Landlord\Customer;
 use App\Models\Landlord\GeneralTable\GeneralTableDetail;
 use App\Models\Product;
+use App\Models\Tenant\Configuration;
 use App\Models\Tenant\Warehouse;
 use App\Models\Tenant\WorkShop\Service;
 use App\Models\Tenant\WorkShop\Vehicle;
@@ -44,7 +45,10 @@ class WorkOrderDto
         $dto['igv']         =   $dto_amounts['igv'];
 
         //======= QUOTE ==========
-         $dto['quote_id']    =   $data['quote_id']??null;
+        $dto['quote_id']    =   $data['quote_id'] ?? null;
+
+        //========= CONFIGURATION ==========
+        $dto['validation_stock']    =   $data['validation_stock'];
 
         return $dto;
     }
@@ -152,11 +156,12 @@ class WorkOrderDto
         return $dtoImages;
     }
 
-    public function getDtoWorkImage(int $id,array $data){
+    public function getDtoWorkImage(int $id, array $data)
+    {
         return [
-                    'work_order_id' => $id,
-                    'img_name'      => $data['name'],
-                    'img_route'     => $data['route'],
+            'work_order_id' => $id,
+            'img_name'      => $data['name'],
+            'img_route'     => $data['route'],
         ];
     }
 

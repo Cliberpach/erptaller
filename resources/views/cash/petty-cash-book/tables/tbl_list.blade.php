@@ -2,6 +2,7 @@
     <thead>
         <tr>
             <th>ID</th>
+            <th>#</th>
             <th data-priority="2">CAJA</th>
             <th>CANT INICIAL</th>
             <th data-priority="3">FECHA APERTURA</th>

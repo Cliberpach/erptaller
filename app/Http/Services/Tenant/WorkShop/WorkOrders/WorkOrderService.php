@@ -37,17 +37,17 @@ class WorkOrderService
 
         $work_order     =   $this->s_repository->insertWorkOrder($dto);
 
-        $dto_inventory      =   $this->s_dto->getDtoInventory($data['inventory_items']??[], $work_order);
-        $dto_technicians    =   $this->s_dto->getDtoTechnicians($data['technicians']??[], $work_order);
+        $dto_inventory      =   $this->s_dto->getDtoInventory($data['inventory_items'] ?? [], $work_order);
+        $dto_technicians    =   $this->s_dto->getDtoTechnicians($data['technicians'] ?? [], $work_order);
 
         $this->s_repository->insertWorkOrderDetail($data['lst_products'], $data['lst_services'], $work_order);
         $this->s_repository->insertWorkInventory($dto_inventory);
         $this->s_repository->insertWorkTechnicians($dto_technicians);
 
         //======= CUENTA CLIENTE =======
-        $this->s_customer_account->store(['work_order_id'=>$work_order->id]);
+        $this->s_customer_account->store(['work_order_id' => $work_order->id]);
 
-        $dto_images =   $this->s_dto->getDtoOrderImages($data['vehicle_images']??[], $work_order);
+        $dto_images =   $this->s_dto->getDtoOrderImages($data['vehicle_images'] ?? [], $work_order);
         $this->s_repository->insertWorkImages($dto_images);
         return $work_order;
     }
@@ -55,28 +55,32 @@ class WorkOrderService
     public function update(array $data, int $id): WorkOrder
     {
         $data       =   $this->s_validation->validationUpdate($data, $id);
+       
         $dto        =   $this->s_dto->getDtoStore($data);
 
         $work_order =   $this->s_repository->updateWorkOrder($dto, $id);
 
-        $products_preview   =   $this->s_repository->getWorkProducts($id);
-        foreach ($products_preview as $item) {
-            $this->s_warehouse_product->increaseStock($item->warehouse_id,$item->product_id,$item->quantity);
+        if ($data['validation_stock_preview']) {
+            $products_preview   =   $this->s_repository->getWorkProducts($id);
+            foreach ($products_preview as $item) {
+                $this->s_warehouse_product->increaseStock($item->warehouse_id, $item->product_id, $item->quantity);
+            }
         }
+
 
         $this->s_repository->deleteDetailProduct($id);
         $this->s_repository->deleteDetailService($id);
         $this->s_repository->insertWorkOrderDetail($data['lst_products'], $data['lst_services'], $work_order);
 
         $this->s_repository->deleteDetailInventory($id);
-        $dto_inventory      =   $this->s_dto->getDtoInventory($data['inventory_items']??[], $work_order);
+        $dto_inventory      =   $this->s_dto->getDtoInventory($data['inventory_items'] ?? [], $work_order);
         $this->s_repository->insertWorkInventory($dto_inventory);
 
         $this->s_repository->deleteDetailTechnical($id);
-        $dto_technicians    =   $this->s_dto->getDtoTechnicians($data['technicians']??[], $work_order);
+        $dto_technicians    =   $this->s_dto->getDtoTechnicians($data['technicians'] ?? [], $work_order);
         $this->s_repository->insertWorkTechnicians($dto_technicians);
 
-        $this->updateWorkImages($id, $data['vehicle_images']??[]);
+        $this->updateWorkImages($id, $data['vehicle_images'] ?? []);
 
         return $work_order;
     }

@@ -1,4 +1,3 @@
-<!-- Consolidado -->
 <div class="card mt-3 border-0 shadow-sm">
     <div class="card-header bg-secondary fw-semibold d-flex align-items-center text-white">
         <i class="fa-solid fa-chart-simple me-2"></i>

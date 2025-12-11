@@ -2,9 +2,9 @@
 
 namespace App\Http\Services\Tenant\Cash\PettyCashBook;
 
+use App\Http\Services\Tenant\Cash\PettyCash\CashService;
 use App\Models\Company;
 use App\Models\ExitMoney;
-use App\Models\Tenant\Cash\PettyCash;
 use App\Models\Tenant\Cash\PettyCashBook;
 use App\Models\Tenant\PaymentMethod;
 use App\Models\Tenant\Sale;
@@ -16,12 +16,14 @@ class PettyCashBookService
     private PettyCashBookRepository $s_repository;
     private PettyCashBookDto $s_dto;
     private PettyCashBookValidation $s_validation;
+    private CashService $s_cash;
 
     public function __construct()
     {
         $this->s_repository =   new PettyCashBookRepository();
         $this->s_dto        =   new PettyCashBookDto();
         $this->s_validation =   new PettyCashBookValidation($this->s_repository);
+        $this->s_cash       =   new CashService();
     }
 
     public function openPettyCash(array $data): PettyCashBook
@@ -29,6 +31,7 @@ class PettyCashBookService
         $this->s_validation->validateOpenCash($data);
         $dto    =   $this->s_dto->getDtoStore($data);
         $petty_cash_book   =   $this->s_repository->insertPettyCashBook($dto);
+        $this->s_cash->setStatus($dto['petty_cash_id'],'ABIERTO');
         return $petty_cash_book;
     }
 
@@ -188,7 +191,7 @@ class PettyCashBookService
         $petty_cash_book->closing_amount    =   $consolidated['amount_close'];
         $petty_cash_book->final_date        =   now();
         $petty_cash_book->save();
-       
+
         return $petty_cash_book;
     }
 }

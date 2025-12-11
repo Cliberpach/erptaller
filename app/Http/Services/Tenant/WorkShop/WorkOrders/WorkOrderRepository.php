@@ -3,6 +3,7 @@
 namespace App\Http\Services\Tenant\WorkShop\WorkOrders;
 
 use App\Http\Services\Tenant\Inventory\WarehouseProduct\WarehouseProductService;
+use App\Models\Tenant\Configuration;
 use App\Models\Tenant\WorkShop\WorkOrder\WorkOrder;
 use App\Models\Tenant\WorkShop\WorkOrder\WorkOrderImage;
 use App\Models\Tenant\WorkShop\WorkOrder\WorkOrderInventory;
@@ -28,11 +29,20 @@ class WorkOrderRepository
         return WorkOrder::create($dto);
     }
 
+    public function findWorkOrder(int $id){
+        return WorkOrder::findOrFail($id);
+    }
+
     public function insertWorkOrderDetail(array $lst_products, array $lst_services, WorkOrder $work_order)
     {
         foreach ($lst_products as $item) {
-            $this->s_validation->validationProduct($item);
-            $this->s_warehouse_product->decreaseStock($item->warehouse_id,$item->id,$item->quantity);
+
+            $this->s_validation->validationProduct($item,$work_order->validation_stock);
+
+            if ($work_order->validation_stock) {
+                $this->s_warehouse_product->decreaseStock($item->warehouse_id, $item->id, $item->quantity);
+            }
+
             $dto_item = $this->s_dto->getDtoOrderProduct($item, $work_order);
             WorkOrderProduct::create($dto_item);
         }
@@ -134,7 +144,8 @@ class WorkOrderRepository
         WorkOrderImage::create($dto);
     }
 
-    public function getWorkProducts(int $id){
-        return WorkOrderProduct::where('work_order_id',$id)->get();
+    public function getWorkProducts(int $id)
+    {
+        return WorkOrderProduct::where('work_order_id', $id)->get();
     }
 }

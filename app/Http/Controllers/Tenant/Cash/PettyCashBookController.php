@@ -10,7 +10,6 @@ use Illuminate\Support\Facades\DB;
 use App\Models\PettyCash;
 use App\Models\PettyCashBook;
 use Illuminate\Support\Facades\Session;
-use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Throwable;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -37,24 +36,9 @@ class PettyCashBookController extends Controller
     public function index()
     {
 
-        $cashList = DB::select('select * from petty_cashes as c
-                            where c.status = "created" or c.status="close" ');
-
         $shiftList = DB::select('select * from shifts');
 
-        $cashBookList = DB::select('select cu.id as id
-                            ,ca.id as petty_cash_id,ca.name as name_cash,
-                            cu.initial_amount,cu.initial_date,
-                            IF(cu.final_date is NULL,"-",cu.final_date) as final_date,
-                            IF(cu.closing_amount is NULL,"-",cu.closing_amount) as closing_amount,
-                            IF(cu.sale_day is NULL,"-",cu.sale_day) as sale_day,
-                            ca.status as status_cajaprincipal,
-                            cu.status as status_cajaunica
-                            from petty_cashes as ca
-                            inner join petty_cash_books as cu
-                            on ca.id=cu.petty_cash_id');
-
-        return view('cash.petty-cash-book.index', compact('cashList', 'shiftList', 'cashBookList'));
+        return view('cash.petty-cash-book.index', compact('shiftList'));
     }
 
     public function getCashBooks(Request $request)
@@ -62,6 +46,7 @@ class PettyCashBookController extends Controller
         $cashes = DB::connection('tenant')
             ->table('petty_cash_books as c')
             ->select(
+                DB::raw("CONCAT('CM-', LPAD(c.id, 8, '0')) as code"),
                 'c.id',
                 'c.petty_cash_id',
                 'c.status',
@@ -78,7 +63,11 @@ class PettyCashBookController extends Controller
             )
             ->where('c.status', '<>', 'ANULADO');
 
-        return DataTables::of($cashes)->toJson();
+        return DataTables::of($cashes)
+            ->filterColumn('code', function ($query, $keyword) {
+                $query->whereRaw("CONCAT('CM-', LPAD(c.id, 8, '0')) LIKE ?", ["%{$keyword}%"]);
+            })
+            ->toJson();
     }
 
     /*

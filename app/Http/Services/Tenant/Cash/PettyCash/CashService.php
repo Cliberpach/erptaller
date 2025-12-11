@@ -44,4 +44,9 @@ class CashService
         $cashes = $this->s_repository->searchCashAvailable($data);
         return $cashes;
     }
+
+    public function setStatus(int $id, string $status)
+    {
+        $this->s_repository->setStatus($id,$status);
+    }
 }

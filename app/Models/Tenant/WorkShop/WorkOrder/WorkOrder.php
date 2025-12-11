@@ -25,6 +25,7 @@ class WorkOrder extends Model
         'plate',
         'fuel_level',
         'quote_id',
+        'validation_stock',
 
         'creator_user_id',
         'editor_user_id',

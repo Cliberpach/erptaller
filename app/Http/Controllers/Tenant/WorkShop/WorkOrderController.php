@@ -92,6 +92,7 @@ class WorkOrderController extends Controller
         $colors                     =   Color::where('status', 'ACTIVE')->get();
         $categories                 =   UtilController::getCategoriesProducts();
         $brands                     =   UtilController::getBrandsProducts();
+        $configuration              =   Configuration::findOrFail(2);
 
         return view('workshop.work_orders.create', compact(
             'igv',
@@ -108,7 +109,8 @@ class WorkOrderController extends Controller
             'years',
             'colors',
             'categories',
-            'brands'
+            'brands',
+            'configuration'
         ));
     }
 
@@ -182,6 +184,8 @@ array:18 [ // app\Http\Controllers\Tenant\WorkShop\WorkOrderController.php:102
         $lst_technicians            =   FormatController::formatLstTechnicians($order['technicians']->toArray());
         $lst_images                 =   FormatController::formatLstImages($order['images']->toArray());
 
+        $configuration              =   Configuration::findOrFail(2);
+
         return view(
             'workshop.work_orders.edit',
             compact(
@@ -196,7 +200,8 @@ array:18 [ // app\Http\Controllers\Tenant\WorkShop\WorkOrderController.php:102
                 'technicians',
                 'lst_inventory',
                 'lst_technicians',
-                'lst_images'
+                'lst_images',
+                'configuration'
             )
         );
     }
@@ -238,7 +243,7 @@ array:17 [ // app\Http\Controllers\Tenant\WorkShop\QuoteController.php:145
             return response()->json(['success' => true, 'message' => 'ORDEN DE TRABAJO ACTUALIZADA CON ÉXITO']);
         } catch (Throwable $th) {
             DB::rollBack();
-            return response()->json(['success' => false, 'message' => $th->getMessage()]);
+            return response()->json(['success' => false, 'message' => $th->getMessage(),'line'=>$th->getLine(),'file'=>$th->getFile()]);
         }
     }
 

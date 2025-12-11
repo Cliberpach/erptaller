@@ -239,7 +239,7 @@
 
                         const response = await fetch(url);
                         if (!response.ok) throw new Error('Error al buscar vehiculos');
-                         const data = await response.json();
+                        const data = await response.json();
                         const results = data.data ?? [];
                         callback(results);
                         if (results.length === 0) {
@@ -251,7 +251,7 @@
                         callback();
                     }
                 },
-               render: {
+                render: {
                     option: (item, escape) => `
                         <div>
                             <i class="fas fa-car" style="margin-right:6px; color:#0d6efd;"></i>
@@ -291,13 +291,20 @@
                 load: async (query, callback) => {
                     if (!query.length) return callback();
                     try {
-                        const url = route('tenant.utils.searchProductStock', {
+
+                        const configuration = @json($configuration->property);
+                        let urlSearchProduct = 'tenant.utils.searchProductStock';
+                        if (configuration == '0') {
+                            urlSearchProduct = 'tenant.utils.searchProduct';
+                        }
+
+                        const url = route(urlSearchProduct, {
                             q: query,
                             warehouse_id: window.warehouseSelect.getValue()
                         });
                         const response = await fetch(url);
                         if (!response.ok) throw new Error('Error al buscar productos');
-                         const data = await response.json();
+                        const data = await response.json();
                         const results = data.data ?? [];
                         callback(results);
                         if (results.length === 0) {
@@ -328,7 +335,7 @@
                 create: false,
                 preload: false,
                 plugins: ['clear_button'],
-                  onType: (str) => {
+                onType: (str) => {
                     lastServiceQuery = str;
                 },
                 load: async (query, callback) => {
@@ -470,6 +477,7 @@
 
             if (item && item.sale_price) {
                 document.querySelector('#product_price').value = item.sale_price;
+                document.querySelector('#product_quantity').value = 1;
             }
             if (item && item.stock) {
                 document.querySelector('#product_stock').value = item.stock;
@@ -549,9 +557,12 @@
 
         async function validationAddProduct(productSelected, lstItems) {
 
-            const validationStock = await validatedProductStock(productSelected);
-            if (!validationStock) {
-                return false;
+            const configuration = @json($configuration->property);
+            if (configuration === '1') {
+                const validationStock = await validatedProductStock(productSelected);
+                if (!validationStock) {
+                    return false;
+                }
             }
 
             const indexExists = lstItems.findIndex((i) => i.id == productSelected.id);

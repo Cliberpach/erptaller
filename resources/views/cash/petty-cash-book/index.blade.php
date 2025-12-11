@@ -67,6 +67,13 @@
                         "searchable": false
                     },
                     {
+                        data: 'code',
+                        name: 'code',
+                        searchable: true,
+                        orderable: true,
+                        className: "text-center"
+                    },
+                    {
                         data: 'petty_cash_name',
                         name: 'c.petty_cash_name',
                         searchable: true,
@@ -135,33 +142,37 @@
                                 id: data.id
                             });
 
-                            const btnCerrar = data.status === 'ABIERTO' ?
+                            const optionCerrar = data.status === 'ABIERTO' ?
                                 `
-                                    <button onclick="openMdlCloseCash(${data.id})" 
-                                            type="button"
-                                            class="btn btn-warning btnCerrar">
-                                        <i class="fas fa-lock" style="color: #ffffff;"></i>
-                                        CERRAR
-                                    </button>
-                                ` :
-                                '';
+                                    <li>
+                                        <button class="dropdown-item text-primary fw-semibold"
+                                                onclick="openMdlCloseCash(${data.id})">
+                                            <i class="fas fa-lock me-2"></i> Cerrar caja
+                                        </button>
+                                    </li>
+                                ` : '';
 
                             return `
-                                <div class="acciones d-flex gap-1 justify-content-center">
+                                <div class="dropdown">
+                                    <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                        <i class="fas fa-cog"></i>
+                                    </button>
 
-                                    ${btnCerrar}
+                                    <ul class="dropdown-menu dropdown-menu-end">
 
-                                    <a target="_blank" href="${pdfUrl}">
-                                        <button type="button" class="btn btn-danger btnPdf">
-                                            <i class="far fa-file-pdf"></i>
-                                        </button>
-                                    </a>
+                                        ${optionCerrar}
 
+                                        <li>
+                                            <a class="dropdown-item text-danger fw-semibold" target="_blank" href="${pdfUrl}">
+                                                <i class="far fa-file-pdf me-2"></i> PDF
+                                            </a>
+                                        </li>
+
+                                    </ul>
                                 </div>
                             `;
                         }
                     }
-
                 ],
                 language: {
                     decimal: "",

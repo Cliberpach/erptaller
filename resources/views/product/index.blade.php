@@ -82,52 +82,74 @@
                 autoWidth: true,
                 columns: [{
                         data: 'id',
-                        name: 'id'
+                        name: 'id',
+                        searchable:false,
+                        orderable:true
                     },
                     {
                         data: 'name',
-                        name: 'name'
+                        name: 'p.name',
+                        searchable:true,
+                        orderable:true
                     },
                     {
                         data: 'category_name',
-                        name: 'category_name'
+                        name: 'c.name',
+                        searchable:true,
+                        orderable:true
                     },
                     {
                         data: 'brand_name',
-                        name: 'brand_name'
+                        name: 'b.name',
+                        searchable:true,
+                        orderable:true
                     },
                     {
                         data: 'sale_price',
-                        name: 'sale_price',
-                        className: 'text-end'
+                        name: 'p.sale_price',
+                        className: 'text-end',
+                        searchable:false,
+                        orderable:true
                     },
                     {
                         data: 'purchase_price',
-                        name: 'purchase_price',
-                        className: 'text-end'
+                        name: 'p.purchase_price',
+                        className: 'text-end',
+                        searchable:false,
+                        orderable:true
                     },
                     {
                         data: 'stock',
-                        name: 'stock',
-                        className: 'text-end'
+                        name: 'p.stock',
+                        className: 'text-end',
+                        searchable:false,
+                        orderable:false
                     },
                     {
                         data: 'stock_min',
                         name: 'stock_min',
-                        className: 'text-end'
+                        className: 'text-end',
+                        searchable:false,
+                        orderable:false
                     },
                     {
                         data: 'code_factory',
-                        name: 'code_factory',
+                        name: 'p.code_factory',
+                        searchable:true,
+                        orderable:false
                     },
                     {
                         data: 'code_bar',
-                        name: 'code_bar'
+                        name: 'p.code_bar',
+                        searchable:true,
+                        orderable:false
                     },
                     {
                         data: 'img_route',
                         name: 'img_route',
                         className: 'text-center',
+                        searchable:false,
+                        orderable:false,
                         render: function(data, type, row) {
                             if (data) {
                                 return `<img class="imgShowLightBox" src="/${data}" alt="Imagen" style="width: 50px; height: 50px; object-fit: cover; border-radius: 6px;">`;

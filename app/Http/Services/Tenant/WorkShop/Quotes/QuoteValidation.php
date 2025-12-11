@@ -3,6 +3,7 @@
 namespace App\Http\Services\Tenant\WorkShop\Quotes;
 
 use App\Http\Services\Tenant\Inventory\WarehouseProduct\WarehouseProductService;
+use App\Models\Tenant\Configuration;
 use App\Models\Tenant\WorkShop\Quote\Quote;
 use Exception;
 
@@ -52,16 +53,24 @@ class QuoteValidation
         $products                   =   $data['products'];
         $services                   =   $data['services'];
 
-        $lst_products_validated     =   collect($this->s_warehouse_product->validatedStock($products->toArray()));
-        $count_products_validated   =   $lst_products_validated->where('valid', true)->count();
-       
-        if($count_products_validated === 0 && count($services) === 0){
-            throw new Exception("NO EXISTEN PRODUCTOS Y SERVICIOS EN LA COTIZACIÓN");
+        $configuration              =   Configuration::findOrFail(2);
+        if ($configuration->property === 1) {
+            $lst_products_validated     =   collect($this->s_warehouse_product->validatedStock($products->toArray()));
+            $count_products_validated   =   $lst_products_validated->where('valid', true)->count();
+
+            if ($count_products_validated === 0 && count($services) === 0) {
+                throw new Exception("NO EXISTEN PRODUCTOS Y SERVICIOS EN LA COTIZACIÓN");
+            }
+            $data_validated =    [
+                'valid_products'    =>  $lst_products_validated->where('valid', true)->toArray()
+            ];
+        } else {
+            $data_validated =    [
+                'valid_products'    =>  $products->toArray()
+            ];
         }
 
-        $data_validated=    [
-            'valid_products'    =>  $lst_products_validated->where('valid',true)->toArray()
-        ];
+        $data_validated['configuration']    =   $configuration;
 
         return $data_validated;
     }

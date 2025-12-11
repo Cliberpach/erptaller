@@ -3,9 +3,6 @@
         <label for="cash_available_id" class="form-label">Cajas Disponibles</label>
         <select name="cash_available_id" class="selectCajas form-select" id="cash_available_id" aria-label="Default select example">
             <option value=""></option>
-            @foreach ($cashList as $cash)
-                <option value="{{ $cash->id }}">{{ $cash->name }}</option>
-            @endforeach
         </select>
         <p hidden class="msgError cash_available_id_error"></p>
     </div>

@@ -69,40 +69,40 @@
         document.querySelector('#monto_cierre_consolidated').textContent = formatSoles(data.amount_close);
 
 
-        document.getElementById("total_sales_general").textContent = sales.total.toFixed(2);
-        document.getElementById("total_expenses_general").textContent = expenses.total.toFixed(2);
+        document.getElementById("total_sales_general").textContent = formatSoles(sales.total);
+        document.getElementById("total_expenses_general").textContent = formatSoles(expenses.total);
 
         sales.report.forEach((item, index) => {
 
             const expenseItem = expenses.report[index];
 
             const html = `
-            <div class="col-md-6">
-                <div class="border rounded p-3 bg-light">
-                    <h6 class="fw-bold mb-2">
-                        <i class="fa-solid fa-wallet text-primary me-2"></i>
-                        ${item.payment_method_name}
-                    </h6>
+                <div class="col-md-6">
+                    <div class="border rounded p-3 bg-light">
+                        <h6 class="fw-bold mb-2 text-dark">
+                            <i class="fa-solid fa-wallet text-primary me-2"></i>
+                            ${item.payment_method_name}
+                        </h6>
 
-                    <div class="d-flex justify-content-between">
-                        <span>Ventas:</span>
-                        <span class="fw-bold text-success">${item.amount.toFixed(2)}</span>
-                    </div>
+                        <div class="d-flex justify-content-between">
+                            <span class="text-dark">Ventas:</span>
+                            <span class="fw-bold text-success">${formatSoles(item.amount)}</span>
+                        </div>
 
-                    <div class="d-flex justify-content-between">
-                        <span>Egresos:</span>
-                        <span class="fw-bold text-danger">${expenseItem.amount.toFixed(2)}</span>
-                    </div>
+                        <div class="d-flex justify-content-between">
+                            <span class="text-danger">Egresos:</span>
+                            <span class="fw-bold text-danger">${formatSoles(expenseItem.amount)}</span>
+                        </div>
 
-                    <div class="d-flex justify-content-between mt-2 pt-2 border-top">
-                        <span class="fw-semibold">Neto:</span>
-                        <span class="fw-bold ${
-                            item.amount - expenseItem.amount >= 0 ? "text-success" : "text-danger"
-                        }">${(item.amount - expenseItem.amount).toFixed(2)}</span>
+                        <div class="d-flex justify-content-between mt-2 pt-2 border-top">
+                            <span class="fw-semibold text-dark">Neto:</span>
+                            <span class="fw-bold ${
+                                item.amount - expenseItem.amount >= 0 ? "text-primary" : "text-danger"
+                            }">${formatSoles(item.amount - expenseItem.amount)}</span>
+                        </div>
                     </div>
                 </div>
-            </div>
-        `;
+            `;
 
             container.insertAdjacentHTML("beforeend", html);
         });
@@ -133,7 +133,7 @@
     }
 
     function closeCash() {
-        
+
         const swalWithBootstrapButtons = Swal.mixin({
             customClass: {
                 confirmButton: "btn btn-success",
@@ -168,9 +168,10 @@
                     toastr.clear();
 
                     const formData = new FormData();
-                    formData.append('id',paramsMdlCloseCash.id);
+                    formData.append('id', paramsMdlCloseCash.id);
 
-                    const res = await axios.post(route('tenant.movimientos_caja.closePettyCash', paramsMdlCloseCash.id),
+                    const res = await axios.post(route('tenant.movimientos_caja.closePettyCash',
+                            paramsMdlCloseCash.id),
                         formData);
 
                     if (res.data.success) {

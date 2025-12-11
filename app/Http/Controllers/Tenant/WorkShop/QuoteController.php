@@ -67,7 +67,7 @@ class QuoteController extends Controller
             })
             ->toJson();
     }
-    
+
     public function getQuote(int $id)
     {
         try {

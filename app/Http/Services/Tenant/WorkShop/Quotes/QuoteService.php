@@ -6,6 +6,11 @@ use App\Http\Controllers\FormatController;
 use App\Http\Controllers\UtilController;
 use App\Http\Services\Tenant\Inventory\WarehouseProduct\WarehouseProductService;
 use App\Models\Company;
+use App\Models\CompanyInvoice;
+use App\Models\Department;
+use App\Models\District;
+use App\Models\Landlord\Color;
+use App\Models\Province;
 use App\Models\Tenant\Configuration;
 use App\Models\Tenant\Maintenance\BankAccount\BankAccount;
 use App\Models\Tenant\Warehouse;
@@ -59,7 +64,7 @@ class QuoteService
         $company    =   Company::findOrFail(1);
         $bank_accounts  =   BankAccount::where('status', 'ACTIVO')->get();
         $configuration  =   Configuration::findOrFail(1);
-     
+
         return $pdf = Pdf::loadView(
             'workshop.quotes.reports.pdf_quote',
             compact(
@@ -94,6 +99,17 @@ class QuoteService
         $customer_formatted         =   FormatController::getFormatInitialCustomer($quote->customer_id);
         $vehicle_formatted          =   FormatController::getFormatInitialVehicle($quote->vehicle_id);
 
+        $types_identity_documents   =   UtilController::getIdentityDocuments();
+        $departments                =   Department::all();
+        $districts                  =   District::all();
+        $provinces                  =   Province::all();
+        $company_invoice            =   CompanyInvoice::find(1);
+        $years                      =   UtilController::getYears();
+        $colors                     =   Color::where('status', 'ACTIVE')->get();
+        $categories                 =   UtilController::getCategoriesProducts();
+        $brands                     =   UtilController::getBrandsProducts();
+        $configuration              =   $data_validated['configuration'];
+
         return view(
             'workshop.work_orders.create',
             compact(
@@ -105,7 +121,17 @@ class QuoteService
                 'lst_products',
                 'lst_services',
                 'customer_formatted',
-                'vehicle_formatted'
+                'vehicle_formatted',
+                'types_identity_documents',
+                'departments',
+                'provinces',
+                'districts',
+                'company_invoice',
+                'years',
+                'colors',
+                'categories',
+                'brands',
+                'configuration'
             )
         );
     }

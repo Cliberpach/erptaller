@@ -26,6 +26,7 @@ return new class extends Migration
             $table->string('code_factory')->nullable();
             $table->string('code_bar')->nullable();
             $table->string('image')->nullable();
+            $table->longText('img_route')->nullable();
             $table->enum('status',['ACTIVE','INACTIVE'])->default('ACTIVE');
             $table->timestamps();
         });

@@ -38,7 +38,7 @@
 <script>
     const paramsMdlEditProduct = {
         id: null,
-        warehouse_id:null
+        warehouse_id: null
     };
 
     async function openMdlEditProduct(productId) {
@@ -72,13 +72,16 @@
 
         toastr.clear();
         const product = getFormProductEdit();
-        if(!product){
+        if (!product) {
             return;
         }
 
-        const validationStock = await validatedProductStock(product);
-        if (!validationStock) {
-            return false;
+        const configuration = @json($configuration->property);
+        if (configuration == '1') {
+            const validationStock = await validatedProductStock(product);
+            if (!validationStock) {
+                return false;
+            }
         }
 
         saveProductEdit(product, lstProducts);
@@ -108,7 +111,7 @@
         };
 
         const product = {
-            warehouse_id:paramsMdlEditProduct.warehouse_id,
+            warehouse_id: paramsMdlEditProduct.warehouse_id,
             id,
             sale_price: salePrice,
             quantity,
