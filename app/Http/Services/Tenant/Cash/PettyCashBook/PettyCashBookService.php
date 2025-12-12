@@ -31,7 +31,7 @@ class PettyCashBookService
         $this->s_validation->validateOpenCash($data);
         $dto    =   $this->s_dto->getDtoStore($data);
         $petty_cash_book   =   $this->s_repository->insertPettyCashBook($dto);
-        $this->s_cash->setStatus($dto['petty_cash_id'],'ABIERTO');
+        $this->s_cash->setStatus($dto['petty_cash_id'], 'ABIERTO');
         return $petty_cash_book;
     }
 
@@ -186,11 +186,13 @@ class PettyCashBookService
         $this->s_validation->validationClosePettyCash($data);
         $consolidated   =   $this->getConsolidated($data['id']);
 
-        $petty_cash_book    =   $this->s_repository->getPettyCashBook($data['id']);
-        $petty_cash_book->status    =   'CERRADO';
+        $petty_cash_book                    =   $this->s_repository->getPettyCashBook($data['id']);
+        $petty_cash_book->status            =   'CERRADO';
         $petty_cash_book->closing_amount    =   $consolidated['amount_close'];
         $petty_cash_book->final_date        =   now();
         $petty_cash_book->save();
+
+        $this->s_cash->setStatus($petty_cash_book->petty_cash_id, 'CERRADO');
 
         return $petty_cash_book;
     }
