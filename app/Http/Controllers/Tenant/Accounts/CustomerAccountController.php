@@ -133,7 +133,7 @@ array:11 [ // app\Http\Controllers\Tenant\Accounts\CustomerAccountController.php
             return response()->json(['success' => true, 'message' => 'PAGO REGISTRADO CON ÉXITO']);
         } catch (Throwable $th) {
             DB::rollBack();
-            return response()->json(['success' => false, 'message' => $th->getMessage()]);
+            return response()->json(['success' => false, 'message' => $th->getMessage(),'line'=>$th->getLine(),'file'=>$th->getFile()]);
         }
     }
 

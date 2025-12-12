@@ -128,7 +128,7 @@
 
                 imagenHTML = `
                         <a href="${link_img}" target="_blank">
-                            <img src="${link_img}" 
+                            <img src="${link_img}"
                                 style="width:80px; height:80px; object-fit:contain; border-radius:4px; border:1px solid #ddd;" />
                         </a>
                     `;
@@ -285,7 +285,7 @@
     function tipoPago(tipoPago) {
         const tipo_pago = tipoPago.value;
         if (tipo_pago == "TODO") {
-            const saldo = document.querySelector('#saldo').value;
+            const saldo = document.querySelector('#saldo').textContent;
             const modoPagoId = document.querySelector('#modo_pago').value;
             if (modoPagoId == 1) {
                 document.querySelector('#efectivo_venta').value = saldo;

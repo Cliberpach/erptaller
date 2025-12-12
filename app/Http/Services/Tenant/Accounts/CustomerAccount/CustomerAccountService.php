@@ -56,7 +56,7 @@ class CustomerAccountService
             File::makeDirectory($path, 0755, true);
         }
 
-        $file   =   $data['imagen'];
+        $file   =   $data['imagen']??null;
 
         if ($file instanceof UploadedFile && $file->isValid()) {
             $file->move($path, $pay->img_name);
