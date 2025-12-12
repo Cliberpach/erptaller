@@ -6,7 +6,7 @@
 
 .required_field::after {
     content: " *";
-    color: #dc3545; 
+    color: #dc3545;
     font-weight: bold;
 }
 
@@ -14,3 +14,19 @@
 .filepond--credits {
     display: none !important;
 }
+
+/* Elevar lightGallery por encima del modal */
+.lg-backdrop {
+    z-index: 999999999999999999 !important;
+}
+
+.lg-outer {
+    z-index: 999999999999999999 !important;
+}
+
+.lg-toolbar,
+.lg-sub-html,
+.lg-thumb-outer {
+    z-index: 999999999999999999 !important;
+}
+

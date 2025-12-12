@@ -54,6 +54,19 @@
                 </div>
             </div>
 
+            <!-- CUENTAS CLIENTE -->
+            <div class="col-md-6 mt-3">
+                <div class="rounded border p-0 shadow-sm" style="background:#f8fafc;">
+                    <div class="rounded-top d-flex align-items-center px-3 py-2" style="background:#3b82f6;">
+                        <i class="fa-solid fa-users me-2 text-white"></i>
+                        <span class="fw-semibold text-white">Cobranzas Cliente</span>
+                    </div>
+
+                    <div class="p-3" id="customer_accounts_container" style="min-height: 180px;">
+                    </div>
+                </div>
+            </div>
+
         </div>
 
         <hr>
@@ -67,12 +80,17 @@
         <!-- TOTALES GENERALES -->
         <div class="d-flex justify-content-between mt-1 px-2">
             <span class="fw-semibold text-dark">Total ventas:</span>
-            <span id="total_sales_general" class="fw-bold text-success">0.00</span>
+            <span id="total_sales_general" class="fw-bold text-primary">0.00</span>
         </div>
 
         <div class="d-flex justify-content-between mt-1 px-2">
             <span class="fw-semibold text-dark">Total egresos:</span>
             <span id="total_expenses_general" class="fw-bold text-danger">0.00</span>
+        </div>
+
+        <div class="d-flex justify-content-between mt-1 px-2">
+            <span class="fw-semibold text-dark">Total cobranzas cliente:</span>
+            <span id="total_customer_accounts_general" class="fw-bold text-primary">0.00</span>
         </div>
 
         <hr>

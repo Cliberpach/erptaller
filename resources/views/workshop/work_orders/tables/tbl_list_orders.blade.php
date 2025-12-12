@@ -8,6 +8,8 @@
             <th class="text-center">PLACA</th>
             <th class="text-center">ALMACÉN</th>
             <th class="text-center">TOTAL</th>
+            <th class="text-center">A CUENTA</th>
+            <th class="text-center">SALDO</th>
             <th class="text-center">REGISTRADOR</th>
             <th class="text-center">ESTADO</th>
             <th class="text-center">FEC REGISTRO</th>

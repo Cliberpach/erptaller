@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en" class="light-style layout-menu-fixed" dir="ltr" data-theme="theme-default"
+<html lang="en" class="dark-style layout-menu-fixed" dir="ltr" data-theme="theme-dark"
     data-assets-path="{{ asset('assets') }}" data-template="vertical-menu-template-free">
 
-<link rel="icon" type="image/x-icon" href="{{ asset('assets/favicon.ico') }}?v={{ time() }}">
-
 <head>
+    <link rel="icon" type="image/x-icon" href="{{ asset('assets/favicon.ico') }}?v={{ time() }}">
+
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @routes

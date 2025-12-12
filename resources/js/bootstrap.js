@@ -20,12 +20,12 @@ import "filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css";
 import FilePondPluginFileValidateSize from "filepond-plugin-file-validate-size";
 import es_ES from "filepond/locale/es-es.js";
 
-import FilePondPluginFileValidateType from "filepond-plugin-file-validate-type"; 
+import FilePondPluginFileValidateType from "filepond-plugin-file-validate-type";
 
 FilePond.registerPlugin(
     FilePondPluginImagePreview,
     FilePondPluginFileValidateSize,
-    FilePondPluginFileValidateType 
+    FilePondPluginFileValidateType
 );
 
 FilePond.setOptions(es_ES);
@@ -33,6 +33,26 @@ FilePond.setOptions(es_ES);
 window.FilePond = FilePond;
 
 
+import lightGallery from 'lightgallery';
+
+// Estilos principales
+import 'lightgallery/css/lightgallery.css';
+
+// Plugins
+import lgThumbnail from 'lightgallery/plugins/thumbnail';
+import 'lightgallery/css/lg-thumbnail.css';
+
+import lgZoom from 'lightgallery/plugins/zoom';
+import 'lightgallery/css/lg-zoom.css';
+
+
+window.lightGallery = lightGallery;
+window.lgThumbnail = lgThumbnail;
+window.lgZoom = lgZoom;
+
+
+/*======== HOVERCSS =========*/
+import 'hover.css/css/hover.css';
 
 
 /**

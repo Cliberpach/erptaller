@@ -12,10 +12,6 @@
             <h4 class="card-title mb-md-0 mb-2">LISTA DE ÓRDENES DE TRABAJO</h4>
 
             <div class="d-flex flex-wrap gap-2">
-                {{-- <button class="btn btn-warning" onclick="openMdlImportMarca()">
-                    <i class="fa-solid fa-upload"></i> IMPORTAR
-                </button> --}}
-
                 <a href="{{ route('tenant.taller.ordenes_trabajo.create') }}" class="btn btn-primary text-white">
                     <i class="fas fa-plus-circle"></i> Nuevo
                 </a>
@@ -100,6 +96,26 @@
                     {
                         data: 'total',
                         name: 'o.total',
+                        searchable: false,
+                        orderable: false,
+                        className: "text-center",
+                        render: function(data, type, row) {
+                            return formatSoles(data);
+                        }
+                    },
+                    {
+                        data: 'on_account',
+                        name: 'on_account',
+                        searchable: false,
+                        orderable: false,
+                        className: "text-center",
+                        render: function(data, type, row) {
+                            return formatSoles(data);
+                        }
+                    },
+                    {
+                        data: 'balance',
+                        name: 'balance',
                         searchable: false,
                         orderable: false,
                         className: "text-center",

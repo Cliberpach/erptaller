@@ -59,6 +59,7 @@
 
         const sales = data.report_sales;
         const expenses = data.report_expenses;
+        const customer_accounts = data.report_customer_accounts;
 
         const pettyCashBook = data.petty_cash_book;
         document.querySelector('#consolidated_caja').textContent = pettyCashBook.petty_cash_name;
@@ -69,9 +70,11 @@
 
         document.getElementById("total_sales_general").textContent = formatSoles(sales.total);
         document.getElementById("total_expenses_general").textContent = formatSoles(expenses.total);
+        document.getElementById("total_customer_accounts_general").textContent = formatSoles(customer_accounts.total);
 
         const salesContainer = document.getElementById("sales_container");
         const expensesContainer = document.getElementById("expenses_container");
+        const customerAccountsContainer = document.getElementById("customer_accounts_container");
 
         salesContainer.innerHTML = "";
         expensesContainer.innerHTML = "";
@@ -102,8 +105,21 @@
             expensesContainer.insertAdjacentHTML("beforeend", html);
         });
 
-    }
+        // Cuentas Cliente
+        customer_accounts.report.forEach(item => {
+            const html = `
+                <div class="d-flex justify-content-between border-bottom pb-2 mb-2">
+                    <span class="fw-semibold text-dark">
+                        <i class="fa-solid fa-user text-primary me-1"></i>
+                        ${item.payment_method_name}
+                    </span>
+                    <span class="fw-bold text-primary">${formatSoles(item.amount)}</span>
+                </div>
+            `;
+            customerAccountsContainer.insertAdjacentHTML("beforeend", html);
+        });
 
+    }
 
     async function getConsolidatedCash(cashBookId) {
         try {

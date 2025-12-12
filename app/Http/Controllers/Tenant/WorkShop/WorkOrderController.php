@@ -38,6 +38,7 @@ class WorkOrderController extends Controller
     {
         $quotes = DB::connection('tenant')
             ->table('work_orders as o')
+            ->leftJoin('customer_accounts as ca','ca.work_order_id','o.id')
             ->select(
                 'o.id',
                 DB::raw('CONCAT("OT-",o.id) as code'),
@@ -49,7 +50,9 @@ class WorkOrderController extends Controller
                 'o.status',
                 'o.created_at',
                 'o.quote_id',
-                DB::raw('CONCAT("COT-",o.quote_id) as quote_code')
+                DB::raw('CONCAT("COT-",o.quote_id) as quote_code'),
+                'ca.balance',
+                DB::raw('(ca.amount - ca.balance) as on_account')
             )
             ->where('o.status', '<>', 'ANULADO');
 

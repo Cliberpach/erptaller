@@ -30,15 +30,21 @@
     </div>
 </div>
 
+
 <style>
     .swal2-container {
         z-index: 9999999;
+    }
+
+    .card.hvr-float-shadow {
+        display: flex;
     }
 </style>
 
 <script>
     const paramsMdlShowOrder = {
-        id: null
+        id: null,
+        galleryInstance: null
     };
 
     async function openMdlShowOrder(id) {
@@ -63,6 +69,10 @@
                 toastr.error(res.data.message, 'ERROR EN EL SERVIDOR');
             }
         } catch (error) {
+            console.error("Mensaje:", error.message);
+            console.error("Archivo:", error.fileName);
+            console.error("Línea:", error.lineNumber);
+            console.error("Stack:", error.stack);
             toastr.error(error, 'ERROR EN LA PETICIÓN OBTENER ORDEN');
         } finally {
             ocultarAnimacion1();
@@ -86,8 +96,8 @@
         statusEl.classList.remove('bg-primary', 'bg-danger');
         statusEl.classList.add(order.status === 'ACTIVO' ? 'bg-primary' : 'bg-danger');
 
-        const spanValidationStock   =   document.querySelector('#show_validation_stock');
-        spanValidationStock.textContent =   order.validation_stock == '1'? 'VALIDADO':'NO VALIDADO';
+        const spanValidationStock = document.querySelector('#show_validation_stock');
+        spanValidationStock.textContent = order.validation_stock == '1' ? 'VALIDADO' : 'NO VALIDADO';
         spanValidationStock.classList.remove('bg-primary', 'bg-danger');
         spanValidationStock.classList.add(order.validation_stock === '1' ? 'bg-primary' : 'bg-danger');
 
@@ -162,24 +172,47 @@
 
     function paintOrderImages(images) {
         const container = document.getElementById('show_images_body');
+
+        if (paramsMdlShowOrder.galleryInstance) {
+            paramsMdlShowOrder.galleryInstance.destroy();
+            paramsMdlShowOrder.galleryInstance = null;
+        }
+
         container.innerHTML = '';
 
         images.forEach(img => {
             const col = document.createElement('div');
-            col.classList.add('col-6', 'col-md-3', 'mb-3');
+            col.classList.add('col-lg-4', 'col-md-6', 'col-sm-12', 'col-xs-12', 'mb-3');
 
             const imgUrl = "{{ asset('') }}" + img.img_route;
 
             col.innerHTML = `
-                <div class="card h-100 shadow-sm">
-                    <img src="${imgUrl}" class="card-img-top" alt="${img.img_name}" style="object-fit: cover; height:150px;">
-                    <div class="card-body p-2 text-center">
-                        <p class="mb-1 small text-truncate" title="${img.img_name}">${img.img_name}</p>
+                <a href="${imgUrl}" class="lg-item">
+                    <div class="card h-100 shadow-sm hvr-float-shadow">
+                        <img src="${imgUrl}" class="card-img-top" alt="${img.img_name}" style="object-fit: cover; height:150px;">
+                        <div class="card-body p-2 text-center">
+                            <p class="mb-1 small text-truncate" title="${img.img_name}">
+                                ${img.img_name}
+                            </p>
+                        </div>
                     </div>
-                </div>
+                </a>
             `;
 
             container.appendChild(col);
         });
+
+        if (images.length > 0) {
+            paramsMdlShowOrder.galleryInstance = lightGallery(container, {
+                selector: '.lg-item',
+                plugins: [lgThumbnail, lgZoom],
+                appendSubHtmlTo: '.lg-item',
+                mobileSettings: {
+                    controls: true,
+                    showCloseIcon: true,
+                }
+            });
+        }
+
     }
 </script>
