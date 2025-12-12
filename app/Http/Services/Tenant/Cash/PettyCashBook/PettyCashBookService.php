@@ -5,11 +5,13 @@ namespace App\Http\Services\Tenant\Cash\PettyCashBook;
 use App\Http\Services\Tenant\Cash\PettyCash\CashService;
 use App\Models\Company;
 use App\Models\ExitMoney;
+use App\Models\Tenant\Accounts\CustomerAccountDetail;
 use App\Models\Tenant\Cash\PettyCashBook;
 use App\Models\Tenant\PaymentMethod;
 use App\Models\Tenant\Sale;
 use App\Models\Tenant\User;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\DB;
 
 class PettyCashBookService
 {
@@ -44,10 +46,10 @@ class PettyCashBookService
         $cajero             =   User::findOrFail($petty_cash_book->user_id);
         $payment_methods    =   PaymentMethod::where('estado', 'ACTIVO')->get();
 
+        $consolidated       =   $this->getConsolidated($id);
+
         //========= EGRESOS ===========
         $exit_moneys            =   ExitMoney::where('petty_cash_book_id', $id)->where('status', true)->get();
-        $amounts_exit_moneys    =   $this->totalEgresosPorMetodoPago($payment_methods, $exit_moneys);
-        $total_exit_moneys      =   ExitMoney::where('petty_cash_book_id', $id)->where('status', true)->sum('total');
 
         //======= OBTENER DATOS DE LA EMPRESA ========
         $company = Company::first();
@@ -55,6 +57,26 @@ class PettyCashBookService
         //========= OBTENER DOCUMENTOS DE VENTA ======
         $sale_documents     =   Sale::where('petty_cash_book_id', $id)->get();
 
+        $customer_pays      =   CustomerAccountDetail::from('customer_accounts_details as cad')
+            ->join('customer_accounts as ca', 'ca.id', 'cad.customer_account_id')
+            ->leftJoin('work_orders as wo', 'wo.id', '=', 'ca.work_order_id')
+            ->leftJoin('sales_documents as sd', 'sd.id', '=', 'ca.sale_id')
+            ->where('cad.petty_cash_book_id',$id)
+            ->select(
+                'ca.document_number',
+                DB::raw("
+                    CASE
+                        WHEN ca.work_order_id IS NOT NULL THEN wo.customer_name
+                        WHEN ca.sale_id IS NOT NULL THEN sd.customer_name
+                        ELSE NULL
+                    END AS customer_name
+                "),
+                'cad.cash',
+                'cad.amount',
+                'cad.total',
+                'cad.payment_method_id',
+                'cad.created_at'
+            )->get();
 
         //====== VISTA PDF ==========
         $pdf = Pdf::loadView(
@@ -67,8 +89,8 @@ class PettyCashBookService
                 'cajero',
 
                 'exit_moneys',
-                'amounts_exit_moneys',
-                'total_exit_moneys'
+                'consolidated',
+                'customer_pays'
             )
         );
 
@@ -113,18 +135,20 @@ class PettyCashBookService
 
     public function getConsolidated(int $id)
     {
-        $payment_methods    =   PaymentMethod::where('estado', 'ACTIVO')->get();
+        $payment_methods            =   PaymentMethod::where('estado', 'ACTIVO')->get();
 
-        $report_sales       =   $this->getReportSales($payment_methods, $id);
-        $report_expenses    =   $this->getReportExpenses($payment_methods, $id);
-        $petty_cash_book    =   $this->s_repository->getPettyCashBookInfo($id);
-        $amount_close       =   $report_sales['total'] - $report_expenses['total'] + $petty_cash_book->initial_amount;
+        $report_sales               =   $this->getReportSales($payment_methods, $id);
+        $report_expenses            =   $this->getReportExpenses($payment_methods, $id);
+        $report_customer_accounts   =   $this->getReportCustomerAccounts($payment_methods, $id);
+        $petty_cash_book            =   $this->s_repository->getPettyCashBookInfo($id);
+        $amount_close               =   $report_customer_accounts['total'] + $report_sales['total'] - $report_expenses['total'] + $petty_cash_book->initial_amount;
 
         return [
-            'report_sales' =>    $report_sales,
-            'report_expenses' => $report_expenses,
-            'petty_cash_book'   =>  $petty_cash_book,
-            'amount_close'      =>  $amount_close
+            'report_sales'              =>  $report_sales,
+            'report_expenses'           =>  $report_expenses,
+            'report_customer_accounts'  =>  $report_customer_accounts,
+            'petty_cash_book'           =>  $petty_cash_book,
+            'amount_close'              =>  $amount_close
         ];
     }
 
@@ -180,6 +204,36 @@ class PettyCashBookService
             'report' => $report_expenses
         ];
     }
+
+    public function getReportCustomerAccounts($payment_methods, int $id)
+    {
+        $customer_pays              =   CustomerAccountDetail::where('petty_cash_book_id', $id)->get();
+        $report_customer_accounts   =   [];
+        foreach ($payment_methods as $payment_method) {
+            $item   =   [];
+            $amount =   0;
+
+            if ($payment_method->id === 1) {
+                $amount   +=   $customer_pays->sum('cash');
+            } else {
+                $amount   =   $customer_pays->where('payment_method_id', $payment_method->id)->sum('amount');
+            }
+
+
+            $item       =   [
+                'payment_method_id' =>  $payment_method->id,
+                'payment_method_name' => $payment_method->description,
+                'amount'            =>  $amount
+            ];
+
+            $report_customer_accounts[] =   $item;
+        }
+
+        $total  =   $customer_pays->sum('total');
+
+        return ['total' => $total, 'report' => $report_customer_accounts];
+    }
+
 
     public function closePettyCash(array $data)
     {

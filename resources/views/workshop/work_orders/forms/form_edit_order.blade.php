@@ -6,6 +6,18 @@
         <span class="text-danger">*</span> Los campos marcados son obligatorios.
     </p>
 
+    <div class="alert alert-info alert-dismissible fade show" role="alert">
+        <strong class="text-dark">Validación de Stock:</strong>
+
+        @if ($configuration->property == 1)
+            <span class="text-success fw-bold">ACTIVADA</span>
+        @else
+            <span class="text-danger fw-bold">DESACTIVADA</span>
+        @endif
+
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
     <!-- ==========================
          SECCIÓN PRINCIPAL / CLIENTE
     =========================== -->
@@ -219,11 +231,11 @@
                         <label for="fuelSelect" class="form-check-label text-secondary fw-bold">NIVEL DE
                             GASOLINA:</label>
                         <select id="fuelSelect" class="form-control" name="fuel_level">
-                            <option value="0" >VACÍO</option>
-                            <option value="25" >1/4</option>
-                            <option value="50" >1/2</option>
-                            <option value="75" >3/4</option>
-                            <option value="100" >LLENO</option>
+                            <option value="0">VACÍO</option>
+                            <option value="25">1/4</option>
+                            <option value="50">1/2</option>
+                            <option value="75">3/4</option>
+                            <option value="100">LLENO</option>
                         </select>
 
                         <div style="width: 250px; margin-bottom: 20px;" class="mt-2">

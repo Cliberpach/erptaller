@@ -16,7 +16,6 @@
 
         .container {
             width: 90%;
-            /* Aumentamos el ancho del contenedor */
             margin: 30px auto;
             background-color: white;
             border-radius: 10px;
@@ -113,6 +112,36 @@
         .table-info-totales td {
             font-size: 9px;
         }
+
+        /*======== FOOTER ==========*/
+        @page {
+            margin: 30px 50px 90px 50px;
+        }
+
+
+        header {
+            position: fixed;
+            top: -80px;
+            left: 0;
+            right: 0;
+            height: 80px;
+        }
+
+        footer {
+            position: fixed;
+            bottom: -60px;
+            left: 0;
+            right: 0;
+            height: 50px;
+            text-align: center;
+            font-size: 12px;
+            color: #777;
+        }
+
+        .footer-content {
+            border-top: 1px solid #ccc;
+            padding-top: 10px;
+        }
     </style>
 </head>
 
@@ -144,8 +173,7 @@
 
         <table class="table-info" style="width: 100%; border-collapse: collapse; margin-top: 10px;">
             <tr>
-                <td style="width: 50%; padding: 2px; font-weight: bold; text-align: left; border: 1px solid #ddd;">
-                    Cajero:</td>
+                <td style="width: 50%; padding: 2px; font-weight: bold; text-align: left; border: 1px solid #ddd;">CAJERO:</td>
                 <td style="width: 50%; padding: 2px; text-align: left; border: 1px solid #ddd;">{{ $cajero->name }}</td>
             </tr>
             <tr>
@@ -155,23 +183,25 @@
                     {{ $petty_cash_book->petty_cash_name }}</td>
             </tr>
             <tr>
-                <td style="width: 50%; padding: 2px; font-weight: bold; text-align: left; border: 1px solid #ddd;">
-                    Turno:</td>
+                <td style="width: 50%; padding: 2px; font-weight: bold; text-align: left; border: 1px solid #ddd;">TURNO:</td>
                 <td style="width: 50%; padding: 2px; text-align: left; border: 1px solid #ddd;">
                     {{ $petty_cash_book->shift->time }}
                 </td>
             </tr>
             <tr>
-                <td style="width: 50%; padding: 2px; font-weight: bold; text-align: left; border: 1px solid #ddd;">Monto
-                    Inicial:</td>
+                <td style="width: 50%; padding: 2px; font-weight: bold; text-align: left; border: 1px solid #ddd;">MONTO INICIAL:</td>
                 <td style="width: 50%; padding: 2px; text-align: left; border: 1px solid #ddd;">
                     {{ $petty_cash_book->initial_amount }}</td>
             </tr>
             <tr>
-                <td style="width: 50%; padding: 2px; font-weight: bold; text-align: left; border: 1px solid #ddd;">Fecha
-                    y Hora de Apertura:</td>
+                <td style="width: 50%; padding: 2px; font-weight: bold; text-align: left; border: 1px solid #ddd;">FECHA APERTURA:</td>
                 <td style="width: 50%; padding: 2px; text-align: left; border: 1px solid #ddd;">
                     {{ \Carbon\Carbon::parse($petty_cash_book->initial_date)->format('d/m/Y H:i') }}</td>
+            </tr>
+            <tr>
+                <td style="width: 50%; padding: 2px; font-weight: bold; text-align: left; border: 1px solid #ddd;">FECHA CIERRE:</td>
+                <td style="width: 50%; padding: 2px; text-align: left; border: 1px solid #ddd;">
+                    {{ \Carbon\Carbon::parse($petty_cash_book->close_date)->format('d/m/Y H:i') }}</td>
             </tr>
         </table>
 
@@ -190,38 +220,37 @@
                 </tr>
             </thead>
             <tbody>
-                @php
-                    // Inicializar variables para almacenar el total por tipo de pago
-                    $totals = [];
-                    foreach ($payment_methods as $payment_method) {
-                        $totals[$payment_method->id] = 0;
-                    }
-                @endphp
-
                 @foreach ($sale_documents as $sale)
                     <tr>
                         <td>{{ $sale->serie . '-' . $sale->correlative }}</td>
                         <td>{{ $sale->customer_name }}</td>
-                        <td>{{ number_format($sale->total, 2) }}</td>
+                        <td style="text-align: right;">{{ number_format($sale->total, 2) }}</td>
 
                         @foreach ($payment_methods as $payment_method)
-                            <td>
+                            <td style="text-align: right;">
                                 @if ($sale->method_pay_id_1 == $payment_method->id)
                                     {{ number_format($sale->amount_pay_1, 2) }}
-                                    @php
-                                        $totals[$payment_method->id] += $sale->amount_pay_1;
-                                    @endphp
                                 @elseif ($sale->method_pay_id_2 == $payment_method->id)
                                     {{ number_format($sale->amount_pay_2, 2) }}
-                                    @php
-                                        $totals[$payment_method->id] += $sale->amount_pay_2;
-                                    @endphp
+                                @else
+                                    0.00
                                 @endif
                             </td>
                         @endforeach
                     </tr>
                 @endforeach
             </tbody>
+            <tfoot>
+                <tr style="font-weight:bold; background:#e0e0e0;">
+                    <td colspan="2" class="text-end">TOTAL</td>
+                    <td style="text-align: right;">
+                        {{ number_format($consolidated['report_sales']['total'], 2, '.', ',') }}
+                    </td>
+                    @foreach ($consolidated['report_sales']['report'] as $item)
+                        <td style="text-align: right;">{{ number_format($item['amount'], 2, '.', ',') }}</td>
+                    @endforeach
+                </tr>
+            </tfoot>
         </table>
 
         <h5 style="font-size:9px;">EGRESOS</h5>
@@ -238,9 +267,6 @@
                 </tr>
             </thead>
             <tbody>
-                @php
-                    $amounts_exit_moneys = $amounts_exit_moneys ?? [];
-                @endphp
 
                 @foreach ($exit_moneys as $index => $egreso)
                     <tr>
@@ -259,46 +285,154 @@
 
                 <tr style="font-weight:bold; background:#e0e0e0;">
                     <td colspan="2" class="text-end">TOTAL</td>
-                    <td class="text-end">{{ number_format($total_exit_moneys, 2, '.', ',') }}</td>
-                    @foreach ($payment_methods as $payment_method)
-                        @php
-                            $total_for_method =
-                                collect($amounts_exit_moneys)->firstWhere('payment_method_id', $payment_method->id)[
-                                    'total'
-                                ] ?? 0;
-                        @endphp
-                        <td style="text-align: right;">{{ number_format($total_for_method, 2, '.', ',') }}</td>
+                    <td class="text-end">{{ number_format($consolidated['report_expenses']['total'], 2, '.', ',') }}
+                    </td>
+                    @foreach ($consolidated['report_expenses']['report'] as $item)
+                        <td style="text-align: right;">{{ number_format($item['amount'], 2, '.', ',') }}</td>
                     @endforeach
                 </tr>
             </tbody>
         </table>
 
-        <table class="table-info-totales">
-            <thead>
+
+        <h5 style="font-size:9px;">COBRANZA CLIENTE</h5>
+
+        <table class="table-info table-sm table" style="border-collapse: collapse; width: 100%;">
+            <thead style="background-color: #c0c0c0; color: #000;">
                 <tr>
-                    <th>Totales</th>
-                    <th>Monto</th>
+                    <th>CLIENTE</th>
+                    <th>DOC</th>
+                    <th>FECHA</th>
+                    @foreach ($payment_methods as $payment_method)
+                        <th>{{ $payment_method->description }}</th>
+                    @endforeach
                 </tr>
             </thead>
             <tbody>
-                @foreach ($payment_methods as $payment_method)
+
+                @foreach ($customer_pays as $index => $pay)
                     <tr>
-                        <td><strong>Total {{ $payment_method->description }}:</strong></td>
-                        <td>{{ number_format($totals[$payment_method->id], 2) }}</td>
+                        <td>{{ $pay->customer_name }}</td>
+                        <td>{{ $pay->document_number }}</td>
+                        <td>{{ $pay->created_at }}</td>
+
+                        @foreach ($payment_methods as $payment_method)
+                            @php
+                                $value = 0;
+                                if ($payment_method->id === 1) {
+                                    $value += $pay->cash;
+                                }
+
+                                if ($payment_method->id !== 1 && $payment_method->id == $pay->payment_method_id) {
+                                    $value += $pay->amount;
+                                }
+                            @endphp
+                            <td style="text-align: right;">{{ number_format($value, 2, '.', ',') }}</td>
+                        @endforeach
                     </tr>
                 @endforeach
-                <tr>
-                    <td><strong>Total Ventas:</strong></td>
-                    <td>{{ number_format($sale_documents->sum('total'), 2) }}</td>
+
+                <tr style="font-weight:bold; background:#e0e0e0;">
+                    <td colspan="2" class="text-end">TOTAL</td>
+                    <td class="text-end">
+                        {{ number_format($consolidated['report_customer_accounts']['total'], 2, '.', ',') }}
+                    </td>
+                    @foreach ($consolidated['report_customer_accounts']['report'] as $item)
+                        <td style="text-align: right;">{{ number_format($item['amount'], 2, '.', ',') }}</td>
+                    @endforeach
                 </tr>
             </tbody>
         </table>
 
-        <!-- Footer -->
-        <div class="footer">
-            <p>&copy; {{ now()->year }} {{ $company->business_name }} - Todos los derechos reservados</p>
-        </div>
 
+        <h5 style="font-size:10px; margin-top:25px;">RESUMEN POR MÉTODO DE PAGO</h5>
+
+        <table class="table-info" style="width:100%; border-collapse: collapse;">
+            <thead>
+                <tr style="background:#f4f8fc;">
+                    <th>MÉTODO</th>
+                    <th style="text-align:right;">VENTAS</th>
+                    <th style="text-align:right;">EGRESOS</th>
+                    <th style="text-align:right;">COBRANZAS</th>
+                    <th style="text-align:right;">TOTAL NETO</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach ($payment_methods as $pm)
+                    @php
+                        $sale = collect($consolidated['report_sales']['report'])->firstWhere(
+                            'payment_method_id',
+                            $pm->id,
+                        );
+                        $expense = collect($consolidated['report_expenses']['report'])->firstWhere(
+                            'payment_method_id',
+                            $pm->id,
+                        );
+                        $customer = collect($consolidated['report_customer_accounts']['report'])->firstWhere(
+                            'payment_method_id',
+                            $pm->id,
+                        );
+
+                        $sale_amount = $sale['amount'] ?? 0;
+                        $expense_amount = $expense['amount'] ?? 0;
+                        $customer_amount = $customer['amount'] ?? 0;
+
+                        $net = $sale_amount - $expense_amount + $customer_amount;
+                    @endphp
+
+                    <tr>
+                        <td>{{ $pm->description }}</td>
+                        <td style="text-align:right;">{{ number_format($sale_amount, 2, '.', ',') }}</td>
+                        <td style="text-align:right;">{{ number_format($expense_amount, 2, '.', ',') }}</td>
+                        <td style="text-align:right;">{{ number_format($customer_amount, 2, '.', ',') }}</td>
+                        <td style="text-align:right; font-weight:bold;">{{ number_format($net, 2, '.', ',') }}</td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+
+        <h5 style="font-size:10px; margin-top:25px;">RESUMEN FINAL</h5>
+
+        <table class="table-info table-sm table" style="border-collapse: collapse; width: 100%;">
+            <tr>
+                <th>SALDO INICIAL</th>
+                <td style="text-align:right;">
+                    {{ number_format($consolidated['petty_cash_book']->initial_amount, 2, '.', ',') }}
+                </td>
+            </tr>
+            <tr>
+                <th> TOTAL VENTAS</th>
+                <td style="text-align:right;">
+                    {{ number_format($consolidated['report_sales']['total'], 2, '.', ',') }}
+                </td>
+            </tr>
+            <tr>
+                <th> TOTAL EGRESOS</th>
+                <td style="text-align:right;">
+                    {{ number_format($consolidated['report_expenses']['total'], 2, '.', ',') }}
+                </td>
+            </tr>
+            <tr>
+                <th> TOTAL COBRANZA CLIENTES</th>
+                <td style="text-align:right;">
+                    {{ number_format($consolidated['report_customer_accounts']['total'], 2, '.', ',') }}
+                </td>
+            </tr>
+            <tr style="background:#e0f7fa;">
+                <th> MONTO CIERRE</th>
+                <td style="text-align:right; font-weight:bold;">
+                    {{ number_format($consolidated['amount_close'], 2, '.', ',') }}
+                </td>
+            </tr>
+        </table>
+
+
+        <!-- Footer -->
+        <footer>
+            <div class="footer-content">
+                <p>&copy; {{ now()->year }} {{ $company->business_name }} - Todos los derechos reservados</p>
+            </div>
+        </footer>
 
     </div>
 </body>

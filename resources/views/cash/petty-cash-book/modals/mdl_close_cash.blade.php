@@ -56,8 +56,6 @@
     }
 
     function paintConsolidatedCash(data) {
-        const container = document.getElementById("consolidated_container");
-        container.innerHTML = "";
 
         const sales = data.report_sales;
         const expenses = data.report_expenses;
@@ -72,40 +70,38 @@
         document.getElementById("total_sales_general").textContent = formatSoles(sales.total);
         document.getElementById("total_expenses_general").textContent = formatSoles(expenses.total);
 
-        sales.report.forEach((item, index) => {
+        const salesContainer = document.getElementById("sales_container");
+        const expensesContainer = document.getElementById("expenses_container");
 
-            const expenseItem = expenses.report[index];
+        salesContainer.innerHTML = "";
+        expensesContainer.innerHTML = "";
 
+        sales.report.forEach(item => {
             const html = `
-                <div class="col-md-6">
-                    <div class="border rounded p-3 bg-light">
-                        <h6 class="fw-bold mb-2 text-dark">
-                            <i class="fa-solid fa-wallet text-primary me-2"></i>
-                            ${item.payment_method_name}
-                        </h6>
-
-                        <div class="d-flex justify-content-between">
-                            <span class="text-dark">Ventas:</span>
-                            <span class="fw-bold text-success">${formatSoles(item.amount)}</span>
-                        </div>
-
-                        <div class="d-flex justify-content-between">
-                            <span class="text-danger">Egresos:</span>
-                            <span class="fw-bold text-danger">${formatSoles(expenseItem.amount)}</span>
-                        </div>
-
-                        <div class="d-flex justify-content-between mt-2 pt-2 border-top">
-                            <span class="fw-semibold text-dark">Neto:</span>
-                            <span class="fw-bold ${
-                                item.amount - expenseItem.amount >= 0 ? "text-primary" : "text-danger"
-                            }">${formatSoles(item.amount - expenseItem.amount)}</span>
-                        </div>
-                    </div>
+                <div class="d-flex justify-content-between border-bottom pb-2 mb-2">
+                    <span class="fw-semibold text-dark">
+                        <i class="fa-solid fa-wallet text-primary me-1"></i>
+                        ${item.payment_method_name}
+                    </span>
+                    <span class="fw-bold text-primary">${formatSoles(item.amount)}</span>
                 </div>
             `;
-
-            container.insertAdjacentHTML("beforeend", html);
+            salesContainer.insertAdjacentHTML("beforeend", html);
         });
+
+        expenses.report.forEach(item => {
+            const html = `
+                <div class="d-flex justify-content-between border-bottom pb-2 mb-2">
+                    <span class="fw-semibold text-dark">
+                        <i class="fa-solid fa-money-bill-transfer text-danger me-1"></i>
+                        ${item.payment_method_name}
+                    </span>
+                    <span class="fw-bold text-danger">${formatSoles(item.amount)}</span>
+                </div>
+            `;
+            expensesContainer.insertAdjacentHTML("beforeend", html);
+        });
+
     }
 
 

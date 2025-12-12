@@ -1,8 +1,12 @@
-<div class="card mt-3 border-0 shadow-sm">
-    <div class="card-header bg-secondary fw-semibold d-flex align-items-center text-white">
-        <i class="fa-solid fa-chart-simple me-2"></i>
-        Consolidado
+<div class="card mt-3 border-0 p-0 shadow-sm">
+    <div class="card-header d-flex align-items-center text-white"
+        style="background:#e5e368; padding: 6px 12px; height: 38px;">
+
+        <i class="fa-solid fa-chart-simple me-2" style="font-size: 14px;"></i>
+        <span class="fw-semibold text-primary" style="font-size: 14px;">CONSOLIDADO</span>
+
     </div>
+
 
     <div class="card-body">
 
@@ -20,8 +24,36 @@
 
         <hr>
 
-        <div id="consolidated_container" class="row g-3">
-            <!-- Aquí se pintarán los métodos de pago -->
+        <div class="row mt-2">
+
+            <!-- VENTAS -->
+            <div class="col-md-6">
+                <div class="rounded border p-0 shadow-sm" style="background:#f8fafc;">
+                    <div class="rounded-top d-flex align-items-center px-3 py-2" style="background:#22c55e;">
+                        <i class="fa-solid fa-cash-register me-2 text-white"></i>
+                        <span class="fw-semibold text-white">Ventas</span>
+                    </div>
+
+                    <div class="p-3" id="sales_container" style="min-height: 180px;">
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- EGRESOS -->
+            <div class="col-md-6">
+                <div class="rounded border p-0 shadow-sm" style="background:#f8fafc;">
+                    <div class="rounded-top d-flex align-items-center px-3 py-2" style="background:#ef4444;">
+                        <i class="fa-solid fa-file-invoice-dollar me-2 text-white"></i>
+                        <span class="fw-semibold text-white">Egresos</span>
+                    </div>
+
+                    <div class="p-3" id="expenses_container" style="min-height: 180px;">
+
+                    </div>
+                </div>
+            </div>
+
         </div>
 
         <hr>
