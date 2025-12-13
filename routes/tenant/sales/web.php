@@ -22,6 +22,7 @@ Route::group(["prefix" => "ventas"], function () {
 
         Route::get('comprobante-electronico', [SaleController::class, 'electronicReceipt'])->name('tenant.ventas.comprobante_electronico');
         Route::get('cotizacion', [SaleController::class, 'quotation'])->name('tenant.ventas.cotizacion');
+        Route::get('create-ot/{id}', [SaleController::class, 'createOt'])->name('tenant.ventas.comprobante_venta.createOt');
     });
 
     Route::group(["prefix" => "clientes"], function () {
@@ -43,6 +44,5 @@ Route::group(["prefix" => "ventas"], function () {
         Route::get('metodo_pago/getPaymentMethods', [PaymentMethodController::class, 'getPaymentMethods'])->name('tenant.ventas.metodo_pago.getPaymentMethods');
         Route::get('assign-accounts/create/{id}', [PaymentMethodController::class, 'assignAccountsCreate'])->name('tenant.ventas.metodo_pago.assignAccountsCreate');
         Route::post('assign-accounts/store', [PaymentMethodController::class, 'assignAccountsStore'])->name('tenant.ventas.metodo_pago.assignAccountsStore');
-
     });
 });

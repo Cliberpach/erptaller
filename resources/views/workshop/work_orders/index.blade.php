@@ -201,6 +201,11 @@
                                                         </a>
                                                     </li>
                                                     <li>
+                                                        <a class="dropdown-item text-primary" href="#" onclick="redirectParams('tenant.ventas.comprobante_venta.createOt',${data.id})">
+                                                            <i class="fa fa-file-invoice-dollar me-2"></i> Facturar
+                                                        </a>
+                                                    </li>
+                                                    <li>
                                                         <a class="dropdown-item text-danger" href="#" onclick="eliminar(${data.id})">
                                                             <i class="fa fa-trash me-2"></i> Eliminar
                                                         </a>

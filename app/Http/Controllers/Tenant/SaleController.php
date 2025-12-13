@@ -340,4 +340,13 @@ sale_document_id:1
         $res    =   InvoiceController::send_sunat($request);
         return $res;
     }
+
+    public function createOt(int $id){
+        try {
+            $view   =   $this->s_sale->createOt($id);
+            return $view;
+        } catch (Throwable $th) {
+            return back();
+        }
+    }
 }

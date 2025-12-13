@@ -286,6 +286,12 @@ function isNumeric(value) {
     return Number.isInteger(Number(value));
 }
 
-
-
-
+function setText(selectInstance, text) {
+    const option = selectInstance.options;
+    for (let key in option) {
+        if (option[key].description.trim() === text.trim()) {
+            selectInstance.setValue(option[key].id);
+            break;
+        }
+    }
+}

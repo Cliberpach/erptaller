@@ -135,7 +135,7 @@
                             ${escape(item.description)}
                         </div>
                     `,
-                                        item: (item, escape) => `
+                    item: (item, escape) => `
                         <div>
                             <i class="fas fa-bullseye" style="margin-right:6px; color:#0d6efd;"></i>
                             ${escape(item.description)}
@@ -242,14 +242,16 @@
     function clearMdlCreateProduct() {
         document.querySelector('#name_mdlproduct').value = '';
         document.querySelector('#description_mdlproduct').value = '';
-        document.querySelector('#sale_price_mdlproduct').value = '';
-        document.querySelector('#purchase_price_mdlproduct').value = '';
+        document.querySelector('#sale_price_mdlproduct').value = '1';
+        document.querySelector('#purchase_price_mdlproduct').value = '1';
         document.querySelector('#stock_mdlproduct').value = '0';
         document.querySelector('#stock_min_mdlproduct').value = '1';
         document.querySelector('#code_factory_mdlproduct').value = '';
         document.querySelector('#code_bar_mdlproduct').value = '';
         window.categorySelect.clear();
         window.brandSelect.clear();
+        setText(window.categorySelect, 'REPUESTO');
+        setText(window.brandSelect, 'NACIONAL');
         document.querySelector('.btnSetImgDefault').click();
     }
 </script>

@@ -17,5 +17,8 @@ class SaleManager
         return $this->s_sale->store($data);
     }
 
+    public function createOt(int $id){
+        return $this->s_sale->createOt($id);
+    }
 
 }

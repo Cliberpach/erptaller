@@ -38,7 +38,7 @@ class WorkOrderController extends Controller
     {
         $quotes = DB::connection('tenant')
             ->table('work_orders as o')
-            ->leftJoin('customer_accounts as ca','ca.work_order_id','o.id')
+            ->leftJoin('customer_accounts as ca', 'ca.work_order_id', 'o.id')
             ->select(
                 'o.id',
                 DB::raw('CONCAT("OT-",o.id) as code'),
@@ -187,6 +187,15 @@ array:18 [ // app\Http\Controllers\Tenant\WorkShop\WorkOrderController.php:102
         $lst_technicians            =   FormatController::formatLstTechnicians($order['technicians']->toArray());
         $lst_images                 =   FormatController::formatLstImages($order['images']->toArray());
 
+        $types_identity_documents   =   UtilController::getIdentityDocuments();
+        $departments                =   Department::all();
+        $districts                  =   District::all();
+        $provinces                  =   Province::all();
+        $company_invoice            =   CompanyInvoice::find(1);
+        $years                      =   UtilController::getYears();
+        $colors                     =   Color::where('status', 'ACTIVE')->get();
+        $categories                 =   UtilController::getCategoriesProducts();
+        $brands                     =   UtilController::getBrandsProducts();
         $configuration              =   Configuration::findOrFail(2);
 
         return view(
@@ -204,6 +213,16 @@ array:18 [ // app\Http\Controllers\Tenant\WorkShop\WorkOrderController.php:102
                 'lst_inventory',
                 'lst_technicians',
                 'lst_images',
+
+                'types_identity_documents',
+                'departments',
+                'provinces',
+                'districts',
+                'company_invoice',
+                'years',
+                'colors',
+                'categories',
+                'brands',
                 'configuration'
             )
         );
@@ -246,7 +265,7 @@ array:17 [ // app\Http\Controllers\Tenant\WorkShop\QuoteController.php:145
             return response()->json(['success' => true, 'message' => 'ORDEN DE TRABAJO ACTUALIZADA CON ÉXITO']);
         } catch (Throwable $th) {
             DB::rollBack();
-            return response()->json(['success' => false, 'message' => $th->getMessage(),'line'=>$th->getLine(),'file'=>$th->getFile()]);
+            return response()->json(['success' => false, 'message' => $th->getMessage(), 'line' => $th->getLine(), 'file' => $th->getFile()]);
         }
     }
 

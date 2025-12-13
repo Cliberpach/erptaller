@@ -358,15 +358,14 @@
                 },
                 render: {
                     option: (item, escape) => `
-                <div>
-                    <strong>${escape(item.text)}</strong><br>
-                    <small>${escape(item.subtext ?? '')}</small>
-                </div>
-            `,
+                        <div>
+                            <strong>${escape(item.text)}</strong><br>
+                            <small>${escape(item.subtext ?? '')}</small>
+                        </div>
+                    `,
                     item: (item, escape) => `<div>${escape(item.text)}</div>`
                 }
             });
-
 
         }
 
@@ -635,6 +634,7 @@
 
             if (item && item.sale_price) {
                 document.querySelector('#service_price').value = item.sale_price;
+                document.querySelector('#service_quantity').value = 1;
             }
         }
 

@@ -79,8 +79,7 @@
                     <option value=""></option>
                     @foreach ($categories as $category)
                         <option @if ($category->is_default) selected @endif style="text-transform: uppercase;"
-                            value="{{ $category->id }}">
-                            {{ $category->name }}</option>
+                            value="{{ $category->id }}">{{ $category->name }}</option>
                     @endforeach
                 </select>
                 <p class="msgError category_id_mdlproduct_error"></p>
@@ -93,8 +92,7 @@
                     <option value=""></option>
                     @foreach ($brands as $brand)
                         <option @if ($brand->is_default) selected @endif style="text-transform: uppercase;"
-                            value="{{ $brand->id }}">{{ $brand->name }}
-                        </option>
+                            value="{{ $brand->id }}">{{ $brand->name }}</option>
                     @endforeach
                 </select>
                 <p class="msgError brand_id_mdlproduct_error"></p>

@@ -1,7 +1,7 @@
 @extends('layouts.template')
 
 @section('title')
-    Órdenes de Trabajo
+    Registrar Documento de Venta
 @endsection
 
 @section('content')
@@ -14,7 +14,7 @@
 
     <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
-            <h4 class="card-title mb-md-0 mb-2">EDITAR ÓRDEN DE TRABAJO</h4>
+            <h4 class="card-title mb-md-0 mb-2">REGISTRAR DOCUMENTO DE VENTA</h4>
 
             <div class="d-flex flex-wrap gap-2">
 
@@ -23,7 +23,7 @@
         <div class="card-body">
             <div class="row">
                 <div class="col-12">
-                    @include('workshop.work_orders.forms.form_edit_order')
+                    @include('sales.sale_document.forms.form_create_sale_ot')
                 </div>
             </div>
         </div>
@@ -38,8 +38,8 @@
                     </button>
 
                     <!-- BOTÓN REGISTRAR -->
-                    <button class="btn btn-primary" form="form-edit-order" type="submit">
-                        <i class="fas fa-save"></i> ACTUALIZAR
+                    <button class="btn btn-primary" form="form-create-quote" type="submit">
+                        <i class="fas fa-save"></i> REGISTRAR
                     </button>
 
                 </div>
@@ -59,8 +59,8 @@
     <script src="https://unpkg.com/justgage@latest/dist/justgage.umd.js"></script>
 
     <script>
-        const lstProducts = @json($lst_products);
-        const lstServices = @json($lst_services);
+        let lstProducts = [];
+        let lstServices = [];
         let dtProducts = null;
         let dtServices = null;
         const amounts = {
@@ -85,14 +85,13 @@
         });
 
         document.addEventListener('DOMContentLoaded', () => {
-            dtProducts = loadDataTableSimple('dt-quotes-products');
-            dtServices = loadDataTableSimple('dt-quotes-services');
+            dtProducts = loadDataTableSimple('dt-orders-products');
+            dtServices = loadDataTableSimple('dt-orders-services');
 
             loadTomSelect();
             loadFilePound();
-            loadPreviewData();
             events();
-
+            setQuote();
         })
 
         function events() {
@@ -107,9 +106,9 @@
                 gauge.refresh(this.value);
             });
 
-            document.querySelector('#form-edit-order').addEventListener('submit', (e) => {
+            document.querySelector('#form-create-quote').addEventListener('submit', (e) => {
                 e.preventDefault();
-                updateOrder(e.target);
+                storeQuote(e.target);
             })
 
             window.clientSelect.on('change', function(value) {
@@ -173,11 +172,11 @@
             window.clientSelect = new TomSelect('#client_id', {
                 valueField: 'id',
                 labelField: 'full_name',
-                searchField: ['full_name'],
                 options: [initialCustomer],
                 items: [initialCustomer.id],
+                searchField: ['full_name'],
                 plugins: ['clear_button'],
-                placeholder: 'Seleccionar',
+                placeholder: 'Seleccione un cliente',
                 maxOptions: 20,
                 create: false,
                 preload: false,
@@ -204,30 +203,32 @@
                 },
                 render: {
                     option: (item, escape) => `
-                        <div>
-                            <strong>${escape(item.full_name)}</strong><br>
-                            <small>${escape(item.email ?? '')}</small>
-                        </div>
-                    `,
+                <div>
+                    <strong>${escape(item.full_name)}</strong><br>
+                    <small>${escape(item.email ?? '')}</small>
+                </div>
+            `,
                     item: (item, escape) => `<div>${escape(item.full_name)}</div>`
                 }
             });
 
-            const initialVehicle = @json($vehicle_formatted);
+            const initialVehicle = @json($vehicle_formatted ?? null);
+            const options = initialVehicle ? [initialVehicle] : [];
+            const items = initialVehicle ? [initialVehicle.id] : [];
             window.vehicleSelect = new TomSelect('#vehicle_id', {
                 valueField: 'id',
                 labelField: 'text',
                 searchField: ['text'],
+                options: options,
+                items: items,
                 plugins: ['clear_button'],
-                options: [initialVehicle],
-                items: [initialVehicle.id],
-                placeholder: 'Seleccionar',
+                placeholder: 'Seleccione un vehículo',
                 maxOptions: 20,
                 create: false,
-                preload: false,
                 onType: (str) => {
                     lastVehicleQuery = str;
                 },
+                preload: false,
                 load: async (query, callback) => {
                     if (!query.length) return callback();
                     try {
@@ -253,11 +254,25 @@
                 render: {
                     option: (item, escape) => `
                         <div>
+                            <i class="fas fa-car" style="margin-right:6px; color:#0d6efd;"></i>
                             <strong>${escape(item.text)}</strong><br>
                             <small>${escape(item.subtext ?? '')}</small>
                         </div>
                     `,
-                    item: (item, escape) => `<div>${escape(item.text)}</div>`
+                    item: (item, escape) => `
+                            <div>
+                                <i class="fas fa-car" style="margin-right:6px; color:#0d6efd;"></i>
+                                ${escape(item.text)}
+                            </div>
+                        `,
+                    no_results: function(data, escape) {
+                        return `
+                            <div class="no-results">
+                                <i class="fas fa-search" style="margin-right:6px; color:#17a2b8;"></i>
+                                Sin resultados
+                            </div>
+                        `;
+                    }
                 }
             });
 
@@ -287,7 +302,6 @@
                             q: query,
                             warehouse_id: window.warehouseSelect.getValue()
                         });
-
                         const response = await fetch(url);
                         if (!response.ok) throw new Error('Error al buscar productos');
                         const data = await response.json();
@@ -344,14 +358,15 @@
                 },
                 render: {
                     option: (item, escape) => `
-                        <div>
-                            <strong>${escape(item.text)}</strong><br>
-                            <small>${escape(item.subtext ?? '')}</small>
-                        </div>
-                    `,
+                <div>
+                    <strong>${escape(item.text)}</strong><br>
+                    <small>${escape(item.subtext ?? '')}</small>
+                </div>
+            `,
                     item: (item, escape) => `<div>${escape(item.text)}</div>`
                 }
             });
+
 
         }
 
@@ -363,70 +378,7 @@
             buttonsStyling: false
         })
 
-        async function accionBuscarPlaca() {
-            const placa = document.querySelector('#plate').value.trim();
-
-            if (placa.length < 6 || placa.length > 8) {
-                toastr.error('LA PLACA DEBE TENER ENTRE 6 Y 8 CARACTERES');
-                return;
-            }
-
-            searchPlate(placa);
-
-        }
-
-        async function searchPlate(placa) {
-            mostrarAnimacion1();
-            try {
-                toastr.clear();
-                const res = await axios.get(route('tenant.utils.searchPlate', placa));
-                if (res.data.success) {
-
-                    if (res.data.origin == 'BD') {
-                        toastr.error('VEHICULO YA EXISTE EN BD');
-                        return;
-                    }
-
-                    const dataApi = res.data.data;
-                    if (dataApi.mensaje == 'SUCCESS') {
-                        toastr.info(dataApi.mensaje);
-                        setDataApi(dataApi.data, res.data.model);
-                    }
-                } else {
-                    toastr.error(res.data.message, 'ERROR EN EL SERVIDOR');
-                }
-            } catch (error) {
-                toastr.error(error, 'ERROR EN LA PETICIÓN CONSULTAR PLACA');
-            } finally {
-                ocultarAnimacion1();
-            }
-        }
-
-        function setDataApi(data, model) {
-
-            const mensaje = data.mensaje;
-            if (mensaje == 'No encontrado') {
-                toastr.error(mensaje);
-                return;
-            }
-
-            window.modelSelect.clear();
-            window.modelSelect.clearOptions();
-
-            const marca = data.marca;
-            const modelo = data.modelo;
-
-            const text = `${marca} - ${modelo}`;
-
-            window.modelSelect.addOption({
-                id: model.id,
-                text
-            });
-
-            window.modelSelect.setValue(model.id);
-        }
-
-        function validationSubmit() {
+        function validationStoreQuote() {
             if (lstProducts.length === 0 && lstServices.length === 0) {
                 toastr.error('DEBE AGREGAR AL MENOS UN PRODUCTO O SERVICIO A LA COTIZACIÓN');
                 return false;
@@ -434,20 +386,20 @@
             return true;
         }
 
-        async function updateOrder(formCreateQuote) {
+        async function storeQuote(formCreateQuote) {
 
             toastr.clear();
-            const isValid = validationSubmit();
+            const isValid = validationStoreQuote();
             if (!isValid) {
                 return;
             }
 
             const result = await Swal.fire({
-                title: '¿Desea actualizar la orden?',
+                title: '¿Desea registrar la orden?',
                 text: "Confirmar",
                 icon: 'question',
                 showCancelButton: true,
-                confirmButtonText: 'SI',
+                confirmButtonText: 'SI, registrar',
                 cancelButtonText: 'NO',
                 reverseButtons: true,
                 customClass: {
@@ -464,7 +416,7 @@
                     clearValidationErrors('msgError');
 
                     Swal.fire({
-                        title: 'Actualizando orden...',
+                        title: 'Registrando orden...',
                         text: 'Por favor espere',
                         allowOutsideClick: false,
                         allowEscapeKey: false,
@@ -473,14 +425,19 @@
                         }
                     });
 
-                    const id = @json($work_order->id);
                     const formData = new FormData(formCreateQuote);
                     formData.append('lst_products', JSON.stringify(lstProducts));
                     formData.append('lst_services', JSON.stringify(lstServices));
-                    formData.append('_method', 'PUT');
-                    const res = await axios.post(route('tenant.taller.ordenes_trabajo.update', id), formData);
+
+                    const quoteId = @json($quote->id ?? null);
+                    if (quoteId !== null) {
+                        formData.append('quote_id', quoteId);
+                    }
+
+                    const res = await axios.post(route('tenant.taller.ordenes_trabajo.store'), formData);
 
                     if (res.data.success) {
+                        window.open(res.data.pdf_url, '_blank');
                         toastr.success(res.data.message, 'OPERACIÓN COMPLETADA');
                         redirect('tenant.taller.ordenes_trabajo.index');
                     } else {
@@ -522,7 +479,6 @@
                 document.querySelector('#product_price').value = item.sale_price;
                 document.querySelector('#product_quantity').value = 1;
             }
-
             if (item && item.stock) {
                 document.querySelector('#product_stock').value = item.stock;
             }
@@ -543,16 +499,15 @@
 
             addItem(productSelected, lstProducts);
             dtProducts = destroyDataTable(dtProducts);
-            clearTable('dt-quotes-products');
+            clearTable('dt-orders-products');
             paintOrderProducts(lstProducts);
-            dtProducts = loadDataTableSimple('dt-quotes-products');
+            dtProducts = loadDataTableSimple('dt-orders-products');
 
             calculateAmounts();
             paintAmounts();
             toastr.success('PRODUCTO AGREGADO AL DETALLE DE PRODUCTOS');
 
         }
-
 
         function getProductSelected() {
 
@@ -615,7 +570,6 @@
                 toastr.error(`${lstItems[indexExists].name} YA EXISTE EN EL DETALLE DE PRODUCTOS`);
                 return false;
             }
-
             return true;
         }
 
@@ -624,7 +578,7 @@
         }
 
         function paintOrderProducts(lstItems) {
-            const tbody = document.querySelector('#dt-quotes-products tbody');
+            const tbody = document.querySelector('#dt-orders-products tbody');
             let rows = ``;
 
             lstItems.forEach((item) => {
@@ -665,9 +619,9 @@
             lstItems.splice(indexItem, 1);
 
             dtProducts = destroyDataTable(dtProducts);
-            clearTable('dt-quotes-products');
+            clearTable('dt-orders-products');
             paintOrderProducts(lstItems);
-            dtProducts = loadDataTableSimple('dt-quotes-products');
+            dtProducts = loadDataTableSimple('dt-orders-products');
 
             calculateAmounts();
             paintAmounts();
@@ -681,7 +635,6 @@
 
             if (item && item.sale_price) {
                 document.querySelector('#service_price').value = item.sale_price;
-                document.querySelector('#service_quantity').value = 1;
             }
         }
 
@@ -700,9 +653,9 @@
 
             addItem(serviceSelected, lstServices);
             dtServices = destroyDataTable(dtServices);
-            clearTable('dt-quotes-services');
+            clearTable('dt-orders-services');
             paintOrderServices(lstServices);
-            dtServices = loadDataTableSimple('dt-quotes-services');
+            dtServices = loadDataTableSimple('dt-orders-services');
 
             calculateAmounts();
             paintAmounts();
@@ -763,7 +716,7 @@
         }
 
         function paintOrderServices(lstItems) {
-            const tbody = document.querySelector('#dt-quotes-services tbody');
+            const tbody = document.querySelector('#dt-orders-services tbody');
             let rows = ``;
 
             lstItems.forEach((item) => {
@@ -803,9 +756,9 @@
             lstItems.splice(indexItem, 1);
 
             dtServices = destroyDataTable(dtServices);
-            clearTable('dt-quotes-services');
+            clearTable('dt-orders-services');
             paintOrderServices(lstItems);
-            dtServices = loadDataTableSimple('dt-quotes-services');
+            dtServices = loadDataTableSimple('dt-orders-services');
 
             calculateAmounts();
             paintAmounts();
@@ -937,58 +890,10 @@
             });
         }
 
-        function loadPreviewData() {
-
-            //====== PRODUCTS
-            dtProducts = destroyDataTable(dtProducts);
-            clearTable('dt-quotes-products');
-            paintOrderProducts(lstProducts);
-            dtProducts = loadDataTableSimple('dt-quotes-products');
-
-            //======= SERVICES =======
-            dtServices = destroyDataTable(dtServices);
-            clearTable('dt-quotes-services');
-            paintOrderServices(lstServices);
-            dtServices = loadDataTableSimple('dt-quotes-services');
-
-            calculateAmounts();
-            paintAmounts();
-
-            //========= INVENTORY =========
-            const lstInventory = @json($lst_inventory);
-            lstInventory.forEach((i) => {
-                const check = document.querySelector(`#inv_item_${i}`);
-                check.checked = true;
-            })
-
-            //======= TECHNICIANS ========
-            const lstTechnicians = @json($lst_technicians);
-            window.techniciansSelect.setValue(lstTechnicians);
-
-            //======== IMAGES =======
-            const lstImages = @json($lst_images);
-            const inputs = document.querySelectorAll('.filepond-input');
-            inputs.forEach((input, index) => {
-                let pond = FilePond.find(input);
-
-                if (lstImages[index]) {
-                    pond.addFile(lstImages[index].img_route);
-                }
-            });
-
-            //========= FUEL LEVEL =======
-            const workOrder = @json($work_order);
-            const fuelSelect = document.querySelector('#fuelSelect');
-            fuelSelect.value = workOrder.fuel_level;
-            gauge.refresh(fuelSelect.value);
-
-        }
-
         async function validatedProductStock(item) {
             mostrarAnimacion1();
             try {
                 const res = await axios.get(route('tenant.utils.validatedProductStock', {
-                    work_order_id: @json($work_order->id),
                     warehouse_id: item.warehouse_id,
                     product_id: item.id,
                     quantity: item.quantity
@@ -1005,6 +910,34 @@
                 return null;
             } finally {
                 ocultarAnimacion1();
+            }
+        }
+
+        function setQuote() {
+            const quote = @json($quote ?? null);
+            if (quote) {
+
+                //====== PRODUCTS =========
+                const lstProductsBD = @json($lst_products ?? null);
+                lstProducts = [...lstProductsBD];
+
+                dtProducts = destroyDataTable(dtProducts);
+                clearTable('dt-orders-products');
+                paintOrderProducts(lstProducts);
+                dtProducts = loadDataTableSimple('dt-orders-products');
+
+                //======= SERVICES =======
+                const lstServicesBD = @json($lst_services ?? null);
+                lstServices = [...lstServicesBD];
+
+                dtServices = destroyDataTable(dtServices);
+                clearTable('dt-orders-services');
+                paintOrderServices(lstServices);
+                dtServices = loadDataTableSimple('dt-orders-services');
+
+                calculateAmounts();
+                paintAmounts();
+
             }
         }
     </script>

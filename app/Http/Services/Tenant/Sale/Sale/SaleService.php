@@ -2,11 +2,21 @@
 
 namespace App\Http\Services\Tenant\Sale\Sale;
 
+use App\Http\Controllers\FormatController;
 use App\Http\Controllers\Tenant\NumberToLettersController;
+use App\Http\Controllers\UtilController;
 use App\Http\Services\Tenant\Maintenance\Company\CompanyManager;
 use App\Models\Company;
+use App\Models\CompanyInvoice;
+use App\Models\Department;
+use App\Models\District;
+use App\Models\Landlord\Color;
+use App\Models\Province;
+use App\Models\Tenant\Configuration;
 use App\Models\Tenant\Sale;
+use App\Models\Tenant\Warehouse;
 use Exception;
+use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\DB;
 
 class SaleService
@@ -128,5 +138,45 @@ class SaleService
         if (count($isActive) === 0) {
             throw new Exception("EL TIPO DE VENTA NO ESTÁ ACTIVO EN LA EMPRESA!!!");
         }
+    }
+
+
+    public function createOt(int $id): View
+    {
+        $igv                        =   round(Company::find(1)->igv, 2);
+        $warehouses                 =   Warehouse::where('estado', 'ACTIVO')->get();
+        $checks_inventory_vehicle   =   UtilController::getInventoryVehicleChecks();
+        $technicians                =   UtilController::getTechnicians();
+        $customer_formatted         =   FormatController::getFormatInitialCustomer(1);
+        $validate_stock             =   Configuration::findOrFail(2)->property;
+        $types_identity_documents   =   UtilController::getIdentityDocuments();
+        $departments                =   Department::all();
+        $districts                  =   District::all();
+        $provinces                  =   Province::all();
+        $company_invoice            =   CompanyInvoice::find(1);
+        $years                      =   UtilController::getYears();
+        $colors                     =   Color::where('status', 'ACTIVE')->get();
+        $categories                 =   UtilController::getCategoriesProducts();
+        $brands                     =   UtilController::getBrandsProducts();
+        $configuration              =   Configuration::findOrFail(2);
+
+        return view('sales.sale_document.create-ot', compact(
+            'igv',
+            'warehouses',
+            'checks_inventory_vehicle',
+            'technicians',
+            'customer_formatted',
+            'validate_stock',
+            'types_identity_documents',
+            'departments',
+            'provinces',
+            'districts',
+            'company_invoice',
+            'years',
+            'colors',
+            'categories',
+            'brands',
+            'configuration'
+        ));
     }
 }
