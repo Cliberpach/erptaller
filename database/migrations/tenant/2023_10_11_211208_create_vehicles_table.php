@@ -17,6 +17,9 @@ return new class extends Migration
             $table->string('plate', 8);
             $table->string('name', 160);
 
+            $table->string('vin', 160)->nullable();
+            $table->string('serie', 160)->nullable();
+
             $table->unsignedBigInteger('customer_id');
 
             $table->unsignedBigInteger('brand_id');
