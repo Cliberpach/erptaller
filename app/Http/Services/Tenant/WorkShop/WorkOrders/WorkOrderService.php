@@ -55,7 +55,7 @@ class WorkOrderService
     public function update(array $data, int $id): WorkOrder
     {
         $data       =   $this->s_validation->validationUpdate($data, $id);
-       
+
         $dto        =   $this->s_dto->getDtoStore($data);
 
         $work_order =   $this->s_repository->updateWorkOrder($dto, $id);
@@ -88,6 +88,20 @@ class WorkOrderService
     public function destroy(int $id): WorkOrder
     {
         return $this->s_repository->destroy($id);
+    }
+
+    public function finish(int $id): WorkOrder
+    {
+        $work_order =   $this->s_repository->findWorkOrder($id);
+
+        if (!$work_order->validation_stock) {
+            $products   =   $this->s_repository->getWorkProducts($id);
+            foreach ($products as $item) {
+                $this->s_warehouse_product->decreaseStock($item->warehouse_id, $item->product_id, $item->quantity);
+            }
+        }
+
+        return $this->s_repository->finish($id);
     }
 
     public function getWorkOrder(int $id): array

@@ -269,7 +269,6 @@ array:17 [ // app\Http\Controllers\Tenant\WorkShop\QuoteController.php:145
         }
     }
 
-
     public function destroy(int $id)
     {
         DB::beginTransaction();
@@ -280,6 +279,22 @@ array:17 [ // app\Http\Controllers\Tenant\WorkShop\QuoteController.php:145
             DB::commit();
 
             return response()->json(['success' => true, 'message' => 'ORDEN DE TRABAJO ELIMINADA CON ÉXITO']);
+        } catch (Throwable $th) {
+            DB::rollBack();
+            return response()->json(['success' => false, 'message' => $th->getMessage()]);
+        }
+    }
+
+    public function finish(int $id)
+    {
+        DB::beginTransaction();
+        try {
+
+            $work_order  =   $this->s_order->finish($id);
+
+            DB::commit();
+
+            return response()->json(['success' => true, 'message' => 'ORDEN DE TRABAJO FINALIZADA CON ÉXITO']);
         } catch (Throwable $th) {
             DB::rollBack();
             return response()->json(['success' => false, 'message' => $th->getMessage()]);

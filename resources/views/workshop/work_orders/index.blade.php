@@ -177,42 +177,54 @@
                         className: "text-center",
                         render: function(data) {
 
-                            let actions = `
-                                            <div class="dropdown text-center">
+                            let actions = `<div class="dropdown text-center">
                                                 <button class="btn btn-sm btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
                                                     <i class="fa fa-cog"></i>
                                                 </button>
-                                                <ul class="dropdown-menu dropdown-menu-end">
-                                                    <li>
-                                                        <a class="dropdown-item generarPDF"
-                                                           href="${route('tenant.taller.ordenes_trabajo.pdfOne', data.id)}" target="_blank"
-                                                            title="PDF" role="button" aria-label="Generar PDF">
-                                                            <i class="fas fa-file-pdf me-2 text-danger"></i> PDF
-                                                        </a>
-                                                    </li>
-                                                    <li>
-                                                        <a class="dropdown-item" href="#" onclick="openMdlShowOrder(${data.id})">
-                                                            <i class="fa fa-eye me-2"></i> Ver
-                                                        </a>
-                                                    </li>
-                                                    <li>
-                                                        <a class="dropdown-item modificarDetalle" href="#" onclick="redirectParams('tenant.taller.ordenes_trabajo.edit', ${data.id})">
-                                                            <i class="fa fa-edit me-2"></i> Modificar
-                                                        </a>
-                                                    </li>
-                                                    <li>
-                                                        <a class="dropdown-item text-primary" href="#" onclick="redirectParams('tenant.ventas.comprobante_venta.createOt',${data.id})">
-                                                            <i class="fa fa-file-invoice-dollar me-2"></i> Facturar
-                                                        </a>
-                                                    </li>
-                                                    <li>
-                                                        <a class="dropdown-item text-danger" href="#" onclick="eliminar(${data.id})">
-                                                            <i class="fa fa-trash me-2"></i> Eliminar
-                                                        </a>
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                            `;
+                                                <ul class="dropdown-menu dropdown-menu-end">`;
+
+
+                            actions += `
+                                            <li>
+                                                <a class="dropdown-item generarPDF"
+                                                    href="${route('tenant.taller.ordenes_trabajo.pdfOne', data.id)}" target="_blank"
+                                                    title="PDF" role="button" aria-label="Generar PDF">
+                                                    <i class="fas fa-file-pdf me-2 text-danger"></i> PDF
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item" href="#" onclick="openMdlShowOrder(${data.id})">
+                                                    <i class="fa fa-eye me-2"></i> Ver
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item text-primary" href="#" onclick="redirectParams('tenant.ventas.comprobante_venta.createOt',${data.id})">
+                                                    <i class="fa fa-file-invoice-dollar me-2"></i> Facturar
+                                                </a>
+                                            </li>
+                                        `;
+
+                            if (data.status == 'ACTIVO') {
+                                actions += `
+                                            <li>
+                                                <a class="dropdown-item modificarDetalle" href="#" onclick="redirectParams('tenant.taller.ordenes_trabajo.edit', ${data.id})">
+                                                    <i class="fa fa-edit me-2"></i> Modificar
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item text-primary" href="#" onclick="finalizar(${data.id})">
+                                                            <i class="fa fa-check-circle me-2"></i> Finalizar
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item text-danger" href="#" onclick="eliminar(${data.id})">
+                                                    <i class="fa fa-trash me-2"></i> Eliminar
+                                                </a>
+                                            </li>`;
+                            }
+
+                            actions +=  `</ul></div>`;
+
                             return actions;
                         }
                     }
@@ -331,6 +343,110 @@
 
                     try {
                         const res = await axios.delete(route('tenant.taller.ordenes_trabajo.destroy', id));
+                        if (res.data.success) {
+                            toastr.success(res.data.message, 'OPERACIÓN COMPLETADA');
+                            dtOrders.ajax.reload();
+                        } else {
+                            toastr.error(res.data.message, 'ERROR EN EL SERVIDOR');
+                        }
+                    } catch (error) {
+                        toastr.error(error, 'ERROR EN LA PETICIÓN ELIMINAR ORDEN');
+                    } finally {
+                        Swal.close();
+                    }
+
+                } else if (result.dismiss === Swal.DismissReason.cancel) {
+                    swalWithBootstrapButtons.fire({
+                        title: 'Cancelado',
+                        text: 'La solicitud ha sido cancelada.',
+                        icon: 'error',
+                        confirmButtonText: 'Entendido',
+                        customClass: {
+                            confirmButton: 'btn btn-secondary'
+                        },
+                        buttonsStyling: false
+                    });
+                }
+            });
+        }
+
+        function finalizar(id) {
+            const fila = getRowById(dtOrders, id);
+            const htmlInfo = `
+                <div class="card shadow-sm border-0">
+                    <div class="card-body p-2" style="font-size: 1.2rem;">
+
+                        <div class="mb-1">
+                            <i class="fas fa-hashtag text-dark me-1 small"></i>
+                            <span class="fw-bold small">N° Orden:</span><br>
+                            <span class="text-muted small">${fila.id}</span>
+                        </div>
+
+                        <div class="mb-1">
+                            <i class="fas fa-user text-primary me-1 small"></i>
+                            <span class="fw-bold small">Cliente:</span><br>
+                            <span class="text-muted small">${fila.customer_name}</span>
+                        </div>
+
+                        <div class="mb-1">
+                            <i class="fas fa-car text-info me-1 small"></i>
+                            <span class="fw-bold small">Placa:</span><br>
+                            <span class="text-muted small">${fila.plate}</span>
+                        </div>
+
+                        <div class="mb-1">
+                            <i class="fas fa-coins text-warning me-1 small"></i>
+                            <span class="fw-bold small">Total:</span><br>
+                            <span class="text-muted small">S/ ${formatSoles(fila.total)}</span>
+                        </div>
+
+                        <hr class="my-2">
+
+                        <div class="alert alert-warning p-2 mb-0 small d-flex align-items-center">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            <span>
+                                Al finalizar la orden, <strong>se restará el stock</strong> de los productos utilizados.
+                            </span>
+                        </div>
+
+                    </div>
+                </div>
+            `;
+
+            const swalWithBootstrapButtons = Swal.mixin({
+                customClass: {
+                    confirmButton: 'btn btn-success me-2',
+                    cancelButton: 'btn btn-danger',
+                    actions: 'd-flex justify-content-center gap-2 mt-3'
+                },
+                buttonsStyling: false
+            });
+
+            swalWithBootstrapButtons.fire({
+                title: '¿Desea finalizar la orden?',
+                html: `${htmlInfo}`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Sí, finalizar',
+                cancelButtonText: 'No, cancelar',
+                focusCancel: true,
+                reverseButtons: true
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({
+                        title: 'Finalizando orden...',
+                        html: `
+                            <div style="display:flex; align-items:center; justify-content:center; flex-direction:column;">
+                                <i class="fa fa-spinner fa-spin fa-3x text-primary mb-3"></i>
+                                <p style="margin:0; font-weight:600;">Por favor, espere un momento</p>
+                            </div>
+                        `,
+                        allowOutsideClick: false,
+                        showConfirmButton: false
+                    });
+
+                    try {
+                        const res = await axios.post(route('tenant.taller.ordenes_trabajo.finish', id));
                         if (res.data.success) {
                             toastr.success(res.data.message, 'OPERACIÓN COMPLETADA');
                             dtOrders.ajax.reload();

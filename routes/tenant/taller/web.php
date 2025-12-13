@@ -23,6 +23,8 @@ Route::group(["prefix" => "taller"], function () {
         Route::put('update/{id}', [WorkOrderController::class, 'update'])->name('tenant.taller.ordenes_trabajo.update');
         Route::delete('destroy/{id}', [WorkOrderController::class, 'destroy'])->name('tenant.taller.ordenes_trabajo.destroy');
         Route::get('pdf/{id}', [WorkOrderController::class, 'pdfOne'])->name('tenant.taller.ordenes_trabajo.pdfOne');
+        Route::post('finish/{id}', [WorkOrderController::class, 'finish'])->name('tenant.taller.ordenes_trabajo.finish');
+
     });
 
     Route::group(["prefix" => "cotizaciones"], function () {

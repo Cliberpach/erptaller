@@ -29,7 +29,8 @@ class WorkOrderRepository
         return WorkOrder::create($dto);
     }
 
-    public function findWorkOrder(int $id){
+    public function findWorkOrder(int $id)
+    {
         return WorkOrder::findOrFail($id);
     }
 
@@ -37,7 +38,7 @@ class WorkOrderRepository
     {
         foreach ($lst_products as $item) {
 
-            $this->s_validation->validationProduct($item,$work_order->validation_stock);
+            $this->s_validation->validationProduct($item, $work_order->validation_stock);
 
             if ($work_order->validation_stock) {
                 $this->s_warehouse_product->decreaseStock($item->warehouse_id, $item->id, $item->quantity);
@@ -78,6 +79,14 @@ class WorkOrderRepository
     {
         $work_order            =   WorkOrder::findOrFail($id);
         $work_order->status    =   'ANULADO';
+        $work_order->save();
+        return $work_order;
+    }
+
+    public function finish(int $id): WorkOrder
+    {
+        $work_order            =   WorkOrder::findOrFail($id);
+        $work_order->status    =   'FINALIZADO';
         $work_order->save();
         return $work_order;
     }

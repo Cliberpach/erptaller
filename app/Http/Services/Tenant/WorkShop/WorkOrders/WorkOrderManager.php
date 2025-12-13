@@ -29,13 +29,18 @@ class WorkOrderManager
         return $this->s_order->update($data, $id);
     }
 
-    public function destroy(int $id):WorkOrder
+    public function destroy(int $id): WorkOrder
     {
         return $this->s_order->destroy($id);
     }
 
-    public function pdfOne(int $id){
-        return $this->s_order->pdfOne($id);
+    public function finish(int $id): WorkOrder
+    {
+        return $this->s_order->finish($id);
     }
 
+    public function pdfOne(int $id)
+    {
+        return $this->s_order->pdfOne($id);
+    }
 }
