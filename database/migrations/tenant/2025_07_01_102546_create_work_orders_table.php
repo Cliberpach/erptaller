@@ -41,7 +41,7 @@ return new class extends Migration
             $table->string('editor_user_name')->nullable();
             $table->string('create_user_name')->nullable();
 
-            $table->enum('status', ['ACTIVO', 'ANULADO'])->default('ACTIVO');
+            $table->enum('status', ['ACTIVO', 'ANULADO','FINALIZADO'])->default('ACTIVO');
 
             $table->timestamps();
         });
