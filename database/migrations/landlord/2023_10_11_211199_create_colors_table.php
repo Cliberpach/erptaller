@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -15,6 +16,7 @@ return new class extends Migration
             $table->id();
 
             $table->string('description', 160);
+
             $table->string('codigo', 160)->default('#FFFFFF');
             $table->enum('status', ['ACTIVE', 'INACTIVE'])->default('ACTIVE');
 
@@ -28,6 +30,8 @@ return new class extends Migration
 
             $table->timestamps();
         });
+
+        DB::statement("ALTER TABLE colors ADD CONSTRAINT chk_description_not_empty CHECK (description <> '')");
     }
 
     /**

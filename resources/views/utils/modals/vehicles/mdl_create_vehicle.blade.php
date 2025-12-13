@@ -41,10 +41,10 @@
 
     function openMdlCreateVehicle() {
         setDefaultMdlVehicle();
-         if ( typeof vehicleParams.plateSearchVehicle === 'string' 
-         && (vehicleParams.plateSearchVehicle.length === 8 || vehicleParams.plateSearchVehicle.length === 6) ) {
-                document.querySelector('#plate_mdlvehicle').value = vehicleParams.plateSearchVehicle;
-                document.querySelector('#btn_search_plate').click();
+        if (typeof vehicleParams.plateSearchVehicle === 'string' &&
+            (vehicleParams.plateSearchVehicle.length === 8 || vehicleParams.plateSearchVehicle.length === 6)) {
+            document.querySelector('#plate_mdlvehicle').value = vehicleParams.plateSearchVehicle;
+            document.querySelector('#btn_search_plate').click();
         }
         $('#mdlCreateVehicle').modal('show');
 
@@ -115,7 +115,7 @@
                 preload: false,
                 maxItems: 1,
                 create: false,
-                plugins: ['remove_button'], 
+                plugins: ['remove_button'],
                 load: function(query, callback) {
                     if (!query.length) return callback();
                     axios.get(route('tenant.utils.searchModel'), {
@@ -224,7 +224,7 @@
             }
         } catch (error) {
             toastr.error(error, 'ERROR EN LA PETICIÓN CONSULTAR PLACA');
-                    console.log("Stack:", error.stack);
+            console.log("Stack:", error.stack);
 
         } finally {
             ocultarAnimacion1();
@@ -249,11 +249,13 @@
         };
         addModelSelect(modelItem);
 
-        const colorItem = {
-            id: color.id,
-            description: `${dataApi.color}`
-        };
-        addColorSelect(colorItem);
+        if (dataApi.color) {
+            const colorItem = {
+                id: color.id,
+                description: `${dataApi.color}`
+            };
+            addColorSelect(colorItem);
+        }
 
     }
 
@@ -372,12 +374,12 @@
         window.clientMdlVehicleSelect.setValue(clientId);
     }
 
-    function clearMdlCreateVehicle(){
+    function clearMdlCreateVehicle() {
         window.clientMdlVehicleSelect.clear();
-        document.querySelector('#plate_mdlvehicle').value   =   '';
+        document.querySelector('#plate_mdlvehicle').value = '';
         window.modelSelect.clear();
         window.yearSelect.clear();
         window.colorSelect.clear();
-        document.querySelector('#observation_mdlvehicle').textContent   =   '';
+        document.querySelector('#observation_mdlvehicle').textContent = '';
     }
 </script>

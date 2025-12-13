@@ -53,9 +53,14 @@ class VehicleService
                 $_res->model_insert =   $res_model['model_insert'];
                 $_res->model        =   $res_model['model'];
 
-                $res_color          =   $this->s_color->insertIfNotExists($data_api->color);
-                $_res->color_insert =   $res_color['color_insert'];
-                $_res->color        =   $res_color['color'];
+                if (strlen($data_api->color) > 0) {
+                    $res_color          =   $this->s_color->insertIfNotExists($data_api->color);
+                    $_res->color_insert =   $res_color['color_insert'];
+                    $_res->color        =   $res_color['color'];
+                } else {
+                    $_res->color_insert =   false;
+                    $_res->color        =   null;
+                }
 
                 $res->setContent(json_encode($_res));
             }

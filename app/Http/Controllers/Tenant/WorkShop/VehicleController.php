@@ -17,8 +17,6 @@ use App\Models\Landlord\Brand;
 use App\Models\Landlord\Color;
 use App\Models\Landlord\Customer;
 use App\Models\Landlord\ModelV;
-use App\Models\Landlord\TypeIdentityDocument;
-use App\Models\Landlord\Year;
 use App\Models\Province;
 use App\Models\Tenant\WorkShop\Vehicle;
 use Illuminate\Support\Facades\Session;
