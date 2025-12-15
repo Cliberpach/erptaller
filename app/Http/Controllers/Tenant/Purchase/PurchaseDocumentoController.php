@@ -27,7 +27,7 @@ class PurchaseDocumentoController extends Controller
     public function getPurchaseDocuments(Request $request){
         $purchase_documents  =    DB::table('purchase_documents as dp')
                                     ->select(
-                                        'dp.id', 
+                                        'dp.id',
                                         'dp.delivery_date',
                                         'dp.supplier_name',
                                         'dp.supplier_type_document_abbreviation',
@@ -42,7 +42,7 @@ class PurchaseDocumentoController extends Controller
                                     ->where('dp.estado','!=','ANULADO')
                                     ->get();
 
-        return DataTables::of($purchase_documents)->make(true);  
+        return DataTables::of($purchase_documents)->make(true);
     }
 
     public function getProducts(Request $request){
@@ -59,12 +59,12 @@ class PurchaseDocumentoController extends Controller
                     ->join('brands as b', 'b.id', '=', 'p.brand_id')
                     ->join('categories as c', 'c.id', '=', 'p.category_id')
                     ->select(
-                        'p.id', 
+                        'p.id',
                         'p.brand_id',
                         'p.category_id',
                         'p.name',
                         'p.sale_price',
-                        DB::raw('IFNULL(wp.stock, 0) as stock'), 
+                        DB::raw('IFNULL(wp.stock, 0) as stock'),
                         'p.stock_min',
                         'b.name as brand_name',
                         'c.name as category_name',
@@ -89,9 +89,9 @@ class PurchaseDocumentoController extends Controller
     public function create(){
         $categories                 =   Category::all();
         $brands                     =   Brand::all();
-        $colaborador_registrador    =   DB::select('select 
+        $colaborador_registrador    =   DB::select('select
                                         *
-                                        from 
+                                        from
                                         users as u
                                         where u.id = ?',[Auth::user()->id])[0];
 
@@ -99,9 +99,9 @@ class PurchaseDocumentoController extends Controller
 
         $igv                        =   DB::select('select c.igv from companies as c')[0]->igv;
 
-        $type_identity_documents    =   DB::select('select * 
+        $type_identity_documents    =   DB::select('select *
                                         from types_identity_documents as tid
-                                        where 
+                                        where
                                         tid.id = "1"
                                         or tid.id = "3" ');
 
@@ -119,7 +119,7 @@ array:18 [ // app\Http\Controllers\Tenant\Purchase\PurchaseDocumentoController.p
   "proveedor"           => "4"
   "tipo_doc"            => "BOLETA"
   "igv_chk"             => "18"  //====== SI O NO =====
-  "igv_value"           => "18"  // %IGV 
+  "igv_value"           => "18"  // %IGV
   "serie"               => "B001"
   "numero"              => "541"
   "observation"         => "documento compra test"
@@ -136,15 +136,15 @@ array:18 [ // app\Http\Controllers\Tenant\Purchase\PurchaseDocumentoController.p
     public function store(PurchaseDocumentStoreRequest $request){
         DB::beginTransaction();
 
-        
-        $lstPurchaseDocument    =   json_decode($request->get('lstPurchaseDocument'));   
+
+        $lstPurchaseDocument    =   json_decode($request->get('lstPurchaseDocument'));
         $lstPurchaseDocument    =   $this->validationLstPurchaseDocument($lstPurchaseDocument);
 
         $montos                 =   PurchaseDocumentoController::calcularMontos($lstPurchaseDocument,$request->get('igv_chk',null),$request->get('igv_value'));
 
         try {
 
-            $supplier           =   DB::select('select 
+            $supplier           =   DB::select('select
                                     s.name,
                                     tid.abbreviation as type_document_abbreviation,
                                     s.document_number
@@ -152,7 +152,7 @@ array:18 [ // app\Http\Controllers\Tenant\Purchase\PurchaseDocumentoController.p
                                     inner join  types_identity_documents as tid on tid.id = s.type_identity_document_id
                                     where s.id = ?',[$request->get('proveedor')])[0];
 
-            $warehouse          =   DB::select('select * 
+            $warehouse          =   DB::select('select *
                                     from warehouses as w
                                     where w.id = 1')[0];
 
@@ -180,7 +180,7 @@ array:18 [ // app\Http\Controllers\Tenant\Purchase\PurchaseDocumentoController.p
             foreach ($lstPurchaseDocument as  $item) {
 
                 $detail                         =   new PurchaseDocumentDetail();
-                $detail->purchase_document_id   =   $purchase_document->id; 
+                $detail->purchase_document_id   =   $purchase_document->id;
                 $detail->product_id             =   $item->product_id;
                 $detail->brand_id               =   $item->brand_id;
                 $detail->category_id            =   $item->category_id;
@@ -198,9 +198,9 @@ array:18 [ // app\Http\Controllers\Tenant\Purchase\PurchaseDocumentoController.p
                 $stock_previous                     =  UtilController::getStock($item->product_id);
 
                 //====== INSERTANDO STOCK =====
-                DB::update('UPDATE warehouse_products 
-                SET updated_at = ?, stock = stock + ? 
-                WHERE warehouse_id = 1 
+                DB::update('UPDATE warehouse_products
+                SET updated_at = ?, stock = stock + ?
+                WHERE warehouse_id = 1
                 and product_id = ?', [Carbon::now() , $item->quantity , $item->product_id]);
 
                 $stock_later                        =   UtilController::getStock($item->product_id);
@@ -213,7 +213,7 @@ array:18 [ // app\Http\Controllers\Tenant\Purchase\PurchaseDocumentoController.p
                                         'quantity'          =>  $item->quantity,
                                         'price_sale'        =>  null,
                                         'amount'            =>  null,
-                                        'type'              =>  'COMPRA',
+                                        'type'              =>  'IN',
                                         'document'          =>  'CO-'.$purchase_document->id,
                                         'product_name'      =>  $item->product_name,
                                         'brand_name'        =>  $item->brand_name,
@@ -228,7 +228,7 @@ array:18 [ // app\Http\Controllers\Tenant\Purchase\PurchaseDocumentoController.p
 
                 KardexController::store($request_kardex);
             }
-            
+
             DB::commit();
             return response()->json(['success'=>true,'message'=>'DOCUMENTO DE COMPRA REGISTRADO']);
         } catch (\Throwable $th) {
@@ -272,23 +272,23 @@ array:18 [ // app\Http\Controllers\Tenant\Purchase\PurchaseDocumentoController.p
             if (!is_numeric($item->quantity) || $item->quantity <= 0) {
                 throw new Exception("LA CANTIDAD DEL PRODUCTO NO ES VÁLIDA!!!");
             }
-           
+
             //======== VALIDANDO PRODUCTO =====
-            $product_exists                 =   DB::select('select 
-                                                p.id, 
+            $product_exists                 =   DB::select('select
+                                                p.id,
                                                 p.name,
                                                 br.name as brand_name,
                                                 c.name as category_name,
                                                 br.id as brand_id,
                                                 c.id as category_id
                                                 from products as p
-                                                inner join brands as br on br.id = p.brand_id 
+                                                inner join brands as br on br.id = p.brand_id
                                                 inner join categories as c on c.id = p.category_id
                                                 where p.id = ?',[$item->product_id]);
 
-            
+
             if(count($product_exists) === 0){
-                throw new Exception("EL PRODUCTO ".$item->product_name." NO EXISTE EN LA BD!!!");  
+                throw new Exception("EL PRODUCTO ".$item->product_name." NO EXISTE EN LA BD!!!");
             }
 
             $item->product_name     =   $product_exists[0]->name;
@@ -303,20 +303,20 @@ array:18 [ // app\Http\Controllers\Tenant\Purchase\PurchaseDocumentoController.p
     }
 
     public function show($purchase_id){
-        
+
         try {
 
             $document   =   DB::select('select * from purchase_documents as dp
                             where dp.id = ?',[$purchase_id]);
 
             if(count($document) === 0){
-                throw new Exception("NO EXISTE EL DOCUMENTO DE COMPRA EN LA BD!!"); 
+                throw new Exception("NO EXISTE EL DOCUMENTO DE COMPRA EN LA BD!!");
             }
 
             $detail     =   DB::select('select * from purchase_documents_detail as dpd
                             where dpd.purchase_document_id = ?',[$purchase_id]);
 
-           
+
             return response()->json(['success'=>true,
             'message'=>'DOCUMENTO COMPRA OBTENIDO',
             'purchase_document'=>$document[0],
@@ -327,6 +327,6 @@ array:18 [ // app\Http\Controllers\Tenant\Purchase\PurchaseDocumentoController.p
             return response()->json(['success'=>false,'message'=>$th->getMessage()]);
         }
     }
-    
+
 
 }
