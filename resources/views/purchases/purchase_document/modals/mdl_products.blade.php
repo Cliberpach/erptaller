@@ -40,7 +40,7 @@
         </div>
         <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-           
+
         </div>
       </div>
     </div>
@@ -69,7 +69,7 @@
     function selectProduct(producto_id) {
 
         const fila  =   getRowById(dtProductos,producto_id);
-        
+
         if(!fila){
             toastr.error('NO SE ENCONTRÓ EL PRODUCTO EN LA TABLA PRODUCTOS');
             return;
@@ -81,7 +81,7 @@
         const producto                              =   fila;
         document.querySelector('#producto').value   =   producto.name;
         document.querySelector('#precio').value     =   producto.purchase_price;
-            
+
 
         product_selected.product_id                 =   producto.id;
         product_selected.product_name               =   producto.name;
@@ -90,8 +90,7 @@
         product_selected.producto_unidad_medida     =   'NIU';
         product_selected.purchase_price             =   producto.purchase_price;
 
-        console.log('PRODUCTO ELEGIDO');
-        console.log(product_selected);
+        console.log('PRODUCTO ELEGIDO',product_selected);
 
 
         $('#mdlProducts').modal('hide');
