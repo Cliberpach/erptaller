@@ -44,7 +44,7 @@ class VehicleController extends Controller
             ->join(DB::raw('erptaller.customers as cu'), 'cu.id', '=', 'v.customer_id')
             ->join(DB::raw('erptaller.brandsv as b'), 'b.id', '=', 'v.brand_id')
             ->join(DB::raw('erptaller.models as m'), 'm.id', '=', 'v.model_id')
-            ->join(DB::raw('erptaller.years as y'), 'y.id', '=', 'v.year_id')
+            ->leftJoin(DB::raw('erptaller.years as y'), 'y.id', '=', 'v.year_id')
             ->join(DB::raw('erptaller.colors as c'), 'c.id', '=', 'v.color_id')
             ->select(
                 'v.id',
@@ -92,6 +92,8 @@ array:7 [ // app\Http\Controllers\Tenant\WorkShop\VehicleController.php:81
   "plate" => "T3B033"
   "model_id" => "200"
   "year_id" => "80"
+  "vin" => "MA3FB31S290018614"
+  "serie" => "MA3FB31S290018614"
   "observation" => "test"
 ]
 */
@@ -164,6 +166,8 @@ array:8 [ // app\Http\Controllers\Tenant\WorkShop\VehicleController.php:159
   "year_id" => "98"
   "color_id" => "1"
   "observation" => "t"
+  "vin" => "MA3FB31S290018614"
+  "serie" => "MA3FB31S290018614"
 ]
 */
     public function update(VehicleUpdateRequest $request, $id)

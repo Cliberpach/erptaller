@@ -23,8 +23,8 @@
         <div class="col-md-6">
             <label for="plate" class="form-label fw-bold required_field">Placa:</label>
             <div class="input-group">
-                <input type="text" class="form-control text-uppercase" id="plate_mdlvehicle" name="plate_mdlvehicle" maxlength="8"
-                    minlength="6" placeholder="Ej: ABC123" required>
+                <input type="text" class="form-control text-uppercase" id="plate_mdlvehicle" name="plate_mdlvehicle"
+                    maxlength="8" minlength="6" placeholder="Ej: ABC123" required>
                 <button class="btn btn-outline-secondary" type="button" id="btn_search_plate" title="Buscar vehículo">
                     <i class="fas fa-search"></i>
                 </button>
@@ -75,6 +75,30 @@
                 Debe seleccionar un color.
             </div>
             <p class="color_id_mdlvehicle_error msgError mb-0"></p>
+        </div>
+
+        <!-- VIN -->
+        <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+            <label for="vin" class="form-label fw-bold">VIN:</label>
+            <div class="input-group">
+                <span class="input-group-text">
+                    <i class="fas fa-car"></i>
+                </span>
+                <input type="text" class="form-control" id="vin" name="vin" placeholder="VIN" readonly>
+            </div>
+            <p class="vin_error msgError mb-0"></p>
+        </div>
+
+        <!-- Serie -->
+        <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+            <label for="serie" class="form-label fw-bold">Serie:</label>
+            <div class="input-group">
+                <span class="input-group-text">
+                    <i class="fas fa-barcode"></i>
+                </span>
+                <input type="text" class="form-control" id="serie" name="serie" placeholder="Serie" readonly>
+            </div>
+            <p class="serie_error msgError mb-0"></p>
         </div>
 
         <!-- Observación -->

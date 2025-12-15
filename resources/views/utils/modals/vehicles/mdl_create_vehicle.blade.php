@@ -257,6 +257,9 @@
             addColorSelect(colorItem);
         }
 
+        document.querySelector('#vin').value = dataApi.vin;
+        document.querySelector('#serie').value = dataApi.serie;
+
     }
 
     function addModelSelect(item) {

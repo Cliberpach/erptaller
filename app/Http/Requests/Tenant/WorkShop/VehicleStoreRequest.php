@@ -71,6 +71,19 @@ class VehicleStoreRequest extends FormRequest
                 'string',
                 'max:300',
             ],
+
+            // VIN: opcional, máximo 160 caracteres
+            'vin' => [
+                'nullable',
+                'string',
+                'max:160',
+            ],
+
+            'serie' => [
+                'nullable',
+                'string',
+                'max:160',
+            ],
         ];
     }
 
@@ -97,6 +110,10 @@ class VehicleStoreRequest extends FormRequest
 
             // observation
             'observation.max' => 'La observación no puede tener más de 300 caracteres.',
+
+            'vin.max' => 'El vin no puede tener más de 160 caracteres.',
+            'serie.max' => 'La serie no puede tener más de 160 caracteres.',
+
         ];
     }
 

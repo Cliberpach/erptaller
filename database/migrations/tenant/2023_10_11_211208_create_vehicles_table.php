@@ -32,6 +32,10 @@ return new class extends Migration
 
             $table->string('observation', 300)->nullable();
 
+            $table->string('vin', 160)->nullable();
+            $table->string('serie', 160)->nullable();
+
+
             $table->enum('status', ['ACTIVO', 'ANULADO'])->default('ACTIVO');
 
             $table->unsignedBigInteger('creator_user_id')->nullable();

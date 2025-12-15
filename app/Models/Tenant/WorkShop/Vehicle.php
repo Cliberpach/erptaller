@@ -23,6 +23,8 @@ class Vehicle extends Model
         'year_id',
         'color_id',
         'observation',
+        'vin',
+        'serie',
         'status',
         'creator_user_id',
         'editor_user_id',

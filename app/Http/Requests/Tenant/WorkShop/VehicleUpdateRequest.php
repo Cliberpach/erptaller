@@ -33,7 +33,7 @@ class VehicleUpdateRequest extends FormRequest
                 'min:6',
                 'max:8',
                 Rule::unique('vehicles', 'plate')
-                    ->ignore($this->route('id')) 
+                    ->ignore($this->route('id'))
                     ->where(function ($q) {
                         $q->where('status', 'ACTIVE');
                     }),
@@ -61,6 +61,19 @@ class VehicleUpdateRequest extends FormRequest
                 'string',
                 'max:300',
             ],
+
+            // VIN: opcional, máximo 160 caracteres
+            'vin' => [
+                'nullable',
+                'string',
+                'max:160',
+            ],
+
+            'serie' => [
+                'nullable',
+                'string',
+                'max:160',
+            ]
         ];
     }
 
@@ -87,6 +100,9 @@ class VehicleUpdateRequest extends FormRequest
 
             // observation
             'observation.max' => 'La observación no puede tener más de 300 caracteres.',
+
+            'vin.max' => 'El vin no puede tener más de 160 caracteres.',
+            'serie.max' => 'La serie no puede tener más de 160 caracteres.',
         ];
     }
 

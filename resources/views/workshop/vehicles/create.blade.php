@@ -245,9 +245,9 @@
 
         function setDataApi(res) {
 
-            const dataApi   =   res.data.data.data;
-            const model     =   res.data.model;
-            const color     =   res.data.color;
+            const dataApi = res.data.data.data;
+            const model = res.data.model;
+            const color = res.data.color;
 
             const mensaje = dataApi.mensaje;
             if (mensaje == 'No encontrado') {
@@ -261,11 +261,16 @@
             };
             addModelSelect(modelItem);
 
-            const colorItem = {
-                id: color.id,
-                description: `${dataApi.color}`
-            };
-            addColorSelect(colorItem);
+            if (dataApi.color) {
+                const colorItem = {
+                    id: color.id,
+                    description: `${dataApi.color}`
+                };
+                addColorSelect(colorItem);
+            }
+
+            document.querySelector('#vin').value    =   dataApi.vin;
+            document.querySelector('#serie').value  =   dataApi.serie;
 
         }
 

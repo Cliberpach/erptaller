@@ -19,6 +19,9 @@ class VehicleDto
 
         $model  =   ModelV::findOrFail($data['model_id']);
         $dto['brand_id']    =   $model->brand_id;
+
+        $dto['vin']         =   $data['vin'];
+        $dto['serie']       =   $data['serie'];
         return $dto;
     }
 }
