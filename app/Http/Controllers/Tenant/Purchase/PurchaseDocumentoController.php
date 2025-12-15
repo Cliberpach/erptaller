@@ -207,7 +207,9 @@ array:18 [ // app\Http\Controllers\Tenant\Purchase\PurchaseDocumentoController.p
 
                 //===== GRABANDO EN KARDEX ========
                 $request_kardex     =   new Request();
-                $request_kardex->merge([  'product_id'      =>  $item->product_id,
+                $request_kardex->merge([
+                                        'warehouse_id'      =>  $item->warehouse_id,
+                                        'product_id'        =>  $item->product_id,
                                         'brand_id'          =>  $item->brand_id,
                                         'category_id'       =>  $item->category_id,
                                         'quantity'          =>  $item->quantity,

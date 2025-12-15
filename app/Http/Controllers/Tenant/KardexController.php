@@ -63,7 +63,7 @@ class KardexController extends Controller
             ->orderBy('k.warehouse_id')
             ->orderBy('k.created_at');
 
-       
+
         if ($request->get('product_id')) {
             $kardex = $kardex->where('k.product_id', $request->get('product_id'));
         }
@@ -133,6 +133,7 @@ array:14 [ // app\Http\Controllers\Tenant\KardexController.php:11
         try {
 
             $kardex                     =   new Kardex();
+            $kardex->warehouse_id       =   $request->get('warehouse_id');
             $kardex->product_id         =   $request->get('product_id');
             $kardex->brand_id           =   $request->get('brand_id');
             $kardex->category_id        =   $request->get('category_id');
