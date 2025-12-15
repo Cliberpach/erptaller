@@ -155,6 +155,7 @@ array:14 [ // app\Http\Controllers\Tenant\KardexController.php:11
             $kardex->customer_name      =   $request->get('customer_name');
             $kardex->user_recorder_id   =   $request->get('user_recorder_id');
             $kardex->user_recorder_name =   $request->get('user_recorder_name');
+            $kardex->registration_date  =   now();
             $kardex->save();
         } catch (\Throwable $th) {
             throw new Exception($th->getMessage());
