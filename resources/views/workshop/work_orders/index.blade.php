@@ -164,6 +164,36 @@
                         }
                     },
                     {
+                        data: 'status_invoice',
+                        name: 'o.status_invoice',
+                        searchable: false,
+                        orderable: false,
+                        className: "text-center",
+                        render: function(data, type, row) {
+
+                            let badgeClass = '';
+                            let label = data ?? '';
+
+                            switch (data) {
+                                case 'FACTURADO':
+                                    badgeClass = 'badge bg-primary';
+                                    break;
+                                case 'NO FACTURADO':
+                                    badgeClass = 'badge bg-danger';
+                                    break;
+                                case 'FACTURADO PARCIAL':
+                                    badgeClass = 'badge bg-warning';
+                                    break;
+                                default:
+                                    badgeClass = 'badge bg-secondary';
+                                    break;
+                            }
+
+                            return `<span class="${badgeClass}">${label}</span>`;
+
+                        }
+                    },
+                    {
                         data: 'created_at',
                         name: 'o.created_at',
                         searchable: false,
@@ -199,7 +229,7 @@
                                             </li>
                                         `;
 
-                            if(data.status_invoice != 'FACTURADO'){
+                            if (data.status_invoice != 'FACTURADO') {
                                 actions += `<li>
                                                 <a class="dropdown-item text-primary" href="#" onclick="redirectParams('tenant.taller.ordenes_trabajo.invoiceCreate',${data.id})">
                                                     <i class="fa fa-file-invoice-dollar me-2"></i> Facturar
@@ -226,7 +256,7 @@
                                             </li>`;
                             }
 
-                            actions +=  `</ul></div>`;
+                            actions += `</ul></div>`;
 
                             return actions;
                         }

@@ -12,6 +12,7 @@
             <th class="text-center">SALDO</th>
             <th class="text-center">REGISTRADOR</th>
             <th class="text-center">ESTADO</th>
+            <th class="text-center">FACTURACION</th>
             <th class="text-center">FEC REGISTRO</th>
             <th data-priority="1" class="text-center"></th>
         </tr>
