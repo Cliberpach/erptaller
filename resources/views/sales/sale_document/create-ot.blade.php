@@ -1,7 +1,7 @@
 @extends('layouts.template')
 
 @section('title')
-    Registrar Documento de Venta
+    Comprobante de Venta
 @endsection
 
 @section('content')
@@ -9,12 +9,12 @@
     @include('utils.modals.vehicles.mdl_create_vehicle')
     @include('utils.modals.products.mdl_create_product')
     @include('utils.modals.services.mdl_create_service')
-    @include('workshop.work_orders.modals.mdl_edit_product')
-    @include('workshop.work_orders.modals.mdl_edit_service')
+    @include('sales.sale_document.modals.mdl_edit_product')
+    @include('sales.sale_document.modals.mdl_edit_service')
 
     <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
-            <h4 class="card-title mb-md-0 mb-2">REGISTRAR DOCUMENTO DE VENTA</h4>
+            <h4 class="card-title mb-md-0 mb-2">DOCUMENTO DE VENTA</h4>
 
             <div class="d-flex flex-wrap gap-2">
 
@@ -59,8 +59,8 @@
     <script src="https://unpkg.com/justgage@latest/dist/justgage.umd.js"></script>
 
     <script>
-        let lstProducts = [];
-        let lstServices = [];
+        const lstProducts = @json($lst_products);
+        const lstServices = @json($lst_services);
         let dtProducts = null;
         let dtServices = null;
         const amounts = {
@@ -73,17 +73,6 @@
         let lastServiceQuery = null;
         let lastVehicleQuery = null;
 
-        const gauge = new JustGage({
-            id: "gauge",
-            value: 50,
-            min: 0,
-            max: 100,
-            label: "Gasolina (%)",
-            pointer: true,
-            levelColors: ["#ff0000", "#f9c802", "#00b050"],
-            gaugeWidthScale: 0.7
-        });
-
         document.addEventListener('DOMContentLoaded', () => {
             dtProducts = loadDataTableSimple('dt-orders-products');
             dtServices = loadDataTableSimple('dt-orders-services');
@@ -92,6 +81,8 @@
             loadFilePound();
             events();
             setQuote();
+            loadPreviewData();
+
         })
 
         function events() {
@@ -102,10 +93,6 @@
             eventsMdlProduct();
             eventsMdlService();
 
-            document.getElementById("fuelSelect").addEventListener("change", function() {
-                gauge.refresh(this.value);
-            });
-
             document.querySelector('#form-create-quote').addEventListener('submit', (e) => {
                 e.preventDefault();
                 storeQuote(e.target);
@@ -115,16 +102,8 @@
                 actionChangeClient(value);
             });
 
-            window.vehicleSelect.on('change', function(value) {
-                actionChangeVehicle(value);
-            });
-
-            window.productSelect.on('change', function(value) {
-                actionChangeProduct(value);
-            });
-
-            window.serviceSelect.on('change', function(value) {
-                actionChangeService(value);
+            window.invoiceTypeSelect.on('change', function(value) {
+                actionChangeInvoiceType(value);
             });
 
             document.addEventListener('click', (e) => {
@@ -152,12 +131,6 @@
         }
 
         function loadTomSelect() {
-
-            window.techniciansSelect = new TomSelect("#technicians", {
-                create: false,
-                maxItems: 3,
-                plugins: ['remove_button']
-            });
 
             window.warehouseSelect = new TomSelect('#warehouse_id', {
                 create: false,
@@ -203,170 +176,39 @@
                 },
                 render: {
                     option: (item, escape) => `
-                <div>
-                    <strong>${escape(item.full_name)}</strong><br>
-                    <small>${escape(item.email ?? '')}</small>
-                </div>
-            `,
+                        <div>
+                            <strong>${escape(item.full_name)}</strong><br>
+                            <small>${escape(item.email ?? '')}</small>
+                        </div>
+                    `,
                     item: (item, escape) => `<div>${escape(item.full_name)}</div>`
                 }
             });
 
-            const initialVehicle = @json($vehicle_formatted ?? null);
-            const options = initialVehicle ? [initialVehicle] : [];
-            const items = initialVehicle ? [initialVehicle.id] : [];
-            window.vehicleSelect = new TomSelect('#vehicle_id', {
-                valueField: 'id',
-                labelField: 'text',
-                searchField: ['text'],
-                options: options,
-                items: items,
-                plugins: ['clear_button'],
-                placeholder: 'Seleccione un vehículo',
-                maxOptions: 20,
-                create: false,
-                onType: (str) => {
-                    lastVehicleQuery = str;
-                },
-                preload: false,
-                load: async (query, callback) => {
-                    if (!query.length) return callback();
-                    try {
-                        const url = route('tenant.utils.searchVehicle', {
-                            q: query,
-                            customer_id: window.clientSelect.getValue()
-                        });
-
-                        const response = await fetch(url);
-                        if (!response.ok) throw new Error('Error al buscar vehiculos');
-                        const data = await response.json();
-                        const results = data.data ?? [];
-                        callback(results);
-                        if (results.length === 0) {
-                            vehicleParams.plateSearchVehicle = lastVehicleQuery;
-                            console.log("No se encontró en BD. Guardado:", window.typedCustomer);
-                        }
-                    } catch (error) {
-                        console.error('Error cargando vehiculos:', error);
-                        callback();
-                    }
-                },
-                render: {
-                    option: (item, escape) => `
-                        <div>
-                            <i class="fas fa-car" style="margin-right:6px; color:#0d6efd;"></i>
-                            <strong>${escape(item.text)}</strong><br>
-                            <small>${escape(item.subtext ?? '')}</small>
-                        </div>
-                    `,
-                    item: (item, escape) => `
+            const invoiceTypeSelect = document.getElementById('invoice_type');
+            if (invoiceTypeSelect && !invoiceTypeSelect.tomselect) {
+                window.invoiceTypeSelect = new TomSelect(invoiceTypeSelect, {
+                    valueField: 'id',
+                    labelField: 'name',
+                    searchField: ['name', 'id'],
+                    create: false,
+                    sortField: {
+                        field: 'id',
+                        direction: 'desc'
+                    },
+                    plugins: ['clear_button'],
+                    render: {
+                        option: (item, escape) => `
                             <div>
-                                <i class="fas fa-car" style="margin-right:6px; color:#0d6efd;"></i>
-                                ${escape(item.text)}
+                                ${escape(item.name)}
                             </div>
                         `,
-                    no_results: function(data, escape) {
-                        return `
-                            <div class="no-results">
-                                <i class="fas fa-search" style="margin-right:6px; color:#17a2b8;"></i>
-                                Sin resultados
-                            </div>
-                        `;
+                        item: (item, escape) => `
+                            <div>${escape(item.name)}</div>
+                        `
                     }
-                }
-            });
-
-            window.productSelect = new TomSelect('#product_id', {
-                valueField: 'id',
-                labelField: 'text',
-                searchField: ['text'],
-                placeholder: 'Seleccione un producto',
-                maxOptions: 20,
-                create: false,
-                preload: false,
-                plugins: ['clear_button'],
-                onType: (str) => {
-                    lastProductQuery = str;
-                },
-                load: async (query, callback) => {
-                    if (!query.length) return callback();
-                    try {
-
-                        const configuration = @json($configuration->property);
-                        let urlSearchProduct = 'tenant.utils.searchProductStock';
-                        if (configuration == '0') {
-                            urlSearchProduct = 'tenant.utils.searchProduct';
-                        }
-
-                        const url = route(urlSearchProduct, {
-                            q: query,
-                            warehouse_id: window.warehouseSelect.getValue()
-                        });
-                        const response = await fetch(url);
-                        if (!response.ok) throw new Error('Error al buscar productos');
-                        const data = await response.json();
-                        const results = data.data ?? [];
-                        callback(results);
-                        if (results.length === 0) {
-                            productParams.name = lastProductQuery;
-                        }
-                    } catch (error) {
-                        console.error('Error cargando productos:', error);
-                        callback();
-                    }
-                },
-                render: {
-                    option: (item, escape) => `
-                        <div>
-                            <strong>${escape(item.text)}</strong><br>
-                            <small>${escape(item.subtext ?? '')}</small>
-                        </div>
-                    `,
-                    item: (item, escape) => `<div>${escape(item.text)}</div>`
-                }
-            });
-
-            window.serviceSelect = new TomSelect('#service_id', {
-                valueField: 'id',
-                labelField: 'text',
-                searchField: ['text'],
-                placeholder: 'Seleccione un servicio',
-                maxOptions: 20,
-                create: false,
-                preload: false,
-                plugins: ['clear_button'],
-                onType: (str) => {
-                    lastServiceQuery = str;
-                },
-                load: async (query, callback) => {
-                    if (!query.length) return callback();
-                    try {
-                        const url = `{{ route('tenant.utils.searchService') }}?q=${encodeURIComponent(query)}`;
-                        const response = await fetch(url);
-                        if (!response.ok) throw new Error('Error al buscar servicios');
-                        const data = await response.json();
-                        const results = data.data ?? [];
-                        callback(results);
-                        if (results.length === 0) {
-                            serviceParams.name = lastServiceQuery;
-                            console.log("No se encontró en BD. Guardado:", window.typedCustomer);
-                        }
-                    } catch (error) {
-                        console.error('Error cargando servicios:', error);
-                        callback();
-                    }
-                },
-                render: {
-                    option: (item, escape) => `
-                <div>
-                    <strong>${escape(item.text)}</strong><br>
-                    <small>${escape(item.subtext ?? '')}</small>
-                </div>
-            `,
-                    item: (item, escape) => `<div>${escape(item.text)}</div>`
-                }
-            });
-
+                });
+            }
 
         }
 
@@ -378,7 +220,7 @@
             buttonsStyling: false
         })
 
-        function validationStoreQuote() {
+        function validationStore() {
             if (lstProducts.length === 0 && lstServices.length === 0) {
                 toastr.error('DEBE AGREGAR AL MENOS UN PRODUCTO O SERVICIO A LA COTIZACIÓN');
                 return false;
@@ -389,13 +231,13 @@
         async function storeQuote(formCreateQuote) {
 
             toastr.clear();
-            const isValid = validationStoreQuote();
+            const isValid = validationStore();
             if (!isValid) {
                 return;
             }
 
             const result = await Swal.fire({
-                title: '¿Desea registrar la orden?',
+                title: '¿Desea generar el comprobante de venta?',
                 text: "Confirmar",
                 icon: 'question',
                 showCancelButton: true,
@@ -416,7 +258,7 @@
                     clearValidationErrors('msgError');
 
                     Swal.fire({
-                        title: 'Registrando orden...',
+                        title: 'Generando Comprobante...',
                         text: 'Por favor espere',
                         allowOutsideClick: false,
                         allowEscapeKey: false,
@@ -428,13 +270,9 @@
                     const formData = new FormData(formCreateQuote);
                     formData.append('lst_products', JSON.stringify(lstProducts));
                     formData.append('lst_services', JSON.stringify(lstServices));
+                    formData.append('work_order_id', @json($work_order->id));
 
-                    const quoteId = @json($quote->id ?? null);
-                    if (quoteId !== null) {
-                        formData.append('quote_id', quoteId);
-                    }
-
-                    const res = await axios.post(route('tenant.taller.ordenes_trabajo.store'), formData);
+                    const res = await axios.post(route('tenant.taller.ordenes_trabajo.invoiceStore'), formData);
 
                     if (res.data.success) {
                         window.open(res.data.pdf_url, '_blank');
@@ -557,14 +395,6 @@
 
         async function validationAddProduct(productSelected, lstItems) {
 
-            const configuration = @json($configuration->property);
-            if (configuration === '1') {
-                const validationStock = await validatedProductStock(productSelected);
-                if (!validationStock) {
-                    return false;
-                }
-            }
-
             const indexExists = lstItems.findIndex((i) => i.id == productSelected.id);
             if (indexExists != -1) {
                 toastr.error(`${lstItems[indexExists].name} YA EXISTE EN EL DETALLE DE PRODUCTOS`);
@@ -585,9 +415,6 @@
                 rows += `
                     <tr>
                         <td class="text-center">
-                            <button onclick="openMdlEditProduct(${item.id})" type="button" class="btn btn-sm btn-primary btn-edit" data-id="${item.id}">
-                                <i class="fas fa-edit"></i>
-                            </button>
                             <button type="button" class="btn btn-sm btn-danger btn-delete-product" data-id="${item.id}">
                                 <i class="fas fa-trash-alt"></i>
                             </button>
@@ -635,6 +462,25 @@
 
             if (item && item.sale_price) {
                 document.querySelector('#service_price').value = item.sale_price;
+            }
+        }
+
+        async function actionChangeInvoiceType(value){
+            if(!value)return;
+            mostrarAnimacion1();
+            try {
+                toastr.clear();
+                const res = await axios.get(route('tenant.utils.isActiveInvoiceType',{id:value}));
+                if(res.data.success){
+                    toastr.info(res.data.message,'OPERACIÓN COMPLETADA');
+                }else{
+                    toastr.error(res.data.message,'ERROR EN EL SERVIDOR');
+                    window.invoiceTypeSelect.open();
+                }
+            } catch (error) {
+                toastr.error(error,'ERROR EN LA PETICIÓN VALIDAR COMPROBANTE ACTIVO');
+            }finally{
+                ocultarAnimacion1();
             }
         }
 
@@ -723,9 +569,6 @@
                 rows += `
                     <tr>
                         <td class="text-center">
-                            <button onclick="openMdlEditService(${item.id})" type="button" class="btn btn-sm btn-primary btn-edit" data-id="${item.id}">
-                                <i class="fas fa-edit"></i>
-                            </button>
                             <button type="button" class="btn btn-sm btn-danger btn-delete-service" data-id="${item.id}">
                                 <i class="fas fa-trash-alt"></i>
                             </button>
@@ -890,29 +733,6 @@
             });
         }
 
-        async function validatedProductStock(item) {
-            mostrarAnimacion1();
-            try {
-                const res = await axios.get(route('tenant.utils.validatedProductStock', {
-                    warehouse_id: item.warehouse_id,
-                    product_id: item.id,
-                    quantity: item.quantity
-                }));
-
-                if (res.data.success) {
-                    return res.data;
-                }
-
-                toastr.error(res.data.message, 'ERROR EN EL SERVIDOR');
-                return null;
-            } catch (error) {
-                toastr.error('ERROR EN LA PETICIÓN VALIDAR STOCK');
-                return null;
-            } finally {
-                ocultarAnimacion1();
-            }
-        }
-
         function setQuote() {
             const quote = @json($quote ?? null);
             if (quote) {
@@ -939,6 +759,25 @@
                 paintAmounts();
 
             }
+        }
+
+        function loadPreviewData() {
+
+            //====== PRODUCTS
+            dtProducts = destroyDataTable(dtProducts);
+            clearTable('dt-orders-products');
+            paintOrderProducts(lstProducts);
+            dtProducts = loadDataTableSimple('dt-orders-products');
+
+            //======= SERVICES =======
+            dtServices = destroyDataTable(dtServices);
+            clearTable('dt-orders-services');
+            paintOrderServices(lstServices);
+            dtServices = loadDataTableSimple('dt-orders-services');
+
+            calculateAmounts();
+            paintAmounts();
+
         }
     </script>
 @endsection

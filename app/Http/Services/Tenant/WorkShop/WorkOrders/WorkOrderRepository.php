@@ -3,7 +3,7 @@
 namespace App\Http\Services\Tenant\WorkShop\WorkOrders;
 
 use App\Http\Services\Tenant\Inventory\WarehouseProduct\WarehouseProductService;
-use App\Models\Tenant\Configuration;
+use App\Models\Tenant\Sale;
 use App\Models\Tenant\WorkShop\WorkOrder\WorkOrder;
 use App\Models\Tenant\WorkShop\WorkOrder\WorkOrderImage;
 use App\Models\Tenant\WorkShop\WorkOrder\WorkOrderInventory;
@@ -124,7 +124,13 @@ class WorkOrderRepository
 
     public function getWorkOrder(int $id): array
     {
-        $order          =   WorkOrder::findOrFail($id);
+        $order = WorkOrder::with([
+            'vehicle.brand',
+            'vehicle.model',
+            'vehicle.year',
+            'vehicle.color',
+        ])->findOrFail($id);
+
         $products       =   WorkOrderProduct::where('work_order_id', $id)->get();
         $services       =   WorkOrderService::where('work_order_id', $id)->get();
         $inventory      =   WorkOrderInventory::where('work_order_id', $id)->get();
@@ -156,5 +162,64 @@ class WorkOrderRepository
     public function getWorkProducts(int $id)
     {
         return WorkOrderProduct::where('work_order_id', $id)->get();
+    }
+
+      public function getWorkServices(int $id)
+    {
+        return WorkOrderService::where('work_order_id', $id)->get();
+    }
+
+    public function isWorkProductInvoiced(int $work_order_id, int $product_id): bool
+    {
+        $exists =   WorkOrderProduct::where('work_order_id', $work_order_id)
+            ->where('product_id', $product_id)
+            ->where('invoiced', true)
+            ->exists();
+
+        return $exists;
+    }
+
+    public function isWorkServiceInvoiced(int $work_order_id, int $service_id): bool
+    {
+        $exists =   WorkOrderService::where('work_order_id', $work_order_id)
+            ->where('service_id', $service_id)
+            ->where('invoiced', true)
+            ->exists();
+
+        return $exists;
+    }
+
+    public function setInvoicedWorkProducts(int $work_order_id, Sale $sale, array $lst_products)
+    {
+        foreach ($lst_products as $product) {
+            WorkOrderProduct::where('work_order_id', $work_order_id)
+                ->where('product_id', $product->id)
+                ->update([
+                    'invoiced' => true,
+                    'invoiced_sale_id' => $sale->id,
+                    'invoiced_sale_serie' => $sale->serie . '-' . $sale->correlative
+                ]);
+        }
+    }
+
+    public function setInvoicedWorkServices(int $work_order_id, Sale $sale, array $lst_services)
+    {
+        foreach ($lst_services as $service) {
+            WorkOrderService::where('work_order_id', $work_order_id)
+                ->where('service_id', $service->id)
+                ->update([
+                    'invoiced' => true,
+                    'invoiced_sale_id' => $sale->id,
+                    'invoiced_sale_serie' => $sale->serie . '-' . $sale->correlative
+                ]);
+        }
+    }
+
+     public function setWorkStatusInvoice(int $id,string $status): WorkOrder
+    {
+        $work_order                     =   WorkOrder::findOrFail($id);
+        $work_order->status_invoice     =   $status;
+        $work_order->save();
+        return $work_order;
     }
 }

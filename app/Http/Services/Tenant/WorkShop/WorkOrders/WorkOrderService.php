@@ -2,12 +2,23 @@
 
 namespace App\Http\Services\Tenant\WorkShop\WorkOrders;
 
+use App\Http\Controllers\FormatController;
+use App\Http\Controllers\UtilController;
 use App\Http\Services\Tenant\Accounts\CustomerAccount\CustomerAccountService;
 use App\Http\Services\Tenant\Inventory\WarehouseProduct\WarehouseProductService;
+use App\Http\Services\Tenant\Sale\Sale\SaleService;
 use App\Http\Services\Tenant\WorkShop\WorkOrders\WorkOrderDto;
 use App\Http\Services\Tenant\WorkShop\WorkOrders\WorkOrderRepository;
 use App\Http\Services\Tenant\WorkShop\WorkOrders\WorkOrderValidation;
 use App\Models\Company;
+use App\Models\CompanyInvoice;
+use App\Models\Department;
+use App\Models\District;
+use App\Models\Landlord\Color;
+use App\Models\Province;
+use App\Models\Tenant\Configuration;
+use App\Models\Tenant\Sale;
+use App\Models\Tenant\Warehouse;
 use App\Models\Tenant\WorkShop\WorkOrder\WorkOrder;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\UploadedFile;
@@ -20,14 +31,16 @@ class WorkOrderService
     private WorkOrderValidation $s_validation;
     private WarehouseProductService $s_warehouse_product;
     private CustomerAccountService $s_customer_account;
+    private SaleService $s_sale;
 
     public function __construct()
     {
-        $this->s_repository =   new WorkOrderRepository();
-        $this->s_dto        =   new WorkOrderDto();
-        $this->s_validation =   new WorkOrderValidation();
+        $this->s_repository         =   new WorkOrderRepository();
+        $this->s_dto                =   new WorkOrderDto();
+        $this->s_validation         =   new WorkOrderValidation();
         $this->s_warehouse_product  =   new WarehouseProductService();
         $this->s_customer_account   =   new CustomerAccountService();
+        $this->s_sale               =   new SaleService();
     }
 
     public function store(array $data): WorkOrder
@@ -200,5 +213,98 @@ class WorkOrderService
         $company    =   Company::findOrFail(1);
 
         return $pdf = Pdf::loadView('workshop.work_orders.reports.pdf_order', compact('data_order', 'company'));
+    }
+
+    public function invoiceCreate(int $id)
+    {
+        $igv                        =   round(Company::find(1)->igv, 2);
+        $warehouses                 =   Warehouse::where('estado', 'ACTIVO')->get();
+
+        $invoice_types              =   UtilController::getInvoiceTypes();
+        $types_identity_documents   =   UtilController::getIdentityDocuments();
+        $departments                =   Department::all();
+        $districts                  =   District::all();
+        $provinces                  =   Province::all();
+        $company_invoice            =   CompanyInvoice::find(1);
+        $years                      =   UtilController::getYears();
+        $colors                     =   Color::where('status', 'ACTIVE')->get();
+        $categories                 =   UtilController::getCategoriesProducts();
+        $brands                     =   UtilController::getBrandsProducts();
+        $configuration              =   Configuration::findOrFail(2);
+
+        $order                      =   $this->getWorkOrder($id);
+        $work_order                 =   $order['order'];
+        $order['products']          =   $order['products']->where('invoiced',false);
+        $order['services']          =   $order['services']->where('invoiced',false);
+
+        $customer_formatted         =   FormatController::getFormatInitialCustomer($work_order->customer_id);
+        $vehicle_formatted          =   FormatController::getFormatInitialVehicle($work_order->vehicle_id);
+
+        $work_order                 =   $order['order'];
+        $lst_products               =   FormatController::formatLstProducts($order['products']->toArray());
+        $lst_services               =   FormatController::formatLstServices($order['services']->toArray());
+
+        return view('sales.sale_document.create-ot', compact(
+            'igv',
+            'invoice_types',
+            'warehouses',
+            'customer_formatted',
+            'vehicle_formatted',
+            'types_identity_documents',
+            'departments',
+            'provinces',
+            'districts',
+            'company_invoice',
+            'years',
+            'colors',
+            'categories',
+            'brands',
+            'configuration',
+            'lst_products',
+            'lst_services',
+            'work_order'
+        ));
+    }
+
+
+    /*
+array:17 [ // app\Http\Services\Tenant\WorkShop\WorkOrders\WorkOrderService.php:264
+  "_token" => "YqcvEqq5grlzzcaGuNm4u9CTRIp7Y9ntQzwa1yUI"
+  "_method" => "POST"
+  "warehouse_id" => "1"
+  "invoice_type" => "65"
+  "client_id" => "3"
+  "vehicle_id" => "7"
+  "product_id" => null
+  "product_stock" => null
+  "product_quantity" => null
+  "product_price" => null
+  "dt-orders-products_length" => "10"
+  "service_id" => null
+  "service_quantity" => null
+  "service_price" => null
+  "dt-orders-services_length" => "10"
+  "lst_products" => "[{"warehouse_id":1,"id":1,"name":"BUJÍA 20 MM","category_name":"BUJÍAS","brand_name":"ASUS","sale_price":"14.990000","quantity":"2.000000","total":"29.980000"},{"warehouse_id":1,"id":13,"name":"ARRANCADOR Z","category_name":"LLAVES","brand_name":"NASCAR","sale_price":"1.000000","quantity":"1.000000","total":"1.000000"}]"
+  "lst_services" => "[{"id":3,"name":"RENOVACIÓN DE MOTOR","sale_price":"2000.000000","quantity":"2.000000","total":"4000.000000"}]"
+  "work_order_id" => "37"
+]
+*/
+    public function invoiceStore($data):Sale
+    {
+        $data   =   $this->s_validation->validationInvoice($data);
+        $sale   =   $this->s_sale->storeFromOrder($data);
+        $this->s_repository->setInvoicedWorkProducts($data['work_order_id'], $sale, $data['lst_products']);
+        $this->s_repository->setInvoicedWorkServices($data['work_order_id'], $sale, $data['lst_services']);
+
+        $cant_products_not_invoiced  =   $this->s_repository->getWorkProducts($data['work_order_id'])->where('invoiced',false)->count();
+        $cant_services_not_invoiced  =   $this->s_repository->getWorkServices($data['work_order_id'])->where('invoiced',false)->count();
+
+        if($cant_products_not_invoiced + $cant_services_not_invoiced === 0 ){
+            $this->s_repository->setWorkStatusInvoice($data['work_order_id'],'FACTURADO');
+        }else{
+            $this->s_repository->setWorkStatusInvoice($data['work_order_id'],'FACTURADO PARCIAL');
+        }
+
+        return $sale;
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Company;
 
 use App\Models\DocumentType;
+use App\Models\Landlord\GeneralTable\GeneralTableDetail;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Rule;
@@ -29,9 +30,8 @@ class CompanyNumerationRequest extends FormRequest
             'billing_type_document' => [
                 'required',
                 'integer',
-                'in:1,3,6,7,9,80',
                 function ($attribute, $value, $fail) {
-                    if (!DocumentType::where('id', $value)->where('status', 1)->exists()) {
+                    if (!GeneralTableDetail::where('id', $value)->where('status', 'ACTIVO')->exists()) {
                         $fail("El $attribute seleccionado no es válido.");
                     }
                 },
@@ -52,7 +52,7 @@ class CompanyNumerationRequest extends FormRequest
             'billing_type_document.required'    => 'El tipo de documento de facturación es obligatorio.',
             'billing_type_document.integer'     => 'El tipo de documento de facturación debe ser un número entero.',
             'billing_type_document.in'          => 'El tipo de documento de facturación debe ser uno de los siguientes valores: 1, 3, 6, 7, 9, 80.',
-            
+
             'serie.required'                    => 'La serie es obligatoria.',
 
             'start_number.required'             => 'El número de inicio es obligatorio.',

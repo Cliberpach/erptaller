@@ -49,6 +49,7 @@ class WorkOrderController extends Controller
                 'o.create_user_name',
                 'o.status',
                 'o.created_at',
+                'o.status_invoice',
                 'o.quote_id',
                 DB::raw('CONCAT("COT-",o.quote_id) as quote_code'),
                 'ca.balance',
@@ -310,6 +311,65 @@ array:17 [ // app\Http\Controllers\Tenant\WorkShop\QuoteController.php:145
         } catch (Throwable $th) {
             Session::flash('message_error', $th->getMessage());
             return back();
+        }
+    }
+
+    public function invoiceCreate(int $id)
+    {
+        try {
+            $view   =   $this->s_order->invoiceCreate($id);
+            return $view;
+        } catch (Throwable $th) {
+            return back();
+        }
+    }
+
+    /*
+array:16 [ // app\Http\Controllers\Tenant\WorkShop\WorkOrderController.php:327
+  "_token" => "YqcvEqq5grlzzcaGuNm4u9CTRIp7Y9ntQzwa1yUI"
+  "_method" => "POST"
+  "warehouse_id" => "1"
+  "client_id" => "3"
+  "vehicle_id" => "7"
+  "product_id" => null
+  "product_stock" => null
+  "product_quantity" => null
+  "product_price" => null
+  "dt-orders-products_length" => "10"
+  "service_id" => null
+  "service_quantity" => null
+  "service_price" => null
+  "dt-orders-services_length" => "10"
+  "lst_products" => "[{"warehouse_id":1,"id":1,"name":"BUJÍA 20 MM","category_name":"BUJÍAS","brand_name":"ASUS","sale_price":"14.990000","quantity":"2.000000","total":"29.980000"},{"warehouse_id":1,"id":13,"name":"ARRANCADOR Z","category_name":"LLAVES","brand_name":"NASCAR","sale_price":"1.000000","quantity":"1.000000","total":"1.000000"}]"
+  "lst_services" => "[{"id":3,"name":"RENOVACIÓN DE MOTOR","sale_price":"2000.000000","quantity":"2.000000","total":"4000.000000"}]"
+]
+*/
+    public function invoiceStore(Request  $request)
+    {
+        DB::beginTransaction();
+        try {
+            $sale       =   $this->s_order->invoiceStore($request->toArray());
+            $pdf_url    =   route('tenant.ventas.comprobante_venta.pdf_voucher', ['id' => $sale->id, 'size' => 1]);
+            $message    =   'OT-' . $request->get('work_order_id') . ' ,FACTURADA CON ÉXITO: ' . $sale->serie . '-' . $sale->correlative;
+
+            Session::flash('message_success', $message);
+
+            DB::commit();
+            return response()->json([
+                'success'   =>  true,
+                'message'   =>  $message,
+                'pdf_url'   =>  $pdf_url
+            ]);
+        } catch (Throwable $th) {
+            DB::rollBack();
+
+            Session::flash('message_error',$th->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => $th->getMessage(),
+                'file' => $th->getFile(),
+                'line' => $th->getLine()
+            ]);
         }
     }
 }

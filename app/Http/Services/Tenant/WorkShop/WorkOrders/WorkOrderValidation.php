@@ -3,10 +3,11 @@
 namespace App\Http\Services\Tenant\WorkShop\WorkOrders;
 
 use App\Http\Services\Tenant\Inventory\WarehouseProduct\WarehouseProductService;
-use App\Models\Product;
 use App\Models\Tenant\Configuration;
 use App\Models\Tenant\WorkShop\Quote\Quote;
 use App\Models\Tenant\WorkShop\WorkOrder\WorkOrder;
+use App\Models\Tenant\WorkShop\WorkOrder\WorkOrderProduct;
+use App\Models\Tenant\WorkShop\WorkOrder\WorkOrderService;
 use Exception;
 
 class WorkOrderValidation
@@ -78,5 +79,43 @@ class WorkOrderValidation
                 );
             }
         }
+    }
+
+    public function validationInvoice(array $data){
+        $work_order_id  =   $data['work_order_id'];
+        $lst_products   =   json_decode($data['lst_products']);
+        $lst_services   =   json_decode($data['lst_services']);
+
+        if(count($lst_products) === 0 && count($lst_services) === 0){
+            throw new Exception("LA ORDEN DE TRABAJO ESTÁ VACÍA");
+        }
+
+        foreach ($lst_products as $item) {
+            $exists =   WorkOrderProduct::where('work_order_id',$work_order_id)
+                        ->where('product_id',$item->id)
+                        ->where('invoiced',true)
+                        ->exists();
+
+            if($exists){
+                throw new Exception($item->name.',YA FUE FACTURADO EN ESTA ORDEN: OT-'.$work_order_id->id);
+            }
+        }
+
+        foreach ($lst_services as $item) {
+            $exists =   WorkOrderService::where('work_order_id',$work_order_id)
+                        ->where('service_id',$item->id)
+                        ->where('invoiced',true)
+                        ->exists();
+
+            if($exists){
+                throw new Exception($item->name.',YA FUE FACTURADO EN ESTA ORDEN: OT-'.$work_order_id->id);
+            }
+        }
+
+        $data['lst_products']   =   $lst_products;
+        $data['lst_services']   =   $lst_services;
+
+        return $data;
+
     }
 }

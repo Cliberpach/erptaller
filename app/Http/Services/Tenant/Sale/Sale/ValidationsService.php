@@ -3,6 +3,8 @@
 namespace App\Http\Services\Tenant\Sale\Sale;
 
 use App\Models\Company;
+use App\Models\Landlord\Customer;
+use App\Models\Landlord\GeneralTable\GeneralTableDetail;
 use App\Models\Product;
 use App\Models\User;
 use Exception;
@@ -39,7 +41,6 @@ class ValidationsService
     */
     public static function validationStore($data): object
     {
-
         //====== VALIDANDO USUARIO REGISTRADOR DEBE EXISTIR ======
         $user_recorder  =   User::findOrFail($data['user_recorder_id']);
 
@@ -47,10 +48,9 @@ class ValidationsService
             throw new Exception("EL USUARIO REGISTRADOR NO EXISTE EN LA BD!!!");
         }
 
-
         //======= VALIDANDO USUARIO ACTUAL DEBE ESTAR EN UNA CAJA APERTURADA =======
         $user_in_petty_cash =   DB::select(
-            'select
+            'SELECT
                                 pc.name as petty_cash_name,
                                 pcb.petty_cash_id,
                                 pcb.id as petty_cash_book_id,
@@ -126,7 +126,6 @@ class ValidationsService
         ];
     }
 
-
     public static function validationLstPays(array $lstPays, object $amounts):array
     {
 
@@ -166,5 +165,45 @@ class ValidationsService
         $lstPays[]  =   (object)['method_pay' => null, 'amount' => null];
 
         return $lstPays;
+    }
+
+       public static function validationStoreFromOrder($data): array
+    {
+        //======= VALIDACION TIPO DE VENTA Y CLIENTE =========
+        $type_sale      =   $data['invoice_type'];
+        $customer_id    =   $data['client_id'];
+
+        $customer       =   Customer::findOrFail($customer_id);
+        $invoice_tpye   =   GeneralTableDetail::findOrFail($type_sale);
+
+        //======== RUC Y BOLETA ======
+        if ($customer->type_document_abbreviation === 'RUC' && $invoice_tpye->parameter === 'B') {
+            throw new Exception("NO SE PERMITEN BOLETAS DE VENTA CON RUC!!!");
+        }
+
+        //======== DNI Y FACTURA ======
+        if ($customer->type_document_abbreviation === 'DNI' && $invoice_tpye->parameter === 'F') {
+            throw new Exception("NO SE PERMITEN FACTURAS DE VENTA CON DNI!!!");
+        }
+
+        //======= VALIDANDO DETALLE DE LA VENTA =======
+        $lst_products   =   $data['lst_products'];
+        $lst_services   =   $data['lst_services'];
+
+        if (count($lst_products) === 0 && count($lst_services) === 0) {
+            throw new Exception("EL DETALLE DE LA VENTA ESTÁ VACÍO!!!");
+        }
+
+        //====== VALIDANDO IGV PORCENTAJE DE LA COMPAÑIA =====
+        $company    =   Company::find(1);
+
+        $data['customer']       =   $customer;
+        $data['invoice_type']   =   $invoice_tpye;
+        $data['igv_percentage'] =   $company->igv;
+        $data['lst_products']   =   $lst_products;
+        $data['lst_services']   =   $lst_services;
+        $data['type']           =   'PRODUCTOS';
+
+        return $data;
     }
 }

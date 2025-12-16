@@ -18,6 +18,11 @@ class WorkOrderService extends Model
         'price_sale',
         'amount',
         'status',
+
+        'invoiced',
+        'invoiced_sale_id',
+        'invoiced_sale_serie',
+
         'created_at',
         'updated_at',
     ];

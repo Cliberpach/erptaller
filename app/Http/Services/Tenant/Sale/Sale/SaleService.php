@@ -2,22 +2,12 @@
 
 namespace App\Http\Services\Tenant\Sale\Sale;
 
-use App\Http\Controllers\FormatController;
 use App\Http\Controllers\Tenant\NumberToLettersController;
-use App\Http\Controllers\UtilController;
 use App\Http\Services\Tenant\Maintenance\Company\CompanyManager;
-use App\Models\Company;
-use App\Models\CompanyInvoice;
-use App\Models\Department;
-use App\Models\District;
-use App\Models\Landlord\Color;
-use App\Models\Province;
-use App\Models\Tenant\Configuration;
+use App\Models\Landlord\GeneralTable\GeneralTableDetail;
+use App\Models\Tenant\DocumentSerialization;
 use App\Models\Tenant\Sale;
-use App\Models\Tenant\Warehouse;
 use Exception;
-use Illuminate\Contracts\View\View;
-use Illuminate\Support\Facades\DB;
 
 class SaleService
 {
@@ -25,6 +15,8 @@ class SaleService
     private CalculationsService $s_calculations;
     private CorrelativeService  $s_correlative;
     private SaleDetailService $s_detail;
+    private SaleRepository $s_repository;
+    private SaleDto $s_dto;
     private CompanyManager $s_company;
 
     public function __construct()
@@ -34,6 +26,8 @@ class SaleService
         $this->s_correlative    =   new CorrelativeService();
         $this->s_detail         =   new SaleDetailService();
         $this->s_company        =   new CompanyManager();
+        $this->s_repository     =   new SaleRepository();
+        $this->s_dto            =   new SaleDto();
     }
 
     public function store(array $data): Sale
@@ -124,59 +118,59 @@ class SaleService
 
     public static function isActiveTypeSale($type_sale)
     {
+        $invoice_type   =   GeneralTableDetail::findOrFail($type_sale);
 
-        $isActive   =   DB::select(
-            'SELECT
-                            ds.*
-                            FROM document_serializations AS ds
-                            WHERE
-                            ds.company_id = ?
-                            AND ds.document_type_id = ?',
-            [Company::find(1)->id, $type_sale]
-        );
+        $is_active  =   DocumentSerialization::where('document_type_id', $type_sale)
+            ->where('company_id', 1)
+            ->first();
 
-        if (count($isActive) === 0) {
-            throw new Exception("EL TIPO DE VENTA NO ESTÁ ACTIVO EN LA EMPRESA!!!");
+        if (!$is_active) {
+            throw new Exception($invoice_type->name . ", NO ESTÁ ACTIVO EN LA EMPRESA");
         }
     }
 
-
-    public function createOt(int $id): View
+    public function calculateAmounts($data)
     {
-        $igv                        =   round(Company::find(1)->igv, 2);
-        $warehouses                 =   Warehouse::where('estado', 'ACTIVO')->get();
-        $checks_inventory_vehicle   =   UtilController::getInventoryVehicleChecks();
-        $technicians                =   UtilController::getTechnicians();
-        $customer_formatted         =   FormatController::getFormatInitialCustomer(1);
-        $validate_stock             =   Configuration::findOrFail(2)->property;
-        $types_identity_documents   =   UtilController::getIdentityDocuments();
-        $departments                =   Department::all();
-        $districts                  =   District::all();
-        $provinces                  =   Province::all();
-        $company_invoice            =   CompanyInvoice::find(1);
-        $years                      =   UtilController::getYears();
-        $colors                     =   Color::where('status', 'ACTIVE')->get();
-        $categories                 =   UtilController::getCategoriesProducts();
-        $brands                     =   UtilController::getBrandsProducts();
-        $configuration              =   Configuration::findOrFail(2);
+        $lst_products   =   $data['lst_products'];
+        $lst_services   =   $data['lst_services'];
 
-        return view('sales.sale_document.create-ot', compact(
-            'igv',
-            'warehouses',
-            'checks_inventory_vehicle',
-            'technicians',
-            'customer_formatted',
-            'validate_stock',
-            'types_identity_documents',
-            'departments',
-            'provinces',
-            'districts',
-            'company_invoice',
-            'years',
-            'colors',
-            'categories',
-            'brands',
-            'configuration'
-        ));
+        $subtotal   =   0;
+        $igv_amount =   0;
+        $total      =   0;
+
+        foreach ($lst_products as $item) {
+            $total  +=  (float)$item->quantity * (float)$item->sale_price;
+        }
+        foreach ($lst_services as $item) {
+            $total  +=  (float)$item->quantity * (float)$item->sale_price;
+        }
+
+        $subtotal       =   $total / ((100 + (float)$data['igv_percentage']) / 100);
+        $igv_amount     =   $total - $subtotal;
+
+        $data['subtotal']       =   $subtotal;
+        $data['igv_amount']     =   $igv_amount;
+        $data['total']          =   $total;
+
+        return $data;
+    }
+
+    public function storeFromOrder($data):Sale
+    {
+        $this->isActiveTypeSale($data['invoice_type']);
+        $data   =   $this->s_validations->validationStoreFromOrder($data);
+        $data   =   $this->calculateAmounts($data);
+
+        $dto    =   $this->s_dto->getDtoStoreFromOrder($data);
+        $sale   =   $this->s_repository->insertSale($dto);
+
+        $dto_services   =   $this->s_dto->getDtoServices($data['lst_services'],$sale);
+        $this->s_repository->insertSaleService($dto_services);
+
+        $dto_products   =   $this->s_dto->getDtoProducts($data['lst_products'],$sale);
+        $this->s_repository->insertSaleProduct($dto_products);
+
+        return $sale;
+
     }
 }

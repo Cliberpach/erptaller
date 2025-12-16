@@ -25,6 +25,8 @@ Route::group(["prefix" => "taller"], function () {
         Route::get('pdf/{id}', [WorkOrderController::class, 'pdfOne'])->name('tenant.taller.ordenes_trabajo.pdfOne');
         Route::post('finish/{id}', [WorkOrderController::class, 'finish'])->name('tenant.taller.ordenes_trabajo.finish');
 
+        Route::get('invoice-create/{id}', [WorkOrderController::class, 'invoiceCreate'])->name('tenant.taller.ordenes_trabajo.invoiceCreate');
+        Route::post('invoice-store', [WorkOrderController::class, 'invoiceStore'])->name('tenant.taller.ordenes_trabajo.invoiceStore');
     });
 
     Route::group(["prefix" => "cotizaciones"], function () {
@@ -39,7 +41,6 @@ Route::group(["prefix" => "taller"], function () {
         Route::delete('destroy/{id}', [QuoteController::class, 'destroy'])->name('tenant.taller.cotizaciones.destroy');
         Route::get('pdf/{id}', [QuoteController::class, 'pdfOne'])->name('tenant.taller.cotizaciones.pdfOne');
         Route::get('convert-order/{id}', [QuoteController::class, 'convertOrderCreate'])->name('tenant.taller.cotizaciones.convertOrderCreate');
-
     });
 
     Route::group(["prefix" => "servicios"], function () {

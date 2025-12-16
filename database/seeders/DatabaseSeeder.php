@@ -14,6 +14,7 @@ use Database\Seeders\landlord\BrandSeeder;
 use Database\Seeders\landlord\CustomerSeeder;
 use Database\Seeders\landlord\GeneralTableSeeder;
 use Database\Seeders\landlord\IdentityDocumentSeeder;
+use Database\Seeders\landlord\InvoiceTypeSeeder;
 use Database\Seeders\landlord\ModelSeeder;
 use Database\Seeders\landlord\ModuleSeeder;
 use Database\Seeders\landlord\TypeIdentityDocumentSeeder;
@@ -85,6 +86,7 @@ class DatabaseSeeder extends Seeder
         $this->call(GeneralTableSeeder::class);
         $this->call(IdentityDocumentSeeder::class);
         $this->call(TypeIdentityDocumentSeeder::class);
+        $this->call(InvoiceTypeSeeder::class);
         $this->call(BankSeeder::class);
     }
 }

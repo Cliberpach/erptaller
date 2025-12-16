@@ -6,9 +6,9 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          
+
             @include('company.forms.form_edit_numeration_tenant')
-           
+
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">CERRAR</button>
@@ -52,18 +52,18 @@
                 { data: 'start_number', name: 'start_number' },
                 { data: 'initiated', name: 'initiated' },
                 {
-                    data: null, 
+                    data: null,
                     render: function(data, type, row) {
-                       
-                      
+
+
 
                         return `
                           <i class="fas fa-trash-alt btn btn-danger"></i>
                         `;
                     },
-                    name: 'actions', 
-                    orderable: false, 
-                    searchable: false 
+                    name: 'actions',
+                    orderable: false,
+                    searchable: false
                 }
             ],
             language: {
@@ -129,7 +129,7 @@
                 html: 'Actualizando numeración...',
                 allowOutsideClick: false,
                 didOpen: () => {
-                    Swal.showLoading(); 
+                    Swal.showLoading();
                 }
             });
 
@@ -143,7 +143,7 @@
                 const response  =   await fetch(urlStoreNumeration, {
                                         method: 'POST',
                                         headers: {
-                                            'X-CSRF-TOKEN': token 
+                                            'X-CSRF-TOKEN': token
                                         },
                                         body: formData
                                     });
@@ -157,7 +157,7 @@
                     Swal.close();
                     return;
                 }
-                
+
                 if(res.success){
                     toastr.success(res.message,'OPERACIÓN COMPLETADA');
                     dtNumerations.ajax.reload(null, false);
@@ -177,8 +177,8 @@
                 toastr.error(error,'ERROR EN LA PETICIÓN REGISTRAR VENTA');
                 Swal.close();
             }
-          
-           
+
+
         } else if (result.dismiss === Swal.DismissReason.cancel) {
             swalWithBootstrapButtons.fire({
             title: "OPERACIÓN CANCELADA",
@@ -203,9 +203,9 @@
         }
 
         //=========== SE MANEJA UNA SOLA SERIE POR DOCUMENTO =======
-        const prefix_serie  =   lstBillingTypes[indexBilling].prefix_serie;
+        const prefix_serie  =   lstBillingTypes[indexBilling].parameter;
         document.querySelector('#serie').value  =   prefix_serie + '001';
- 
+
     }
 
 </script>

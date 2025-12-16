@@ -2,13 +2,13 @@
 
 namespace App\Models\Tenant\WorkShop\WorkOrder;
 
+use App\Models\Tenant\WorkShop\Vehicle;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class WorkOrder extends Model
 {
     use HasFactory;
-    protected $table = 'work_orders';
 
     protected $fillable = [
         'warehouse_id',
@@ -34,6 +34,8 @@ class WorkOrder extends Model
         'editor_user_name',
         'create_user_name',
         'status',
+        'status_invoice',
+        
         'created_at',
         'updated_at'
     ];
@@ -61,5 +63,10 @@ class WorkOrder extends Model
                 }
             }
         });
+    }
+
+     public function vehicle()
+    {
+        return $this->belongsTo(Vehicle::class, 'vehicle_id');
     }
 }

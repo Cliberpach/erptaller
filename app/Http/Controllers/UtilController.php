@@ -8,7 +8,10 @@ use App\Models\Landlord\Company;
 use App\Models\Landlord\GeneralTable\GeneralTableDetail;
 use App\Models\Landlord\TypeIdentityDocument;
 use App\Models\Landlord\Year;
+use App\Models\Tenant\BillingCompany;
+use App\Models\Tenant\DocumentSerialization;
 use App\Models\User;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
@@ -212,5 +215,27 @@ class UtilController extends Controller
     public static function getBanks(){
         $banks  =   GeneralTableDetail::where('general_table_id',3)->where('status','ACTIVO')->get();
         return $banks;
+    }
+
+    public static function getInvoiceTypes(){
+        $invoice_types  =   GeneralTableDetail::where('general_table_id',4)->where('status','ACTIVO')->get();
+        return $invoice_types;
+    }
+
+    public function isActiveInvoiceType(int $id){
+        try {
+
+            $invoice_type   =   GeneralTableDetail::findOrFail($id);
+            $exists         =   DocumentSerialization::where('document_type_id',$id)->exists();
+
+            if(!$exists){
+                throw new Exception($invoice_type->name.", NO ESTÁ ACTIVO EN LA EMPRESA");
+            }
+
+            return response()->json([ 'success'=>true,'message'=>$invoice_type->name.",ACTIVO EN LA EMPRESA"]);
+
+        } catch (Throwable $th) {
+            return response()->json(['success'=>false,'message'=>$th->getMessage()]);
+        }
     }
 }

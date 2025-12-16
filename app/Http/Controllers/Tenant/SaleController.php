@@ -210,18 +210,18 @@ array:3 [ // app\Http\Controllers\Tenant\SaleController.php:119
         }
     }
 
-    public function pdf_voucher($sale_id)
+    public function pdf_voucher($sale_id, $size = 0)
     {
         try {
 
             $company                =   Company::find(1);
-            $sale_document          =   Sale::find($sale_id);
-            $sale_document_detail   =   DB::select('select *
-                                        from sales_documents_details as sdd
-                                        where sdd.sale_document_id = ?', [$sale_id]);
+            $sale_document          =   Sale::findOrFail($sale_id);
+            $sale_document_detail   =   DB::select('SELECT *
+                                        FROM sales_documents_details AS sdd
+                                        WHERE sdd.sale_document_id = ?', [$sale_id]);
 
             $data_qr                =   (object)[
-                'ruc_emisor'       =>  $company->ruc,
+                'ruc_emisor'        =>  $company->ruc,
                 'tipo_comprobante'  =>  $sale_document->type_sale_code,
                 'serie'             =>  $sale_document->serie,
                 'correlativo'       =>  $sale_document->correlative,
@@ -247,11 +247,16 @@ array:3 [ // app\Http\Controllers\Tenant\SaleController.php:119
                 'sale_document'         =>  $sale_document,
                 'customer'              =>  $customer,
                 'sale_document_detail'  =>  $sale_document_detail
-            ])->setPaper([0, 0, 226.772, 651.95]);
+            ]);
 
+            if ((int)$size === 0) {
+                $pdf->setPaper([0, 0, 226.772, 651.95]);
+            } else {
+                $pdf->setPaper('A4');
+            }
 
             return $pdf->stream($sale_document->serie . '-' . $sale_document->correlative . '.pdf');
-        } catch (\Throwable $th) {
+        } catch (Throwable $th) {
             return response()->json(['success' => false, 'message' => $th->getMessage(), 'line' => $th->getLine()]);
         }
     }
@@ -339,14 +344,5 @@ sale_document_id:1
         ]);
         $res    =   InvoiceController::send_sunat($request);
         return $res;
-    }
-
-    public function createOt(int $id){
-        try {
-            $view   =   $this->s_sale->createOt($id);
-            return $view;
-        } catch (Throwable $th) {
-            return back();
-        }
     }
 }

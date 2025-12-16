@@ -4,11 +4,13 @@ namespace App\Http\Controllers\Tenant;
 
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\UtilController;
 use App\Http\Requests\Company\CompanyNumerationRequest;
 use App\Http\Requests\CompanyStoreRequest;
 use Illuminate\Http\Request;
 use App\Models\Company;
 use App\Models\CompanyInvoice;
+use App\Models\Landlord\GeneralTable\GeneralTableDetail;
 use App\Models\Module;
 use App\Models\ModuleChild;
 use App\Models\ModuleGrandChild;
@@ -23,6 +25,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 use Spatie\Permission\Models\Role;
+use Throwable;
 use Yajra\DataTables\Facades\DataTables;
 
 class CompanyController extends Controller
@@ -39,8 +42,8 @@ class CompanyController extends Controller
     public function index()
     {
         $companies = DB::table('companies as e')
-                        ->select('e.id', 'e.ruc','e.business_name', 'e.created_at')
-                        ->get();
+            ->select('e.id', 'e.ruc', 'e.business_name', 'e.created_at')
+            ->get();
 
         return view('company.tenant', compact('companies'));
     }
@@ -51,36 +54,34 @@ class CompanyController extends Controller
     }
 
     public function edit($id)
-{
-    // Encuentra la empresa por su ID
-    $company            = Company::findOrFail($id);
+    {
+        // Encuentra la empresa por su ID
+        $company            = Company::findOrFail($id);
 
-    $departments        =   DB::select('select * from departments');
-    $districts          =   DB::select('select * from districts');
-    $provinces          =   DB::select('select * from provinces');
+        $departments        =   DB::select('select * from departments');
+        $districts          =   DB::select('select * from districts');
+        $provinces          =   DB::select('select * from provinces');
 
-    $company_invoice    =   CompanyInvoice::where('company_id',$company->id)->get()[0];
-
-
-    $billing_documents  =   DB::select('
-                                SELECT 
-                                    dt.id, 
-                                    dt.description,
-                                    dt.abbreviation,
-                                    dt.prefix_serie
-                                FROM document_types AS dt 
-                                WHERE dt.id IN (1, 3, 6, 7, 9, 80)
-                                AND dt.id NOT IN (SELECT ds.document_type_id FROM document_serializations AS ds)
-                            ');
-
-    // Devuelve la vista 'company.editcompanie_tenant' con la variable 'company'
-    return view('company.editcompanie_tenant', 
-    compact('company','departments','districts','provinces','company_invoice',
-    'billing_documents'));
-}
+        $company_invoice    =   CompanyInvoice::where('company_id', $company->id)->get()[0];
 
 
-    public function store(CompanyStoreRequest $request):RedirectResponse
+        $billing_documents  =   UtilController::getInvoiceTypes();
+        // Devuelve la vista 'company.editcompanie_tenant' con la variable 'company'
+        return view(
+            'company.editcompanie_tenant',
+            compact(
+                'company',
+                'departments',
+                'districts',
+                'provinces',
+                'company_invoice',
+                'billing_documents'
+            )
+        );
+    }
+
+
+    public function store(CompanyStoreRequest $request): RedirectResponse
     {
         try {
             DB::beginTransaction();
@@ -131,7 +132,6 @@ class CompanyController extends Controller
             $this->insertDataTenant($tenant->database, $request);
 
             return to_route("landlord.mantenimientos.empresa");
-
         } catch (\Exception $ex) {
             DB::rollback();
             return redirect()->back()->with("error", $ex->getMessage());
@@ -147,7 +147,7 @@ class CompanyController extends Controller
         $company->business_name = $request->get("razon_social");
         $company->abbreviated_business_name  = $request->get("razon_social_abreviada");
         $company->zip_code = $request->get("ubigeo");
-        $company->fiscal_address = $request->get("direccion_fiscal")?$request->get('direccion_fiscal'):'NO INDICADO';
+        $company->fiscal_address = $request->get("direccion_fiscal") ? $request->get('direccion_fiscal') : 'NO INDICADO';
         $company->email = $request->get("correo");
 
         if ($request->hasFile('certificate_url')) {
@@ -218,7 +218,7 @@ class CompanyController extends Controller
         }
     }
 
-/*
+    /*
 array:16 [▼ // app\Http\Controllers\Tenant\CompanyController.php:223
   "_token"                      => "t1wIO5GKzEziM9RdaOMIWJLeOl8rAFQzis778ha6"
   "_method"                     => "PUT"
@@ -242,105 +242,111 @@ array:16 [▼ // app\Http\Controllers\Tenant\CompanyController.php:223
 ]
 */
     public function update(Request $request, $id)
-{
+    {
 
-    //========= GUARDANDO UBIGEO =====
-    $company_invoice                    =   CompanyInvoice::find(1);
-    $company_invoice->department_id     =   $request->get('department');
-    $company_invoice->province_id       =   $request->get('province');
-    $company_invoice->district_id       =   $request->get('district');
+        //========= GUARDANDO UBIGEO =====
+        $company_invoice                    =   CompanyInvoice::find(1);
+        $company_invoice->department_id     =   $request->get('department');
+        $company_invoice->province_id       =   $request->get('province');
+        $company_invoice->district_id       =   $request->get('district');
 
-    $department     =   DB::select('select 
+        $department     =   DB::select(
+            'select
                         d.name,
                         d.zone
                         from departments as d
                         where d.id = ?',
-                        [$request->get('department')])[0]; 
+            [$request->get('department')]
+        )[0];
 
-    $company_invoice->department_name   =   $department->name;
+        $company_invoice->department_name   =   $department->name;
 
-    $company_invoice->province_name     =   DB::select('select 
-                                            p.name 
+        $company_invoice->province_name     =   DB::select(
+            'select
+                                            p.name
                                             from provinces as p
                                             where p.id = ?',
-                                            [$request->get('province')])[0]->name;
-        
-    $company_invoice->district_name     =   DB::select('select 
-                                            d.name 
+            [$request->get('province')]
+        )[0]->name;
+
+        $company_invoice->district_name     =   DB::select(
+            'select
+                                            d.name
                                             from districts as d
                                             where d.id = ?',
-                                            [$request->get('district')])[0]->name;
+            [$request->get('district')]
+        )[0]->name;
 
-    $company_invoice->update();
-    
+        $company_invoice->update();
 
-    $company = Company::findOrFail($id);
 
-    // Validar el formulario, incluyendo la validación de archivo
-    $request->validate([
-        'business_name' => 'required|string|max:255',
-        'abbreviated_business_name' => 'nullable|string|max:255',
-        'fiscal_address'    => 'nullable|string|max:255',
-        'phone'             => 'nullable|string|max:20',
-        'cellphone'         => 'nullable|string|max:20',
-        'email'             => 'nullable|email|max:255',
-        'zip_code'          => 'nullable|string|max:10',
-        'facebook'          => 'nullable|string|max:255',
-        'instagram'         => 'nullable|string|max:255',
-        'web'               => 'nullable|string|max:255',
-        'invoicing_status'  => 'required|in:0,1',
-        'logo'              => 'nullable|file|mimes:jpeg,png,jpg,gif|max:2048', // Validación del logo
-        'base64_logo'       => 'nullable|string',
-    ]);
+        $company = Company::findOrFail($id);
 
-    if ($request->hasFile('logo')) {
+        // Validar el formulario, incluyendo la validación de archivo
+        $request->validate([
+            'business_name' => 'required|string|max:255',
+            'abbreviated_business_name' => 'nullable|string|max:255',
+            'fiscal_address'    => 'nullable|string|max:255',
+            'phone'             => 'nullable|string|max:20',
+            'cellphone'         => 'nullable|string|max:20',
+            'email'             => 'nullable|email|max:255',
+            'zip_code'          => 'nullable|string|max:10',
+            'facebook'          => 'nullable|string|max:255',
+            'instagram'         => 'nullable|string|max:255',
+            'web'               => 'nullable|string|max:255',
+            'invoicing_status'  => 'required|in:0,1',
+            'logo'              => 'nullable|file|mimes:jpeg,png,jpg,gif|max:2048', // Validación del logo
+            'base64_logo'       => 'nullable|string',
+        ]);
 
-        $route_logo_tenant   =   public_path('storage/'.$company->files_route.'/logo/');
+        if ($request->hasFile('logo')) {
 
-        if (!File::exists($route_logo_tenant)) {
-            File::makeDirectory($route_logo_tenant, 0755, true); 
+            $route_logo_tenant   =   public_path('storage/' . $company->files_route . '/logo/');
+
+            if (!File::exists($route_logo_tenant)) {
+                File::makeDirectory($route_logo_tenant, 0755, true);
+            }
+
+            //======= ELIMINAR LOGO ANTERIOR SI EXISTE =======
+            if (File::exists($company->logo_url)) {
+                File::delete($company->logo_url);
+            }
+
+            $file                   =   $request->file('logo');
+            $fileName               =   $company->ruc . '.' . $file->getClientOriginalExtension();
+
+            $base64_logo            = 'data:' . $file->getMimeType() . ';base64,' . base64_encode(file_get_contents($file));
+            $company->base64_logo   = $base64_logo; // Guardar en la columna logo_base64
+
+            // $file               = $request->file('logo');
+            // $path               = $file->store('logos', 'public'); // Guardar el archivo en el directorio 'logos' en storage/public
+            $company->logo      = 'storage/' . $company->files_route . '/logo/' . $fileName; // Guardar la ruta en la base de datos
+            $company->logo_url  = 'storage/' . $company->files_route . '/logo/' . $fileName;
+
+            $file->move($route_logo_tenant, $fileName);
         }
 
-        //======= ELIMINAR LOGO ANTERIOR SI EXISTE =======
-        if (File::exists($company->logo_url)) {
-            File::delete($company->logo_url);
-        }
+        // Guardar los demás campos
+        $company->business_name             =   $request->business_name;
+        $company->abbreviated_business_name =   $request->abbreviated_business_name;
+        $company->fiscal_address            =   $request->fiscal_address;
+        $company->phone                     =   $request->phone;
+        $company->cellphone                 =   $request->cellphone;
+        $company->email                     =   $request->email;
+        $company->zip_code                  =   $request->zip_code;
+        $company->facebook                  =   $request->facebook;
+        $company->instagram                 =   $request->instagram;
+        $company->web                       =   $request->web;
+        $company->invoicing_status          =   $request->invoicing_status;
+        $company->lat                       =   $request->get('lat');
+        $company->lng                       =   $request->get('lng');
+        $company->save();
 
-        $file                   =   $request->file('logo');
-        $fileName               =   $company->ruc.'.'.$file->getClientOriginalExtension(); 
-
-        $base64_logo            = 'data:' . $file->getMimeType() . ';base64,' . base64_encode(file_get_contents($file));
-        $company->base64_logo   = $base64_logo; // Guardar en la columna logo_base64
-    
-        // $file               = $request->file('logo');
-        // $path               = $file->store('logos', 'public'); // Guardar el archivo en el directorio 'logos' en storage/public
-        $company->logo      = 'storage/'.$company->files_route.'/logo/'.$fileName; // Guardar la ruta en la base de datos
-        $company->logo_url  = 'storage/'.$company->files_route.'/logo/'.$fileName; 
-
-        $file->move($route_logo_tenant, $fileName);
+        return redirect()->route('tenant.mantenimientos.empresa')->with('success', 'Empresa actualizada correctamente');
     }
 
-    // Guardar los demás campos
-    $company->business_name             =   $request->business_name;
-    $company->abbreviated_business_name =   $request->abbreviated_business_name;
-    $company->fiscal_address            =   $request->fiscal_address;
-    $company->phone                     =   $request->phone;
-    $company->cellphone                 =   $request->cellphone;
-    $company->email                     =   $request->email;
-    $company->zip_code                  =   $request->zip_code;
-    $company->facebook                  =   $request->facebook;
-    $company->instagram                 =   $request->instagram;
-    $company->web                       =   $request->web;
-    $company->invoicing_status          =   $request->invoicing_status;
-    $company->lat                       =   $request->get('lat');
-    $company->lng                       =   $request->get('lng');
-    $company->save();
 
-    return redirect()->route('tenant.mantenimientos.empresa')->with('success', 'Empresa actualizada correctamente');
-}
-
-
-/*
+    /*
 array:11 [ // app\Http\Controllers\Tenant\CompanyController.php:254
   "_token"          => "msn2RI2Bm4Zyz8grzFO3PrR1HEZEBK0dDYU7YchN"
   "urbanization"    => "afasf"  --REQEST
@@ -386,132 +392,112 @@ tmp\phpBE97.tmp"
   }
 ]
 */
-public function updateInvoice($id,Request $request){
-    DB::beginTransaction();
+    public function updateInvoice($id, Request $request)
+    {
+        DB::beginTransaction();
 
-    try {
+        try {
 
-        $company_invoice                    =   CompanyInvoice::find(1);                                 
-        $company_invoice->secondary_user    =   $request->get('sol_user'); 
-        $company_invoice->secondary_password=   $request->get('sol_pass'); 
-        $company_invoice->ubigeo            =   $request->get('district'); 
-        $company_invoice->urbanization      =   $request->get('urbanization');
-        $company_invoice->local_code        =   $request->get('local_code');
-        $company_invoice->api_user_gre      =   $request->get('api_user_gre');
-        $company_invoice->api_password_gre  =   $request->get('api_pass_gre');
-        $company_invoice->update();
-
-        //========= PREGUNTANDO SI HAY CERTIFICADO EN EL REQUEST ========
-        if ($request->hasFile('certificate')) {
-
-            $certificateFile    = $request->file('certificate');
-            $extension          = $certificateFile->getClientOriginalExtension();
-            $company            = Company::find(1);
-        
-          
-            $directoryPath = 'public/' . $company->files_route . '/greenter/certificado/';
-            if (!Storage::exists($directoryPath)) {
-                Storage::makeDirectory($directoryPath);
-            }
-        
-            // Define el nombre para el archivo .pem
-            $pemFilename    =   'certificate_production.'.$extension;
-            $path           =   $certificateFile->storeAs($directoryPath, $pemFilename);
-        
-            $company_invoice->certificate_url   = 'storage/' . $company->files_route . '/greenter/' . $pemFilename;
-            $company_invoice->certificate       = $pemFilename;
+            $company_invoice                    =   CompanyInvoice::find(1);
+            $company_invoice->secondary_user    =   $request->get('sol_user');
+            $company_invoice->secondary_password =   $request->get('sol_pass');
+            $company_invoice->ubigeo            =   $request->get('district');
+            $company_invoice->urbanization      =   $request->get('urbanization');
+            $company_invoice->local_code        =   $request->get('local_code');
+            $company_invoice->api_user_gre      =   $request->get('api_user_gre');
+            $company_invoice->api_password_gre  =   $request->get('api_pass_gre');
             $company_invoice->update();
-                   
+
+            //========= PREGUNTANDO SI HAY CERTIFICADO EN EL REQUEST ========
+            if ($request->hasFile('certificate')) {
+
+                $certificateFile    = $request->file('certificate');
+                $extension          = $certificateFile->getClientOriginalExtension();
+                $company            = Company::find(1);
+
+
+                $directoryPath = 'public/' . $company->files_route . '/greenter/certificado/';
+                if (!Storage::exists($directoryPath)) {
+                    Storage::makeDirectory($directoryPath);
+                }
+
+                // Define el nombre para el archivo .pem
+                $pemFilename    =   'certificate_production.' . $extension;
+                $path           =   $certificateFile->storeAs($directoryPath, $pemFilename);
+
+                $company_invoice->certificate_url   = 'storage/' . $company->files_route . '/greenter/' . $pemFilename;
+                $company_invoice->certificate       = $pemFilename;
+                $company_invoice->update();
+            }
+
+
+            DB::commit();
+            return response()->json(['success' => true, 'message' => 'DATOS DE FACTURACIÓN ACTUALIZADOS']);
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            return response()->json(['success' => false, 'message' => $th->getMessage()]);
         }
-
-
-        DB::commit();
-        return response()->json(['success'=>true,'message'=>'DATOS DE FACTURACIÓN ACTUALIZADOS']);
-
-    } catch (\Throwable $th) {
-        DB::rollBack();
-        return response()->json(['success'=>false,'message'=>$th->getMessage()]);
     }
-}
 
-public function getListNumeration(Request $request){
+    public function getListNumeration(Request $request)
+    {
 
-    $numerations = DB::table('document_serializations as ds')
-                ->select(
-                    'ds.id', 
-                    'ds.serie',
-                    'ds.start_number',
-                    'ds.description',
-                    'ds.initiated'
-                )->whereIn('ds.document_type_id', [1, 3, 6, 7, 9, 80])
-                ->get();
+        $numerations = DB::table('document_serializations as ds')
+            ->select(
+                'ds.id',
+                'ds.serie',
+                'ds.start_number',
+                'ds.description',
+                'ds.initiated'
+            )
+            ->get();
 
-    
-
-    return DataTables::of($numerations)
+        return DataTables::of($numerations)
             ->make(true);
+    }
 
-}
-
-/*
+    /*
 array:3 [ // app\Http\Controllers\Tenant\CompanyController.php:395
   "billing_type_document"   => "3"
   "serie"                   => "B001"
   "start_number"            => "1"
 ]
-*/ 
-public function storeNumeration(CompanyNumerationRequest $request){
-    DB::beginTransaction();
+*/
+    public function storeNumeration(CompanyNumerationRequest $request)
+    {
+        DB::beginTransaction();
 
-    try {
-        
-        //====== VALIDANDO QUE NO EXISTA NUMERACIÓN PREVIA PARA ESTE TIPO DE DOCUMENTO =========
-        $numeration_exists  =   DB::select('select 
-                                ds.id
-                                from document_serializations as ds
-                                where ds.document_type_id = ?',
-                                [$request->get('billing_type_document')]);
+        try {
 
-        if(count($numeration_exists) !== 0){
-            throw new Exception("ESTE DOCUMENTO YA TIENE NUMERACIÓN!!!");
+            //====== VALIDANDO QUE NO EXISTA NUMERACIÓN PREVIA PARA ESTE TIPO DE DOCUMENTO =========
+            $numeration_exists  =   DocumentSerialization::where('document_type_id',$request->get('billing_type_document'))->first();
+
+            if ($numeration_exists){
+                throw new Exception("ESTE DOCUMENTO YA TIENE NUMERACIÓN!!!");
+            }
+
+            //======== OBTIENDO DATA DEL TIPO DE DOCUMENTO =========
+            $type_document  =   GeneralTableDetail::findOrFail($request->get('billing_type_document'));
+
+            $serialization                      =   new DocumentSerialization();
+            $serialization->company_id          =   1;
+            $serialization->document_type_id    =   $type_document->id;
+            $serialization->serie               =   $request->get('serie');
+            $serialization->description         =   $type_document->description;
+            $serialization->start_number        =   $request->get('start_number');
+            $serialization->number_limit        =   8;
+            $serialization->destiny             =   null;
+            $serialization->default             =   'NO';
+            $serialization->final_number        =   0;
+            $serialization->initiated           =   'NO';
+            $serialization->save();
+
+            DB::commit();
+
+            return response()->json(['success' => true, 'message' => "NUMERACIÓN REGISTRADA"]);
+        } catch (Throwable $th) {
+            DB::rollBack();
+            return response()->json(['success' => false, 'message' => $th->getMessage()]);
         }
-
-        //======== OBTIENDO DATA DEL TIPO DE DOCUMENTO =========
-        $type_document  =   DB::select('
-                            SELECT 
-                                dt.id,
-                                dt.description,
-                                dt.code,
-                                dt.destiny,
-                                CASE 
-                                    WHEN LENGTH(dt.prefix_serie) = 1 THEN CONCAT(dt.prefix_serie, "001")
-                                    WHEN LENGTH(dt.prefix_serie) = 2 THEN CONCAT(dt.prefix_serie, "01")
-                                    ELSE dt.prefix_serie 
-                                END AS serie
-                            FROM document_types AS dt
-                            WHERE dt.id = ?', [$request->get('billing_type_document')])[0];
-
-        $serialization                      =   new DocumentSerialization();
-        $serialization->company_id          =   1;
-        $serialization->document_type_id    =   $type_document->id;
-        $serialization->serie               =   $type_document->serie;
-        $serialization->description         =   $type_document->description;
-        $serialization->start_number        =   $request->get('start_number');
-        $serialization->number_limit        =   8;
-        $serialization->destiny             =   $type_document->destiny;
-        $serialization->default             =   'NO';
-        $serialization->final_number        =   0;
-        $serialization->initiated           =   'NO';
-        $serialization->save();
-
-        DB::commit();
-
-        return response()->json(['success'=>true,'message'=>"NUMERACIÓN REGISTRADA"]);
-
-
-    } catch (\Throwable $th) {
-        return response()->json(['success'=>false,'message'=>$th->getMessage()]);
     }
-}
-
 }

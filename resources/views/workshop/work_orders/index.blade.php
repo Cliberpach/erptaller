@@ -197,12 +197,15 @@
                                                     <i class="fa fa-eye me-2"></i> Ver
                                                 </a>
                                             </li>
-                                            <li>
-                                                <a class="dropdown-item text-primary" href="#" onclick="redirectParams('tenant.ventas.comprobante_venta.createOt',${data.id})">
+                                        `;
+
+                            if(data.status_invoice != 'FACTURADO'){
+                                actions += `<li>
+                                                <a class="dropdown-item text-primary" href="#" onclick="redirectParams('tenant.taller.ordenes_trabajo.invoiceCreate',${data.id})">
                                                     <i class="fa fa-file-invoice-dollar me-2"></i> Facturar
                                                 </a>
-                                            </li>
-                                        `;
+                                            </li>`;
+                            }
 
                             if (data.status == 'ACTIVO') {
                                 actions += `

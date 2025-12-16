@@ -2,6 +2,7 @@
 
 namespace App\Http\Services\Tenant\WorkShop\WorkOrders;
 
+use App\Models\Tenant\Sale;
 use App\Models\Tenant\WorkShop\Quote\Quote;
 use App\Models\Tenant\WorkShop\WorkOrder\WorkOrder;
 
@@ -42,5 +43,14 @@ class WorkOrderManager
     public function pdfOne(int $id)
     {
         return $this->s_order->pdfOne($id);
+    }
+
+    public function invoiceCreate(int $id)
+    {
+        return $this->s_order->invoiceCreate($id);
+    }
+
+    public function invoiceStore($data):Sale {
+        return $this->s_order->invoiceStore($data);
     }
 }

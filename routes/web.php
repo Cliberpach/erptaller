@@ -31,6 +31,7 @@ use App\Http\Controllers\Tenant\WorkShop\ModelController;
 use App\Http\Controllers\Tenant\WorkShop\ServiceController;
 use App\Http\Controllers\Tenant\WorkShop\VehicleController;
 use App\Http\Controllers\Tenant\WorkShop\YearController;
+use App\Http\Controllers\UtilController;
 
 /*
 |--------------------------------------------------------------------------
@@ -256,4 +257,5 @@ Route::group(["prefix" => "utils"], function () {
     Route::get('serch-plate/{placa}', [VehicleController::class, 'searchPlate'])->name('tenant.utils.searchPlate');
     Route::get('validated-product/stock', [ProductController::class, 'validatedProductStock'])->name('tenant.utils.validatedProductStock');
     Route::get('getListBankAccounts', [BankAccountController::class,'getListBankAccounts'])->name('tenant.utils.getListBankAccounts');
+    Route::get('is-active-invoice/{id}', [UtilController::class, 'isActiveInvoiceType'])->name('tenant.utils.isActiveInvoiceType');
 });
