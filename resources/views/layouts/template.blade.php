@@ -1,44 +1,51 @@
 <!DOCTYPE html>
-<html lang="en" class="dark-style layout-menu-fixed" dir="ltr" data-theme="theme-dark"
-    data-assets-path="{{ asset('assets') }}" data-template="vertical-menu-template-free">
+<html lang="en">
 
 <head>
-    <link rel="icon" type="image/x-icon" href="{{ asset('assets/favicon.ico') }}?v={{ time() }}">
-
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @routes
-    @include('layouts/header')
+    @include('layouts.head')
 </head>
 
 <body>
+    <div class="page-layout">
 
-    <div class="row">
-        <div class="col-12">
-            @include('utils.spinners.spinner_1')
+        <!-- begin::GXON Page Header -->
+        <header class="app-header">
+            @include('layouts.body.header')
+        </header>
+        <!-- end::GXON Page Header -->
+
+        @include('layouts.body.mdl_search')
+
+        <!-- begin::GXON Sidebar Menu -->
+        <aside class="app-menubar" id="appMenubar">
+            @include('layouts.body.aside')
+        </aside>
+        <!-- end::GXON Sidebar Menu -->
+
+        <!-- begin::GXON Sidebar right -->
+        <div class="app-sidebar-end">
+            @include('layouts.body.app-sidebar-end')
         </div>
+        <!-- end::GXON Sidebar right -->
+
+        <main class="app-wrapper">
+            @include('layouts.body.main')
+        </main>
+
+        <!-- begin::GXON Footer -->
+        <footer class="footer-wrapper bg-body">
+            @include('layouts.body.footer')
+        </footer>
+        <!-- end::GXON Footer -->
+
     </div>
 
-    @include('layouts/body/body')
-    @include('layouts/js')
-
+    <!-- begin::GXON Page Scripts -->
+    @include('layouts.js')
+    <!-- end::GXON Page Scripts -->
 </body>
-
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        showAlertsPlan();
-    })
-
-    function showAlertsPlan() {
-        toastr.clear();
-        const hasMessageError = {{ Session::has('plan_md_error') ? 'true' : 'false' }};
-
-        if (hasMessageError) {
-            const message = {!! json_encode(Session::get('plan_md_error')) !!};
-            toastr.error(message, 'OPERACIÓN INCORRECTA');
-
-        }
-    }
-</script>
 
 </html>

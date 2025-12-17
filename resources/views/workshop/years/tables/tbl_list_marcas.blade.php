@@ -1,5 +1,5 @@
- <table class="table-striped table-bordered table-hover table" style="text-transform:uppercase" id="dt-years">
-     <thead>
+ <table class="display table" id="dt-years">
+    <thead class="table-light">
          <tr>
              <th class="text-center"></th>
              <th class="text-center">AÑO</th>

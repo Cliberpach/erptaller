@@ -1,20 +1,20 @@
-<table class="table-striped table-bordered table-hover table" style="text-transform:uppercase" id="dt-orders">
-    <thead>
+<table class="display table"   id="dt-orders">
+    <thead class="table-light">
         <tr>
-            <th class="text-center">ID</th>
-            <th class="text-center">#</th>
-            <th class="text-center">COT</th>
-            <th class="text-center">CLIENTE</th>
-            <th class="text-center">PLACA</th>
-            <th class="text-center">ALMACÉN</th>
-            <th class="text-center">TOTAL</th>
-            <th class="text-center">A CUENTA</th>
-            <th class="text-center">SALDO</th>
-            <th class="text-center">REGISTRADOR</th>
-            <th class="text-center">ESTADO</th>
-            <th class="text-center">FACTURACION</th>
-            <th class="text-center">FEC REGISTRO</th>
-            <th data-priority="1" class="text-center"></th>
+            <th class="minw-100px">ID</th>
+            <th class="minw-100px">#</th>
+            <th class="minw-100px">Cot</th>
+            <th class="minw-200px">Cliente</th>
+            <th class="minw-100px">Placa</th>
+            <th class="minw-100px">Almacén</th>
+            <th class="minw-100px">Total</th>
+            <th class="minw-100px">A cuenta</th>
+            <th class="minw-100px">Saldo</th>
+            <th class="minw-200px">Registrador</th>
+            <th class="minw-100px">Estado</th>
+            <th class="minw-200px">Facturación</th>
+            <th class="minw-200px">Fec Registro</th>
+            <th data-priority="1" class="text-end"></th>
         </tr>
     </thead>
     <tbody>

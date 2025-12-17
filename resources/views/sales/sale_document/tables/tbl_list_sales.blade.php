@@ -1,5 +1,5 @@
-<table id="tbl_list_sales" style="width:100%" class="table table-hover" > 
-    <thead>
+<table id="tbl_list_sales" class="display table">
+    <thead class="table-light">
         <tr>
             <th data-priority="1">#</th>
             <th data-priority="2">FECHA</th>
@@ -11,8 +11,8 @@
             <th >Acciones</th>
         </tr>
     </thead>
-    <tbody class="body-table">
-     
+    <tbody>
+
 
     </tbody>
 </table>

@@ -5,32 +5,19 @@
 @endsection
 
 @section('content')
-    @include('workshop.colors.modalfile')
     @include('workshop.colors.modals.mdl_create_color')
     @include('workshop.colors.modals.mdl_edit_color')
-
-    <div class="card">
-        <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
-            <h4 class="card-title mb-md-0 mb-2">LISTA DE COLORES</h4>
-
+    <div class="card overflow-hidden">
+        <div class="card-header d-flex align-items-center justify-content-between">
+            <h6 class="card-title mb-0">LISTA DE COLORES</h6>
             <div class="d-flex flex-wrap gap-2">
-                {{-- <button class="btn btn-warning" onclick="openMdlImportMarca()">
-                    <i class="fa-solid fa-upload"></i> IMPORTAR
-                </button> --}}
-
                 <a onclick="openMdlCreateColor()" class="btn btn-primary text-white">
                     <i class="fas fa-plus-circle"></i> Nuevo
                 </a>
             </div>
         </div>
-        <div class="card-body">
-            <div class="row">
-                <div class="col">
-                    <div class="table-responsive">
-                        @include('workshop.colors.tables.tbl_list_colores')
-                    </div>
-                </div>
-            </div>
+        <div class="card-body p-0 pb-2">
+            @include('workshop.colors.tables.tbl_list_colores')
         </div>
     </div>
 @endsection

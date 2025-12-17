@@ -6,25 +6,17 @@
 
 @section('content')
     @include('workshop.work_orders.modals.mdl_show_order')
-
-    <div class="card">
-        <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
-            <h4 class="card-title mb-md-0 mb-2">LISTA DE ÓRDENES DE TRABAJO</h4>
-
+    <div class="card overflow-hidden">
+        <div class="card-header d-flex align-items-center justify-content-between">
+            <h6 class="card-title mb-0">LISTA DE ÓRDENES DE TRABAJO</h6>
             <div class="d-flex flex-wrap gap-2">
                 <a href="{{ route('tenant.taller.ordenes_trabajo.create') }}" class="btn btn-primary text-white">
                     <i class="fas fa-plus-circle"></i> Nuevo
                 </a>
             </div>
         </div>
-        <div class="card-body">
-            <div class="row">
-                <div class="col">
-                    <div class="table-responsive">
-                        @include('workshop.work_orders.tables.tbl_list_orders')
-                    </div>
-                </div>
-            </div>
+        <div class="card-body p-0 pb-2">
+            @include('workshop.work_orders.tables.tbl_list_orders')
         </div>
     </div>
 @endsection
@@ -54,20 +46,17 @@
                 "columns": [{
                         data: 'id',
                         name: 'o.id',
-                        className: "text-center",
                         "visible": false,
                         "searchable": false
                     },
                     {
                         data: 'code',
-                        className: "text-center",
                         "visible": true,
                         "searchable": true,
                         "orderable": true
                     },
                     {
                         data: 'quote_code',
-                        className: "text-center",
                         "searchable": true,
                         "orderable": true
                     },
@@ -76,14 +65,12 @@
                         name: 'customer_name',
                         searchable: true,
                         orderable: true,
-                        className: "text-center"
                     },
                     {
                         data: 'plate',
                         name: 'o.plate',
                         searchable: true,
                         orderable: true,
-                        className: "text-center"
                     },
                     {
                         data: 'warehouse_name',
@@ -91,14 +78,13 @@
                         searchable: true,
                         orderable: true,
                         visible: false,
-                        className: "text-center"
                     },
                     {
                         data: 'total',
                         name: 'o.total',
                         searchable: false,
                         orderable: false,
-                        className: "text-center",
+                        className: "text-end",
                         render: function(data, type, row) {
                             return formatSoles(data);
                         }
@@ -108,7 +94,7 @@
                         name: 'on_account',
                         searchable: false,
                         orderable: false,
-                        className: "text-center",
+                        className: "text-end",
                         render: function(data, type, row) {
                             return formatSoles(data);
                         }
@@ -118,7 +104,7 @@
                         name: 'balance',
                         searchable: false,
                         orderable: false,
-                        className: "text-center",
+                        className: "text-end",
                         render: function(data, type, row) {
                             return formatSoles(data);
                         }
@@ -128,14 +114,12 @@
                         name: 'o.create_user_name',
                         searchable: true,
                         orderable: true,
-                        className: "text-center"
                     },
                     {
                         data: 'status',
                         name: 'o.status',
                         searchable: false,
                         orderable: false,
-                        className: "text-center",
                         render: function(data, type, row) {
 
                             let badgeClass = '';
@@ -168,7 +152,6 @@
                         name: 'o.status_invoice',
                         searchable: false,
                         orderable: false,
-                        className: "text-center",
                         render: function(data, type, row) {
 
                             let badgeClass = '';
@@ -198,13 +181,12 @@
                         name: 'o.created_at',
                         searchable: false,
                         orderable: false,
-                        className: "text-center"
                     },
                     {
                         searchable: false,
                         orderable: false,
                         data: null,
-                        className: "text-center",
+                        className: "text-end",
                         render: function(data) {
 
                             let actions = `<div class="dropdown text-center">

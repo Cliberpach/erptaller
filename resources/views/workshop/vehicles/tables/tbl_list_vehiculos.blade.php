@@ -1,5 +1,5 @@
-<table class="table-striped table-bordered table-hover table" style="text-transform:uppercase" id="dt-vehiculos">
-    <thead>
+<table class="display table"   id="dt-vehiculos">
+    <thead class="table-light">
         <tr>
             <th class="text-center">#</th>
             <th class="text-center">CLIENTE</th>
@@ -15,5 +15,4 @@
     <tbody>
 
     </tbody>
-
 </table>

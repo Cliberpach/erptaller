@@ -5,25 +5,23 @@
 @endsection
 
 @section('css')
-    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css') }}" />
     <link rel="stylesheet" href="{{ asset('assets/css/styles.css') }}">
 @endsection
 
 @section('content')
-    <div class="card">
-        <div class="card-header d-flex justify-content-between flex-row">
-            <h4 class="card-title">LISTA DE EGRESOS</h4>
+    <div class="card overflow-hidden">
+        <div class="card-header d-flex align-items-center justify-content-between">
+            <h6 class="card-title mb-0">LISTA DE EGRESOS</h6>
             <div class="input-group-append">
                 <a href="{{ route('tenant.egreso.create') }}" class="btn btn-primary">
                     <div class="lign-items-center d-flex align-items-center">
                         <i class="fas fa-plus pe-1"></i>
-                        <p class="mb-0 ml-2">Añadir nuevo</p>
+                        <p class="mb-0 ml-2">NUEVO</p>
                     </div>
                 </a>
             </div>
         </div>
-
-        <div class="row">
+        <div class="card-body p-0 pb-2">
             <form action="{{ route('tenant.cajas.egreso') }}" method="GET">
                 <div class="d-flex justify-content-center align-items-center mb-3">
                     <div class="form-group me-3">
@@ -44,13 +42,10 @@
                     </div>
                 </div>
             </form>
-            <div class="col">
-                @include('cash.exit-money.tables.tbl_list_exit_money')
-            </div>
+            @include('cash.exit-money.tables.tbl_list_exit_money')
         </div>
     </div>
 @endsection
-
 
 @section('js')
     <script>
@@ -114,7 +109,7 @@
                         className: "text-center",
                         render: function(data) {
                             const pdfUrl = `{{ route('tenant.egreso.pdf', ':id') }}`.replace(':id', data
-                            .id);
+                                .id);
                             const editUrl = `{{ route('tenant.egreso.edit', ':id') }}`.replace(':id', data
                                 .id);
 

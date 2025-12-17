@@ -121,10 +121,9 @@ function eventsUtils() {
 //============== LIMPIAR UNA TABLA ========
 function clearTable(idTabla) {
     const tbody = document.querySelector(`#${idTabla} tbody`);
-    console.log(tbody);
-    // while (tbody.firstChild) {
-    //     tbody.removeChild(tbody.firstChild);
-    // }
+    while (tbody.firstChild) {
+        tbody.removeChild(tbody.firstChild);
+    }
 }
 
 function destroyDataTable(dtTable) {

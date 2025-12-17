@@ -5,7 +5,6 @@
 @endsection
 
 @section('css')
-    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css') }}" />
     <link rel="stylesheet" href="{{ asset('assets/css/styles.css') }}">
     <style>
         .my-swal {
@@ -14,28 +13,21 @@
     </style>
 @endsection
 
+
 @section('content')
     @include('cash.petty-cash.modals.mdl_create_cash')
     @include('cash.petty-cash.modals.mdl_edit_cash')
-
-    <div class="card">
-        <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
-            <h4 class="card-title mb-md-0 mb-2">LISTA DE CAJAS</h4>
-
-            <div class="d-flex flex-wrap gap-2">
+    <div class="card overflow-hidden">
+        <div class="card-header d-flex align-items-center justify-content-between">
+            <h6 class="card-title mb-0">LISTA DE CAJAS</h6>
+            <div class="input-group-append">
                 <a onclick="openMdlCreateCash()" class="btn btn-primary text-white">
                     <i class="fas fa-plus-circle"></i> NUEVO
                 </a>
             </div>
         </div>
-        <div class="card-body">
-            <div class="row">
-                <div class="col">
-                    <div class="table-responsive">
-                        @include('cash.petty-cash.tables.tbl_cash_list')
-                    </div>
-                </div>
-            </div>
+        <div class="card-body p-0 pb-2">
+            @include('cash.petty-cash.tables.tbl_cash_list')
         </div>
     </div>
 @endsection

@@ -7,25 +7,17 @@
 @section('content')
     @include('workshop.services.modals.mdl_create_service')
     @include('workshop.services.modals.mdl_edit_service')
-
-    <div class="card">
-        <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
-            <h4 class="card-title mb-md-0 mb-2">LISTA DE SERVICIOS</h4>
-
+    <div class="card overflow-hidden">
+        <div class="card-header d-flex align-items-center justify-content-between">
+            <h6 class="card-title mb-0">LISTA DE SERVICIOS</h6>
             <div class="d-flex flex-wrap gap-2">
                 <a onclick="openMdlCreateMarca()" class="btn btn-primary text-white">
                     <i class="fas fa-plus-circle"></i> NUEVO
                 </a>
             </div>
         </div>
-        <div class="card-body">
-            <div class="row">
-                <div class="col">
-                    <div class="table-responsive">
-                        @include('workshop.services.tables.tbl_list_services')
-                    </div>
-                </div>
-            </div>
+        <div class="card-body p-0 pb-2">
+            @include('workshop.services.tables.tbl_list_services')
         </div>
     </div>
 @endsection

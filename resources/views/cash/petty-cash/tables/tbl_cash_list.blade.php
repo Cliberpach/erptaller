@@ -1,5 +1,5 @@
-<table id="dt-cash" style="width:100%" class="table-hover table">
-    <thead>
+<table id="dt-cash" class="display table">
+    <thead class="table-light">
         <tr>
             <th >#</th>
             <th data-priority="2">NOMBRE</th>

@@ -5,30 +5,19 @@
 @endsection
 
 @section('content')
-    @include('workshop.years.modals.mdl_edit_year')
-
-    <div class="card">
-        <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
-            <h4 class="card-title mb-md-0 mb-2">LISTA DE VEHÍCULOS</h4>
-
+    @include('workshop.brands.modals.mdl_create_marca')
+    @include('workshop.brands.modals.mdl_edit_marca')
+    <div class="card overflow-hidden">
+        <div class="card-header d-flex align-items-center justify-content-between">
+            <h6 class="card-title mb-0">LISTA DE VEHÍCULOS</h6>
             <div class="d-flex flex-wrap gap-2">
-                {{-- <button class="btn btn-warning" onclick="openMdlImportMarca()">
-                    <i class="fa-solid fa-upload"></i> IMPORTAR
-                </button> --}}
-
                 <a href="{{ route('tenant.taller.vehiculos.create') }}" class="btn btn-primary text-white">
                     <i class="fas fa-plus-circle"></i> Nuevo
                 </a>
             </div>
         </div>
-        <div class="card-body">
-            <div class="row">
-                <div class="col">
-                    <div class="table-responsive">
-                        @include('workshop.vehicles.tables.tbl_list_vehiculos')
-                    </div>
-                </div>
-            </div>
+        <div class="card-body p-0 pb-2">
+            @include('workshop.vehicles.tables.tbl_list_vehiculos')
         </div>
     </div>
 @endsection

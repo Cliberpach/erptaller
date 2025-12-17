@@ -1,5 +1,5 @@
- <table class="table table-striped table-bordered table-hover" style="text-transform:uppercase" id="dt-colores">
-     <thead>
+ <table class="display table" id="dt-colores">
+    <thead class="table-light">
          <tr>
              <th class="text-center"></th>
              <th class="text-center">NOMBRE</th>

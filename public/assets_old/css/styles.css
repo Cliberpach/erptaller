@@ -1,0 +1,159 @@
+p {
+    margin: 0;
+}
+td.child {
+    text-align: center;
+}
+
+/*MODAL*/
+
+/*modal-body*/
+.modal-body span {
+    font-weight: bold;
+    color: orange;
+}
+
+/*modal-footer*/
+.modal-footer {
+    flex-wrap: unset;
+    flex-direction: row;
+}
+.col-info,
+.col-buttons {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    flex: 6;
+    gap: 10px;
+}
+
+.col-info {
+    color: orange;
+}
+
+.col-buttons {
+    justify-content: flex-end;
+}
+
+.col-buttons button {
+    padding: 7px;
+}
+
+/*errores*/
+.msgError {
+    color: red;
+    font-size: 12px;
+    margin: 0;
+}
+.inputError {
+    border-color: red !important;
+}
+
+/*Sweet alert*/
+.swal2-backdrop-show {
+    z-index: 2000;
+}
+
+/*container image - Products*/
+.container-img {
+    height: 240px;
+    position: relative;
+    transition: opacity 0.3s ease-out;
+}
+
+.container-img::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border: 2px dashed rgba(103, 101, 101, 0.5);
+    pointer-events: none;
+}
+
+.container-img img {
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+}
+.container-img:hover {
+    opacity: 0.7;
+    cursor: pointer;
+}
+
+/*SALES-POINT*/
+
+/*table products*/
+
+#table-products {
+    font-size: 11px;
+    font-weight: 900;
+}
+
+/*body-car*/
+.sale-detail__col {
+    height: 400px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+.body-car p,
+.body-car input,
+.body-car span {
+    font-size: 11px;
+    font-weight: bold;
+}
+.body-car p {
+    width: 50px;
+}
+.body-car input {
+    width: 90px;
+}
+.body-car td {
+    padding: 10px 5px;
+}
+
+/*OPERACIÓN GRAVADA IGV y TOTAL*/
+.payment__total {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    height: 60px;
+    font-weight: 900;
+    font-size: 24px;
+}
+
+.payment__detail-op,
+.payment__detail-igv {
+    display: flex;
+}
+
+.payment__detail-op span,
+.payment__detail-igv span {
+    flex: 0.6;
+}
+
+.payment__detail-op p,
+.payment__detail-igv p {
+    flex: 1.1;
+}
+
+.igv-amount,
+.op-amount {
+    font-weight: 900;
+}
+
+/*=========== UTILS ========*/
+.color_warning {
+    color: orange;
+}
+
+/*======== CAMPOS OBLIGATORIOS =========*/
+.required_field::after {
+    content: "*";
+    color: orange;
+    font-weight: bold;
+    margin-left: 0.25rem;
+}
+
+

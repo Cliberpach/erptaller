@@ -5,40 +5,27 @@
 @endsection
 
 @section('css')
-    <link rel="stylesheet" href="{{asset('assets/css/styles.css')}}">
 @endsection
 
 @section('content')
-
-    <div class="card">
-        @csrf
-        <div class="card-header d-flex flex-row justify-content-between">
-            <h4 class="card-title">LISTA DE VENTAS</h4>
-            
+    <div class="card overflow-hidden">
+        <div class="card-header d-flex align-items-center justify-content-between">
+            <h6 class="card-title mb-0">LISTA DE VENTAS</h6>
             <div class="input-group-append">
-                <button onclick="goToSaleCreate()"  type="button" data-bs-whatever="Nueva caja" class="btn btn-primary btn-add-new" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                <button onclick="goToSaleCreate()" type="button" data-bs-whatever="Nueva caja"
+                    class="btn btn-primary btn-add-new" data-bs-toggle="modal" data-bs-target="#exampleModal">
                     <div class="lign-items-center d-flex align-items-center">
                         <i class="fas fa-plus pe-1"></i>
                         <p class="mb-0 ml-2"> NUEVO</p>
                     </div>
-                </button> 
+                </button>
             </div>
         </div>
-        <div class="card-body">
-            
-            <div class="row">
-                <div class="col-12">
-                    <div class="table-responsive">
-                        @include('sales.sale_document.tables.tbl_list_sales')
-                    </div>
-                </div>
-            </div>
-          
+        <div class="card-body p-0 pb-2">
+            @include('sales.sale_document.tables.tbl_list_sales')
         </div>
     </div>
-    
 @endsection
-
 
 @section('js')
 <script>
@@ -66,16 +53,16 @@
             },
             order: [[0, 'desc']],
             columns: [
-              
+
                 { data: 'id', name: 'id' },
                 { data: 'fecha_registro', name: 'fecha_registro' },
                 { data: 'customer_name', name: 'customer_name' },
                 { data: 'doc', name: 'doc' },
                 { data: 'total', name: 'total' },
                 {
-                    data: null, 
+                    data: null,
                     render: function(data, type, row) {
-                        
+
                         let badge_class =   '';
 
                         if(data.estado === 'PENDIENTE'){
@@ -93,35 +80,35 @@
 
                         return `<span class="badge bg-${badge_class}">${data.estado}</span>`;
                     },
-                    name: 'actions', 
-                    orderable: false, 
-                    searchable: false 
+                    name: 'actions',
+                    orderable: false,
+                    searchable: false
                 },
                 {
-                    data: null, 
+                    data: null,
                     render: function(data, type, row) {
 
                         const urlDownloadXml = "{{ route('tenant.ventas.comprobante_venta.downloadXml', ':id') }}".replace(':id', data.id);
                         const urlDownloadCdr = "{{ route('tenant.ventas.comprobante_venta.downloadCdr', ':id') }}".replace(':id', data.id);
                         const urlPdf         =  "{{ route('tenant.ventas.comprobante_venta.pdf_voucher', ':id')}}".replace(':id',data.id);
-                        
+
                         let descargas = `<div style="display: flex; justify-content: flex-start; gap: 10px; flex-wrap: nowrap;">`;
 
                         descargas   +=  `<a target="_blank" class="btn btn-danger" style="color:white; max-width: 150px; flex-shrink: 0;" href="${urlPdf}">
-                                            <i class="fa-solid fa-file-pdf"></i> PDF   
+                                            <i class="fa-solid fa-file-pdf"></i> PDF
                                         </a>`;
 
                         if(data.ruta_xml){
                             const asset_route   =   @json(asset(''));
                             descargas   +=  `<a class="btn btn-success" style="color:white; max-width: 150px; flex-shrink: 0;" href="${urlDownloadXml}" >
-                                                <i class="fa-solid fa-file-excel"></i> XML   
+                                                <i class="fa-solid fa-file-excel"></i> XML
                                             </a>`;
                         }
 
                         if(data.ruta_cdr){
                             const asset_route   =   @json(asset(''));
                             descargas   +=  `<a class="btn btn-primary" style="color:white; max-width: 150px; flex-shrink: 0;" href="${urlDownloadCdr}">
-                                                <i class="fa-solid fa-book"></i> CDR   
+                                                <i class="fa-solid fa-book"></i> CDR
                                             </a>`;
                         }
 
@@ -129,40 +116,42 @@
 
                         return descargas;
                     },
-                    name: 'actions', 
-                    orderable: false, 
-                    searchable: false 
+                    name: 'actions',
+                    orderable: false,
+                    searchable: false
                 },
                 {
-                    data: null, 
+                    data: null,
                     render: function(data, type, row) {
-                        
-                        let acciones    =   ` <div class="btn-group">
-                                            <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                                                <i class="fa-solid fa-bars-staggered"></i>
-                                            </button>
-                                            <ul class="dropdown-menu">`;
+
+                        let acciones    =   `<div class="btn-group float-end">
+                                                <button
+                                                    class="btn btn-white btn-sm btn-shadow btn-icon waves-effect dropdown-toggle"
+                                                    type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                    <i class="fi fi-rr-menu-dots"></i>
+                                                </button>
+                                                <ul class="dropdown-menu dropdown-menu-end">`;
 
                         if( data.type_sale_code === '3' || data.type_sale_code === '1'){
 
                             if (data.estado === 'PENDIENTE' || data.estado === 'RECHAZADO') {
                                 acciones    +=  `<li>
-                                                <a class="dropdown-item" href="javascript:void(0);" oncliCK="sendSunat(${data.id})">
-                                                    <i class="fa-solid fa-paper-plane"></i> Sunat
-                                                </a>
-                                            </li>`; 
+                                                    <a class="dropdown-item" href="javascript:void(0);" onclick="sendSunat(${data.id})">
+                                                        <i class="fa-solid fa-paper-plane"></i> Sunat
+                                                    </a>
+                                                </li>`;
                             }
-                            
-                        }  
-                        
+
+                        }
+
                         acciones += `</ul></div>`;
 
-                        
+
                         return acciones;
                     },
-                    name: 'actions', 
-                    orderable: false, 
-                    searchable: false 
+                    name: 'actions',
+                    orderable: false,
+                    searchable: false
                 }
             ],
             pageLength: 25,
@@ -220,20 +209,20 @@
         reverseButtons: true
         }).then(async (result) => {
         if (result.isConfirmed) {
-           
+
             Swal.fire({
                 title: `Documento de venta: ${sale_document.serie}-${sale_document.correlative}`,
                 html: "ENVIANDO A SUNAT...",
                 allowOutsideClick: false,
                 didOpen: () => {
-                    Swal.showLoading(); 
+                    Swal.showLoading();
                 }
             });
 
             try {
                 toastr.clear();
                 const token                   =   document.querySelector('input[name="_token"]').value;
-                
+
                 const formData                =   new FormData();
                 const urlInvoice              =   @json(route('tenant.ventas.comprobante_venta.send_sunat'));
 
@@ -242,7 +231,7 @@
                 const response  =   await fetch(urlInvoice, {
                                          method: 'POST',
                                          headers: {
-                                             'X-CSRF-TOKEN': token 
+                                             'X-CSRF-TOKEN': token
                                          },
                                          body: formData
                                      });
@@ -258,7 +247,7 @@
                     Swal.close();
                     return;
                 }
-                
+
                 if(res.success){
                     dtSales.ajax.reload(null, false);
                     toastr.success(res.message,'OPERACIÓN COMPLETADA');
@@ -286,6 +275,6 @@
         });
     }
 
-</script> 
+</script>
 <script src="{{asset('assets/js/utils.js')}}"></script>
 @endsection

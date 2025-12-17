@@ -1,5 +1,5 @@
-<table id="dt-exit-moneys" style="width:100%" class="table-hover table">
-    <thead>
+<table id="dt-exit-moneys" class="display table">
+    <thead class="table-light">
         <tr>
             <th>#</th>
             <th>Fecha de emisión</th>

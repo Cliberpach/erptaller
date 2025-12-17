@@ -5,38 +5,28 @@
 @endsection
 
 @section('css')
-    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css') }}" />
     <link rel="stylesheet" href="{{ asset('assets/css/styles.css') }}">
     <style>
         .my-swal {
             z-index: 3000 !important;
         }
     </style>
-    <link rel="stylesheet" href="{{ asset('assets/css/cuadre.css') }}">
 @endsection
 
 @section('content')
     @include('cash.petty-cash-book.modals.mdl_open_cash')
     @include('cash.petty-cash-book.modals.mdl_close_cash')
-
-    <div class="card">
-        <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
-            <h4 class="card-title mb-md-0 mb-2">MOVIMIENTOS DE CAJA</h4>
-
+    <div class="card overflow-hidden">
+        <div class="card-header d-flex align-items-center justify-content-between">
+            <h6 class="card-title mb-0">MOVIMIENTOS DE CAJA</h6>
             <div class="d-flex flex-wrap gap-2">
                 <a onclick="openMdlOpenCash()" class="btn btn-primary text-white">
                     <i class="fas fa-plus-circle"></i> NUEVO
                 </a>
             </div>
         </div>
-        <div class="card-body">
-            <div class="row">
-                <div class="col">
-                    <div class="table-responsive">
-                        @include('cash.petty-cash-book.tables.tbl_list')
-                    </div>
-                </div>
-            </div>
+        <div class="card-body p-0 pb-2">
+            @include('cash.petty-cash-book.tables.tbl_list')
         </div>
     </div>
 @endsection

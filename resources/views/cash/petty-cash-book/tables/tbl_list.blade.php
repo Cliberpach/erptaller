@@ -1,5 +1,5 @@
 <table id="dt-cash-books" style="width:100%" class="table-hover table">
-    <thead>
+    <thead class="table-light">
         <tr>
             <th>ID</th>
             <th>#</th>
@@ -12,7 +12,7 @@
             <th data-priority="1"></th>
         </tr>
     </thead>
-    <tbody class="body-table">
+    <tbody>
 
 
     </tbody>

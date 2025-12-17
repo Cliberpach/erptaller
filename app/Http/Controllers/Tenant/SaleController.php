@@ -220,6 +220,9 @@ array:3 [ // app\Http\Controllers\Tenant\SaleController.php:119
                                         FROM sales_documents_details AS sdd
                                         WHERE sdd.sale_document_id = ?', [$sale_id]);
 
+            $route_view             =   'sales.sale_document.pdf.pdf';
+            $pdf_size               =   null;
+
             $data_qr                =   (object)[
                 'ruc_emisor'        =>  $company->ruc,
                 'tipo_comprobante'  =>  $sale_document->type_sale_code,
@@ -242,18 +245,21 @@ array:3 [ // app\Http\Controllers\Tenant\SaleController.php:119
 
             $customer       =   Customer::find($sale_document->customer_id);
 
-            $pdf = PDF::loadview('sales.sale_document.pdf.pdf', [
+            if ((int)$size === 0) {
+                $pdf_size   =   [0, 0, 226.772, 651.95];
+            } else {
+                $pdf_size   =   'A4';
+                $route_view =   'sales.sale_document.pdf.pdf-a4';
+            }
+
+            $pdf = PDF::loadview($route_view, [
                 'company'               =>  $company,
                 'sale_document'         =>  $sale_document,
                 'customer'              =>  $customer,
                 'sale_document_detail'  =>  $sale_document_detail
             ]);
 
-            if ((int)$size === 0) {
-                $pdf->setPaper([0, 0, 226.772, 651.95]);
-            } else {
-                $pdf->setPaper('A4');
-            }
+            $pdf->setPaper($pdf_size);
 
             return $pdf->stream($sale_document->serie . '-' . $sale_document->correlative . '.pdf');
         } catch (Throwable $th) {
@@ -265,8 +271,6 @@ array:3 [ // app\Http\Controllers\Tenant\SaleController.php:119
     {
         //
     }
-
-
 
     public function electronicReceipt()
     {

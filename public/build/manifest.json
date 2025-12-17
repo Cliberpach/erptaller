@@ -20,7 +20,7 @@
     "src": "node_modules/lightgallery/images/loading.gif"
   },
   "resources/css/app.css": {
-    "file": "assets/app-c847d60d.css",
+    "file": "assets/app-cb6e5b75.css",
     "isEntry": true,
     "src": "resources/css/app.css"
   },
