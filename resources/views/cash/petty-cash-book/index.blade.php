@@ -1,7 +1,7 @@
 @extends('layouts.template')
 
 @section('title')
-    Caja
+    Movimientos de Caja
 @endsection
 
 @section('css')
@@ -73,8 +73,8 @@
                     {
                         data: 'initial_amount',
                         name: 'c.initial_amount',
-                        searchable: true,
-                        orderable: true,
+                        searchable: false,
+                        orderable: false,
                         className: "text-center"
                     },
                     {
@@ -94,15 +94,15 @@
                     {
                         data: 'closing_amount',
                         name: 'c.closing_amount',
-                        searchable: true,
-                        orderable: true,
+                        searchable: false,
+                        orderable: false,
                         className: "text-center"
                     },
                     {
                         data: 'status',
                         name: 'c.status',
                         searchable: true,
-                        orderable: true,
+                        orderable: false,
                         className: "text-center",
                         render: function(status) {
 
@@ -124,6 +124,7 @@
                     },
                     {
                         searchable: false,
+                        orderable:false,
                         data: null,
                         className: "text-center",
                         render: function(data, type, row) {

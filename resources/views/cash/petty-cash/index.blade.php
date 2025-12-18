@@ -50,9 +50,11 @@
             dtCash = new DataTable('#dt-cash', {
                 "processing": true,
                 "ajax": '{{ route('tenant.cajas.getListCash') }}',
+                "order": [
+                    [0, "desc"]
+                ],
                 "columns": [{
                         data: 'id',
-                        className: "text-center",
                         "visible": false,
                         "searchable": false
                     },
@@ -61,21 +63,19 @@
                         name: 'c.name',
                         searchable: true,
                         orderable: true,
-                        className: "text-center"
                     },
                     {
                         data: 'created_at',
                         name: 'c.created_at',
                         searchable: true,
                         orderable: true,
-                        className: "text-center"
+                        type: 'string'
                     },
                     {
                         data: 'status',
                         name: 'c.status',
                         searchable: true,
                         orderable: true,
-                        className: "text-center",
                         render: function(status) {
 
                             let badgeClass = '';
@@ -99,8 +99,9 @@
                     },
                     {
                         searchable: false,
+                        orderable: false,
                         data: null,
-                        className: "text-center",
+                        className: "text-end",
                         render: function(data) {
                             return `
                             <div class="btn-group">
@@ -153,21 +154,10 @@
                             1: "1 fila seleccionada"
                         }
                     }
-                },
-                "order": [
-                    [0, "desc"]
-                ],
+                }
             });
 
         }
-
-        const swalWithBootstrapButtons = Swal.mixin({
-            customClass: {
-                confirmButton: 'btn btn-success',
-                cancelButton: 'btn btn-danger',
-            },
-            buttonsStyling: false
-        })
 
         function eliminar(id) {
             const fila = getRowById(dtCash, id);

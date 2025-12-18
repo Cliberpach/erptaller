@@ -2,16 +2,8 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <div class="model-header-btn">
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-
-                <div class="modal-header-titulo">
-
-                    <i class="fas fa-cogs" style="font-size: 85px; color: #96a9ca;"></i>
-                    <h5 class="modal-title" id="mdlOpenCashLabel">Caja</h5>
-                    <p style="font-size: 11px">Apertura de caja</p>
-                </div>
+                <h5 class="modal-title" id="exampleModalLabel">Aperturar Caja </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <hr>
             <div class="modal-body">
