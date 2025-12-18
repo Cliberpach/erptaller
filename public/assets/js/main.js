@@ -2,7 +2,7 @@ const initAppToggler = () => {
 
     const appTogglers = document.querySelectorAll(".app-toggler");
 	const appMenubars = document.getElementById("appMenubar"); // single element
-	
+
 	if (!appMenubars || appTogglers.length === 0) return;
 
 	appTogglers.forEach(toggler => {
@@ -41,9 +41,13 @@ const saerchList = () => {
 	let listItems = [];
 
 	// JSON load
-	$.getJSON("assets/ajax/search.json", function(data) {
+	/*
+    $.getJSON("assets/ajax/search.json", function(data) {
 		listItems = data.listItems;
 	});
+    */
+
+    listItems   =   lstSearchModules;
 
 	// Search functionality
 	$("#searchInput").on("keyup", function() {
@@ -51,9 +55,9 @@ const saerchList = () => {
 		let searchContainer = $("#searchContainer");
 		searchContainer.empty();
 		searchContainer.hide();
-		
+
 		$('#recentlyResults').hide();
-		
+
 		if (query.length === 0) {
 			searchContainer.hide();
 			$('#recentlyResults').show();
@@ -95,8 +99,8 @@ const saerchList = () => {
 					<div class="avatar avatar-lg bg-danger-subtle shadow-secondary rounded-circle text-danger mb-3 m-auto">
 						<i class="fi fi-rr-assessment"></i>
 					</div>
-					<h5 class="mb-1">No result found</h5>
-					<div class="text-muted">Please try again with a different query</div>
+					<h5 class="mb-1">Sin resultados</h5>
+					<div class="text-muted">Intenta con una búsqueda diferente</div>
 				</div>
 			`);
 			searchContainer.show();
@@ -119,17 +123,17 @@ const setElementHeight = () => {
 		const footerHeight = footer ? footer.offsetHeight : 0;
 		document.documentElement.style.setProperty('--footer-height', `${footerHeight}px`);
 	}
-	
+
 	const chatBox = document.querySelector('.chat-wrapper');
 	if (chatBox) {
 		const chatHeight = chatBox.offsetHeight;
 		document.documentElement.style.setProperty('--chat-height', `${chatHeight}px`);
 	}
-	
+
 };
 
 const initSelectPicker = () => {
-	
+
 	document.querySelectorAll('.select-status').forEach(dropdown => {
 		const toggleButton = dropdown.querySelector('.dropdown-toggle');
 		const items = dropdown.querySelectorAll('.dropdown-item');
@@ -208,10 +212,10 @@ function initPopover() {
 }
 
 function initSidebarMenu() {
-	
+
 	jQuery('.app-navbar .menubar > li.menu-arrow > a').next('.menu-inner').slideUp();
 	jQuery('.app-navbar .menu-inner > li > a').next('.menu-inner').slideUp();
-	
+
 	jQuery('.app-navbar .menubar > li.menu-arrow > a, .app-navbar .menu-inner > li > a').unbind().on('click', function(e){
 		if(jQuery(this).hasClass('open')){
 			jQuery(this).removeClass('open');
@@ -221,7 +225,7 @@ function initSidebarMenu() {
 				jQuery(this).addClass('open');
 			}
 			if(jQuery(this).parent('li').children('.menu-inner').length > 0){
-				
+
 				e.preventDefault();
 				jQuery(this).next('.menu-inner').slideDown();
 				jQuery(this).parent('li').siblings('li').find('a:first').removeClass('open');
@@ -231,7 +235,7 @@ function initSidebarMenu() {
 			}
 		}
 	});
-	
+
 	for (var nk = window.location,
 		o = $(".app-navbar .menubar a").filter(function(){
 		return this.href == nk;
@@ -322,7 +326,7 @@ function initChatSidebarToggle() {
             sidebar.classList.remove('open');
             overlay.classList.remove('show');
         });
-		
+
 		btnClose.addEventListener('click', () => {
             sidebar.classList.remove('open');
             overlay.classList.remove('show');

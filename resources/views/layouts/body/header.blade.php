@@ -1,3 +1,27 @@
+@php
+    $host = request()->getHost();
+
+    // Verificar si es localhost
+    $isLocalhost = str_contains($host, 'localhost');
+
+    // Partes del dominio
+    $hostParts = explode('.', $host);
+
+    // Detectar si es subdominio (solo si NO es localhost)
+    $isSubdomain = !$isLocalhost && count($hostParts) > 2;
+
+    $mostrarButton = false;
+
+    if ($isLocalhost && count($hostParts) > 1) {
+        $mostrarButton = true;
+    }
+
+    if (!$isLocalhost && count($hostParts) > 2) {
+        $mostrarButton = true;
+    }
+
+@endphp
+
 <div class="app-header-inner">
     <button class="app-toggler" type="button" aria-label="app toggler">
         <span></span>
@@ -9,8 +33,8 @@
             <button type="button" class="btn btn-sm position-absolute start-0 ms-3 border-0 p-0">
                 <i class="fi fi-rr-search"></i>
             </button>
-            <input type="text" class="form-control rounded-5 ps-5" placeholder="Buscar algo"
-                data-bs-toggle="modal" data-bs-target="#searchResultsModal">
+            <input type="text" class="form-control rounded-5 ps-5" placeholder="Buscar algo" data-bs-toggle="modal"
+                data-bs-target="#searchResultsModal">
         </form>
         {{-- <ul class="navbar-nav d-none d-xxl-flex flex-row gap-4">
             <li class="nav-item">
@@ -53,6 +77,23 @@
         </div>
         <div class="vr my-3"></div>
         <div class="d-flex align-items-center gap-sm-2 px-lg-4 px-sm-2 gap-0 px-1">
+
+            @if ($mostrarButton)
+                <div style="display:flex;flex-direction:column;justify-items:center;">
+                    <a href="calendar.html"
+                        class="btn btn-icon btn-action-gray rounded-circle waves-effect waves-light">
+                        <i class="fas fa-file-invoice-dollar"></i>
+                    </a>
+                    <span style="font-size: 9px;">Cotización</span>
+                </div>
+                <div style="display:flex;flex-direction:column;align-items:center;">
+                    <a href="calendar.html"
+                        class="btn btn-icon btn-action-gray rounded-circle waves-effect waves-light">
+                        <i class="fas fa-tools"></i>
+                    </a>
+                    <span style="font-size: 9px;">Orden</span>
+                </div>
+            @endif
             {{-- <a href="email/inbox.html"
                 class="btn btn-icon btn-action-gray rounded-circle waves-effect waves-light position-relative">
                 <i class="fi fi-rr-envelope"></i>
@@ -158,26 +199,27 @@
             <a href="#" class="d-flex align-items-center py-2" data-bs-toggle="dropdown"
                 data-bs-auto-close="outside" aria-expanded="true">
                 <div class="d-none d-lg-inline-block me-2 text-end">
-                    <div class="fw-bold text-dark">{{Auth::user()->name}}</div>
+                    <div class="fw-bold text-dark">{{ Auth::user()->name }}</div>
                     <small class="text-body d-block lh-sm">
-                        <i class="fi fi-rr-angle-down text-3xs me-1"></i> {{ DB::table('plans')->first()->description }} -
+                        <i class="fi fi-rr-angle-down text-3xs me-1"></i>
+                        {{ DB::table('plans')->first()->description }} -
                         @foreach (Auth::user()->roles as $role)
                             {{ $role->name }}
                         @endforeach
                     </small>
                 </div>
                 <div class="avatar avatar-sm rounded-circle avatar-status-success">
-                    <img src="{{asset('assets/images/avatar/avatar1.webp')}}" alt="">
+                    <img src="{{ asset('assets/images/avatar/avatar1.webp') }}" alt="">
                 </div>
             </a>
             <ul class="dropdown-menu dropdown-menu-end w-225px mt-1">
                 <li class="d-flex align-items-center p-2">
                     <div class="avatar avatar-sm rounded-circle">
-                        <img src="{{asset('assets/images/avatar/avatar1.webp')}}" alt="">
+                        <img src="{{ asset('assets/images/avatar/avatar1.webp') }}" alt="">
                     </div>
                     <div class="ms-2">
-                        <div class="fw-bold text-dark">{{Auth::user()->name}} </div>
-                        <small class="text-body d-block lh-sm">{{Auth::user()->email}}</small>
+                        <div class="fw-bold text-dark">{{ Auth::user()->name }} </div>
+                        <small class="text-body d-block lh-sm">{{ Auth::user()->email }}</small>
                     </div>
                 </li>
                 <li>
@@ -212,8 +254,7 @@
                     <div class="dropdown-divider my-1"></div>
                 </li>
                 <li>
-                    <a class="dropdown-item d-flex align-items-center text-danger gap-2"
-                        href="{{ route('logout') }}">
+                    <a class="dropdown-item d-flex align-items-center text-danger gap-2" href="{{ route('logout') }}">
                         <i class="fi fi-sr-exit scale-1x"></i> Cerrar Sesión
                     </a>
                 </li>

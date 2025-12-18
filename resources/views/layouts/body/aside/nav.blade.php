@@ -60,7 +60,9 @@
     <li class="menu-heading">
         <span class="menu-label">Menu</span>
     </li>
-    {{-- <li class="menu-item">
+
+    {{--
+    <li class="menu-item">
         <a class="menu-link" href="chat.html">
             <i class="fi fi-rr-comment"></i>
             <span class="menu-label">Chat</span>
@@ -123,7 +125,7 @@
                         </li>
                     @else
                         <li class="menu-item">
-                            <a class="menu-link" href="{{ route($base . $child->route_name) }}"">
+                            <a class="menu-link" href="{{ route($base . $child->route_name) }}">
                                 <span class="menu-label">{{ $child->description }}</span>
                             </a>
                         </li>
