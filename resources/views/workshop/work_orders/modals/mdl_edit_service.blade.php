@@ -70,12 +70,14 @@
         const service = getFormServiceEdit();
         setServiceEdit(service, lstServices);
         dtServices = destroyDataTable(dtServices);
-        clearTable('dt-quotes-services');
+        clearTable('dt-orders-services');
         paintOrderServices(lstServices);
-        dtServices = loadDataTableSimple('dt-quotes-services');
+        dtServices = loadDataTableSimple('dt-orders-services');
 
         calculateAmounts();
         paintAmounts();
+        paintCantServices();
+
         toastr.success('SERVICIO ACTUALIZADO EN EL DETALLE DE SERVICIOS');
 
         $('#mdl_edit_service').modal('hide');

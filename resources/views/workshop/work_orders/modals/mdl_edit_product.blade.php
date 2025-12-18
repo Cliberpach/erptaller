@@ -87,12 +87,13 @@
         saveProductEdit(product, lstProducts);
 
         dtProducts = destroyDataTable(dtProducts);
-        clearTable('dt-quotes-products');
+        clearTable('dt-orders-products');
         paintOrderProducts(lstProducts);
-        dtProducts = loadDataTableSimple('dt-quotes-products');
+        dtProducts = loadDataTableSimple('dt-orders-products');
 
         calculateAmounts();
         paintAmounts();
+        paintCantProducts();
         toastr.success('PRODUCTO ACTUALIZADO EN EL DETALLE DE PRODUCTOS');
 
         $('#mdl_edit_product').modal('hide');

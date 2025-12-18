@@ -80,14 +80,14 @@
 
             @if ($mostrarButton)
                 <div style="display:flex;flex-direction:column;justify-items:center;">
-                    <a href="calendar.html"
+                    <a href="{{ route('tenant.taller.cotizaciones.create') }}"
                         class="btn btn-icon btn-action-gray rounded-circle waves-effect waves-light">
                         <i class="fas fa-file-invoice-dollar"></i>
                     </a>
                     <span style="font-size: 9px;">Cotización</span>
                 </div>
                 <div style="display:flex;flex-direction:column;align-items:center;">
-                    <a href="calendar.html"
+                    <a href="{{ route('tenant.taller.ordenes_trabajo.create') }}"
                         class="btn btn-icon btn-action-gray rounded-circle waves-effect waves-light">
                         <i class="fas fa-tools"></i>
                     </a>

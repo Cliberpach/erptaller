@@ -78,7 +78,7 @@
     </div>
 
 
-       <div class="row">
+    <div class="row">
         <div class="col-12">
             <h6 class="card-title mb-3">Detalles</h6>
             <div class="clearfix">
@@ -86,14 +86,22 @@
                     <div class="card-header">
                         <ul class="nav nav-pills card-header-pills" id="myTabPills" role="tablist">
                             <li class="nav-item" role="presentation">
-                                <button class="nav-link active" id="products-tabPills" data-bs-toggle="tab"
-                                    data-bs-target="#productPills" type="button" role="tab"
-                                    aria-controls="productPills" aria-selected="true">Productos</button>
+                                <button class="nav-link active d-flex align-items-center gap-2" id="products-tabPills"
+                                    data-bs-toggle="tab" data-bs-target="#productPills" type="button" role="tab"
+                                    aria-controls="productPills" aria-selected="true">Productos
+                                    <span class="badge bg-danger rounded-pill badge-products d-none">
+                                        0
+                                    </span>
+                                </button>
                             </li>
                             <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="services-tabPills" data-bs-toggle="tab"
-                                    data-bs-target="#servicePills" type="button" role="tab"
-                                    aria-controls="servicePills" aria-selected="false">Servicios</button>
+                                <button class="nav-link d-flex align-items-center gap-2" id="services-tabPills"
+                                    data-bs-toggle="tab" data-bs-target="#servicePills" type="button" role="tab"
+                                    aria-controls="servicePills" aria-selected="false">Servicios
+                                    <span class="badge bg-danger rounded-pill badge-services d-none">
+                                        0
+                                    </span>
+                                </button>
                             </li>
                             <li class="nav-item" role="presentation">
                                 <button class="nav-link" id="inventory-tabPills" data-bs-toggle="tab"
