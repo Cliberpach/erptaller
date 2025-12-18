@@ -9,7 +9,7 @@
             <button type="button" class="btn btn-sm position-absolute start-0 ms-3 border-0 p-0">
                 <i class="fi fi-rr-search"></i>
             </button>
-            <input type="text" class="form-control rounded-5 ps-5" placeholder="Search anything's"
+            <input type="text" class="form-control rounded-5 ps-5" placeholder="Buscar algo"
                 data-bs-toggle="modal" data-bs-target="#searchResultsModal">
         </form>
         {{-- <ul class="navbar-nav d-none d-xxl-flex flex-row gap-4">
@@ -158,7 +158,7 @@
             <a href="#" class="d-flex align-items-center py-2" data-bs-toggle="dropdown"
                 data-bs-auto-close="outside" aria-expanded="true">
                 <div class="d-none d-lg-inline-block me-2 text-end">
-                    <div class="fw-bold text-dark">Robert Brown</div>
+                    <div class="fw-bold text-dark">{{Auth::user()->name}}</div>
                     <small class="text-body d-block lh-sm">
                         <i class="fi fi-rr-angle-down text-3xs me-1"></i> {{ DB::table('plans')->first()->description }} -
                         @foreach (Auth::user()->roles as $role)
@@ -176,8 +176,8 @@
                         <img src="{{asset('assets/images/avatar/avatar1.webp')}}" alt="">
                     </div>
                     <div class="ms-2">
-                        <div class="fw-bold text-dark">Robert Brown </div>
-                        <small class="text-body d-block lh-sm">robert@gmail.com</small>
+                        <div class="fw-bold text-dark">{{Auth::user()->name}} </div>
+                        <small class="text-body d-block lh-sm">{{Auth::user()->email}}</small>
                     </div>
                 </li>
                 <li>
@@ -185,7 +185,7 @@
                 </li>
                 <li>
                     <a class="dropdown-item d-flex align-items-center gap-2" href="profile.html">
-                        <i class="fi fi-rr-user scale-1x"></i> View Profile
+                        <i class="fi fi-rr-user scale-1x"></i> Ver Perfil
                     </a>
                 </li>
                 <li>
