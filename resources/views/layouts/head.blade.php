@@ -65,6 +65,8 @@
 <link rel="stylesheet" href="{{ asset('assets/libs/flatpickr/flatpickr.min.css') }}">
 <link rel="stylesheet" href="{{ asset('assets/libs/datatables/datatables.min.css') }}">
 <link rel="stylesheet" href="{{ asset('assets/css/styles.css') }}">
+<link rel="stylesheet" href="{{ asset('assets/css/style-own.css') }}">
+
 <!-- end::GXON CSS Stylesheet -->
 
 @yield('css')

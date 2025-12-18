@@ -12,14 +12,14 @@
             <input type="text" class="form-control rounded-5 ps-5" placeholder="Search anything's"
                 data-bs-toggle="modal" data-bs-target="#searchResultsModal">
         </form>
-        <ul class="navbar-nav d-none d-xxl-flex flex-row gap-4">
+        {{-- <ul class="navbar-nav d-none d-xxl-flex flex-row gap-4">
             <li class="nav-item">
                 <a class="nav-link" href="analytics.html">Reports & Analytics</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="pages/faq.html">Help</a>
             </li>
-        </ul>
+        </ul> --}}
     </div>
     <div class="app-header-end">
         <div class="px-lg-3 d-flex align-items-center px-2 ps-0">
@@ -53,14 +53,14 @@
         </div>
         <div class="vr my-3"></div>
         <div class="d-flex align-items-center gap-sm-2 px-lg-4 px-sm-2 gap-0 px-1">
-            <a href="email/inbox.html"
+            {{-- <a href="email/inbox.html"
                 class="btn btn-icon btn-action-gray rounded-circle waves-effect waves-light position-relative">
                 <i class="fi fi-rr-envelope"></i>
                 <span
                     class="position-absolute bg-danger border-3 border-light rounded-circle end-0 top-0 me-1 mt-1 border p-1">
                     <span class="visually-hidden">New alerts</span>
                 </span>
-            </a>
+            </a> --}}
             <div class="dropdown text-end">
                 <button type="button" class="btn btn-icon btn-action-gray rounded-circle waves-effect waves-light"
                     data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="true">
@@ -149,9 +149,9 @@
                     </div>
                 </div>
             </div>
-            <a href="calendar.html" class="btn btn-icon btn-action-gray rounded-circle waves-effect waves-light">
+            {{-- <a href="calendar.html" class="btn btn-icon btn-action-gray rounded-circle waves-effect waves-light">
                 <i class="fi fi-rr-calendar"></i>
-            </a>
+            </a> --}}
         </div>
         <div class="vr my-3"></div>
         <div class="dropdown ms-sm-3 ms-lg-4 ms-2 text-end">

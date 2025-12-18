@@ -29,3 +29,11 @@
 .lg-thumb-outer {
     z-index: 999999999999999999 !important;
 }
+
+
+/*========= CONTAINER LAYOUT ==========*/
+.app-wrapper .container{
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    max-width: 100% !important;
+}

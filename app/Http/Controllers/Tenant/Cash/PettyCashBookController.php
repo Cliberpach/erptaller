@@ -61,7 +61,8 @@ class PettyCashBookController extends Controller
                 'c.updated_at',
                 'c.petty_cash_name'
             )
-            ->where('c.status', '<>', 'ANULADO');
+            ->where('c.status', '<>', 'ANULADO')
+            ->where('c.type','<>','FICTICIO');
 
         return DataTables::of($cashes)
             ->filterColumn('code', function ($query, $keyword) {

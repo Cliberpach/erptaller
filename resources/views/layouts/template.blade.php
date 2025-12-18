@@ -33,9 +33,9 @@
         <!-- end::GXON Sidebar Menu -->
 
         <!-- begin::GXON Sidebar right -->
-        <div class="app-sidebar-end">
+        {{-- <div class="app-sidebar-end">
             @include('layouts.body.app-sidebar-end')
-        </div>
+        </div> --}}
         <!-- end::GXON Sidebar right -->
 
         <main class="app-wrapper">
