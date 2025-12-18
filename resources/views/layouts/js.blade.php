@@ -1,9 +1,10 @@
-  <script src="{{asset('assets/libs/global/global.min.js')}}"></script>
-  <script src="{{asset('assets/libs/datatables/datatables.min.js')}}"></script>
-  <script src="{{asset('assets/js/datatable.js')}}"></script>
-  <script src="{{asset('assets/js/appSettings.js')}}"></script>
-  <script src="{{asset('assets/js/main.js')}}"></script>
-
+<script src="{{ asset('assets/libs/global/global.min.js') }}"></script>
+<script src="{{ asset('assets/libs/datatables/datatables.min.js') }}"></script>
+<script src="{{ asset('assets/js/datatable.js') }}"></script>
+<script src="{{ asset('assets/js/appSettings.js') }}"></script>
+<script src="{{ asset('assets/js/main.js') }}"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.full.min.js"></script>
+  {{-- <script src="{{asset('assets/js/toast.js')}}"></script> --}}
 <script src="{{ asset('assets/js/utils.js') }}"></script>
 
 <script>

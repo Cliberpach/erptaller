@@ -20,12 +20,12 @@
     "src": "node_modules/lightgallery/images/loading.gif"
   },
   "resources/css/app.css": {
-    "file": "assets/app-cb6e5b75.css",
+    "file": "assets/app-e3b0c442.css",
     "isEntry": true,
     "src": "resources/css/app.css"
   },
   "resources/js/app.css": {
-    "file": "assets/app-7fed0680.css",
+    "file": "assets/app-c1078029.css",
     "src": "resources/js/app.css"
   },
   "resources/js/app.js": {
@@ -37,9 +37,9 @@
       "assets/loading-298ad3ff.gif"
     ],
     "css": [
-      "assets/app-7fed0680.css"
+      "assets/app-c1078029.css"
     ],
-    "file": "assets/app-45825eac.js",
+    "file": "assets/app-3d90811d.js",
     "isEntry": true,
     "src": "resources/js/app.js"
   }
