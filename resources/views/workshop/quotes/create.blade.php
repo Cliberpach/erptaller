@@ -217,7 +217,7 @@
 
                         const response = await fetch(url);
                         if (!response.ok) throw new Error('Error al buscar vehiculos');
-                       const data = await response.json();
+                        const data = await response.json();
                         const results = data.data ?? [];
                         callback(results);
                         if (results.length === 0) {
@@ -795,7 +795,7 @@
 
             if (!value) return;
             const vehicle = window.vehicleSelect.options[value];
-            document.querySelector('#plate').value = vehicle.text;
+            document.querySelector('#plate').value = vehicle.text + '-' + vehicle.subtext;
 
             //========= TRAER CLIENTES ==========
             mostrarAnimacion1();

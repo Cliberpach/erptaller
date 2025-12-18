@@ -852,7 +852,7 @@
 
             if (!value) return;
             const vehicle = window.vehicleSelect.options[value];
-            document.querySelector('#plate').value = vehicle.text;
+            document.querySelector('#plate').value = vehicle.text + '-' + vehicle.subtext;
 
             //========= TRAER CLIENTES ==========
             mostrarAnimacion1();
