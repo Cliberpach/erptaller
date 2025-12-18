@@ -9,6 +9,13 @@
 </head>
 
 <body>
+
+    <div class="row">
+        <div class="col-12">
+            @include('utils.spinners.spinner_1')
+        </div>
+    </div>
+
     <div class="page-layout">
 
         <!-- begin::GXON Page Header -->

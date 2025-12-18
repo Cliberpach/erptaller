@@ -65,7 +65,13 @@ toastr.options = {
     timeOut: 3000,
 };
 
-window.toastr = toastr; 
+window.toastr = toastr;
+
+
+/*======== SWAL =========*/
+import Swal from 'sweetalert2';
+window.Swal = Swal;
+
 
 
 /**

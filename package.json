@@ -25,6 +25,7 @@
         "flowbite": "^2.5.2",
         "hover.css": "^2.3.2",
         "lightgallery": "^2.9.0",
+        "sweetalert2": "^11.26.10",
         "toastr": "^2.1.4",
         "tom-select": "^2.4.3",
         "ziggy-js": "^2.6.0"

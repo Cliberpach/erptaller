@@ -85,8 +85,8 @@
         });
 
         document.addEventListener('DOMContentLoaded', () => {
-            dtProducts = loadDataTableSimple('dt-quotes-products');
-            dtServices = loadDataTableSimple('dt-quotes-services');
+            dtProducts = loadDataTableSimple('dt-orders-products');
+            dtServices = loadDataTableSimple('dt-orders-services');
 
             loadTomSelect();
             loadFilePound();
@@ -355,14 +355,6 @@
 
         }
 
-        const swalWithBootstrapButtons = Swal.mixin({
-            customClass: {
-                confirmButton: 'btn btn-success',
-                cancelButton: 'btn btn-danger',
-            },
-            buttonsStyling: false
-        })
-
         async function accionBuscarPlaca() {
             const placa = document.querySelector('#plate').value.trim();
 
@@ -543,9 +535,9 @@
 
             addItem(productSelected, lstProducts);
             dtProducts = destroyDataTable(dtProducts);
-            clearTable('dt-quotes-products');
+            clearTable('dt-orders-products');
             paintOrderProducts(lstProducts);
-            dtProducts = loadDataTableSimple('dt-quotes-products');
+            dtProducts = loadDataTableSimple('dt-orders-products');
 
             calculateAmounts();
             paintAmounts();
@@ -624,7 +616,7 @@
         }
 
         function paintOrderProducts(lstItems) {
-            const tbody = document.querySelector('#dt-quotes-products tbody');
+            const tbody = document.querySelector('#dt-orders-products tbody');
             let rows = ``;
 
             lstItems.forEach((item) => {
@@ -665,9 +657,9 @@
             lstItems.splice(indexItem, 1);
 
             dtProducts = destroyDataTable(dtProducts);
-            clearTable('dt-quotes-products');
+            clearTable('dt-orders-products');
             paintOrderProducts(lstItems);
-            dtProducts = loadDataTableSimple('dt-quotes-products');
+            dtProducts = loadDataTableSimple('dt-orders-products');
 
             calculateAmounts();
             paintAmounts();
@@ -700,9 +692,9 @@
 
             addItem(serviceSelected, lstServices);
             dtServices = destroyDataTable(dtServices);
-            clearTable('dt-quotes-services');
+            clearTable('dt-orders-services');
             paintOrderServices(lstServices);
-            dtServices = loadDataTableSimple('dt-quotes-services');
+            dtServices = loadDataTableSimple('dt-orders-services');
 
             calculateAmounts();
             paintAmounts();
@@ -763,7 +755,7 @@
         }
 
         function paintOrderServices(lstItems) {
-            const tbody = document.querySelector('#dt-quotes-services tbody');
+            const tbody = document.querySelector('#dt-orders-services tbody');
             let rows = ``;
 
             lstItems.forEach((item) => {
@@ -803,9 +795,9 @@
             lstItems.splice(indexItem, 1);
 
             dtServices = destroyDataTable(dtServices);
-            clearTable('dt-quotes-services');
+            clearTable('dt-orders-services');
             paintOrderServices(lstItems);
-            dtServices = loadDataTableSimple('dt-quotes-services');
+            dtServices = loadDataTableSimple('dt-orders-services');
 
             calculateAmounts();
             paintAmounts();
@@ -941,15 +933,15 @@
 
             //====== PRODUCTS
             dtProducts = destroyDataTable(dtProducts);
-            clearTable('dt-quotes-products');
+            clearTable('dt-orders-products');
             paintOrderProducts(lstProducts);
-            dtProducts = loadDataTableSimple('dt-quotes-products');
+            dtProducts = loadDataTableSimple('dt-orders-products');
 
             //======= SERVICES =======
             dtServices = destroyDataTable(dtServices);
-            clearTable('dt-quotes-services');
+            clearTable('dt-orders-services');
             paintOrderServices(lstServices);
-            dtServices = loadDataTableSimple('dt-quotes-services');
+            dtServices = loadDataTableSimple('dt-orders-services');
 
             calculateAmounts();
             paintAmounts();

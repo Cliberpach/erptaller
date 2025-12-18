@@ -16,7 +16,7 @@
                 S/ 0.00
             </td>
         </tr>
-        <tr class="bg-primary text-white">
+        <tr class=" text-white">
             <th class="fw-bold">
                 <i class="fas fa-coins me-2"></i> TOTAL A PAGAR
             </th>

@@ -356,14 +356,6 @@
 
         }
 
-        const swalWithBootstrapButtons = Swal.mixin({
-            customClass: {
-                confirmButton: 'btn btn-success',
-                cancelButton: 'btn btn-danger',
-            },
-            buttonsStyling: false
-        })
-
         function validationStoreQuote() {
             if (lstProducts.length === 0 && lstServices.length === 0) {
                 toastr.error('DEBE AGREGAR AL MENOS UN PRODUCTO O SERVICIO A LA COTIZACIÓN');

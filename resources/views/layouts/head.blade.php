@@ -31,7 +31,9 @@
 <!-- end::GXON Meta Twitter -->
 
 <!-- begin::GXON Website Page Title -->
-<title>GXON HR Management Admin Dashboard Template + RTL</title>
+{{-- <title>GXON HR Management Admin Dashboard Template + RTL</title> --}}
+<title>ErpTaller</title>
+
 <!-- end::GXON Website Page Title -->
 
 <!-- begin::GXON Mobile Specific -->

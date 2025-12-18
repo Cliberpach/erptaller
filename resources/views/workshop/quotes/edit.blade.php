@@ -350,14 +350,6 @@
             });
         }
 
-        const swalWithBootstrapButtons = Swal.mixin({
-            customClass: {
-                confirmButton: 'btn btn-success',
-                cancelButton: 'btn btn-danger',
-            },
-            buttonsStyling: false
-        })
-
         async function accionBuscarPlaca() {
             const placa = document.querySelector('#plate').value.trim();
 

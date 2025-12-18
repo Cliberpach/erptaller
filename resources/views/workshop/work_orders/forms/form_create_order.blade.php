@@ -30,11 +30,12 @@
         </div>
     @endif
 
-    <div class="row">
-        <div class="col-12">
-            <!-- ==========================
+    <!-- ==========================
          SECCIÓN PRINCIPAL / CLIENTE
     =========================== -->
+    <div class="row">
+        <div class="col-12">
+
             <div class="card border-primary mb-4 shadow-sm">
                 <div class="card-header bg-primary fw-bold small py-2 text-white">
                     DATOS DEL CLIENTE Y VEHÍCULO
@@ -61,7 +62,7 @@
                         <!-- Cliente -->
                         <div class="col-lg-6 col-md-8 col-sm-12">
                             <label class="form-label fw-bold required_field">Cliente:</label>
-                            <i class="fas fa-user-plus btn btn-warning btn-sm" onclick="openMdlNewCustomer();"
+                            <i class="fas fa-plus btn btn-warning btn-sm" onclick="openMdlNewCustomer();"
                                 style="margin-left:4px;"></i>
 
                             <select class="form-control" id="client_id" name="client_id" required>
@@ -166,7 +167,7 @@
         <div class="col-12 d-flex justify-content-lg-end">
             <div class="col-12 col-lg-4">
                 <div class="table-responsive">
-                    @include('workshop.quotes.tables.tbl_amounts')
+                    @include('workshop.work_orders.tables.tbl_amounts')
                 </div>
             </div>
         </div>
