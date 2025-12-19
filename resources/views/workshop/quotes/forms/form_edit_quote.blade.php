@@ -38,7 +38,7 @@
                         <!-- Cliente -->
                         <div class="col-lg-6 col-md-8 col-sm-12">
                             <label class="form-label fw-bold required_field">Cliente:</label>
-                            <i class="fas fa-user-plus btn btn-warning btn-sm" onclick="openMdlNewCustomer();"
+                            <i class="fas fa-plus btn btn-warning btn-sm" onclick="openMdlNewCustomer();"
                                 style="margin-left:4px;"></i>
 
                             <select class="form-control" id="client_id" name="client_id" required>
@@ -61,10 +61,25 @@
 
                         <!-- Placa -->
                         <div class="col-lg-4 col-md-6 col-sm-12">
-                            <label class="form-label fw-bold required_field">Placa:</label>
+                            <label class="form-label fw-bold">Placa:</label>
                             <input type="text" class="form-control text-uppercase" id="plate" name="plate"
                                 maxlength="8" minlength="6" placeholder="Ej: ABC123" required
                                 value="{{ $quote->plate }}">
+
+                            @if (count($vehicle_formatted) != 0)
+                                <div id="vehicle_info" class="bg-light mt-2 rounded border p-2">
+                                    <i class="fas fa-car text-primary me-1"></i>
+                                    <span class="fw-semibold">{{ $vehicle_formatted['subtext'] }}</span>
+                                    <span class="text-muted"></span>
+                                </div>
+                            @else
+                                <div id="vehicle_info" class="bg-light mt-2 rounded border p-2 d-none">
+                                    <i class="fas fa-car text-primary me-1"></i>
+                                    <span class="fw-semibold"></span>
+                                    <span class="text-muted"></span>
+                                </div>
+                            @endif
+
                             <p class="plate_error msgError mb-0"></p>
                         </div>
 
@@ -92,14 +107,22 @@
                     <div class="card-header">
                         <ul class="nav nav-pills card-header-pills" id="myTabPills" role="tablist">
                             <li class="nav-item" role="presentation">
-                                <button class="nav-link active" id="products-tabPills" data-bs-toggle="tab"
-                                    data-bs-target="#productPills" type="button" role="tab"
-                                    aria-controls="productPills" aria-selected="true">Productos</button>
+                                <button class="nav-link active d-flex align-items-center gap-2" id="products-tabPills"
+                                    data-bs-toggle="tab" data-bs-target="#productPills" type="button" role="tab"
+                                    aria-controls="productPills" aria-selected="true">Productos
+                                    <span class="badge bg-danger rounded-pill badge-products d-none">
+                                        0
+                                    </span>
+                                </button>
                             </li>
                             <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="services-tabPills" data-bs-toggle="tab"
-                                    data-bs-target="#servicePills" type="button" role="tab"
-                                    aria-controls="servicePills" aria-selected="false">Servicios</button>
+                                <button class="nav-link d-flex align-items-center gap-2" id="services-tabPills"
+                                    data-bs-toggle="tab" data-bs-target="#servicePills" type="button" role="tab"
+                                    aria-controls="servicePills" aria-selected="false">Servicios
+                                    <span class="badge bg-danger rounded-pill badge-services d-none">
+                                        0
+                                    </span>
+                                </button>
                             </li>
                         </ul>
                     </div>
