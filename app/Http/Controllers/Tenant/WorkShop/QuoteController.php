@@ -39,6 +39,11 @@ class QuoteController extends Controller
 
     public function getQuotes(Request $request)
     {
+        $customer_id    =   $request->get('customer_id');
+        $start_date     =   $request->get('start_date');
+        $end_date       =   $request->get('end_date');
+        $status         =   $request->get('status');
+
         $quotes =   DB::connection('tenant')
             ->table('quotes as q')
             ->leftJoin('work_orders as wo', 'wo.quote_id', 'q.id')
@@ -57,6 +62,19 @@ class QuoteController extends Controller
                 DB::raw('CONCAT("OT-",wo.id) as work_order_code')
             )
             ->where('q.status', '<>', 'ANULADO');
+
+        if ($customer_id) {
+            $quotes->where('q.customer_id', $customer_id);
+        }
+        if ($start_date) {
+            $quotes->whereDate('q.created_at', '>=', $start_date);
+        }
+        if ($end_date) {
+            $quotes->whereDate('q.created_at', '<=', $end_date);
+        }
+        if ($status) {
+            $quotes->where('q.status', '=', $status);
+        }
 
         return DataTables::of($quotes)
             ->filterColumn('code', function ($query, $keyword) {

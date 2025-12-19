@@ -36,7 +36,12 @@ class WorkOrderController extends Controller
 
     public function getWorkOrders(Request $request)
     {
-        $quotes = DB::connection('tenant')
+        $customer_id    =   $request->get('customer_id');
+        $start_date     =   $request->get('start_date');
+        $end_date       =   $request->get('end_date');
+        $status         =   $request->get('status');
+
+        $orders = DB::connection('tenant')
             ->table('work_orders as o')
             ->leftJoin('customer_accounts as ca', 'ca.work_order_id', 'o.id')
             ->select(
@@ -57,7 +62,20 @@ class WorkOrderController extends Controller
             )
             ->where('o.status', '<>', 'ANULADO');
 
-        return DataTables::of($quotes)
+        if($customer_id){
+            $orders->where('o.customer_id',$customer_id);
+        }
+        if($start_date){
+            $orders->whereDate('o.created_at','>=',$start_date);
+        }
+        if($end_date){
+            $orders->whereDate('o.created_at','<=',$end_date);
+        }
+        if($status){
+            $orders->where('o.status','=',$status);
+        }
+
+        return DataTables::of($orders)
             ->filterColumn('code', function ($query, $keyword) {
                 $query->whereRaw("CONCAT('OT-', o.id) LIKE ?", ["%{$keyword}%"]);
             })
