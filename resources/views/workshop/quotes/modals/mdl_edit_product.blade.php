@@ -94,6 +94,7 @@
 
         calculateAmounts();
         paintAmounts();
+        paintCantProducts();
         toastr.success('PRODUCTO ACTUALIZADO EN EL DETALLE DE PRODUCTOS');
 
         $('#mdl_edit_product').modal('hide');

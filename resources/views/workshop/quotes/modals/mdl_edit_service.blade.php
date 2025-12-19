@@ -61,7 +61,6 @@
         document.querySelector('#service_quantity_edit').value = item.quantity;
         document.querySelector('#service_name_edit').textContent = item.name;
         document.querySelector('#service_original_price_edit').textContent = item.sale_price;
-
     }
 
     function updateItemService() {
@@ -76,6 +75,7 @@
 
         calculateAmounts();
         paintAmounts();
+        paintCantServices();
         toastr.success('SERVICIO ACTUALIZADO EN EL DETALLE DE SERVICIOS');
 
         $('#mdl_edit_service').modal('hide');

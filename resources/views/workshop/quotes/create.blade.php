@@ -474,8 +474,24 @@
 
             calculateAmounts();
             paintAmounts();
+            paintCantProducts();
+
             toastr.success('PRODUCTO AGREGADO AL DETALLE DE PRODUCTOS');
 
+        }
+
+        function paintCantProducts() {
+            const cant = lstProducts.reduce((total, item) => {
+                return total + Number(item.quantity);
+            }, 0);
+
+            const badgeProducts = document.querySelector('.badge-products');
+            if (cant === 0) {
+                badgeProducts.classList.add('d-none');
+            } else {
+                badgeProducts.classList.remove('d-none');
+                badgeProducts.textContent = cant;
+            }
         }
 
         function getProductSelected() {
@@ -584,6 +600,8 @@
 
             calculateAmounts();
             paintAmounts();
+            paintCantProducts();
+
             toastr.info('PRODUCTO ELIMINADO DEL DETALLE PRODUCTOS');
         }
 
@@ -618,8 +636,23 @@
 
             calculateAmounts();
             paintAmounts();
+            paintCantServices();
             toastr.success('SERVICIO AGREGADO AL DETALLE DE SERVICIOS');
 
+        }
+
+        function paintCantServices() {
+            const cant = lstServices.reduce((total, item) => {
+                return total + Number(item.quantity);
+            }, 0);
+
+            const badgeProducts = document.querySelector('.badge-services');
+            if (cant === 0) {
+                badgeProducts.classList.add('d-none');
+            } else {
+                badgeProducts.classList.remove('d-none');
+                badgeProducts.textContent = cant;
+            }
         }
 
         function getServiceSelected() {
@@ -721,6 +754,7 @@
 
             calculateAmounts();
             paintAmounts();
+            paintCantServices();
             toastr.info('SERVICIO ELIMINADO DEL DETALLE SERVICIOS');
         }
 
@@ -792,10 +826,17 @@
 
         async function actionChangeVehicle(value) {
             document.querySelector('#plate').value = '';
+            const vehicleInfo = document.querySelector('#vehicle_info');
+            vehicleInfo.classList.add('d-none');
+            vehicleInfo.querySelector('.fw-semibold').textContent = '';
+
 
             if (!value) return;
             const vehicle = window.vehicleSelect.options[value];
-            document.querySelector('#plate').value = vehicle.text + '-' + vehicle.subtext;
+            document.querySelector('#plate').value = vehicle.text;
+
+            vehicleInfo.classList.remove('d-none');
+            vehicleInfo.querySelector('.fw-semibold').textContent = vehicle.subtext;
 
             //========= TRAER CLIENTES ==========
             mostrarAnimacion1();
