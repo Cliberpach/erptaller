@@ -45,7 +45,7 @@ class SaleService
         $validated_pays         =       $this->s_validations->validationLstPays($lstPays, $amounts);
 
         //========= OBTENIENDO CORRELATIVO Y SERIE =========
-        $data_correlative       =       $this->s_correlative->getCorrelative($validated_data->type_sale_code);
+        $data_correlative       =       $this->s_correlative->getCorrelative($validated_data->type_sale_id);
 
         //====== LEGENDA ========
         $legend                 =       NumberToLettersController::numberToLetters($amounts->total);
@@ -91,6 +91,7 @@ class SaleService
         $sale->petty_cash_book_id       =   $validated_data->petty_cash->petty_cash_book_id;
 
         //======== TIPO DE VENTA ======
+        $sale->type_sale_id             =   $validated_data->type_sale_id;
         $sale->type_sale_code           =   $validated_data->type_sale_code;
         $sale->type_sale_name           =   $validated_data->type_sale_name;
 

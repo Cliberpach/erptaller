@@ -14,11 +14,13 @@ class BrandSeeder extends Seeder
     {
         Brand::create([
             'name' => 'MARCA',
-            'status' => 'INACTIVE'
+            'status' => 'INACTIVE',
         ]);
 
         Brand::create([
-            'name' => 'NACIONAL'
+            'name' => 'NACIONAL',
+            'status' => 'ACTIVE',
+            'Is_default' => true,
         ]);
     }
 }

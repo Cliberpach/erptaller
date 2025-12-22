@@ -68,7 +68,7 @@ class ValidationsService
         }
 
         //======= VALIDACION TIPO DE VENTA Y CLIENTE =========
-        $type_sale      =   $data['type_sale'];
+        $type_sale      =   GeneralTableDetail::findOrFail($data['type_sale']);
         $type_sale_name =   null;
         $customer_id    =   $data['customer_id'];
 
@@ -83,24 +83,18 @@ class ValidationsService
                             where c.id = ?', [$customer_id]);
 
         //======== RUC Y BOLETA ======
-        if ($customer[0]->type_document_abbreviation === 'RUC' && $type_sale === '3') {
+        if ($customer[0]->type_document_abbreviation === 'RUC' && $type_sale->id == '3') {
             throw new Exception("NO SE PERMITEN BOLETAS DE VENTA CON RUC!!!");
         }
 
         //======== DNI Y FACTURA ======
-        if ($customer[0]->type_document_abbreviation === 'DNI' && $type_sale === '1') {
+        if ($customer[0]->type_document_abbreviation === 'DNI' && $type_sale->id == '1') {
             throw new Exception("NO SE PERMITEN FACTURAS DE VENTA CON DNI!!!");
         }
 
-        if ($type_sale === '80') {
-            $type_sale_name =   'NOTA DE VENTA';
-        }
-        if ($type_sale === '3') {
-            $type_sale_name =   'BOLETA DE VENTA ELECTRÓNICA';
-        }
-        if ($type_sale === '1') {
-            $type_sale_name =   'FACTURA ELECTRÓNICA';
-        }
+
+        $type_sale_name =   $type_sale->name;
+
 
         //======= VALIDANDO DETALLE DE LA VENTA =======
         $lstSale    =   json_decode($data['lstSale']);
@@ -118,7 +112,8 @@ class ValidationsService
             'customer'          =>  $customer[0],
             'user_recorder'     =>  $user_recorder,
             'petty_cash'        =>  $user_in_petty_cash[0],
-            'type_sale_code'    =>  $type_sale,
+            'type_sale_id'      =>  $type_sale->id,
+            'type_sale_code'    =>  $type_sale->symbol,
             'type_sale_name'    =>  $type_sale_name,
             'igv_percentage'    =>  $data['igv_percentage'],
             'lstSale'           =>  $lstSale,

@@ -30,7 +30,7 @@ class ModuleSeeder extends Seeder
         ModuleChild::create([
             'module_id' => $petty_cash->id,
             'description' => 'Apertura/Cierre',
-            'route_name' => 'cajas.apertura_cierre',
+            'route_name' => 'movimientos_caja.apertura_cierre',
             'order' => '2'
         ]);
 

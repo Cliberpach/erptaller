@@ -76,8 +76,8 @@ class SaleController extends Controller
         $districts      =   DB::select('select * from districts');
         $provinces      =   DB::select('select * from provinces');
 
-        $company_invoice                    =   CompanyInvoice::find(1);
-
+        $company_invoice    =   CompanyInvoice::find(1);
+        $invoice_types      =   UtilController::getInvoiceTypes();
         $payment_methods    =   PaymentMethod::where('estado', 'ACTIVO')->get();
 
         return view(
@@ -93,7 +93,8 @@ class SaleController extends Controller
                 'districts',
                 'provinces',
                 'payment_methods',
-                'company_invoice'
+                'company_invoice',
+                'invoice_types'
             )
         );
     }

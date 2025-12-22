@@ -13,24 +13,25 @@ return new class extends Migration
     {
         Schema::create('customer_accounts_details', function (Blueprint $table) {
             $table->id();
-            $table->unsignedInteger('customer_account_id');
+            $table->unsignedBigInteger('customer_account_id');
             $table->foreign('customer_account_id')->references('id')->on('customer_accounts');
 
-            $table->foreignId('petty_cash_book_id')->references('id')->on('petty_cash_books');
+            $table->unsignedBigInteger('petty_cash_book_id');
+            $table->foreign('petty_cash_book_id')->references('id')->on('petty_cash_books');
 
             $table->date('date');
             $table->text('observation')->nullable();
-            $table->text('img_route')->nullable();
+            $table->longText('img_route')->nullable();
+            $table->longText('img_name')->nullable();
 
-            $table->unsignedDecimal('amount', 16, 6);
-
-            $table->unsignedInteger('payment_method_id');
+            $table->unsignedBigInteger('payment_method_id');
             $table->foreign('payment_method_id')->references('id')->on('payment_methods');
 
             $table->unsignedDecimal('cash', 15, 6)->nullable()->default(0.00);
             $table->unsignedDecimal('amount', 16, 6)->nullable()->default(0.00);
-            $table->unsignedDecimal('balance',16,6)->nullable();
-            
+            $table->unsignedDecimal('balance', 16, 6)->nullable();
+            $table->unsignedDecimal('total', 16, 6)->nullable();
+
             $table->timestamps();
         });
     }

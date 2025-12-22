@@ -3,7 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Facades\DB;
+
 return new class extends Migration
 {
     /**
@@ -14,7 +14,16 @@ return new class extends Migration
         Schema::create('petty_cashes', function (Blueprint $table) {
             $table->id();
             $table->string('name')->nullable(false);
-            $table->string('status')->default('created');;
+            $table->string('status')->default('created');
+            $table->enum('type', ['CAJA', 'FICTICIO'])->default('CAJA');
+            $table->enum('status', ['ANULADO', 'ABIERTO', 'CERRADO'])->default('CERRADO');
+
+            $table->unsignedBigInteger('creator_user_id')->nullable();
+            $table->string('creator_user_name')->nullable();
+            $table->unsignedBigInteger('editor_user_id')->nullable();
+            $table->string('editor_user_name')->nullable();
+            $table->unsignedBigInteger('delete_user_id')->nullable();
+            $table->string('delete_user_name')->nullable();
             $table->timestamps();
         });
     }

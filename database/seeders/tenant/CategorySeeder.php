@@ -19,6 +19,8 @@ class CategorySeeder extends Seeder
 
         Category::create([
             'name' => 'RESPUESTO',
+            'status' => 'ACTIVE',
+            'is_default' => true,
         ]);
     }
 }

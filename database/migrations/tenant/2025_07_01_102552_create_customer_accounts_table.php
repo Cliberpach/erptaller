@@ -15,7 +15,7 @@ return new class extends Migration
 
             $table->id();
 
-            $table->unsignedInteger('sale_id');
+            $table->unsignedBigInteger('sale_id');
             $table->foreign('sale_id')->references('id')->on('sales_documents');
 
             $table->string('document_number')->nullable();
@@ -28,6 +28,15 @@ return new class extends Migration
 
             $table->enum('status', ['PENDIENTE', 'PAGADO', 'ANULADO'])->default('PENDIENTE');
 
+            $table->unsignedBigInteger('creator_user_id')->nullable();
+            $table->string('creator_user_name')->nullable();
+            $table->unsignedBigInteger('editor_user_id')->nullable();
+            $table->string('editor_user_name')->nullable();
+            $table->unsignedBigInteger('delete_user_id')->nullable();
+            $table->string('delete_user_name')->nullable();
+
+            $table->unsignedBigInteger('work_order_id');
+            $table->foreign('work_order_id')->references('id')->on('work_orders');
 
             $table->timestamps();
         });

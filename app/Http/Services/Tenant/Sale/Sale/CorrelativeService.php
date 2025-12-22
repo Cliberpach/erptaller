@@ -28,10 +28,10 @@ class CorrelativeService
         $sales_documents    =   DB::select('SELECT
                                 count(*) as cant
                                 from sales_documents as sd
-                                where sd.type_sale_code = ?', [$type_sale])[0];
+                                where sd.type_sale_id = ?', [$type_sale])[0];
 
         $document_serialization =   DocumentSerialization::where('company_id',1)->where('document_type_id',$type_sale)->first();
-
+       
         //==== SI LA CANT ES 0 =====
         if ($sales_documents->cant === 0) {
 

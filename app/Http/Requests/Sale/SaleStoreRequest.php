@@ -25,7 +25,11 @@ class SaleStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'type_sale'     => 'required|in:80,3,1', 
+            'type_sale' => [
+                'required',
+                Rule::exists('landlord.general_table_details', 'id')
+                    ->where('status', 'ACTIVO')
+            ],
             'customer_id' => [
                 'required',
                 Rule::exists('landlord.customers', 'id')->where('status', 'ACTIVO'),
@@ -43,7 +47,7 @@ class SaleStoreRequest extends FormRequest
         return [
             'type_sale.required'    => 'El tipo de venta es obligatorio.',
             'type_sale.in'          => 'El tipo de venta debe ser uno de los siguientes: 127, 128, 129.',
-            
+
             'customer_id.required'  => 'El cliente es obligatorio.',
             'customer_id.exists'    => 'El cliente seleccionado debe estar activo.',
         ];
