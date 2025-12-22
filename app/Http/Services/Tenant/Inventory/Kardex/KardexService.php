@@ -50,6 +50,8 @@ class KardexService
             $kardex->user_recorder_id   =   $document->user_recorder_id;
             $kardex->user_recorder_name =   $document->user_recorder_name;
             $kardex->registration_date  =   $document->created_at;
+            $kardex->stock_previous     =   0;
+            $kardex->stock_later        =   0;
             $kardex->save();
         }
     }
