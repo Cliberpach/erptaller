@@ -137,7 +137,6 @@
                     item: (item, escape) => `<div>${escape(item.full_name)}</div>`
                 }
             });
-
         }
 
         function iniciarDtQuotes() {
@@ -331,14 +330,6 @@
 
         }
 
-        const swalWithBootstrapButtons = Swal.mixin({
-            customClass: {
-                confirmButton: 'btn btn-success',
-                cancelButton: 'btn btn-danger',
-            },
-            buttonsStyling: false
-        })
-
         function eliminar(id) {
             const fila = getRowById(dtQuotes, id);
             const htmlVehicleInfo = `
@@ -385,16 +376,8 @@
             </div>
         `;
 
-            const swalWithBootstrapButtons = Swal.mixin({
-                customClass: {
-                    confirmButton: 'btn btn-success me-2',
-                    cancelButton: 'btn btn-danger',
-                    actions: 'd-flex justify-content-center gap-2 mt-3'
-                },
-                buttonsStyling: false
-            });
 
-            swalWithBootstrapButtons.fire({
+            Swal.fire({
                 title: '¿Desea eliminar la cotización?',
                 html: `${htmlVehicleInfo}`,
                 icon: 'question',

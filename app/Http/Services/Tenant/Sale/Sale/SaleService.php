@@ -54,7 +54,7 @@ class SaleService
         $legend                 =       NumberToLettersController::numberToLetters($amounts->total);
 
         //======= GUARDAR MAESTRO VENTA =======
-        $sale   =   $this->saveSale($validated_data, $amounts, $legend, $validated_pays, $data_correlative);
+        $sale                   =       $this->saveSale($validated_data, $amounts, $legend, $validated_pays, $data_correlative);
 
         //========= REGISTRAR DETALLE TYPE PRODUCTOS =======
         if ($validated_data->type === 'PRODUCTOS') {
@@ -127,6 +127,10 @@ class SaleService
         $sale->payment_condition_id     =   $validated_data->payment_condition->id;
         $sale->payment_condition_name   =   $validated_data->payment_condition->name;
         $sale->payment_condition_days   =   $validated_data->payment_condition->nro_days;
+
+        //=============== VEHICLE PLATE =========
+        $sale->vehicle_id               =   $validated_data->vehicle_id;
+        $sale->plate                    =   $validated_data->plate;
         $sale->save();
 
         return $sale;

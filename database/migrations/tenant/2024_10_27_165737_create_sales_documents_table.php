@@ -18,23 +18,23 @@ return new class extends Migration
             $table->unsignedBigInteger('customer_id');
             //$table->foreign('customer_id')->references('id')->on('customers');
 
-            $table->string('customer_name',160);
+            $table->string('customer_name', 160);
             $table->enum('customer_type_document', ['DNI', 'RUC']);
-            $table->string('customer_document_number',20);
-            $table->string('customer_document_code',4);
-            $table->string('customer_phone',20)->nullable();
+            $table->string('customer_document_number', 20);
+            $table->string('customer_document_code', 4);
+            $table->string('customer_phone', 20)->nullable();
 
             //====== USUARIO REGISTRADOR Y SUS DATOS HISTÓRICOS =======
             $table->unsignedBigInteger('user_recorder_id');
             $table->foreign('user_recorder_id')->references('id')->on('users');
 
-            $table->string('user_recorder_name',160);
+            $table->string('user_recorder_name', 160);
 
             //========== CAJA EN LA QUE SE ESTÁ CREANDO LA VENTA =====
             $table->unsignedBigInteger('petty_cash_id');
             $table->foreign('petty_cash_id')->references('id')->on('petty_cashes');
 
-            $table->string('petty_cash_name',160);
+            $table->string('petty_cash_name', 160);
 
             //========= MOVIMIENTO DE LA CAJA EN LA CUAL SE GENERA LA VENTA =======
             $table->unsignedBigInteger('petty_cash_book_id');
@@ -42,15 +42,15 @@ return new class extends Migration
 
             //========= TIPO DE VENTA, CODIGO Y NOMBRE =======
             $table->unsignedBigInteger('type_sale_id');
-            $table->string('type_sale_code',160);
-            $table->string('type_sale_name',160);
+            $table->string('type_sale_code', 160);
+            $table->string('type_sale_name', 160);
 
             //====== MONTOS =========
             $table->decimal('igv_percentage', 14, 6)->unsigned();
             $table->decimal('subtotal', 14, 6)->unsigned();
             $table->decimal('igv_amount', 14, 6)->unsigned();
             $table->decimal('total', 14, 6)->unsigned();
-            $table->string('legend',260);
+            $table->string('legend', 260);
 
             //======== PAGOS ======
             $table->unsignedBigInteger('method_pay_id_1');
@@ -63,9 +63,9 @@ return new class extends Migration
 
             //========= SERIE Y CORRELATIVO =======
             $table->unsignedInteger('correlative');
-            $table->string('serie',100);
+            $table->string('serie', 100);
 
-            $table->enum('estado', ['ACEPTADO','PENDIENTE', 'ENVIADO', 'RECHAZADO'])->default('PENDIENTE');
+            $table->enum('estado', ['ACEPTADO', 'PENDIENTE', 'ENVIADO', 'RECHAZADO'])->default('PENDIENTE');
 
             //======= FACTURACIÓN ========
             $table->tinyInteger('response_cdrZip')->nullable();
@@ -88,11 +88,17 @@ return new class extends Migration
             $table->unsignedBigInteger('payment_condition_id');
             $table->foreign('payment_condition_id')->references('id')->on('payment_conditions');
 
-            $table->string('payment_condition_name',100);
+            $table->string('payment_condition_name', 100);
             $table->unsignedInteger('payment_condition_days');
 
             $table->date('registration_date');
             $table->date('expiration_date');
+
+
+            $table->unsignedBigInteger('vehicle_id')->nullable();
+            $table->foreign('vehicle_id')->references('id')->on('vehicles');
+
+            $table->string('plate', 8)->nullable();
 
             $table->timestamps();
         });

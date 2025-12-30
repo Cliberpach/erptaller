@@ -128,7 +128,10 @@ class ValidationsService
 
             'expiration_date'   =>  $expiration_date,
             'registration_date' =>  $registration_date,
-            'payment_condition' =>  $payment_condition
+            'payment_condition' =>  $payment_condition,
+
+            'vehicle_id'        =>  $data['vehicle_id'],
+            'plate'             =>  $data['plate']
         ];
     }
 

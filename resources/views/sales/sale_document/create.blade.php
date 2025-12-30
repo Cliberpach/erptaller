@@ -316,6 +316,14 @@
             document.querySelector('#payment_condition_id').addEventListener('change', setExpirationDate);
 
 
+            window.clientSelect.on('change', function(value) {
+                actionChangeClient(value);
+            });
+
+            window.vehicleSelect.on('change', function(value) {
+                actionChangeVehicle(value);
+            });
+
         }
 
         function changeMethodPay(selecMethodPay) {
@@ -383,6 +391,7 @@
         }
 
         function loadTomSelect() {
+
             const initialCustomer = @json($customer_formatted);
             window.clientSelect = new TomSelect('#customer_id', {
                 valueField: 'id',
@@ -424,6 +433,65 @@
                         </div>
                     `,
                     item: (item, escape) => `<div>${escape(item.full_name)}</div>`,
+                    no_results: function(data, escape) {
+                        return `
+                            <div class="no-results">
+                                <i class="fas fa-search" style="margin-right:6px; color:#17a2b8;"></i>
+                                Sin resultados
+                            </div>
+                        `;
+                    }
+                }
+            });
+
+            window.vehicleSelect = new TomSelect('#vehicle_id', {
+                valueField: 'id',
+                labelField: 'text',
+                searchField: ['text'],
+                plugins: ['clear_button'],
+                placeholder: 'Seleccione un vehículo',
+                maxOptions: 20,
+                create: false,
+                preload: false,
+                onType: (str) => {
+                    lastVehicleQuery = str;
+                },
+                load: async (query, callback) => {
+                    if (!query.length) return callback();
+                    try {
+                        const url = route('tenant.utils.searchVehicle', {
+                            q: query,
+                            customer_id: window.clientSelect.getValue()
+                        });
+
+                        const response = await fetch(url);
+                        if (!response.ok) throw new Error('Error al buscar vehiculos');
+                        const data = await response.json();
+                        const results = data.data ?? [];
+                        callback(results);
+                        if (results.length === 0) {
+                            vehicleParams.plateSearchVehicle = lastVehicleQuery;
+                            console.log("No se encontró en BD. Guardado:", window.typedCustomer);
+                        }
+                    } catch (error) {
+                        console.error('Error cargando vehiculos:', error);
+                        callback();
+                    }
+                },
+                render: {
+                    option: (item, escape) => `
+                        <div>
+                            <i class="fas fa-car" style="margin-right:6px; color:#0d6efd;"></i>
+                            <strong>${escape(item.text)}</strong><br>
+                            <small>${escape(item.subtext ?? '')}</small>
+                        </div>
+                    `,
+                    item: (item, escape) => `
+                            <div>
+                                <i class="fas fa-car" style="margin-right:6px; color:#0d6efd;"></i>
+                                ${escape(item.text)}
+                            </div>
+                        `,
                     no_results: function(data, escape) {
                         return `
                             <div class="no-results">
@@ -876,6 +944,100 @@
             const dd = String(fechaBase.getDate()).padStart(2, '0');
 
             inputFechaVencimiento.value = `${yyyy}-${mm}-${dd}`;
+        }
+
+        async function actionChangeClient(value) {
+
+            if (!value) return;
+
+            mostrarAnimacion1();
+            try {
+
+                const res = await axios.get(route('tenant.utils.searchVehicle', {
+                    q: '',
+                    customer_id: value
+                }));
+
+                if (res.data.success) {
+                    toastr.info(res.data.message, 'OPERACIÓN COMPLETADA');
+                    setVehiclesClient(res.data.data);
+                }
+
+            } catch (error) {
+                toastr.error(error, 'ERROR AL CARGAR VEHÍCULOS DEL CLIENTE');
+                return;
+            } finally {
+                ocultarAnimacion1();
+            }
+        }
+
+        function setVehiclesClient(vehicles) {
+            window.vehicleSelect.clear();
+            window.vehicleSelect.clearOptions();
+
+            vehicles.forEach(v => {
+                window.vehicleSelect.addOption({
+                    id: v.id,
+                    text: v.text,
+                    subtext: v.subtext
+                });
+            });
+        }
+
+        async function actionChangeVehicle(value) {
+            document.querySelector('#plate').value = '';
+            const vehicleInfo = document.querySelector('#vehicle_info');
+            vehicleInfo.classList.add('d-none');
+            vehicleInfo.querySelector('.fw-semibold').textContent = '';
+
+
+            if (!value) return;
+            const vehicle = window.vehicleSelect.options[value];
+            document.querySelector('#plate').value = vehicle.text;
+
+            vehicleInfo.classList.remove('d-none');
+            vehicleInfo.querySelector('.fw-semibold').textContent = vehicle.subtext;
+
+            //========= TRAER CLIENTES ==========
+            mostrarAnimacion1();
+            try {
+
+                const res = await axios.get(route('tenant.utils.searchCustomer', {
+                    q: '',
+                    vehicle_id: value
+                }));
+
+                if (res.data.success) {
+                    toastr.info(res.data.message, 'OPERACIÓN COMPLETADA');
+                    setCustomerOfVehicle(res.data.data);
+                }
+
+            } catch (error) {
+                toastr.error(error, 'ERROR AL CARGAR CLIENTE DEL VEHÍCULO');
+                return;
+            } finally {
+                ocultarAnimacion1();
+            }
+        }
+
+        function setCustomerOfVehicle(customer) {
+            window.clientSelect.clear();
+            window.clientSelect.clearOptions();
+
+            customer.forEach(v => {
+                window.clientSelect.addOption({
+                    id: v.id,
+                    full_name: v.full_name,
+                    email: v.email
+                });
+            });
+
+            if (customer.length > 0) {
+                window.clientSelect.off('change');
+                window.clientSelect.setValue(customer[0].id);
+                window.clientSelect.on('change', actionChangeClient);
+
+            }
         }
     </script>
 @endsection

@@ -193,6 +193,8 @@ array:10 [ // app\Http\Controllers\Tenant\SaleController.php:202
   "registration_date" => "2025-12-29"
   "expiration_date" => "2026-01-28"
   "customer_id" => "1"
+  "vehicle_id" => "1"
+  "plate" => "M5I098"
   "lstSale" => "[{"id":2,"brand_id":2,"category_id":2,"name":"ARRANCADOR","stock_min":0,"code_factory":null,"code_bar":null,"category_name":"RESPUESTO","brand_name":"NACIONAL","stock":"99.00","sale_price":"1.00","purchase_price":"1.00","cant":1},{"id":1,"brand_id":2,"category_id":2,"name":"BUJIA","stock_min":0,"code_factory":null,"code_bar":null,"category_name":"RESPUESTO","brand_name":"NACIONAL","stock":"99.00","sale_price":"1.00","purchase_price":"1.00","cant":1}]"
   "lstPays" => "[{"method_pay":1,"amount":2}]"
   "user_recorder_id" => "1"

@@ -75,7 +75,7 @@
             dtProducts = loadDataTableSimple('dt-quotes-products');
             dtServices = loadDataTableSimple('dt-quotes-services');
 
-            iniciarTomSelect();
+            loadTomSelect();
             events();
         })
 
@@ -132,7 +132,7 @@
 
         }
 
-        function iniciarTomSelect() {
+        function loadTomSelect() {
 
             window.warehouseSelect = new TomSelect('#warehouse_id', {
                 create: false,

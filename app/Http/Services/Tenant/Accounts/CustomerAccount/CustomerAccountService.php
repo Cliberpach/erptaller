@@ -47,14 +47,17 @@ class CustomerAccountService
 
         $customer_account   =   $data['customer_account'];
         $balance            =   round($customer_account->balance, 2);
+        $paid               =   round($customer_account->paid,2);
         $amount_pay         =   round($data['cantidad'], 2);
         $new_balance        =   $balance - $amount_pay;
+        $new_paid           =   $paid + $amount_pay;
         $new_status         =   $new_balance == 0 ? 'PAGADO' : 'PENDIENTE';
 
-        $dto_account        =   ['balance' => $new_balance, 'status' => $new_status];
+        $dto_account        =   ['balance' => $new_balance, 'status' => $new_status,'paid'=>$new_paid];
         $this->s_repository->updateCustomerAccount($data['id'], $dto_account);
+        
         $data['balance']    =   $new_balance;
-
+        $data['paid']       =   $new_paid;
         $dto    =   $this->s_dto->getDtoPay($data);
         $pay    =   $this->s_repository->insertPay($dto);
 

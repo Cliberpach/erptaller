@@ -27,6 +27,7 @@ class CustomerAccountDto
         $dto['document_date']   =   $work_order->created_at;
         $dto['amount']          =   $work_order->total;
         $dto['balance']         =   $work_order->total;
+        $dto['paid']            =   0;
 
         return $dto;
     }
@@ -38,10 +39,11 @@ class CustomerAccountDto
         $sale   =   Sale::findOrFail($data['sale_id']);
 
         $dto['sale_id']         =   $sale->id;
-        $dto['document_number'] =   $sale->serie.'-'. $sale->correlative;
+        $dto['document_number'] =   $sale->serie . '-' . $sale->correlative;
         $dto['document_date']   =   $sale->created_at;
         $dto['amount']          =   $sale->total;
         $dto['balance']         =   $sale->total;
+        $dto['paid']            =   0;
 
         return $dto;
     }
