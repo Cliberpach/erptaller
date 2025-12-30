@@ -27,8 +27,16 @@ class CustomerAccountService
 
     public function store(array $data): CustomerAccount
     {
-        $dto   =    $this->s_dto->getDtoFromWorkOrder($data);
-        $customer_account   =   $this->s_repository->insertCustomerAccount($dto);
+        $dto    =   [];
+        if (isset($data['sale_id'])) {
+            $dto                =    $this->s_dto->getDtoFromSale($data);
+        }
+
+        if (isset($data['work_order_id'])) {
+            $dto                =    $this->s_dto->getDtoFromWorkOrder($data);
+        }
+
+        $customer_account   =    $this->s_repository->insertCustomerAccount($dto);
 
         return $customer_account;
     }
@@ -50,13 +58,16 @@ class CustomerAccountService
         $dto    =   $this->s_dto->getDtoPay($data);
         $pay    =   $this->s_repository->insertPay($dto);
 
+        $this->s_repository->setPaymentStatus($data['id']);
+
+        //============ STORE IMG ===========
         $carpet_company =   Company::findOrFail(1)->files_route;
-        $path = public_path("storage/{$carpet_company}/customer_accounts/images/");
+        $path           =   public_path("storage/{$carpet_company}/customer_accounts/images/");
         if (!File::exists($path)) {
             File::makeDirectory($path, 0755, true);
         }
 
-        $file   =   $data['imagen']??null;
+        $file   =   $data['imagen'] ?? null;
 
         if ($file instanceof UploadedFile && $file->isValid()) {
             $file->move($path, $pay->img_name);
@@ -64,6 +75,7 @@ class CustomerAccountService
 
         return $pay;
     }
+
 
     public function pdfOne(int $id)
     {

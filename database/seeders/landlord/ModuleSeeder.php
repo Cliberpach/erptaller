@@ -118,21 +118,6 @@ class ModuleSeeder extends Seeder
         ]);
 
 
-
-
-        // ModuleChild::create([
-        //     'module_id' => $sale->id,
-        //     'description' => 'Comprobante Electrónico',
-        //     'route_name' => 'ventas.comprobante_electronico',
-        //     'order' => '2'
-
-        // // ModuleChild::create([
-        // //     'module_id' => $sale->id,
-        // //     'description' => 'Cotización',
-        // //     'route_name' => 'ventas.cotizacion',
-        // //     'order' => '2'
-        // // ]);
-
         ModuleChild::create([
             'module_id' => $sale->id,
             'description' => 'Clientes',
@@ -147,6 +132,14 @@ class ModuleSeeder extends Seeder
             'order'         => '2'
         ]);
 
+        ModuleChild::create([
+            'module_id'     => $sale->id,
+            'description'   => 'Condiciones Pago',
+            'route_name'    => 'ventas.condiciones_pago.index',
+            'order'         => '2'
+        ]);
+
+        /*============ CUENTAS ==========*/
         $accounts = Module::create([
             'description' => 'Cuentas',
             'order' => '1'

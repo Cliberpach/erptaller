@@ -3,6 +3,7 @@
 namespace App\Http\Services\Tenant\Sale\Sale;
 
 use App\Http\Controllers\Tenant\NumberToLettersController;
+use App\Http\Services\Tenant\Accounts\CustomerAccount\CustomerAccountService;
 use App\Http\Services\Tenant\Maintenance\Company\CompanyManager;
 use App\Models\Landlord\GeneralTable\GeneralTableDetail;
 use App\Models\Tenant\DocumentSerialization;
@@ -18,6 +19,7 @@ class SaleService
     private SaleRepository $s_repository;
     private SaleDto $s_dto;
     private CompanyManager $s_company;
+    private CustomerAccountService $s_customer_account;
 
     public function __construct()
     {
@@ -28,6 +30,7 @@ class SaleService
         $this->s_company        =   new CompanyManager();
         $this->s_repository     =   new SaleRepository();
         $this->s_dto            =   new SaleDto();
+        $this->s_customer_account   =   new CustomerAccountService();
     }
 
     public function store(array $data): Sale
@@ -65,6 +68,11 @@ class SaleService
 
         //======= INICIAR FACTURACIÓN =======
         $this->s_company->startInvoicing(1, $validated_data->type_sale_code);
+
+        if($validated_data->payment_condition->type === 'CREDITO'){
+            $data_account   =   ['sale_id'=>$sale->id];
+            $this->s_customer_account->store($data_account);
+        }
 
         return $sale;
     }
@@ -112,6 +120,13 @@ class SaleService
         //======== CORRELATIVO Y SERIE =======
         $sale->correlative              =   $data_correlative->correlative;
         $sale->serie                    =   $data_correlative->serie;
+
+        //========== FECHAS ========
+        $sale->expiration_date          =   $validated_data->expiration_date;
+        $sale->registration_date        =   $validated_data->registration_date;
+        $sale->payment_condition_id     =   $validated_data->payment_condition->id;
+        $sale->payment_condition_name   =   $validated_data->payment_condition->name;
+        $sale->payment_condition_days   =   $validated_data->payment_condition->nro_days;
         $sale->save();
 
         return $sale;

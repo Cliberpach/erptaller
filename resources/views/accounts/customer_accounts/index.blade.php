@@ -104,7 +104,7 @@
                     },
                     {
                         data: 'customer_name',
-                        name: 'sd.customer_name'
+                        name: 'wo.customer_name'
                     },
                     {
                         data: 'document_number',
@@ -124,10 +124,13 @@
                         }
                     },
                     {
-                        data: 'agreement',
+                        data: 'paid_amount',
                         orderable: false,
                         searchable: false,
-                        name: 'ca.agreement'
+                        name: 'paid_amount',
+                        render: function(data) {
+                            return formatSoles(data);
+                        }
                     },
                     {
                         searchable: false,

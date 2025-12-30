@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Tenant;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\FormatController;
 use App\Http\Controllers\UtilController;
 use App\Http\Requests\Sale\SaleStoreRequest;
 use App\Http\Services\Tenant\Sale\Sale\SaleManager;
@@ -51,7 +52,8 @@ class SaleController extends Controller
                 'sd.estado',
                 'sd.type_sale_code',
                 'sd.ruta_xml',
-                'sd.ruta_cdr'
+                'sd.ruta_cdr',
+                'sd.payment_status'
             )
             ->where('sd.estado', '!=', 'ANULADO')
             ->get();
@@ -79,6 +81,8 @@ class SaleController extends Controller
         $company_invoice    =   CompanyInvoice::find(1);
         $invoice_types      =   UtilController::getInvoiceTypes();
         $payment_methods    =   PaymentMethod::where('estado', 'ACTIVO')->get();
+        $customer_formatted =   FormatController::getFormatInitialCustomer(1);
+        $payment_conditions =   UtilController::getPaymentConditions();
 
         return view(
             'sales.sale_document.create',
@@ -94,7 +98,9 @@ class SaleController extends Controller
                 'provinces',
                 'payment_methods',
                 'company_invoice',
-                'invoice_types'
+                'invoice_types',
+                'customer_formatted',
+                'payment_conditions'
             )
         );
     }
@@ -179,14 +185,18 @@ class SaleController extends Controller
     }
 
 
-    /*
-array:3 [ // app\Http\Controllers\Tenant\SaleController.php:119
-    "lstSale"           =>  "[{"id":1,"brand_id":3,"category_id":3,"name":"PAPA LAYS","stock_min":1,"code_factory":"","code_bar":"","category_name":"SNACKS","brand_name":"LAYS","stock":"100.00","sale_price":"12.00","purchase_price":"11.00","cant":1}]"
-    "type_sale"         =>  "127"    --REQUEST AND COMPLEJA
-    "customer_id"       =>  "1"      --REQUEST AND COMPLEJA
-    "user_recorder_id"  =>  "1"   --VALIDACIÓN COMPLEJA
-    "igv_percentage"    =>  "18.0000"
-    "lstPays"           => "[{"method_pay":1,"amount":"14"},{"method_pay":"3","amount":"20"}]"
+/*
+array:10 [ // app\Http\Controllers\Tenant\SaleController.php:202
+  "_token" => "HWA6Jt5lC1pNZKwmvKo1LiAP8xFGC9p2kbAME8Im"
+  "type_sale" => "67"
+  "payment_condition_id" => "3"
+  "registration_date" => "2025-12-29"
+  "expiration_date" => "2026-01-28"
+  "customer_id" => "1"
+  "lstSale" => "[{"id":2,"brand_id":2,"category_id":2,"name":"ARRANCADOR","stock_min":0,"code_factory":null,"code_bar":null,"category_name":"RESPUESTO","brand_name":"NACIONAL","stock":"99.00","sale_price":"1.00","purchase_price":"1.00","cant":1},{"id":1,"brand_id":2,"category_id":2,"name":"BUJIA","stock_min":0,"code_factory":null,"code_bar":null,"category_name":"RESPUESTO","brand_name":"NACIONAL","stock":"99.00","sale_price":"1.00","purchase_price":"1.00","cant":1}]"
+  "lstPays" => "[{"method_pay":1,"amount":2}]"
+  "user_recorder_id" => "1"
+  "igv_percentage" => "18.0000"
 ]
 */
     public function store(SaleStoreRequest $request)
@@ -194,7 +204,6 @@ array:3 [ // app\Http\Controllers\Tenant\SaleController.php:119
 
         DB::beginTransaction();
         try {
-
             $data   =   $request->toArray();
 
             $sale   =   $this->s_sale->store($data);

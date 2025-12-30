@@ -10,6 +10,7 @@ use App\Models\Landlord\TypeIdentityDocument;
 use App\Models\Landlord\Year;
 use App\Models\Tenant\BillingCompany;
 use App\Models\Tenant\DocumentSerialization;
+use App\Models\Tenant\Sale\PaymentCondition\PaymentCondition;
 use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
@@ -237,5 +238,10 @@ class UtilController extends Controller
         } catch (Throwable $th) {
             return response()->json(['success'=>false,'message'=>$th->getMessage()]);
         }
+    }
+
+    public static function getPaymentConditions(){
+        $payment_conditions =   PaymentCondition::where('status','ACTIVO')->get();
+        return $payment_conditions;
     }
 }

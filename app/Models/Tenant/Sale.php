@@ -63,6 +63,12 @@ class Sale extends Model
         'ruta_qr',
 
         'type',
-        'work_order_id'
+        'work_order_id',
+
+        'expiration_date',
+        'registration_date',
+        'payment_condition_id',
+        'payment_condition_name',
+        'payment_condition_days'
     ];
 }

@@ -111,7 +111,7 @@
         document.querySelector('#monto').textContent = formatSoles(cuenta.amount);
         document.querySelector('#saldo').textContent = formatSoles(cuenta.balance);
         document.querySelector('#estado').textContent = cuenta.status;
-        document.querySelector('#type_document').textContent = `ORDEN DE TRABAJO`;
+        document.querySelector('#type_document').textContent = cuenta.work_order_id?`ORDEN DE TRABAJO`:'VENTA';
     }
 
     function pintarDetallePago(detalle) {

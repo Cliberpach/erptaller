@@ -2,13 +2,14 @@
     <thead class="table-light">
         <tr>
             <th data-priority="1">#</th>
-            <th data-priority="2">FECHA</th>
-            <th >CLIENTE</th>
-            <th >DOC</th>
-            <th >MONTO</th>
-            <th >SUNAT</th>
-            <th style="text-align: center;">DESCARGAS</th>
-            <th >Acciones</th>
+            <th data-priority="2">Fecha</th>
+            <th>Cliente</th>
+            <th>Doc</th>
+            <th>Monto</th>
+            <th>Sunat</th>
+            <th>Pago</th>
+            <th style="text-align: center;">Descargas</th>
+            <th>Acción</th>
         </tr>
     </thead>
     <tbody>

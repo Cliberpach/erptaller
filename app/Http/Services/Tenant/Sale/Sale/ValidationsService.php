@@ -6,6 +6,7 @@ use App\Models\Company;
 use App\Models\Landlord\Customer;
 use App\Models\Landlord\GeneralTable\GeneralTableDetail;
 use App\Models\Product;
+use App\Models\Tenant\Sale\PaymentCondition\PaymentCondition;
 use App\Models\User;
 use Exception;
 use Illuminate\Support\Facades\DB;
@@ -108,6 +109,12 @@ class ValidationsService
             throw new Exception("EL PORCENTAJE DE IGV DEL DOCUMENTO DE VENTA NO CORRESPONDE AL DE LA EMPRESA!!!");
         }
 
+        //========= DATES =========
+        $registration_date      =   now();
+        $payment_condition      =   PaymentCondition::findOrFail($data['payment_condition_id']);
+        $nro_days               =   (int) $payment_condition->nro_days;
+        $expiration_date        =   $registration_date->copy()->addDays($nro_days);
+
         return (object)[
             'customer'          =>  $customer[0],
             'user_recorder'     =>  $user_recorder,
@@ -117,7 +124,11 @@ class ValidationsService
             'type_sale_name'    =>  $type_sale_name,
             'igv_percentage'    =>  $data['igv_percentage'],
             'lstSale'           =>  $lstSale,
-            'type'              =>  'PRODUCTOS'
+            'type'              =>  'PRODUCTOS',
+
+            'expiration_date'   =>  $expiration_date,
+            'registration_date' =>  $registration_date,
+            'payment_condition' =>  $payment_condition
         ];
     }
 

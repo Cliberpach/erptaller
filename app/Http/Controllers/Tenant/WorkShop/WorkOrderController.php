@@ -97,7 +97,7 @@ class WorkOrderController extends Controller
         }
     }
 
-    public function create(Request $request)
+    public function create()
     {
         $igv                        =   round(Company::find(1)->igv, 2);
         $warehouses                 =   Warehouse::where('estado', 'ACTIVO')->get();

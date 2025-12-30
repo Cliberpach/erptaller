@@ -36,21 +36,24 @@ class CustomerAccountController extends Controller
         $status     =   $request->get('status');
 
         $customer_accounts    =   DB::table('customer_accounts as ca')
-            ->leftJoin('work_orders as sd', 'sd.id', 'ca.work_order_id')
+            ->leftJoin('work_orders as wo', 'wo.id', 'ca.work_order_id')
+            ->leftJoin('sales_documents as sd', 'sd.id', 'ca.sale_id')
             ->select(
                 'ca.id',
                 'ca.document_number',
-                'sd.customer_name',
+                DB::raw('IF(ca.work_order_id IS NULL, sd.customer_name, wo.customer_name) as customer_name'),
                 'ca.document_date',
                 'ca.amount',
                 'ca.agreement',
                 'ca.balance',
-                'ca.status'
+                'ca.status',
+                DB::raw('(ca.amount - ca.balance) as paid_amount'),
+
             )
             ->where('ca.status', '<>', 'ANULADO');
 
         if ($customer_id) {
-            $customer_accounts->where('sd.customer_id', $customer_id);
+            $customer_accounts->where('wo.customer_id', $customer_id);
         }
         if ($status) {
             $customer_accounts->where('ca.status', $status);
@@ -93,8 +96,8 @@ class CustomerAccountController extends Controller
             }
 
             $detalle    =   CustomerAccountDetail::where('customer_account_id', $id)
-                            ->orderByDesc('id')
-                            ->get();
+                ->orderByDesc('id')
+                ->get();
 
             return response()->json([
                 'success' => true,
@@ -133,11 +136,12 @@ array:11 [ // app\Http\Controllers\Tenant\Accounts\CustomerAccountController.php
             return response()->json(['success' => true, 'message' => 'PAGO REGISTRADO CON ÉXITO']);
         } catch (Throwable $th) {
             DB::rollBack();
-            return response()->json(['success' => false, 'message' => $th->getMessage(),'line'=>$th->getLine(),'file'=>$th->getFile()]);
+            return response()->json(['success' => false, 'message' => $th->getMessage(), 'line' => $th->getLine(), 'file' => $th->getFile()]);
         }
     }
 
-    public function pdfOne(int $id){
+    public function pdfOne(int $id)
+    {
         try {
             $pdf    =   $this->s_account->pdfOne($id);
             return $pdf;

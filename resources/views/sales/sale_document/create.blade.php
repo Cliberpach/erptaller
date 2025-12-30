@@ -20,118 +20,13 @@
         </x-slot>
 
         <x-slot name="contentCard">
-            <div class="row">
-                <div class="col-lg-7 col-md-12 col-sm-12 col-xs-12">
-                    <div class="table-responsive">
-                        @include('sales.sale_document.tables.tbl_products')
-                    </div>
-                </div>
-                <div class="col-lg-5 col-md-12 col-sm-12 col-xs-12">
-                    <div class="row">
-
-                        <!-- Comprobante -->
-                        <div class="col-12">
-                            <label class="form-label fw-bold required_field">Comprobante:</label>
-
-                            <select class="form-control" id="type_sale" name="type_sale" required>
-                                <option value="">Seleccione un comprobante</option>
-                                @foreach ($invoice_types as $item)
-                                    <option value="{{ $item->id }}">{{ $item->name }}</option>
-                                @endforeach
-                            </select>
-                            <p class="type_sale_error msgError mb-0"></p>
-                        </div>
-
-                        {{-- <div class="col-lg-12">
-                            <div class="form-floating">
-
-                                <select class="form-select" id="type_sale" aria-label="Floating label select example">
-                                    <option value="80">NOTA DE VENTA</option>
-                                    <option value="3">BOLETA</option>
-                                    <option value="1">FACTURA</option>
-                                </select>
-                                <label for="type_sale">Comprobante</label>
-
-                            </div>
-                        </div> --}}
-
-                        <div class="col-12">
-                            <div id="boleta-container" style="margin-top:10px;">
-                                <label for="customer_id" style="font-weight:bold;">Cliente</label><i
-                                    class="fas fa-user-plus btn btn-warning" onclick="openMdlNewCustomer();"
-                                    style="margin-left:4px;margin-bottom:4px;"></i>
-                                <select data-placeholder="Seleccionar" class="select2_customer form-select" id="customer_id"
-                                    aria-label="Floating label select example">
-                                    @foreach ($customers as $customer)
-                                        <option value="{{ $customer->id }}">
-                                            {{ $customer->document_number . ' - ' . $customer->name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-
-                    </div>
-
-                    <div class="row sale-detail">
-                        <div class="col sale-detail__col">
-                            @include('sales.sale_document.tables.tbl_sale_detail')
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="row">
-                                <div class="col-lg-6" style="display:flex;justify-content:end;">
-                                    <span style="font-weight:bold;">OP. GRAVADA</span>
-                                </div>
-                                <div class="col-lg-6" style="display:flex;justify-content:end;">
-                                    <p class="op-amount"></p>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-lg-6" style="display:flex;justify-content:end;">
-                                    <span style="font-weight:bold;">IGV</span>
-                                </div>
-                                <div class="col-lg-6" style="display:flex;justify-content:end;">
-                                    <p class="igv-amount"></p>
-                                </div>
-                            </div>
-                            <div class="row mb-3">
-                                <div class="table-responsive">
-                                    @include('sales.sale_document.tables.tbl_pay')
-                                </div>
-                            </div>
-                            <div class="row mb-3">
-                                <div class="col-12">
-                                    <button class="btn btn-primary btnAddPay">
-                                        <i class="fas fa-plus"></i> Agregar pago
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div style="background-color:#343a40; color:#fff;" class="payment__total btn btn-dark">
-                                    <div class="payment__header d-flex align-items-center">
-                                        <i class="fas fa-chevron-circle-right"></i>
-                                        <p>TOTAL</p>
-                                    </div>
-                                    <div class="payment__amount d-flex align-items-center">
-                                        <p class="total-amount">0</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
+            @include('sales.sale_document.forms.form_create')
         </x-slot>
     </x-card>
     @include('utils.modals.customer.mdl_create_customer')
 @endsection
 
 @section('js')
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
     <script>
         const lstSale = [];
         let dtProducts = [];
@@ -154,6 +49,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             iniciarDataTableProductos();
             iniciarSelect2();
+            loadTomSelect();
             events();
 
         });
@@ -314,27 +210,32 @@
 
             })
 
+            document.querySelector('#form-store').addEventListener('submit', (e) => {
+                e.preventDefault();
+                toastr.clear();
+                const validation = validateSale();
+                if (validation) {
+                    storeSale(e.target);
+                }
+            })
+
             document.addEventListener('click', async (e) => {
 
-                if (e.target.closest('.payment__total')) {
-                    toastr.clear();
-                    const validation = validateSale();
-                    if (validation) {
-                        storeSale();
-                    }
-                }
+                if (e.target.closest('.btn_delete_pay')) {
+                    const btn = e.target.closest('.btn_delete_pay');
+                    const indexPay = btn.dataset.index;
 
-                if (e.target.classList.contains('btn_delete_pay')) {
-                    const indexPay = e.target.getAttribute('data-index');
                     lstPays.splice(indexPay, 1);
                     paintLstPays(lstPays);
                 }
 
-                if (e.target.classList.contains('delete-product')) {
+
+                const btnDeleteproduct = e.target.closest('.delete-product');
+                if (btnDeleteproduct) {
 
                     toastr.clear();
                     mostrarAnimacion1();
-                    const producto_id = e.target.getAttribute('data-id');
+                    const producto_id = btnDeleteproduct.getAttribute('data-id');
 
                     const indexProductExists = lstSale.findIndex((p) => {
                         return p.id == producto_id;
@@ -412,6 +313,9 @@
                 }
             })
 
+            document.querySelector('#payment_condition_id').addEventListener('change', setExpirationDate);
+
+
         }
 
         function changeMethodPay(selecMethodPay) {
@@ -461,7 +365,9 @@
                                         <input data-index="${index}" value="${pay.amount}" type="text" class="form-control amount_pay inputDecimalPositivo">
                                     </td>
                                     <td>
-                                        <i class="fas fa-trash-alt btn btn-danger btn_delete_pay" data-index="${index}"></i>
+                                        <button class="btn btn-danger btn-sm btn_delete_pay" data-index="${index}">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
                                     </td>
                                 </tr>`;
 
@@ -473,6 +379,60 @@
                 width: $(this).data('width') ? $(this).data('width') : $(this).hasClass('w-100') ? '100%' : 'style',
                 placeholder: $(this).data('placeholder'),
                 allowClear: true
+            });
+        }
+
+        function loadTomSelect() {
+            const initialCustomer = @json($customer_formatted);
+            window.clientSelect = new TomSelect('#customer_id', {
+                valueField: 'id',
+                options: [initialCustomer],
+                items: [initialCustomer.id],
+                labelField: 'full_name',
+                searchField: ['full_name'],
+                plugins: ['clear_button'],
+                placeholder: 'Seleccione un cliente',
+                maxOptions: 20,
+                create: false,
+                preload: false,
+                onType: (str) => {
+                    lastCustomerQuery = str;
+                },
+                load: async (query, callback) => {
+                    if (query.length < 3) return callback();
+                    try {
+                        const url = `{{ route('tenant.utils.searchCustomer') }}?q=${encodeURIComponent(query)}`;
+                        const response = await fetch(url);
+                        if (!response.ok) throw new Error('Error al buscar clientes');
+                        const data = await response.json();
+                        const results = data.data ?? [];
+                        callback(results);
+                        if (results.length === 0) {
+                            customerParams.documentSearchCustomer = lastCustomerQuery;
+                            console.log("No se encontró en BD. Guardado:", window.typedCustomer);
+                        }
+                    } catch (error) {
+                        console.error('Error cargando clientes:', error);
+                        callback();
+                    }
+                },
+                render: {
+                    option: (item, escape) => `
+                        <div>
+                            <strong>${escape(item.full_name)}</strong><br>
+                            <small>${escape(item.email ?? '')}</small>
+                        </div>
+                    `,
+                    item: (item, escape) => `<div>${escape(item.full_name)}</div>`,
+                    no_results: function(data, escape) {
+                        return `
+                            <div class="no-results">
+                                <i class="fas fa-search" style="margin-right:6px; color:#17a2b8;"></i>
+                                Sin resultados
+                            </div>
+                        `;
+                    }
+                }
             });
         }
 
@@ -740,7 +700,9 @@
                                 </div>
                             </td>
                             <td>
-                                <i class="fas fa-trash-alt delete-product btn btn-danger" data-id=${p.id}></i>
+                                <button class="btn btn-danger btn-sm delete-product" data-id="${p.id}">
+                                    <i class="fas fa-trash"></i>
+                                </button>
                             </td>
                         </tr>`;
             })
@@ -768,16 +730,10 @@
 
         }
 
-        function storeSale() {
+        function storeSale(formStore) {
             clearValidationErrors();
-            const swalWithBootstrapButtons = Swal.mixin({
-                customClass: {
-                    confirmButton: "btn btn-success",
-                    cancelButton: "btn btn-danger"
-                },
-                buttonsStyling: false
-            });
-            swalWithBootstrapButtons.fire({
+
+            Swal.fire({
                 title: "DESEA REGISTRAR LA VENTA?",
                 text: "Se generará un comprobante de venta!",
                 icon: "warning",
@@ -799,13 +755,11 @@
 
                     try {
                         const token = document.querySelector('input[name="_token"]').value;
-                        const formData = new FormData();
+                        const formData = new FormData(formStore);
                         const urlStoreSale = @json(route('tenant.ventas.comprobante_venta.store'));
 
                         formData.append('lstSale', JSON.stringify(lstSale));
                         formData.append('lstPays', JSON.stringify(lstPays));
-                        formData.append('type_sale', document.querySelector('#type_sale').value);
-                        formData.append('customer_id', document.querySelector('#customer_id').value);
                         formData.append('user_recorder_id', @json(Auth::user()->id));
                         formData.append('igv_percentage', @json($company->igv));
 
@@ -892,20 +846,6 @@
             }
         }
 
-        // const calculateTotalAmount=(product,type)=>{
-        //     type=="add"?totalAmount=  totalAmount+parseFloat(product.sale_price):null;
-        //     type=="remove"?totalAmount=  totalAmount-parseFloat(product.sale_price):null;
-        // }
-
-        // const calculateIgv=()=>{
-        //     igv=Math.round((baseIGV*totalAmount) * 100) / 100;
-        // }
-
-        // const calculateOp=()=>{
-        //     opgrav= Math.round((totalAmount-igv)*100)/100;
-        //     totalAmount= Math.round((igv+opgrav)*100)/100;
-        // }
-
         const addProductToCar = (product, indexProductExists, cant) => {
 
             if (indexProductExists === -1) {
@@ -917,232 +857,25 @@
 
         }
 
-        function setSaleTypeCustomer(selectedValue, boleta, customers) {
-            if (selectedValue === '3') {
+        function setExpirationDate() {
 
-                // Inserta HTML en el contenedor 'boleta'
-                boleta.innerHTML = `
-                <div class="form-floating mt-2">
-                    <select class="form-select" id="customerSelect" aria-label="Floating label select example">
-                        ${customers
-                        .filter(customer => customer.name === 'VARIOS')
-                        .map(customer => `<option value="${customer.id}">${customer.name}</option>`)
-                        .join('')}
-                        <option value="DNI">DNI</option>
-                    </select>
-                    <label for="customerSelect">Cliente</label>
-                </div>
-                <div id="dni_container"></div>
-                `;
+            const selectCondicion = document.getElementById('payment_condition_id');
+            const inputFechaRegistro = document.querySelector('#registration_date');
+            const inputFechaVencimiento = document.querySelector('#expiration_date');
 
-                var customerSelect = document.querySelector('#customerSelect');
-                var dni_container = document.querySelector('#dni_container');
+            const selectedOption = selectCondicion.options[selectCondicion.selectedIndex];
+            const days = parseInt(selectedOption.dataset.days || 0, 10);
 
-                customerSelect.addEventListener("change", () => {
-                    if (customerSelect.value === "DNI") {
+            const [year, month, day] = inputFechaRegistro.value.split('-');
+            const fechaBase = new Date(year, month - 1, day);
 
-                        dni_container.innerHTML = `
-                        <div class="input-group mt-2">
-                            <input class="form-control" type="text" id="dni" aria-label="Floating label select example" placeholder="Ingrese número de DNI" maxlength="8">
-                            <button class="btn btn-primary" type="button" id="buscarDNI">BUSCAR</button>
-                            <button class="btn btn-primary" type="button" id="btn_change" hidden>CAMBIAR</button>
-                        </div>
-                        <input class="form-control mt-2" type="text" id="dni_name" aria-label="Floating label select example" disabled >
-                        `;
+            fechaBase.setDate(fechaBase.getDate() + days);
 
-                        document.querySelector('#buscarDNI').addEventListener('click', () => {
-                            const dni = document.querySelector('#dni').value;
+            const yyyy = fechaBase.getFullYear();
+            const mm = String(fechaBase.getMonth() + 1).padStart(2, '0');
+            const dd = String(fechaBase.getDate()).padStart(2, '0');
 
-                            if (dni.length !== 8) {
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'DNI Inválido',
-                                    text: 'El DNI debe tener exactamente 8 dígitos.',
-                                });
-                                return;
-                            }
-
-                            Swal.fire({
-                                title: 'Consultar',
-                                text: "¿Desea consultar DNI?",
-                                icon: 'question',
-                                showCancelButton: true,
-                                confirmButtonColor: "#696cff",
-                                confirmButtonText: 'Si, Confirmar',
-                                cancelButtonText: "No, Cancelar",
-                                showLoaderOnConfirm: true,
-                                preConfirm: function() {
-                                    var url = '/landlord/dni/' + dni;
-                                    return fetch(url, {
-                                            method: 'GET',
-                                            headers: {
-                                                'Content-Type': 'application/json',
-                                                'Accept': 'application/json'
-                                            }
-                                        }).then(response => response.json())
-                                        .catch(error => {
-                                            console.error('Error al consultar la API:',
-                                                error);
-                                            Swal.fire({
-                                                icon: 'error',
-                                                title: 'Error',
-                                                text: 'Hubo un problema al consultar la API.'
-                                            });
-                                        });
-                                },
-                                allowOutsideClick: function() {
-                                    return !Swal.isLoading();
-                                }
-                            }).then(function(result) {
-                                if (result.isConfirmed) {
-                                    var data = result.value;
-                                    if (data.success === false) {
-                                        Swal.fire({
-                                            icon: 'error',
-                                            title: 'Oops...',
-                                            text: 'DNI inválido o no existe!'
-                                        });
-                                    } else {
-                                        document.getElementById('dni_name').value = data.data
-                                            .nombre_completo;
-                                        document.getElementById('dni').disabled = true;
-                                        document.getElementById('buscarDNI').hidden = true;
-                                        document.getElementById('btn_change').hidden = false;
-
-                                        document.querySelector('#btn_change').addEventListener(
-                                            'click', () => {
-                                                document.getElementById('btn_change').hidden =
-                                                    true;
-                                                document.getElementById('buscarDNI').hidden =
-                                                    false;
-                                                document.getElementById('dni').disabled = false;
-                                                document.getElementById('dni_name').value = "";
-                                                document.getElementById('dni').value = "";
-                                            })
-                                    }
-                                }
-                            }).catch(function(error) {
-                                console.error('Error al consultar la API:', error);
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Error',
-                                    text: 'Hubo un problema al consultar la API.'
-                                });
-                            });
-                        });
-                    } else {
-                        dni_container.innerHTML = "";
-                    }
-
-                })
-
-
-            } else if (selectedValue === "1") { //======= FACTURA =======
-                boleta.innerHTML = `
-                <div class="form-floating mt-2">
-                <div class="input-group">
-                    <input class="form-control" type="text" id="ruc" aria-label="Floating label select example" placeholder="Ingrese número de RUC" maxlength="11">
-                    <button class="btn btn-primary" type="button" id="sunatButton">SUNAT</button>
-                    <button class="btn btn-primary" type="button" id="btn_change" hidden>CAMBIAR</button>
-                </div>
-                <input class="form-control mt-2" type="text" id="ruc_name" aria-label="Floating label select example" disabled >
-
-            </div>
-                `;
-
-
-                document.querySelector('#sunatButton').addEventListener('click', () => {
-                    const ruc = document.querySelector('#ruc').value;
-
-                    // Validar que el RUC tenga exactamente 11 dígitos
-                    if (ruc.length !== 11) {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'RUC Inválido',
-                            text: 'El RUC debe tener exactamente 11 dígitos.',
-                        });
-                        return; // Detiene la ejecución si el RUC es inválido
-                    }
-
-                    Swal.fire({
-                        title: 'Consultar',
-                        text: "¿Desea consultar RUC a Sunat?",
-                        icon: 'question',
-                        showCancelButton: true,
-                        confirmButtonColor: "#696cff",
-                        confirmButtonText: 'Si, Confirmar',
-                        cancelButtonText: "No, Cancelar",
-                        showLoaderOnConfirm: true,
-                        preConfirm: function() {
-                            var url = '/landlord/ruc/' + ruc;
-                            return fetch(url, {
-                                    method: 'GET',
-                                    headers: {
-                                        'Content-Type': 'application/json',
-                                        'Accept': 'application/json'
-                                    }
-                                }).then(response => response.json())
-                                .catch(error => {
-                                    console.error('Error al consultar la API:', error);
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: 'Error',
-                                        text: 'Hubo un problema al consultar la API.'
-                                    });
-                                });
-                        },
-                        allowOutsideClick: function() {
-                            return !Swal.isLoading();
-                        }
-                    }).then(function(result) {
-                        if (result.isConfirmed) {
-                            var data = result.value;
-                            if (data.success === false) {
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Oops...',
-                                    text: 'RUC inválido o no existe!'
-                                });
-                            } else {
-                                document.getElementById('ruc_name').value = data.data.nombre_o_razon_social;
-                                document.getElementById('ruc').disabled = true;
-                                document.getElementById('sunatButton').hidden = true;
-                                document.getElementById('btn_change').hidden = false;
-
-                                document.querySelector('#btn_change').addEventListener('click', () => {
-                                    document.getElementById('btn_change').hidden = true;
-                                    document.getElementById('sunatButton').hidden = false;
-                                    document.getElementById('ruc').disabled = false;
-                                    document.getElementById('ruc_name').value = "";
-                                    document.getElementById('ruc').value = "";
-                                })
-                            }
-                        }
-                    }).catch(function(error) {
-                        console.error('Error al consultar la API:', error);
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: 'Hubo un problema al consultar la API.'
-                        });
-                    });
-                });
-            } else { //======== NOTA VENTA ==========
-                boleta.innerHTML = `
-                <div class="form-floating mt-2">
-                    <select class="form-select" id="customerSelect" aria-label="Floating label select example">
-                        ${customers
-                        .filter(customer => customer.name === 'VARIOS')
-                        .map(customer => `<option value="${customer.id}">${customer.name}</option>`)
-                        .join('')}
-                    </select>
-                    <label for="customerSelect">Cliente</label>
-                </div>
-                `;
-            }
+            inputFechaVencimiento.value = `${yyyy}-${mm}-${dd}`;
         }
     </script>
-
-    <script src="{{ asset('assets/js/utils.js') }}"></script>
-    <script src="{{ asset('assets/js/extended-ui-perfect-scrollbar.js') }}"></script>
 @endsection

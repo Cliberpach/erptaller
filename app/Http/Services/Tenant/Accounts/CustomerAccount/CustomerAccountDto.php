@@ -3,6 +3,7 @@
 namespace App\Http\Services\Tenant\Accounts\CustomerAccount;
 
 use App\Models\Company;
+use App\Models\Tenant\Sale;
 use App\Models\Tenant\WorkShop\WorkOrder\WorkOrder;
 use Illuminate\Http\UploadedFile;
 
@@ -30,6 +31,21 @@ class CustomerAccountDto
         return $dto;
     }
 
+    public function getDtoFromSale($data): array
+    {
+        $dto    =   [];
+
+        $sale   =   Sale::findOrFail($data['sale_id']);
+
+        $dto['sale_id']         =   $sale->id;
+        $dto['document_number'] =   $sale->serie.'-'. $sale->correlative;
+        $dto['document_date']   =   $sale->created_at;
+        $dto['amount']          =   $sale->total;
+        $dto['balance']         =   $sale->total;
+
+        return $dto;
+    }
+
     public function getDtoPay($data)
     {
         $dto    =   [];
@@ -45,7 +61,7 @@ class CustomerAccountDto
         $dto['amount']              =   $data['importe_venta'];
         $dto['balance']             =   $data['balance'];
 
-        $file   =   $data['imagen']??null;
+        $file   =   $data['imagen'] ?? null;
         if ($file instanceof UploadedFile && $file->isValid()) {
             $extension = $file->getClientOriginalExtension();
             $next_id_pay                =   $this->s_repository->getNexIdPay($dto['customer_account_id']);

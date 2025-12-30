@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Tenant\CustomerController;
 use App\Http\Controllers\Tenant\SaleController;
+use App\Http\Controllers\Tenant\Sales\PaymentConditionController;
 use App\Http\Controllers\Tenant\Sales\PaymentMethodController;
 use Illuminate\Support\Facades\Route;
 
@@ -43,5 +44,16 @@ Route::group(["prefix" => "ventas"], function () {
         Route::get('metodo_pago/getPaymentMethods', [PaymentMethodController::class, 'getPaymentMethods'])->name('tenant.ventas.metodo_pago.getPaymentMethods');
         Route::get('assign-accounts/create/{id}', [PaymentMethodController::class, 'assignAccountsCreate'])->name('tenant.ventas.metodo_pago.assignAccountsCreate');
         Route::post('assign-accounts/store', [PaymentMethodController::class, 'assignAccountsStore'])->name('tenant.ventas.metodo_pago.assignAccountsStore');
+    });
+
+    Route::group(["prefix" => "condiciones_pago"], function () {
+        //======= MÉTODOS DE PAGO =======
+        Route::get('metodo_pago/index', [PaymentConditionController::class, 'index'])->name('tenant.ventas.condiciones_pago.index');
+        Route::get('create', [PaymentConditionController::class, 'create'])->name('tenant.ventas.condiciones_pago.create');
+        Route::get('edit/{id}', [PaymentConditionController::class, 'edit'])->name('tenant.ventas.condiciones_pago.edit');
+        Route::post('store', [PaymentConditionController::class, 'store'])->name('tenant.ventas.condiciones_pago.store');
+        Route::put('update/{id}', [PaymentConditionController::class, 'update'])->name('tenant.ventas.condiciones_pago.update');
+        Route::get('getCondicionPago', [PaymentConditionController::class, 'getCondicionPago'])->name('tenant.ventas.condiciones_pago.getCondicionPago');
+        Route::delete('destroy/{id}', [PaymentConditionController::class, 'destroy'])->name('tenant.ventas.condiciones_pago.destroy');
     });
 });

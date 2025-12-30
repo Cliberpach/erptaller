@@ -84,6 +84,25 @@
                     orderable: false,
                     searchable: false
                 },
+                 {
+                   data: null,
+                    render: function(data, type, row) {
+
+                        let badge_class =   '';
+
+                        if(data.payment_status === 'PENDIENTE'){
+                            badge_class =   'danger';
+                        }
+                        if(data.payment_status === 'PAGADO'){
+                            badge_class =   'primary';
+                        }
+
+                        return `<span class="badge bg-${badge_class}">${data.payment_status}</span>`;
+                    },
+                    name: 'actions',
+                    orderable: false,
+                    searchable: false
+                },
                 {
                     data: null,
                     render: function(data, type, row) {

@@ -85,6 +85,15 @@ return new class extends Migration
 
             $table->unsignedBigInteger('work_order_id')->nullable();
 
+            $table->unsignedBigInteger('payment_condition_id');
+            $table->foreign('payment_condition_id')->references('id')->on('payment_conditions');
+
+            $table->string('payment_condition_name',100);
+            $table->unsignedInteger('payment_condition_days');
+
+            $table->date('registration_date');
+            $table->date('expiration_date');
+
             $table->timestamps();
         });
     }
