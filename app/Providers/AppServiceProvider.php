@@ -33,7 +33,11 @@ class AppServiceProvider extends ServiceProvider
             now()->addHours(6),
             function () use ($base) {
                 return Module::where('show', $base)
-                    ->with(['children', 'children.grandchildren'])
+                    ->with(['children' => function ($query) use ($base) {
+                        $query->where('show', $base);
+                    }, 'children.grandchildren' => function ($query) use ($base) {
+                        $query->where('show', $base);
+                    }])
                     ->get();
             }
         );
@@ -47,7 +51,6 @@ class AppServiceProvider extends ServiceProvider
         View::share('base', $base . '.');
         View::share('modules', $modules);
         View::share('lst_search_modules', $lst_search_modules);
-        dd($modules);
     }
 
     /**
