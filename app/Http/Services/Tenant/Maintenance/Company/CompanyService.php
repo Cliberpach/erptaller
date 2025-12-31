@@ -14,7 +14,7 @@ class CompanyService
     public function __construct() {}
 
     public function startInvoicing(int $company_id,string $type_sale_code)
-    {
+    {dd('a');
         //====== ACTUALIZAR FACTURACIÓN A INICIADA PARA EL TYPE SALE RESPECTIVO ======
         DB::table('document_serializations')
             ->where('company_id', $company_id)
