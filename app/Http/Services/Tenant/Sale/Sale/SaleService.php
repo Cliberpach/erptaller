@@ -65,9 +65,8 @@ class SaleService
             $this->s_detail->storeDetail($sale, $validated_data);
         }
 
-
         //======= INICIAR FACTURACIÓN =======
-        $this->s_company->startInvoicing(1, $validated_data->type_sale_code);
+        $this->s_company->startInvoicing(1, $validated_data->type_sale_id);
 
         if ($validated_data->payment_condition->type === 'CREDITO') {
             $data_account   =   ['sale_id' => $sale->id];
