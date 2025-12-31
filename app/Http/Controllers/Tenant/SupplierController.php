@@ -6,10 +6,12 @@ use App\Http\Controllers\Controller;
 use App\Http\Controllers\UtilController;
 use App\Http\Requests\Supplier\SupplierStoreRequest;
 use App\Http\Requests\Supplier\SupplierUpdatedRequest;
+use App\Models\Landlord\GeneralTable\GeneralTableDetail;
 use App\Models\Supplier;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Throwable;
 use Yajra\DataTables\Facades\DataTables;
 
 class SupplierController extends Controller
@@ -23,7 +25,7 @@ class SupplierController extends Controller
         $suppliers  =    DB::table('suppliers as s')
                         ->join('types_identity_documents as tid','tid.id','s.type_identity_document_id')
                         ->select(
-                            's.id', 
+                            's.id',
                             's.name',
                             's.address',
                             's.phone',
@@ -34,14 +36,14 @@ class SupplierController extends Controller
                         ->where('s.estado','!=','ANULADO')
                         ->get();
 
-        return DataTables::of($suppliers)->make(true);    
+        return DataTables::of($suppliers)->make(true);
     }
 
     public function create(){
-        
-        $type_identity_documents    =   DB::select('select * 
+
+        $type_identity_documents    =   DB::select('select *
                                         from types_identity_documents as tid
-                                        where 
+                                        where
                                         tid.id = "1"
                                         or tid.id = "3" ');
 
@@ -49,7 +51,7 @@ class SupplierController extends Controller
 
     }
 
-    
+
     public function consultarDocumento(Request $request){
 
         try {
@@ -70,12 +72,9 @@ class SupplierController extends Controller
             }
 
             //========= VERIFICANDO QUE EXISTA EL TIPO DOC EN LA BD ========
-            $exists_tipo_doc    =   DB::select('select 
-                                    tid.id,tid.name
-                                    from types_identity_documents as tid
-                                    where tid.id = ?',[$tipo_documento]);
+            $exists_tipo_doc    =   GeneralTableDetail::findOrFail($tipo_documento);
 
-            if(count($exists_tipo_doc) === 0){
+            if(!$exists_tipo_doc){
                 throw new Exception("EL TIPO DE DOC NO EXISTE EN LA BD");
             }
 
@@ -93,19 +92,19 @@ class SupplierController extends Controller
 
 
             //======= COMPROBAR QUE NO EXISTA EL DOCUMENTO EN LA TABLA supplierES =======
-            $existe_nro_documento   =   DB::select('select 
+            $existe_nro_documento   =   DB::select('select
                                         s.id,s.name
                                         from suppliers as s
-                                        where 
+                                        where
                                         s.type_identity_document_id = ?
-                                        and s.document_number = ? 
+                                        and s.document_number = ?
                                         and s.estado = "ACTIVO"',
                                         [$tipo_documento,$nro_documento]);
 
             if(count($existe_nro_documento) > 0){
-                throw new Exception($exists_tipo_doc[0]->name.':'.$nro_documento.'.YA EXISTE EN LA BD');
+                throw new Exception($exists_tipo_doc->name.':'.$nro_documento.'.YA EXISTE EN LA BD');
             }
-            
+
             if($tipo_documento == 1){
 
                 $res_consulta_api   =   UtilController::apiDni($nro_documento);
@@ -132,7 +131,7 @@ class SupplierController extends Controller
             }
 
 
-        } catch (\Throwable $th) {
+        } catch (Throwable $th) {
             return response()->json(['success'=>false,'message'=>$th->getMessage()]);
         }
     }
@@ -153,17 +152,14 @@ class SupplierController extends Controller
         DB::beginTransaction();
         try {
 
-            $type_identity_document                 =   DB::select('select 
-                                                        tid.name,tid.abbreviation,tid.code
-                                                        from types_identity_documents as tid
-                                                        where tid.id = ?',[$request->get('tipo_documento')])[0];
+            $type_identity_document                 =   GeneralTableDetail::findOrFail($request->get('tipo_documento'));
 
             $supplier                               =   new Supplier();
 
             $supplier->type_identity_document_id    =   $request->get('tipo_documento');
             $supplier->type_document_name           =   $type_identity_document->name;
-            $supplier->type_document_abbreviation   =   $type_identity_document->abbreviation;
-            $supplier->type_document_code           =   $type_identity_document->code;
+            $supplier->type_document_abbreviation   =   $type_identity_document->symbol;
+            $supplier->type_document_code           =   $type_identity_document->parameter;
 
             $supplier->document_number              =   $request->get('nro_documento');
             $supplier->name                         =   $request->get('nombre');
@@ -175,7 +171,7 @@ class SupplierController extends Controller
             DB::commit();
 
             return response()->json(['success' => true,'message'=>'PROVEEDOR REGISTRADO CON ÉXITO']);
-        } catch (\Throwable $th) {
+        } catch (Throwable $th) {
             DB::rollBack();
             return response()->json(['success'=>false,'message'=>$th->getMessage()]);
         }
@@ -183,9 +179,9 @@ class SupplierController extends Controller
 
     public function edit($id){
 
-        $type_identity_documents    =   DB::select('select * 
+        $type_identity_documents    =   DB::select('select *
                                         from types_identity_documents as tid
-                                        where 
+                                        where
                                         tid.id = "1"
                                         or tid.id = "3" ');
         $supplier           =   Supplier::find($id);
@@ -216,13 +212,13 @@ class SupplierController extends Controller
         "telefono"          => "974585471"
         "correo"            => "EVA@GMAIL.COM"
     ]
-  */ 
+  */
   public function update($id,SupplierUpdatedRequest $request){
-      
+
     DB::beginTransaction();
     try {
 
-        $type_identity_document             =   DB::select('select 
+        $type_identity_document             =   DB::select('select
                                                 tid.name,tid.abbreviation,tid.code
                                                 from types_identity_documents as tid
                                                 where tid.id = ?',[$request->get('tipo_documento')])[0];
@@ -273,5 +269,5 @@ class SupplierController extends Controller
         }
     }
 
-    
+
 }
