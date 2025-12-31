@@ -160,6 +160,13 @@
     visibility: visible;
 }
 
+
+.menu-link svg {
+    width: 32px;
+    height: 32px;
+}
+
+
 </style>
 
 @yield('css')

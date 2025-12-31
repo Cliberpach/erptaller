@@ -192,27 +192,6 @@ class ModuleSeeder extends Seeder
             'order' => '3'
         ]);
 
-        // ModuleChild::create([
-        //     'module_id' => $inventory->id,
-        //     'description' => 'Servicio',
-        //     'route_name' => 'inventarios.servicio',
-        //     'order' => '2'
-        // ]);
-
-        // ModuleChild::create([
-        //     'module_id' => $inventory->id,
-        //     'description' => 'Movimiento',
-        //     'route_name' => 'inventarios.movimiento',
-        //     'order' => '2'
-        // ]);
-
-        // // ModuleChild::create([
-        // //     'module_id' => $inventory->id,
-        // //     'description' => 'Devolución Proveedor',
-        // //     'route_name' => 'inventarios.devolucion_proveedor',
-        // //     'order' => '2'
-        // // ]);
-
         ModuleChild::create([
             'module_id' => $inventory->id,
             'description' => 'Kardex',
