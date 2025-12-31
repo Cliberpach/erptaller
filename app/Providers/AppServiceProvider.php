@@ -47,6 +47,7 @@ class AppServiceProvider extends ServiceProvider
         View::share('base', $base . '.');
         View::share('modules', $modules);
         View::share('lst_search_modules', $lst_search_modules);
+        dd($modules);
     }
 
     /**
