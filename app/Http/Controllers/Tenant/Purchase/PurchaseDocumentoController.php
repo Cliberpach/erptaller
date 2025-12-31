@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Controllers\Tenant\KardexController;
 use App\Http\Controllers\UtilController;
 use App\Http\Requests\Purchase\PurchaseDocument\PurchaseDocumentStoreRequest;
+use App\Http\Services\Tenant\Inventory\Kardex\KardexService;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Supplier;
@@ -17,9 +18,16 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\DB;
+use Throwable;
 
 class PurchaseDocumentoController extends Controller
 {
+    private KardexService $s_kardex;
+
+    public function __construct(){
+        $this->s_kardex =   new KardexService();
+    }
+
     public function index(){
         return view('purchases.purchase_document.index');
     }
@@ -99,11 +107,7 @@ class PurchaseDocumentoController extends Controller
 
         $igv                        =   DB::select('select c.igv from companies as c')[0]->igv;
 
-        $type_identity_documents    =   DB::select('select *
-                                        from types_identity_documents as tid
-                                        where
-                                        tid.id = "1"
-                                        or tid.id = "3" ');
+        $type_identity_documents    =   UtilController::getIdentityDocuments();
 
         return view('purchases.purchase_document.create',
         compact('categories','brands','colaborador_registrador','suppliers','igv','type_identity_documents'));
@@ -144,15 +148,10 @@ array:18 [ // app\Http\Controllers\Tenant\Purchase\PurchaseDocumentoController.p
 
         try {
 
-            $supplier           =   DB::select('select
-                                    s.name,
-                                    tid.abbreviation as type_document_abbreviation,
-                                    s.document_number
-                                    from suppliers as s
-                                    inner join  types_identity_documents as tid on tid.id = s.type_identity_document_id
-                                    where s.id = ?',[$request->get('proveedor')])[0];
+            $supplier           =   Supplier::findOrFail($request->get('proveedor'));
 
-            $warehouse          =   DB::select('select *
+            $warehouse          =   DB::select('SELECT
+                                    w.*
                                     from warehouses as w
                                     where w.id = 1')[0];
 
@@ -170,7 +169,7 @@ array:18 [ // app\Http\Controllers\Tenant\Purchase\PurchaseDocumentoController.p
             $purchase_document->observation                         =   $request->get('observation');
             $purchase_document->user_recorder_id                    =   Auth::user()->id;
             $purchase_document->user_recorder_name                  =   Auth::user()->name;
-            $purchase_document->prices_with_igv           =   $request->get('igv_chk')?1:0;
+            $purchase_document->prices_with_igv                     =   $request->get('igv_chk')?1:0;
             $purchase_document->igv                       =   $request->get('igv_value');
             $purchase_document->subtotal                  =   $montos->subtotal;
             $purchase_document->amount_igv                =   $montos->monto_igv;
@@ -194,46 +193,19 @@ array:18 [ // app\Http\Controllers\Tenant\Purchase\PurchaseDocumentoController.p
                 $detail->subtotal               =   $item->quantity * $item->purchase_price;
                 $detail->save();
 
-                //======= OBTENIENDO STOCK PREVIO =====
-                $stock_previous                     =  UtilController::getStock($item->product_id);
-
                 //====== INSERTANDO STOCK =====
                 DB::update('UPDATE warehouse_products
                 SET updated_at = ?, stock = stock + ?
                 WHERE warehouse_id = 1
                 and product_id = ?', [Carbon::now() , $item->quantity , $item->product_id]);
 
-                $stock_later                        =   UtilController::getStock($item->product_id);
-
-                //===== GRABANDO EN KARDEX ========
-                $request_kardex     =   new Request();
-                $request_kardex->merge([
-                                        'warehouse_id'      =>  $warehouse->id,
-                                        'product_id'        =>  $item->product_id,
-                                        'brand_id'          =>  $item->brand_id,
-                                        'category_id'       =>  $item->category_id,
-                                        'quantity'          =>  $item->quantity,
-                                        'price_sale'        =>  null,
-                                        'amount'            =>  null,
-                                        'type'              =>  'IN',
-                                        'document'          =>  'CO-'.$purchase_document->id,
-                                        'product_name'      =>  $item->product_name,
-                                        'brand_name'        =>  $item->brand_name,
-                                        'category_name'     =>  $item->category_name,
-                                        'stock_previous'    =>  $stock_previous,
-                                        'stock_later'       =>  $stock_later,
-                                        'purchase_document_id'  =>  $purchase_document->id,
-                                        'customer_id'           =>  null,
-                                        'customer_name'         =>  null,
-                                        'user_recorder_id'      =>  Auth::user()->id,
-                                        'user_recorder_name'    =>  Auth::user()->name]);
-
-                KardexController::store($request_kardex);
             }
 
+            $this->s_kardex->storeFromPurchase($purchase_document);
+         
             DB::commit();
             return response()->json(['success'=>true,'message'=>'DOCUMENTO DE COMPRA REGISTRADO']);
-        } catch (\Throwable $th) {
+        } catch (Throwable $th) {
             DB::rollBack();
             return response()->json(['succes'=>false,'message'=>$th->getMessage()]);
         }

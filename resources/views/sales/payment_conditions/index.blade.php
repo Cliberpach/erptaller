@@ -41,41 +41,44 @@
                 url: url,
                 type: 'GET',
             },
+            order: [
+                [0, 'desc']
+            ],
             columns: [{
                     data: 'id',
                     name: 'id',
-                    searchable:false,
-                    orderable:true
+                    searchable: false,
+                    orderable: true
                 },
                 {
                     data: 'name',
                     name: 'name',
-                    searchable:true,
-                    orderable:true
+                    searchable: true,
+                    orderable: true
                 },
                 {
                     data: 'type',
                     name: 'type',
-                    searchable:true,
-                    orderable:true
+                    searchable: true,
+                    orderable: true
                 },
                 {
                     data: 'nro_days',
                     name: 'nro_days',
-                    searchable:false,
-                    orderable:false
+                    searchable: false,
+                    orderable: false
                 },
                 {
                     data: 'created_at',
                     name: 'created_at',
-                    searchable:false,
-                    orderable:true
+                    searchable: false,
+                    orderable: true
                 },
                 {
                     data: 'updated_at',
                     name: 'updated_at',
-                    searchable:false,
-                    orderable:false
+                    searchable: false,
+                    orderable: false
                 },
                 {
                     data: null,
@@ -175,7 +178,7 @@
                 try {
                     let urlDelete =
                         `{{ route('tenant.ventas.condiciones_pago.destroy', ['id' => ':id']) }}`;
-                    urlDelete   = urlDelete.replace(':id', id);
+                    urlDelete = urlDelete.replace(':id', id);
                     const token = document.querySelector('input[name="_token"]').value;
 
                     const response = await fetch(urlDelete, {

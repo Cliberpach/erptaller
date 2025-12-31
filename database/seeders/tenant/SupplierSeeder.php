@@ -14,7 +14,7 @@ class SupplierSeeder extends Seeder
     public function run(): void
     {
         Supplier::create([
-            'type_identity_document_id' => 1,
+            'type_identity_document_id' =>  39,
             'type_document_name'        => 'DOCUMENTO NACIONAL DE IDENTIDAD',
             'type_document_abbreviation'=> 'DNI',
             'type_document_code'        => '01',

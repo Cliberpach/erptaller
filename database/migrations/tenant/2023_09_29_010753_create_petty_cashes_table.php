@@ -14,7 +14,6 @@ return new class extends Migration
         Schema::create('petty_cashes', function (Blueprint $table) {
             $table->id();
             $table->string('name')->nullable(false);
-            $table->string('status')->default('created');
             $table->enum('type', ['CAJA', 'FICTICIO'])->default('CAJA');
             $table->enum('status', ['ANULADO', 'ABIERTO', 'CERRADO'])->default('CERRADO');
 

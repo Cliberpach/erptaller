@@ -4,6 +4,7 @@ namespace App\Http\Services\Tenant\Sale\Sale;
 
 use App\Http\Controllers\Tenant\NumberToLettersController;
 use App\Http\Services\Tenant\Accounts\CustomerAccount\CustomerAccountService;
+use App\Http\Services\Tenant\Inventory\Kardex\KardexService;
 use App\Http\Services\Tenant\Maintenance\Company\CompanyManager;
 use App\Models\Landlord\GeneralTable\GeneralTableDetail;
 use App\Models\Tenant\DocumentSerialization;
@@ -20,17 +21,19 @@ class SaleService
     private SaleDto $s_dto;
     private CompanyManager $s_company;
     private CustomerAccountService $s_customer_account;
+    private KardexService $s_kardex;
 
     public function __construct()
     {
-        $this->s_validations    =   new ValidationsService();
-        $this->s_calculations   =   new CalculationsService();
-        $this->s_correlative    =   new CorrelativeService();
-        $this->s_detail         =   new SaleDetailService();
-        $this->s_company        =   new CompanyManager();
-        $this->s_repository     =   new SaleRepository();
-        $this->s_dto            =   new SaleDto();
+        $this->s_validations        =   new ValidationsService();
+        $this->s_calculations       =   new CalculationsService();
+        $this->s_correlative        =   new CorrelativeService();
+        $this->s_detail             =   new SaleDetailService();
+        $this->s_company            =   new CompanyManager();
+        $this->s_repository         =   new SaleRepository();
+        $this->s_dto                =   new SaleDto();
         $this->s_customer_account   =   new CustomerAccountService();
+        $this->s_kardex             =   new KardexService();
     }
 
     public function store(array $data): Sale
@@ -54,84 +57,24 @@ class SaleService
         $legend                 =       NumberToLettersController::numberToLetters($amounts->total);
 
         //======= GUARDAR MAESTRO VENTA =======
-        $sale                   =       $this->saveSale($validated_data, $amounts, $legend, $validated_pays, $data_correlative);
+        $dto                    =       $this->s_dto->getDtoStore($validated_data, $amounts, $legend, $validated_pays, $data_correlative);
+        $sale                   =       $this->s_repository->insertSale($dto);
 
         //========= REGISTRAR DETALLE TYPE PRODUCTOS =======
         if ($validated_data->type === 'PRODUCTOS') {
             $this->s_detail->storeDetail($sale, $validated_data);
         }
 
-        //========= REGISTRAR DETALLE TYPE RESERVAS =======
-        /*if($validated_data->type === 'RESERVAS'){
-            $this->s_detail->storeDetailReservations($sale,$validated_data);
-        }*/
 
         //======= INICIAR FACTURACIÓN =======
         $this->s_company->startInvoicing(1, $validated_data->type_sale_code);
 
-        if($validated_data->payment_condition->type === 'CREDITO'){
-            $data_account   =   ['sale_id'=>$sale->id];
+        if ($validated_data->payment_condition->type === 'CREDITO') {
+            $data_account   =   ['sale_id' => $sale->id];
             $this->s_customer_account->store($data_account);
         }
 
-        return $sale;
-    }
-
-    public function saveSale(object $validated_data, object $amounts, $legend, array $validated_pays, object $data_correlative): Sale
-    {
-        $sale                           =   new Sale();
-
-        //======= GUARDANDO CLIENTE =======
-        $sale->customer_id              =   $validated_data->customer->id;
-        $sale->customer_name            =   $validated_data->customer->name;
-        $sale->customer_type_document   =   $validated_data->customer->type_document_abbreviation;
-        $sale->customer_document_number =   $validated_data->customer->document_number;
-        $sale->customer_document_code   =   $validated_data->customer->type_document_code;
-        $sale->customer_phone           =   $validated_data->customer->phone;
-
-        //======= GUARDANDO USUARIO REGISTRADOR =======
-        $sale->user_recorder_id         =   $validated_data->user_recorder->id;
-        $sale->user_recorder_name       =   $validated_data->user_recorder->name;
-
-        //====== GUARDANDO DATOS DE LA CAJA Y MOVIMIENTO DEL USUARIO =====
-        $sale->petty_cash_id            =   $validated_data->petty_cash->petty_cash_id;
-        $sale->petty_cash_name          =   $validated_data->petty_cash->petty_cash_name;
-        $sale->petty_cash_book_id       =   $validated_data->petty_cash->petty_cash_book_id;
-
-        //======== TIPO DE VENTA ======
-        $sale->type_sale_id             =   $validated_data->type_sale_id;
-        $sale->type_sale_code           =   $validated_data->type_sale_code;
-        $sale->type_sale_name           =   $validated_data->type_sale_name;
-
-        //====== MONTOS ======
-        $sale->igv_percentage           =   $validated_data->igv_percentage;
-        $sale->subtotal                 =   $amounts->subtotal;
-        $sale->igv_amount               =   $amounts->igv_amount;
-        $sale->total                    =   $amounts->total;
-        $sale->legend                   =   $legend;
-
-        //======= PAGOS =====
-        $sale->method_pay_id_1          =   $validated_pays[0]->method_pay;
-        $sale->amount_pay_1             =   $validated_pays[0]->amount;
-
-        $sale->method_pay_id_2          =   $validated_pays[1]->method_pay;
-        $sale->amount_pay_2             =   $validated_pays[1]->amount;
-
-        //======== CORRELATIVO Y SERIE =======
-        $sale->correlative              =   $data_correlative->correlative;
-        $sale->serie                    =   $data_correlative->serie;
-
-        //========== FECHAS ========
-        $sale->expiration_date          =   $validated_data->expiration_date;
-        $sale->registration_date        =   $validated_data->registration_date;
-        $sale->payment_condition_id     =   $validated_data->payment_condition->id;
-        $sale->payment_condition_name   =   $validated_data->payment_condition->name;
-        $sale->payment_condition_days   =   $validated_data->payment_condition->nro_days;
-
-        //=============== VEHICLE PLATE =========
-        $sale->vehicle_id               =   $validated_data->vehicle_id;
-        $sale->plate                    =   $validated_data->plate;
-        $sale->save();
+        $this->s_kardex->storeFromSale($sale);
 
         return $sale;
     }
@@ -175,7 +118,7 @@ class SaleService
         return $data;
     }
 
-    public function storeFromOrder($data):Sale
+    public function storeFromOrder($data): Sale
     {
         $this->isActiveTypeSale($data['invoice_type']);
         $data   =   $this->s_validations->validationStoreFromOrder($data);
@@ -184,13 +127,12 @@ class SaleService
         $dto    =   $this->s_dto->getDtoStoreFromOrder($data);
         $sale   =   $this->s_repository->insertSale($dto);
 
-        $dto_services   =   $this->s_dto->getDtoServices($data['lst_services'],$sale);
+        $dto_services   =   $this->s_dto->getDtoServices($data['lst_services'], $sale);
         $this->s_repository->insertSaleService($dto_services);
 
-        $dto_products   =   $this->s_dto->getDtoProducts($data['lst_products'],$sale);
+        $dto_products   =   $this->s_dto->getDtoProducts($data['lst_products'], $sale);
         $this->s_repository->insertSaleProduct($dto_products);
 
         return $sale;
-
     }
 }

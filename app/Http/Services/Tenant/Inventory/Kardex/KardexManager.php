@@ -12,7 +12,7 @@ class KardexManager
         $this->s_kardex    =   new KardexService();
     }
 
-    public function store($document,$item,string $type,string $document_name){
-        $this->s_kardex->store($document,$item,$type, $document_name);
+    public function store(){
+
     }
 }

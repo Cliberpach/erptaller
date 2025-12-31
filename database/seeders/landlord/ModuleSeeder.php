@@ -382,5 +382,12 @@ class ModuleSeeder extends Seeder
             'route_name' => 'consultas.creditos',
             'order' => '2'
         ]);
+
+         ModuleChild::create([
+            'module_id' => $consultas->id,
+            'description' => 'Vehículos',
+            'route_name' => 'consultas.vehiculos.index',
+            'order' => '2'
+        ]);
     }
 }

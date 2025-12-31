@@ -22,6 +22,71 @@ class SaleDto
         $this->s_correlative    =   new CorrelativeService();
     }
 
+    public function getDtoStore(
+        object $validated_data,
+        object $amounts,
+        $legend,
+        array $validated_pays,
+        object $data_correlative
+    ): array {
+        $dto = [];
+
+        //======= CLIENTE =======
+        $dto['customer_id']                = $validated_data->customer->id;
+        $dto['customer_name']              = $validated_data->customer->name;
+        $dto['customer_type_document']     = $validated_data->customer->type_document_abbreviation;
+        $dto['customer_document_number']   = $validated_data->customer->document_number;
+        $dto['customer_document_code']     = $validated_data->customer->type_document_code;
+        $dto['customer_phone']             = $validated_data->customer->phone;
+
+        //======= USUARIO REGISTRADOR =======
+        $dto['user_recorder_id']            = $validated_data->user_recorder->id;
+        $dto['user_recorder_name']          = $validated_data->user_recorder->name;
+
+        //====== CAJA / MOVIMIENTO ======
+        $dto['petty_cash_id']               = $validated_data->petty_cash->petty_cash_id;
+        $dto['petty_cash_name']             = $validated_data->petty_cash->petty_cash_name;
+        $dto['petty_cash_book_id']          = $validated_data->petty_cash->petty_cash_book_id;
+
+        //======== TIPO DE VENTA ======
+        $dto['type_sale_id']                = $validated_data->type_sale_id;
+        $dto['type_sale_code']              = $validated_data->type_sale_code;
+        $dto['type_sale_name']              = $validated_data->type_sale_name;
+
+        //====== MONTOS ======
+        $dto['igv_percentage']              = $validated_data->igv_percentage;
+        $dto['subtotal']                    = $amounts->subtotal;
+        $dto['igv_amount']                  = $amounts->igv_amount;
+        $dto['total']                       = $amounts->total;
+        $dto['legend']                      = $legend;
+
+        //======= PAGOS =====
+        $dto['method_pay_id_1']             = $validated_pays[0]->method_pay ?? null;
+        $dto['amount_pay_1']                = $validated_pays[0]->amount ?? 0;
+
+        $dto['method_pay_id_2']             = $validated_pays[1]->method_pay ?? null;
+        $dto['amount_pay_2']                = $validated_pays[1]->amount ?? 0;
+
+        //======== SERIE Y CORRELATIVO =======
+        $dto['correlative']                 = $data_correlative->correlative;
+        $dto['serie']                       = $data_correlative->serie;
+
+        //========== FECHAS ========
+        $dto['expiration_date']             = $validated_data->expiration_date;
+        $dto['registration_date']           = $validated_data->registration_date;
+
+        $dto['payment_condition_id']        = $validated_data->payment_condition->id;
+        $dto['payment_condition_name']      = $validated_data->payment_condition->name;
+        $dto['payment_condition_days']      = $validated_data->payment_condition->nro_days;
+
+        //=============== VEHÍCULO =========
+        $dto['vehicle_id']                  = $validated_data->vehicle_id;
+        $dto['plate']                       = $validated_data->plate;
+
+        return $dto;
+    }
+
+
     public function getDtoStoreFromOrder(array $data)
     {
         $dto    =   [];
@@ -71,7 +136,7 @@ class SaleDto
         $dto['type']            =   "PRODUCTOS";
 
 
-        $dto['work_order_id']   =   $data['work_order_id']??null;
+        $dto['work_order_id']   =   $data['work_order_id'] ?? null;
 
         return $dto;
     }
@@ -107,7 +172,7 @@ class SaleDto
         return $dto;
     }
 
-     public function getDtoProducts(array $data, Sale $sale)
+    public function getDtoProducts(array $data, Sale $sale)
     {
         $dto    =   [];
 
@@ -121,7 +186,7 @@ class SaleDto
             $s_dto['product_id']                =     $item->id;
             $s_dto['category_id']               =     $product->category_id;
             $s_dto['brand_id']                  =     $product->brand_id;
-            $s_dto['product_code']              =     'P-'.$product->id;
+            $s_dto['product_code']              =     'P-' . $product->id;
             $s_dto['product_unit']              =     'NIU';
             $s_dto['product_description']       =     $product->name;
             $s_dto['product_name']              =     $product->name;

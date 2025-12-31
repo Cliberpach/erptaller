@@ -22,9 +22,8 @@ return new class extends Migration
             $table->date('document_date')->nullable();
 
             $table->unsignedDecimal('amount', 16, 6);
-            $table->text('agreement')->nullable();
-
-            $table->unsignedDecimal('balance');
+            $table->unsignedDecimal('paid',16,6);
+            $table->unsignedDecimal('balance',16,6);
 
             $table->enum('status', ['PENDIENTE', 'PAGADO', 'ANULADO'])->default('PENDIENTE');
 

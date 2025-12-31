@@ -2,6 +2,7 @@
 
 namespace App\Http\Services\Tenant\Inventory\NoteIncome;
 
+use App\Http\Services\Tenant\Inventory\Kardex\KardexService;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
@@ -14,11 +15,13 @@ class NoteIncomeService
 {
     private ValidationsService $s_validations;
     private NoteIncomeDetailService $s_detail;
+    private KardexService $s_kardex;
 
     public function __construct()
     {
         $this->s_validations    =   new ValidationsService();
         $this->s_detail         =   new NoteIncomeDetailService();
+        $this->s_kardex         =   new KardexService();
     }
 
     public function store(array $data)
@@ -35,6 +38,8 @@ class NoteIncomeService
 
         //======= GUARDAR DETALLE =======
         $this->s_detail->storeDetail($data, $note);
+
+        $this->s_kardex->storeFromNoteIncome($note);
     }
 
     public function storeFromProduct(Product $product)

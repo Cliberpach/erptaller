@@ -5,6 +5,7 @@ namespace App\Http\Services\Tenant\WorkShop\WorkOrders;
 use App\Http\Controllers\FormatController;
 use App\Http\Controllers\UtilController;
 use App\Http\Services\Tenant\Accounts\CustomerAccount\CustomerAccountService;
+use App\Http\Services\Tenant\Inventory\Kardex\KardexService;
 use App\Http\Services\Tenant\Inventory\WarehouseProduct\WarehouseProductService;
 use App\Http\Services\Tenant\Sale\Sale\SaleService;
 use App\Http\Services\Tenant\WorkShop\WorkOrders\WorkOrderDto;
@@ -32,6 +33,7 @@ class WorkOrderService
     private WarehouseProductService $s_warehouse_product;
     private CustomerAccountService $s_customer_account;
     private SaleService $s_sale;
+    private KardexService $s_kardex;
 
     public function __construct()
     {
@@ -41,6 +43,7 @@ class WorkOrderService
         $this->s_warehouse_product  =   new WarehouseProductService();
         $this->s_customer_account   =   new CustomerAccountService();
         $this->s_sale               =   new SaleService();
+        $this->s_kardex             =   new KardexService();
     }
 
     public function store(array $data): WorkOrder
@@ -62,6 +65,7 @@ class WorkOrderService
 
         $dto_images =   $this->s_dto->getDtoOrderImages($data['vehicle_images'] ?? [], $work_order);
         $this->s_repository->insertWorkImages($dto_images);
+
         return $work_order;
     }
 
@@ -114,7 +118,11 @@ class WorkOrderService
             }
         }
 
-        return $this->s_repository->finish($id);
+        $order  =   $this->s_repository->finish($id);
+
+        $this->s_kardex->storeFromWorkOrder($order);
+      
+        return $order;
     }
 
     public function getWorkOrder(int $id): array

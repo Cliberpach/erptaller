@@ -14,9 +14,15 @@ class ConfigurationSeeder extends Seeder
     public function run(): void
     {
         $configuration              =   new Configuration();
-        $configuration->description =   'TURNO NOCHE RESERVAS';
-        $configuration->property    =   '19:00';
+        $configuration->description =   'MOSTRAR CUENTAS BANCARIAS';
+        $configuration->property    =   '1';
+        $configuration->symbol      =   'MCB';
         $configuration->save();
 
+        $configuration              =   new Configuration();
+        $configuration->description =   'VALIDAR STOCK EN ORDENES DE TRABAJO';
+        $configuration->property    =   '0';
+        $configuration->symbol      =   'VSOT';
+        $configuration->save();
     }
 }

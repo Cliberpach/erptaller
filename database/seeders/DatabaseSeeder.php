@@ -25,6 +25,7 @@ use Database\Seeders\tenant\ConfigurationSeeder;
 use Database\Seeders\tenant\DepartmentSeeder;
 use Database\Seeders\tenant\DistrictSeeder;
 use Database\Seeders\tenant\DocumentTypeSeeder;
+use Database\Seeders\tenant\PaymentConditionSeeder;
 use Database\Seeders\tenant\PaymentMethodSeeder;
 use Database\Seeders\tenant\PettyCashSeeder;
 use Database\Seeders\tenant\PositionSeeder;
@@ -67,6 +68,7 @@ class DatabaseSeeder extends Seeder
         $this->call(SupplierSeeder::class);
         $this->call(ProofPaymentSeeder::class);
         $this->call(TypeFieldSeeder::class);
+        $this->call(PaymentConditionSeeder::class);
 
         $this->call(TenantUserSeeder::class);
     }

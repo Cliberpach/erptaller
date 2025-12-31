@@ -47,7 +47,6 @@ return new class extends Migration
             $table->unsignedBigInteger('quote_id')->nullable();
             $table->foreign('quote_id')->references('id')->on('quotes');
 
-            $table->enum('status_invoice',['FACTURADO','NO FACTURADO','FACTURADO PARCIAL'])->default('NO FACTURADO');
             $table->boolean('validation_stock');
 
             $table->timestamps();

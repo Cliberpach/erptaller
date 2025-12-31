@@ -16,7 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger("company_id");
             $table->foreign("company_id")->references("id")->on("companies")->onDelete("cascade");
             $table->unsignedBigInteger("document_type_id");
-            $table->foreign("document_type_id")->references("id")->on("document_types")->onDelete("cascade");
+            // $table->foreign("document_type_id")->references("id")->on("document_types")->onDelete("cascade");
             $table->string("serie", 10);
             $table->integer("number_limit");
             $table->string("destiny")->nullable();

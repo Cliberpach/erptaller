@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('description',160);
             $table->string('property',100);
+            $table->string('symbol',10);
             $table->timestamps();
         });
     }

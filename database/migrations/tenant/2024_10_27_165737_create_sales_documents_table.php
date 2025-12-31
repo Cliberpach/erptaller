@@ -90,10 +90,10 @@ return new class extends Migration
 
             $table->string('payment_condition_name', 100);
             $table->unsignedInteger('payment_condition_days');
+            $table->enum('payment_status',['PAGADO','PENDIENTE'])->default('PENDIENTE');
 
             $table->date('registration_date');
             $table->date('expiration_date');
-
 
             $table->unsignedBigInteger('vehicle_id')->nullable();
             $table->foreign('vehicle_id')->references('id')->on('vehicles');
