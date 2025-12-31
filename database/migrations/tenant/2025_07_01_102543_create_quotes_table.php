@@ -46,7 +46,8 @@ return new class extends Migration
             $table->string('create_user_name')->nullable();
 
             $table->enum('status', ['ACTIVO', 'ANULADO', 'CONVERTIDO', 'EXPIRADO'])->default('ACTIVO');
-
+            $table->string('fuel_level')->nullable();
+            
             $table->timestamps();
         });
     }

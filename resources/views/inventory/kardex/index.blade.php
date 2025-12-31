@@ -276,9 +276,10 @@
             const url = @json(route('tenant.inventory.kardex.excel'));
 
             const params = {
+                warehouse_id:1,
                 product_id: document.querySelector('#product_id').value,
-                date_start: document.querySelector('#date_start').value,
-                date_end: document.querySelector('#date_end').value
+                start_date: document.querySelector('#date_start').value,
+                end_date: document.querySelector('#date_end').value
             };
 
             const queryString = new URLSearchParams(params).toString();
@@ -293,9 +294,10 @@
             const url = @json(route('tenant.inventory.kardex.pdf'));
 
             const params = {
+                 warehouse_id:1,
                 product_id: document.querySelector('#product_id').value,
-                date_start: document.querySelector('#date_start').value,
-                date_end: document.querySelector('#date_end').value
+                start_date: document.querySelector('#date_start').value,
+                end_date: document.querySelector('#date_end').value
             };
 
             const queryString = new URLSearchParams(params).toString();

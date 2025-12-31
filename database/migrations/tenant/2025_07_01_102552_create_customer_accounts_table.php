@@ -15,14 +15,14 @@ return new class extends Migration
 
             $table->id();
 
-            $table->unsignedBigInteger('sale_id');
+            $table->unsignedBigInteger('sale_id')->nullable();
             $table->foreign('sale_id')->references('id')->on('sales_documents');
 
             $table->string('document_number')->nullable();
             $table->date('document_date')->nullable();
 
             $table->unsignedDecimal('amount', 16, 6);
-            $table->unsignedDecimal('paid',16,6);
+            $table->unsignedDecimal('paid',16,6)->default(0);
             $table->unsignedDecimal('balance',16,6);
 
             $table->enum('status', ['PENDIENTE', 'PAGADO', 'ANULADO'])->default('PENDIENTE');
@@ -34,7 +34,7 @@ return new class extends Migration
             $table->unsignedBigInteger('delete_user_id')->nullable();
             $table->string('delete_user_name')->nullable();
 
-            $table->unsignedBigInteger('work_order_id');
+            $table->unsignedBigInteger('work_order_id')->nullable();
             $table->foreign('work_order_id')->references('id')->on('work_orders');
 
             $table->timestamps();
