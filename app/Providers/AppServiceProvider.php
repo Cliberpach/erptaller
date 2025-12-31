@@ -2,12 +2,11 @@
 
 namespace App\Providers;
 
-use App\Models\Company;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\View;
 use App\Models\Module;
-use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -19,10 +18,41 @@ class AppServiceProvider extends ServiceProvider
         //
     }
 
+    public function boot(): void
+    {
+        $databaseConnection = (parse_url(config("app.url"), PHP_URL_HOST) === request()->getHost())
+            ? 'landlord'
+            : 'tenant';
+
+        config(['database.default' => $databaseConnection]);
+
+        $base = ($databaseConnection === 'landlord') ? 'landlord' : 'tenant';
+
+        $modules = Cache::remember(
+            "modules_menu_{$base}",
+            now()->addHours(6),
+            function () use ($base) {
+                return Module::where('show', $base)
+                    ->with(['children', 'children.grandchildren'])
+                    ->get();
+            }
+        );
+
+        $lst_search_modules = Cache::remember(
+            "modules_search_{$base}",
+            now()->addHours(6),
+            fn() => $this->getLstSearchModules($base)
+        );
+
+        View::share('base', $base . '.');
+        View::share('modules', $modules);
+        View::share('lst_search_modules', $lst_search_modules);
+    }
+
     /**
      * Bootstrap any application services.
      */
-    public function boot(): void
+    public function boot_old(): void
     {
 
         $databaseConnection = (parse_url(config("app.url"), PHP_URL_HOST) === request()->getHost()) ? 'landlord' : 'tenant';
@@ -37,7 +67,6 @@ class AppServiceProvider extends ServiceProvider
             }])
             ->get();
 
-        // Compartir variables globales con las vistas
         View::share('base', $base . '.');
         View::share('modules', $modules);
         View::share('lst_search_modules', $this->getLstSearchModules($base));
@@ -73,7 +102,8 @@ class AppServiceProvider extends ServiceProvider
                                 ) AS category,
                                 "fi fi-rr-file" AS icon
                             FROM module_grand_children  AS mgc
-                            WHERE mgc.route_name IS NOT NULL');
+                            WHERE mgc.route_name IS NOT NULL'
+        );
 
         return $lst_modules;
     }

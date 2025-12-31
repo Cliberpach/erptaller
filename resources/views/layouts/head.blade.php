@@ -73,5 +73,94 @@
 <link rel="stylesheet"
     href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
 
+
+<style>
+.loader-app {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.car__body {
+  -webkit-animation: shake 1s ease-in-out infinite alternate; /* antes 0.2s */
+          animation: shake 1s ease-in-out infinite alternate;
+}
+
+.car__line {
+  transform-origin: center right;
+  stroke-dasharray: 22;
+  -webkit-animation: line 2s ease-in-out infinite; /* antes 0.8s */
+          animation: line 2s ease-in-out infinite;
+  -webkit-animation-fill-mode: both;
+          animation-fill-mode: both;
+}
+
+.car__line--top {
+  -webkit-animation-delay: 0s;
+          animation-delay: 0s;
+}
+.car__line--middle {
+  -webkit-animation-delay: 0.5s; /* antes 0.2s */
+          animation-delay: 0.5s;
+}
+.car__line--bottom {
+  -webkit-animation-delay: 1s; /* antes 0.4s */
+          animation-delay: 1s;
+}
+
+@-webkit-keyframes shake {
+  0% { transform: translateY(-1%); }
+  100% { transform: translateY(3%); }
+}
+
+@keyframes shake {
+  0% { transform: translateY(-1%); }
+  100% { transform: translateY(3%); }
+}
+
+@-webkit-keyframes line {
+  0% { stroke-dashoffset: 22; }
+  25% { stroke-dashoffset: 22; }
+  50% { stroke-dashoffset: 0; }
+  51% { stroke-dashoffset: 0; }
+  80% { stroke-dashoffset: -22; }
+  100% { stroke-dashoffset: -22; }
+}
+
+@keyframes line {
+  0% { stroke-dashoffset: 22; }
+  25% { stroke-dashoffset: 22; }
+  50% { stroke-dashoffset: 0; }
+  51% { stroke-dashoffset: 0; }
+  80% { stroke-dashoffset: -22; }
+  100% { stroke-dashoffset: -22; }
+}
+
+
+/* Overlay real */
+.loader-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 1);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    z-index: 9999;
+}
+
+.loader-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+</style>
+
 @yield('css')
 @stack('styles')

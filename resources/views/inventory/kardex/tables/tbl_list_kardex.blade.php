@@ -1,19 +1,18 @@
-<table id="tbl_list_kardex" style="width:100%" class="table table-hover">
-    <thead>
+<table id="tbl_list_kardex" style="width:100%" class="table table-hover display">
+    <thead class="table-light">
         <tr>
-            <th>ID</th>
-            <th>PRODUCT ID</th>
-            <th data-priority="1">FECHA</th>
-            <th data-priority="2">PRODUCTO</th>
-            <th data-priority="3">CATEGORÍA</th>
-            <th>MARCA</th>
-            <th>TIPO</th>
-            <th>DOCUMENTO</th>
-            <th>STOCK</th>
-            <th>ENTRADA</th>
-            <th>SALIDA</th>
-            <th>SALDO</th>
-            <th>REGISTRADOR</th>
+            <th class="minw-50px">Id</th>
+            <th class="minw-200px" data-priority="1">Fecha</th>
+            <th class="minw-200px" data-priority="2">Producto</th>
+            <th class="minw-100px" data-priority="3">Categoría</th>
+            <th class="minw-100px">Marca</th>
+            <th class="minw-100px">Tipo</th>
+            <th class="minw-100px">Doc</th>
+            <th class="minw-100px">Stock</th>
+            <th class="minw-100px">Entrada</th>
+            <th class="minw-100px">Salida</th>
+            <th class="minw-100px">Saldo</th>
+            <th class="minw-100px">Registrador</th>
         </tr>
     </thead>
     <tbody class="body-table">

@@ -4,11 +4,11 @@
 <script src="{{ asset('assets/js/appSettings.js') }}"></script>
 
 <script>
-    window.lstSearchModules =   @json($lst_search_modules);
-    const baseUrl           =   @json($base);
+    window.lstSearchModules = @json($lst_search_modules);
+    const baseUrl = @json($base);
 
-    lstSearchModules.forEach((item)=>{
-        item.url    =   route(`${baseUrl}${item.url}`);
+    lstSearchModules.forEach((item) => {
+        item.url = route(`${baseUrl}${item.url}`);
     })
 </script>
 
@@ -20,7 +20,20 @@
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         mostrarSessionMessages();
+        eventsA();
     })
+
+
+
+    function eventsA() {
+        document.addEventListener('click', function(e) {
+
+            const menuLink = e.target.closest('.menu-click');
+            if (!menuLink) return;
+            showLoader();
+
+        });
+    }
 
     function mostrarSessionMessages() {
         const messageSuccess = "{{ Session::get('message_success') }}";
@@ -50,6 +63,24 @@
         }
 
     }
+
+    function showLoader() {
+        document.querySelector('.loader-overlay')?.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function hideLoader() {
+        const loader = document.querySelector('.loader-overlay');
+        if (loader) {
+            loader.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+    }
+
+
+    window.onload = function() {
+        hideLoader()
+    };
 </script>
 
 @yield('js')

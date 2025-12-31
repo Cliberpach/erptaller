@@ -10,7 +10,7 @@
                     <span class="menu-label">Dashboard</span>
                 </a>
             </li>
-            <li class="menu-item">
+            {{-- <li class="menu-item">
                 <a class="menu-link" href="index-rtl.html">
                     <span class="menu-label">Dashboard RTL</span>
                 </a>
@@ -49,12 +49,12 @@
                 <a class="menu-link" href="task-management.html">
                     <span class="menu-label">Task Management</span>
                 </a>
-            </li>
-            <li class="menu-item">
+            </li> --}}
+            {{-- <li class="menu-item">
                 <a class="menu-link" href="analytics.html">
                     <span class="menu-label">Analytics</span>
                 </a>
-            </li>
+            </li> --}}
         </ul>
     </li>
     <li class="menu-heading">
@@ -116,7 +116,7 @@
                             <ul class="menu-inner">
                                 @foreach ($child->grandchildren as $grandchild)
                                     <li class="menu-item">
-                                        <a class="menu-link" href="{{ route($base . $grandchild->route_name) }}">
+                                        <a class="menu-link menu-click" href="{{ route($base . $grandchild->route_name) }}">
                                             <span class="menu-label">{{ $grandchild->description }}</span>
                                         </a>
                                     </li>
@@ -125,7 +125,7 @@
                         </li>
                     @else
                         <li class="menu-item">
-                            <a class="menu-link" href="{{ route($base . $child->route_name) }}">
+                            <a class="menu-link menu-click" href="{{ route($base . $child->route_name) }}">
                                 <span class="menu-label">{{ $child->description }}</span>
                             </a>
                         </li>

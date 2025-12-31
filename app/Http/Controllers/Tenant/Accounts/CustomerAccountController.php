@@ -44,7 +44,7 @@ class CustomerAccountController extends Controller
                 DB::raw('IF(ca.work_order_id IS NULL, sd.customer_name, wo.customer_name) as customer_name'),
                 'ca.document_date',
                 'ca.amount',
-                'ca.agreement',
+                'ca.paid',
                 'ca.balance',
                 'ca.status',
                 DB::raw('(ca.amount - ca.balance) as paid_amount'),

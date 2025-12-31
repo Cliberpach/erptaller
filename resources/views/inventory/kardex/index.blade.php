@@ -4,57 +4,69 @@
     KARDEX
 @endsection
 
-@section('css')
-    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css') }}" />
-    <link rel="stylesheet" href="{{ asset('assets/css/styles.css') }}">
-@endsection
-
 @section('content')
-    <!-- Elemento de superposición -->
-    <div id="overlay" class="overlay"></div>
-
-
     <div class="card">
         @csrf
-        <div class="card-header d-flex flex-row justify-content-between">
+        <div class="card-header d-flex justify-content-between flex-row">
             <h4 class="card-title">KARDEX</h4>
 
             <div class="input-group-append">
-                {{-- <button onclick="goToSaleCreate()"  type="button" data-bs-whatever="Nueva caja" class="btn btn-primary btn-add-new" data-bs-toggle="modal" data-bs-target="#exampleModal">
-                    <div class="lign-items-center d-flex align-items-center">
-                        <i class="fas fa-plus pe-1"></i>
-                        <p class="mb-0 ml-2"> NUEVO</p>
-                    </div>
-                </button>  --}}
+
             </div>
 
         </div>
         <div class="card-body">
-            <div class="row mb-3">
-                <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
-                    <label for="product_id" style="font-weight:bold;">PRODUCTO</label>
-                    <select data-placeholder="Seleccionar" id="product_id" class="form-select select2_form"
-                        aria-label="Default select example" onchange="filterDataTable()">
+            <div class="row align-items-end mb-3">
+
+                <!-- PRODUCTO -->
+                <div class="col-lg-4 col-md-4 col-sm-12">
+                    <label for="product_id" class="fw-bold text-primary">
+                        <i class="fas fa-box-open me-1"></i> PRODUCTO
+                    </label>
+                    <select data-placeholder="Seleccionar" id="product_id" class="form-select">
                         <option value=""></option>
                         @foreach ($products as $product)
                             <option value="{{ $product->id }}">{{ $product->name }}</option>
                         @endforeach
                     </select>
                 </div>
-                <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
-                    <label for="date_start" style="font-weight:bold;">FECHA INICIO</label>
+
+                <!-- FECHA INICIO -->
+                <div class="col-lg-2 col-md-4 col-sm-12">
+                    <label for="date_start" class="fw-bold text-success">
+                        <i class="fas fa-calendar-day me-1"></i> FECHA INICIO
+                    </label>
                     <input type="date" class="form-control" id="date_start" onchange="changeDateStart(this.value)">
                 </div>
-                <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
-                    <label for="date_end" style="font-weight:bold;">FECHA FIN</label>
+
+                <!-- FECHA FIN -->
+                <div class="col-lg-2 col-md-4 col-sm-12">
+                    <label for="date_end" class="fw-bold text-danger">
+                        <i class="fas fa-calendar-check me-1"></i> FECHA FIN
+                    </label>
                     <input type="date" class="form-control" id="date_end" onchange="changeDateEnd(this.value)">
                 </div>
-            </div>
-            <div class="row">
-                <div class="col-12" style="display:flex;justify-content:end;">
-                    <button class="btn btn-primary" style="margin-right: 10px;" onclick="downloadExcel();">EXCEL</button>
-                    <button class="btn btn-primary" onclick="downloadPdf()">PDF</button>
+
+                <!-- BOTÓN FILTRAR -->
+                <div class="col-lg-4 col-md-4 col-sm-12 text-end">
+                    <button type="button" class="btn btn-primary" onclick="filterDataTable()">
+                        <i class="fas fa-filter me-1"></i> Filtrar
+                    </button>
                 </div>
+
+            </div>
+
+            <div class="row">
+                <div class="col-12 d-flex justify-content-end">
+                    <button class="btn btn-success me-2" onclick="downloadExcel();" type="button">
+                        <i class="fas fa-file-excel me-1"></i> EXCEL
+                    </button>
+
+                    <button class="btn btn-danger" onclick="downloadPdf();" type="button">
+                        <i class="fas fa-file-pdf me-1"></i> PDF
+                    </button>
+                </div>
+
                 <div class="col-12">
                     <div class="table-responsive">
                         @include('inventory.kardex.tables.tbl_list_kardex')
@@ -77,15 +89,17 @@
 
         function events() {
             startDataTableKardex();
-            loadSelect2();
+            loadTomSelect();
         }
 
-        function loadSelect2() {
-            $('.select2_form').select2({
-                theme: "bootstrap-5",
-                width: $(this).data('width') ? $(this).data('width') : $(this).hasClass('w-100') ? '100%' : 'style',
-                placeholder: $(this).data('placeholder'),
-                allowClear: true
+        function loadTomSelect() {
+            window.productSelect = new TomSelect('#product_id', {
+                create: false,
+                plugins: ['clear_button'],
+                sortField: {
+                    field: "text",
+                    direction: "asc"
+                }
             });
         }
 
@@ -100,73 +114,102 @@
                     url: urlGetKardex,
                     type: 'GET',
                     data: function(d) {
+                        d.warehouse_id = 1;
                         d.product_id = document.querySelector('#product_id').value;
-                        d.date_start = document.querySelector('#date_start').value;
-                        d.date_end = document.querySelector('#date_end').value;
+                        d.start_date = document.querySelector('#date_start').value;
+                        d.end_date = document.querySelector('#date_end').value;
                     }
                 },
                 order: [
                     [1, 'desc'],
-                    [2, 'desc']
+                    [2, 'desc'],
                 ],
                 columns: [{
-                        data: 'id',
-                        name: 'id',
-                        visible: false,
-                        searchable: false
-                    },
-                    {
                         data: 'product_id',
                         name: 'product_id',
                         visible: false,
                         searchable: false
                     },
                     {
-                        data: 'created_at',
-                        name: 'created_at'
+                        data: 'date',
+                        name: 'date',
+                        searchable: false,
+                        orderable: true
                     },
                     {
                         data: 'product_name',
-                        name: 'product_name'
+                        name: 'product_name',
+                        searchable: true,
+                        orderable: true
                     },
                     {
                         data: 'category_name',
-                        name: 'category_name'
+                        name: 'category_name',
+                        searchable: true,
+                        orderable: true
                     },
                     {
                         data: 'brand_name',
-                        name: 'brand_name'
+                        name: 'brand_name',
+                        searchable: true,
+                        orderable: true
                     },
                     {
                         data: 'type',
-                        name: 'type'
+                        name: 'type',
+                        searchable: false,
+                        orderable: false
                     },
                     {
-                        data: 'document',
-                        name: 'document'
+                        data: 'document_serie',
+                        name: 'document_serie',
+                        searchable: true,
+                        orderable: true
                     },
                     {
-                        data: 'stock_previous',
-                        name: 'stock_previous'
+                        data: 'previous_stock',
+                        name: 'previous_stock',
+                        searchable: false,
+                        orderable: false,
+                        render: function(data) {
+                            return parseFloat(data).toFixed(2);
+                        }
                     },
                     {
                         data: 'entrada',
-                        name: 'entrada'
+                        name: 'entrada',
+                        searchable: false,
+                        orderable: false,
+                        render: function(data) {
+                            return parseFloat(data).toFixed(2);
+                        }
                     },
                     {
                         data: 'salida',
-                        name: 'salida'
+                        name: 'salida',
+                        searchable: false,
+                        orderable: false,
+                        render: function(data) {
+                            return parseFloat(data).toFixed(2);
+                        }
                     },
                     {
-                        data: 'stock_later',
-                        name: 'stock_later'
+                        data: 'later_stock',
+                        name: 'later_stock',
+                        searchable: false,
+                        orderable: false,
+                        render: function(data) {
+                            return parseFloat(data).toFixed(2);
+                        }
                     },
                     {
-                        data: 'user_recorder_name',
-                        name: 'user_recorder_name'
+                        data: 'creator_user_name',
+                        name: 'creator_user_name',
+                        searchable: false,
+                        orderable: false
                     },
                 ],
-                pageLength: 25,
+                pageLength: 50,
                 lengthChange: false,
                 language: {
                     "lengthMenu": "Mostrar _MENU_ registros por página",
@@ -213,8 +256,6 @@
                 return;
             }
 
-            filterDataTable();
-
         }
 
         function changeDateEnd(date_end) {
@@ -227,8 +268,6 @@
                 toastr.error('LA FECHA FINAL DEBE SER MAYOR IGUAL A LA FECHA INICIAL!!');
                 return;
             }
-
-            filterDataTable();
 
         }
 
@@ -266,5 +305,4 @@
 
         }
     </script>
-    <script src="{{ asset('assets/js/utils.js') }}"></script>
 @endsection

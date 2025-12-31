@@ -31,7 +31,6 @@ class KardexController extends Controller
 
     public function getKardex(Request $request)
     {
-
         $kardex =   $this->queryKardex($request);
 
         return DataTables::of($kardex)->make(true);
@@ -39,74 +38,19 @@ class KardexController extends Controller
 
     public static function queryKardex(Request $request)
     {
-        $kardex = DB::table('kardex as k')
-            ->select(
-                'k.id',
-                'k.created_at',
-                'k.product_id',
-                'k.product_name',
-                'k.category_id',
-                'k.category_name',
-                'k.brand_id',
-                'k.brand_name',
-                'k.type',
-                'k.warehouse_id',
-                'k.sale_document_id',
-                'k.note_income_id',
-                'k.document',
-                'k.quantity',
-                'k.user_recorder_id',
-                'k.user_recorder_name'
-            )
-            ->where('k.status', '!=', 'INACTIVE')
-            ->orderBy('k.product_id')
-            ->orderBy('k.warehouse_id')
-            ->orderBy('k.created_at');
+        $warehouse_id   =   $request->get('warehouse_id');
+        $product_id     =   $request->get('product_id');
+        $start_date     =   $request->get('start_date');
+        $end_date       =   $request->get('end_date');
 
+        $kardex =   DB::select(
+                        'CALL sp_kardex(?, ?, ?,?)',
+                        [$warehouse_id, $product_id, $start_date,$end_date]
+                    );
 
-        if ($request->get('product_id')) {
-            $kardex = $kardex->where('k.product_id', $request->get('product_id'));
-        }
-
-        if ($request->get('date_start')) {
-            $kardex = $kardex->whereDate('k.created_at', '>=', $request->get('date_start'));
-        }
-
-        if ($request->get('date_end')) {
-            $kardex = $kardex->whereDate('k.created_at', '<=', $request->get('date_end'));
-        }
-
-        $kardex = $kardex->get();
-
-        return self::calculateStockMovement($kardex);
+        return $kardex;
     }
 
-    protected static function calculateStockMovement($kardexCollection)
-    {
-        $stock_by_product = [];
-
-        return $kardexCollection->map(function ($item) use (&$stock_by_product) {
-            $key = $item->product_id . '-' . $item->warehouse_id;
-
-            $previous_stock = $stock_by_product[$key] ?? 0;
-
-            $entrada = $item->type === 'IN'  ? (float) $item->quantity : 0;
-            $salida  = $item->type === 'OUT' ? (float) $item->quantity : 0;
-
-            $saldo = $previous_stock + $entrada - $salida;
-
-            // Añadir los campos al objeto
-            $item->stock_previous = number_format($previous_stock, 2, '.', '');
-            $item->entrada = number_format($entrada, 2, '.', '');
-            $item->salida  = number_format($salida, 2, '.', '');
-            $item->stock_later = number_format($saldo, 2, '.', '');
-
-            // Actualizamos el acumulado
-            $stock_by_product[$key] = $saldo;
-
-            return $item;
-        });
-    }
 
 
 
