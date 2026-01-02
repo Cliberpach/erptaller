@@ -48,6 +48,7 @@ return new class extends Migration
             $table->foreign('quote_id')->references('id')->on('quotes');
 
             $table->boolean('validation_stock');
+            $table->enum('fuel_level',['-1','0','25','50','75','100'])->default('-1');
 
             $table->timestamps();
         });
