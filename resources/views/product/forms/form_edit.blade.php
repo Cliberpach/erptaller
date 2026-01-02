@@ -80,7 +80,7 @@
 
                 <select name="category_id_edit" style="text-transform: uppercase;" id="category_id_edit"
                     class="form-select select2_form_product_edit" aria-label="Default select example">
-                    <option value="0" selected>SELECCIONAR CATEGORÍA</option>
+                    <option value=""></option>
                     @foreach ($categories as $category)
                         <option style="text-transform: uppercase;" value="{{ $category->id }}">
                             {{ $category->name }}
@@ -97,7 +97,7 @@
                 <label for="brand_id_edit" class="form-label required_field">Marca</label>
                 <select name="brand_id_edit" style="text-transform: uppercase;" id="brand_id_edit"
                     class="form-select select2_form_product_edit" aria-label="Default select example">
-                    <option value="0" selected>SELECCIONAR MARCA</option>
+                    <option value=""></option>
                     @foreach ($brands as $brand)
                         <option style="text-transform: uppercase;" value="{{ $brand->id }}">{{ $brand->name }}
                         </option>

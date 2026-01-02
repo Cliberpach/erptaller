@@ -35,13 +35,13 @@
                 </div>
                 <p class="msgError purchase_price_error"></p>
             </div>
-            <div class="col-lg-6 col-md-6 mb-3 colStock">
+            <div class="col-lg-6 col-md-6 colStock mb-3">
                 <label for="stock" class="form-label required_field">Stock</label>
                 <input value="0" name="stock" type="number" class="form-control stock" min="0"
                     id="stock" aria-describedby="emailHelp" placeholder="STOCK">
                 <p class="msgError stock_error"></p>
             </div>
-            <div class="col-lg-6 col-md-6 mb-3 colStockMin">
+            <div class="col-lg-6 col-md-6 colStockMin mb-3">
                 <label for="stock_min" class="form-label required_field">Stock mínimo</label>
                 <input value="0" name="stock_min" type="number" class="form-control stock_min" min="0"
                     id="stock_min" placeholder="STOCK MÍNIMO" aria-label="Username" aria-describedby="basic-addon1">
@@ -69,37 +69,33 @@
     </div>
     <div class="col-lg-6 col-md-6">
         <div class="row">
+
             <div class="col-lg-12 col-md-12 mb-3">
                 <label for="category_id" class="form-label required_field">Categoría</label>
 
                 <select name="category_id" style="text-transform: uppercase;" id="category_id"
-                    class="form-select select2_form" aria-label="Default select example">
-                    <option value="0" selected>SELECCIONAR CATEGORÍA</option>
-                    @foreach ($categories as $category_id)
-                        <option style="text-transform: uppercase;" value="{{ $category_id->id }}">
-                            {{ $category_id->name }}</option>
+                    class="select2_form form-select" aria-label="Default select example">
+                    <option value=""></option>
+                    @foreach ($categories as $category)
+                        <option @if ($category->is_default) selected @endif style="text-transform: uppercase;"
+                            value="{{ $category->id }}">
+                            {{ $category->name }}</option>
                     @endforeach
                 </select>
-                {{-- <a onclick="openCreatecategory_idModal()" class="btn btn-success">
-                        <i class="fas fa-plus-circle"></i>
-                    </a> --}}
                 <p class="msgError category_id_error"></p>
             </div>
-            <div class="col-lg-12 col-md-12 mb-3">
 
+            <div class="col-lg-12 col-md-12 mb-3">
                 <label for="brand" class="form-label required_field">Marca</label>
-                <select name="brand_id" style="text-transform: uppercase;" id="brand"
-                    class="form-select brand select2_form" aria-label="Default select example">
-                    <option value="0" selected>SELECCIONAR MARCA</option>
+                <select name="brand_id" style="text-transform: uppercase;" id="brand_id"
+                    class="brand select2_form form-select" aria-label="Default select example">
+                    <option value=""></option>
                     @foreach ($brands as $brand)
-                        <option style="text-transform: uppercase;" value="{{ $brand->id }}">{{ $brand->name }}
+                        <option @if ($brand->is_default) selected @endif style="text-transform: uppercase;"
+                            value="{{ $brand->id }}">{{ $brand->name }}
                         </option>
                     @endforeach
                 </select>
-                {{-- <a onclick="openCreateBrandModal()" class="btn btn-success">
-                        <i class="fas fa-plus-circle"></i>
-                    </a> --}}
-
                 <p class="msgError brand_id_error"></p>
             </div>
 
@@ -115,7 +111,7 @@
                     </div>
                     <span class="image_error msgError text-danger"></span>
                     <div id="img_preview_container"
-                        class="border rounded d-flex align-items-center justify-content-center"
+                        class="d-flex align-items-center justify-content-center rounded border"
                         style="height:160px; width:100%; border: 2px dashed #ddd; padding: 10px; text-align: center;">
                         <img class="imgShowLightBox" src="{{ asset('assets/img/products/img_default.png') }}"
                             id="img_vista_previa"

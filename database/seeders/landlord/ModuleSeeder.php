@@ -16,8 +16,9 @@ class ModuleSeeder extends Seeder
     {
         // Caja
         $petty_cash = Module::create([
-            'description' => 'Cajas',
-            'order' => '1'
+            'description'   =>  'Cajas',
+            'order'         =>  '1',
+            'icon'          =>  'cashier_machine_cash_register_pos_icon_225168.svg'
         ]);
 
         ModuleChild::create([
@@ -44,8 +45,9 @@ class ModuleSeeder extends Seeder
 
         // Taller
         $taller = Module::create([
-            'description' => 'Taller',
-            'order' => '1'
+            'description'   =>  'Taller',
+            'order'         =>  '1',
+            'icon'          =>  'car-wash-svgrepo-com.svg'
         ]);
 
         ModuleChild::create([
@@ -106,8 +108,9 @@ class ModuleSeeder extends Seeder
 
         // Ventas
         $sale = Module::create([
-            'description' => 'Ventas',
-            'order' => '1'
+            'description'   => 'Ventas',
+            'order'         => '1',
+            'icon'          => 'percentage-sales-svgrepo-com.svg'
         ]);
 
         ModuleChild::create([
@@ -141,8 +144,9 @@ class ModuleSeeder extends Seeder
 
         /*============ CUENTAS ==========*/
         $accounts = Module::create([
-            'description' => 'Cuentas',
-            'order' => '1'
+            'description'   =>  'Cuentas',
+            'order'         =>  '1',
+            'icon'          =>  'credit-card-svgrepo-com.svg'
         ]);
 
         ModuleChild::create([
@@ -161,8 +165,9 @@ class ModuleSeeder extends Seeder
 
         // Inventario
         $inventory = Module::create([
-            'description' => 'Inventario',
-            'order' => '1'
+            'description'   =>  'Inventario',
+            'order'         =>  '1',
+            'icon'          =>  'warehouse-svgrepo-com.svg'
         ]);
 
         $product = ModuleChild::create([
@@ -229,8 +234,9 @@ class ModuleSeeder extends Seeder
 
         // Compras
         $purchase = Module::create([
-            'description' => 'Compras',
-            'order' => '1'
+            'description'   =>  'Compras',
+            'order'         =>  '1',
+            'icon'          =>  'shopping-cart-svgrepo-com.svg'
         ]);
 
         ModuleChild::create([
@@ -252,8 +258,9 @@ class ModuleSeeder extends Seeder
 
         // Reportes
         $report = Module::create([
-            'description'   => 'Reportes',
-            'order'         => '1'
+            'description'   =>  'Reportes',
+            'order'         =>  '1',
+            'icon'          =>  'analytics-financial-svgrepo-com.svg'
         ]);
 
         ModuleChild::create([
@@ -273,9 +280,10 @@ class ModuleSeeder extends Seeder
 
         // Mantenimiento
         $maintenance = Module::create([
-            'description' => 'Mantenimiento',
-            'order' => '1',
-            'show' => 'landlord'
+            'description'   =>  'Mantenimiento',
+            'order'         =>  '1',
+            'show'          =>  'landlord',
+            'icon'          =>  'configuration-svgrepo-com.svg'
         ]);
 
         ModuleChild::create([
@@ -351,8 +359,9 @@ class ModuleSeeder extends Seeder
 
         // Consultas
         $consultas = Module::create([
-            'description' => 'Consultas',
-            'order' => '1'
+            'description'   =>  'Consultas',
+            'order'         =>  '1',
+            'icon'          =>  'analytics-report-svgrepo-com.svg'
         ]);
 
         ModuleChild::create([

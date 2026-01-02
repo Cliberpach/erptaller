@@ -43,6 +43,8 @@ return new class extends Migration
             $table->enum('plan', [1, 2, 3]);
 
             $table->longText('token_placa')->nullable();
+            $table->longText('certificate')->nullable();
+            $table->longText('certificate_url')->nullable();
 
             $table->timestamps();
         });

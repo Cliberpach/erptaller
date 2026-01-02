@@ -6,13 +6,13 @@
                 <h5 class="modal-title" id="exampleModalLabel">Registrar producto</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <hr>
+
             <div class="modal-body">
 
                 @include('product.forms.form_create')
 
             </div>
-            <hr>
+
             <div class="modal-footer">
                 <div class="col-info">
                     <i class="fas fa-info-circle"></i>
@@ -67,6 +67,10 @@
                 inputCargarImg.value = '';
             }
         })
+
+        $('#mdl-create-product').on('hidden.bs.modal', function() {
+            clearMdlCreateProduct();
+        });
     }
 
     function registrarProducto(formRegistrarProducto) {
@@ -145,5 +149,21 @@
                 });
             }
         });
+    }
+
+    function clearMdlCreateProduct() {
+        document.querySelector('#name').value = '';
+        document.querySelector('#description').value = '';
+        document.querySelector('#sale_price').value = '1';
+        document.querySelector('#purchase_price').value = '1';
+        document.querySelector('#stock').value = '0';
+        document.querySelector('#stock_min').value = '1';
+        document.querySelector('#code_factory').value = '';
+        document.querySelector('#code_bar').value = '';
+        window.categorySelect.clear();
+        window.brandSelect.clear();
+        setText(window.categorySelect, 'REPUESTO');
+        setText(window.brandSelect, 'NACIONAL');
+        document.querySelector('.btnSetImgDefault').click();
     }
 </script>

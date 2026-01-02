@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string("description");
             $table->integer("order");
             $table->string("show")->nullable()->default('tenant');
+            $table->longText('icon');
             $table->timestamps();
         });
     }

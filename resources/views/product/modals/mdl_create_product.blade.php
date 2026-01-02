@@ -6,7 +6,7 @@
           <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-        <hr>
+      
         <div class="modal-body">
 
                 <form class="row" id="my-form" action="">
@@ -117,7 +117,7 @@
                 </form>
 
         </div>
-        <hr>
+
         <div class="modal-footer">
             <div class="col-info">
                 <i class="fas fa-info-circle"></i>

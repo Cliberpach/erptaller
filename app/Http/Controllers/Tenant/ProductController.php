@@ -137,9 +137,6 @@ array:11 [ // app\Http\Controllers\Tenant\ProductController.php:127
 
             $product->update($data);
 
-            //====== GUARDAR NUEVA IMAGEN =======
-            $this->saveImagePublic($request->file('image_edit'), $product);
-
             DB::commit();
             return response()->json(['success' => true, 'data' => $product, 'message' => 'PRODUCTO ACTUALIZADO CON ÉXITO']);
         } catch (Throwable $th) {

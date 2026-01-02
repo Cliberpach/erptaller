@@ -6,13 +6,11 @@
                 <h5 class="modal-title" id="exampleModalLabel">Editar producto</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <hr>
             <div class="modal-body">
 
                 @include('product.forms.form_edit')
 
             </div>
-            <hr>
             <div class="modal-footer">
                 <div class="col-info">
                     <i class="fas fa-info-circle"></i>
@@ -39,7 +37,7 @@
     };
 
     function eventsMdlEditProduct() {
-        loadSelect2ProductEdit();
+        loadTomSelectEdit();
 
         document.querySelector('#form-edit-product').addEventListener('submit', (e) => {
             e.preventDefault();
@@ -47,8 +45,8 @@
         })
 
         document.querySelector('#image_edit').addEventListener('change', function(event) {
-            const file      = event.target.files[0];
-            const reader    = new FileReader();
+            const file = event.target.files[0];
+            const reader = new FileReader();
             if (file) {
 
                 reader.onload = function(e) {
@@ -64,8 +62,8 @@
         document.addEventListener('click', (e) => {
             //======== LIMPIAR IMAGEN =======
             if (e.target.closest('.btnSetImgEditDefault')) {
-                const inputImgPreview   = document.querySelector('#img_vista_previa_edit');
-                inputImgPreview.src     = @json(asset('assets/img/products/img_default.png'));
+                const inputImgPreview = document.querySelector('#img_vista_previa_edit');
+                inputImgPreview.src = @json(asset('assets/img/products/img_default.png'));
 
                 const inputCargarImg = document.querySelector('#image_edit');
                 inputCargarImg.value = '';
@@ -75,14 +73,66 @@
         })
     }
 
-    function loadSelect2ProductEdit() {
-        $('.select2_form_product_edit').select2({
-            theme: "bootstrap-5",
-            width: $(this).data('width') ? $(this).data('width') : $(this).hasClass('w-100') ? '100%' : 'style',
-            placeholder: $(this).data('placeholder'),
-            allowClear: true,
-            dropdownParent: $('#mdl-edit-product')
-        });
+    function loadTomSelectEdit() {
+        const categoryEditSelect = document.getElementById('category_id_edit');
+        if (categoryEditSelect && !categoryEditSelect.tomselect) {
+            window.categoryEditSelect = new TomSelect(categoryEditSelect, {
+                valueField: 'id',
+                labelField: 'description',
+                searchField: ['description', 'id'],
+                placeholder: 'Seleccionar',
+                create: false,
+                sortField: {
+                    field: 'id',
+                    direction: 'desc'
+                },
+                plugins: ['clear_button'],
+                render: {
+                    option: (item, escape) => `
+                        <div>
+                            <i class="fas fa-tags" style="margin-right:6px; color:#28a745;"></i>
+                            ${escape(item.description)}
+                        </div>
+                    `,
+                    item: (item, escape) => `
+                        <div>
+                            <i class="fas fa-tags" style="margin-right:6px; color:#28a745;"></i>
+                            ${escape(item.description)}
+                        </div>
+                    `
+                }
+            });
+        }
+
+        const brandEditSelect = document.getElementById('brand_id_edit');
+        if (brandEditSelect && !brandEditSelect.tomselect) {
+            window.brandEditSelect = new TomSelect(brandEditSelect, {
+                valueField: 'id',
+                labelField: 'description',
+                searchField: ['description', 'id'],
+                placeholder: 'Seleccionar',
+                create: false,
+                sortField: {
+                    field: 'id',
+                    direction: 'desc'
+                },
+                plugins: ['clear_button'],
+                render: {
+                    option: (item, escape) => `
+                        <div>
+                            <i class="fas fa-bullseye" style="margin-right:6px; color:#0d6efd;"></i>
+                            ${escape(item.description)}
+                        </div>
+                    `,
+                    item: (item, escape) => `
+                        <div>
+                            <i class="fas fa-bullseye" style="margin-right:6px; color:#0d6efd;"></i>
+                            ${escape(item.description)}
+                        </div>
+                    `,
+                }
+            });
+        }
     }
 
     function openMdlEdit(id) {
@@ -112,8 +162,9 @@
         document.querySelector('#stock_min_edit').value = row.stock_min;
         document.querySelector('#code_factory_edit').value = row.code_factory;
         document.querySelector('#code_bar_edit').value = row.code_bar;
-        $('#category_id_edit').val(row.category_id).trigger('change');
-        $('#brand_id_edit').val(row.brand_id).trigger('change');
+
+        window.categoryEditSelect.setValue(row.category_id);
+        window.brandEditSelect.setValue(row.brand_id);
 
         const imgPreview = document.querySelector('#img_vista_previa_edit');
         if (row.img_route) {

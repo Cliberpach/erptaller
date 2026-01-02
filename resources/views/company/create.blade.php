@@ -159,7 +159,7 @@
                                     <label class="form-label" for="certificate_url">Certificado:</label>
                                     <div class="input-group">
                                         <input type="file" class="form-control" id="certificate_url"
-                                            name="certificate_url">
+                                            name="certificate_url" >
                                     </div>
                                 </div>
 
