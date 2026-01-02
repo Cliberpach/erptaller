@@ -8,7 +8,7 @@
 @endsection
 
 @section('content')
-    <div class="row"> 
+    <div class="row">
         <form action="{{ route('landlord.mantenimientos.empresas.update',['id'=>$company->id]) }}" method="POST" enctype="multipart/form-data">
             @csrf
             @method('PUT')
@@ -45,7 +45,7 @@
                                         placeholder="Nombre del dominio" id="domain" name="domain"
                                         value="{{$company->domain}}"
                                         readonly>
-                                    <span class="input-group-text">.eldeportivo.online</span>
+                                    <span class="input-group-text">.tallersuite.store</span>
                                     <br>
                                 </div>
                                 @error('domain')
@@ -186,7 +186,7 @@
                                                 <option
                                                 @if ($plan->id == $company->plan)
                                                     selected
-                                                @endif 
+                                                @endif
                                                 value="{{ $plan->id }}">{{ $plan->description }}</option>
                                             @endforeach
                                         </select>
@@ -212,7 +212,7 @@
                                                 <div class="form-check">
                                                     <input class="form-check-input module-checkbox" type="checkbox"
                                                         id="module{{ $module->id }}" name="module_id[]"
-                                                        value="{{ $module->id }}" 
+                                                        value="{{ $module->id }}"
                                                         @if ($tenant_modules->contains('id', $module->id))
                                                             checked
                                                         @endif>
@@ -227,7 +227,7 @@
                                                         <input
                                                             class="form-check-input {{ $child->grandchildren->isNotEmpty() ? 'child-grandchild-checkbox' : 'child-checkbox' }}"
                                                             type="checkbox" id="children{{ $child->id }}"
-                                                            name="child_id[]" value="{{ $child->id }}" 
+                                                            name="child_id[]" value="{{ $child->id }}"
                                                             @if ($tenant_modules_children->contains('id', $child->id))
                                                                 checked
                                                             @endif>
