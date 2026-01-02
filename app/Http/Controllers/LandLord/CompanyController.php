@@ -159,7 +159,7 @@ class CompanyController extends Controller
     public function store(CompanyStoreRequest $request)
     {
         try {
-           
+
             DB::beginTransaction();
 
             $domain = strtolower($request->get("domain"));
@@ -453,11 +453,12 @@ array:17 [▼ // app\Http\Controllers\LandLord\CompanyController.php:315
             foreach ($this->modules as $module) {
                 DB::table("$tenant_data->database.modules")
                     ->insert([
-                        'id'            => $module->id,
-                        'description'   => $module->description,
-                        'order'         => $module->order,
-                        'created_at'    => Carbon::now(),
-                        'updated_at'    => Carbon::now(),
+                        'id'            =>  $module->id,
+                        'description'   =>  $module->description,
+                        'order'         =>  $module->order,
+                        'created_at'    =>  Carbon::now(),
+                        'updated_at'    =>  Carbon::now(),
+                        'icon'          =>  $module->icon
                     ]);
             }
 
@@ -505,7 +506,7 @@ array:17 [▼ // app\Http\Controllers\LandLord\CompanyController.php:315
                 ->where('u.id', '1')
                 ->update(
                     [
-                        'u.password'           =>  Hash::make($request->get('password')),
+                        'u.password'            =>  Hash::make($request->get('password')),
                         'u.password_visible'    =>  $request->get('password'),
                         'u.email'               =>  $request->get("correo")
                     ]
