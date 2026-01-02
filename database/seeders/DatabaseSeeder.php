@@ -68,7 +68,7 @@ class DatabaseSeeder extends Seeder
         $this->call(TypeFieldSeeder::class);
         $this->call(PaymentConditionSeeder::class);
 
-        $this->call(TenantUserSeeder::class);
+        // $this->call(TenantUserSeeder::class);
     }
 
     public function runLandlordSpecificSeeders()

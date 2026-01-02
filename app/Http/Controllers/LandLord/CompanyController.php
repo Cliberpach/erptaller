@@ -14,6 +14,7 @@ use App\Models\ModuleGrandChild;
 use App\Models\Plan;
 use App\Models\Tenant;
 use App\Models\Tenant\DocumentSerialization;
+use App\Models\Tenant\Maintenance\Collaborator\Collaborator;
 use App\Models\User;
 use Carbon\Carbon;
 use Exception;
@@ -158,7 +159,7 @@ class CompanyController extends Controller
     public function store(CompanyStoreRequest $request)
     {
         try {
-
+           
             DB::beginTransaction();
 
             $domain = strtolower($request->get("domain"));
@@ -184,7 +185,7 @@ class CompanyController extends Controller
             if ($request->hasFile('certificate_url')) {
                 $certificate                =   $request->file('certificate_url');
                 $fileFolderPath             =   'storage/' . $tenantDirectory . '/certificate/';
-                $fileName                   =   $tenant->name.'_'.$tenant->id."_". $certificate->getClientOriginalExtension();
+                $fileName                   =   $tenant->name . '_' . $tenant->id . "_" . $certificate->getClientOriginalExtension();
 
                 $company->certificate       =   $fileName;
                 $company->certificate_url   =   $fileFolderPath . $fileName;
@@ -247,8 +248,8 @@ class CompanyController extends Controller
 
         if ($request->hasFile('certificate_url')) {
             $certificate                = $request->file('certificate_url');
-            $fileFolderPath             = 'storage/' .$files_route. '/certificate/';
-            $fileName                   = $files_route.".". $certificate->getClientOriginalExtension();
+            $fileFolderPath             = 'storage/' . $files_route . '/certificate/';
+            $fileName                   = $files_route . "." . $certificate->getClientOriginalExtension();
 
             $certificate->move(public_path($fileFolderPath), $fileName);
             $company->certificate       = $fileName;
@@ -280,16 +281,29 @@ class CompanyController extends Controller
         ]);
 
         //========= CREANDO USUARIO PARA EL TENANT ========
-        /*$user                     =   new User();
-        $user->name                 =   'SUPERADMIN';
+        $collaborator                   =   new Collaborator();
+        $collaborator->full_name        =   'LUIS DANIEL ALVA LUJAN';
+        $collaborator->document_type_id =   39;
+        $collaborator->document_number  =   77412431;
+        $collaborator->address          =   'AV HUSARES 123';
+        $collaborator->phone            =   '989392912';
+        $collaborator->work_days        =   30;
+        $collaborator->rest_days        =   20;
+        $collaborator->monthly_salary   =   12000;
+        $collaborator->daily_salary     =   400;
+        $collaborator->position_id      =   1;
+        $collaborator->save();
+
+        $user                       =   new User();
+        $user->name                 =   'ADMIN';
         $user->email                =   $request->get("correo");
         $user->password             =   Hash::make($request->get("password"));
         $user->password_visible     =   $request->get("password");
+        $user->collaborator_id      =   $collaborator->id;
         $user->save();
 
         $role = Role::where('name', 'admin')->first();
-        $user->assignRole($role);*/
-
+        $user->assignRole($role);
 
         DB::table("document_serializations")->insert([
             [
