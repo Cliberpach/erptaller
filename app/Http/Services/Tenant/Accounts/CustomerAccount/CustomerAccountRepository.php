@@ -35,12 +35,18 @@ class CustomerAccountRepository
         return CustomerAccountDetail::where('customer_account_id', $customer_account_id)->count() + 1;
     }
 
-    public function setPaymentStatus(int $id){
+    public function setPaymentStatus(int $id)
+    {
         $customer_account   =   CustomerAccount::findOrFail($id);
-        if($customer_account->balance == 0 && $customer_account->sale_id){
+        if ($customer_account->balance == 0 && $customer_account->sale_id) {
             $sale                   =   Sale::findOrFail($customer_account->sale_id);
             $sale->payment_status   =   'PAGADO';
             $sale->save();
         }
+    }
+
+    public function findByWorkOrder(int $work_order_id)
+    {
+        return CustomerAccount::where('work_order_id', $work_order_id)->first();
     }
 }

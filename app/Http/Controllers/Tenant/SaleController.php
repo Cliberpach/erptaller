@@ -36,8 +36,12 @@ class SaleController extends Controller
         return view('sales.sale_document.index');
     }
 
-    public function getSales()
+    public function getSales(Request $request)
     {
+        $customer_id    =   $request->get('customer_id');
+        $start_date     =   $request->get('start_date');
+        $end_date       =   $request->get('end_date');
+        $status         =   $request->get('status');
 
         $sales    =   DB::table('sales_documents as sd')
             ->select(
@@ -49,15 +53,26 @@ class SaleController extends Controller
                 DB::raw("CONCAT(sd.serie, '-', sd.correlative) AS doc"),
                 'sd.type_sale_name',
                 DB::raw("FORMAT(sd.total, 2) AS total"),
-                'sd.estado',
+                'sd.sunat_status',
                 'sd.type_sale_code',
                 'sd.ruta_xml',
                 'sd.ruta_cdr',
                 'sd.payment_status'
             )
-            ->where('sd.estado', '!=', 'ANULADO')
-            ->get();
+            ->where('sd.sunat_status', '!=', 'ANULADO');
 
+        if ($customer_id) {
+            $sales->where('sd.customer_id', $customer_id);
+        }
+        if ($start_date) {
+            $sales->whereDate('sd.created_date', '>=', $start_date);
+        }
+        if ($end_date) {
+            $sales->whereDate('sd.created_date', '<=', $end_date);
+        }
+        if($status){
+            $sales->where('sd.sunat_status',$status);
+        }
 
         return DataTables::of($sales)->make(true);
     }
@@ -185,7 +200,7 @@ class SaleController extends Controller
     }
 
 
-/*
+    /*
 array:10 [ // app\Http\Controllers\Tenant\SaleController.php:202
   "_token" => "HWA6Jt5lC1pNZKwmvKo1LiAP8xFGC9p2kbAME8Im"
   "type_sale" => "67"

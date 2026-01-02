@@ -20,7 +20,7 @@ class CustomerAccountDto
     {
         $dto    =   [];
 
-        $work_order  =   WorkOrder::findOrFail($data['work_order_id']);
+        $work_order             =   WorkOrder::findOrFail($data['work_order_id']);
 
         $dto['work_order_id']   =   $work_order->id;
         $dto['document_number'] =   'OT-' . $work_order->id;

@@ -143,7 +143,6 @@
                     item: (item, escape) => `<div>${escape(item.full_name)}</div>`
                 }
             });
-
         }
 
         function loadDtOrders() {

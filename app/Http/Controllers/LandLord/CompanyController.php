@@ -309,7 +309,7 @@ class CompanyController extends Controller
             [
                 'company_id' => $company->id,
                 'document_type_id' => $serializable_document->id,
-                'serie' => $serializable_document->parametero . '01',
+                'serie' => $serializable_document->parameter . '01',
                 'number_limit' => 8,
                 'destiny' => 'NOTA DE VENTA',
                 'default' => 'NO',

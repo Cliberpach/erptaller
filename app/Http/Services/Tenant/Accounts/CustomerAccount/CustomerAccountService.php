@@ -9,6 +9,7 @@ use App\Models\Tenant\Accounts\CustomerAccount;
 use App\Models\Tenant\Accounts\CustomerAccountDetail;
 use App\Models\Tenant\WorkShop\WorkOrder\WorkOrder;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Exception;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\File;
 
@@ -47,15 +48,15 @@ class CustomerAccountService
 
         $customer_account   =   $data['customer_account'];
         $balance            =   round($customer_account->balance, 2);
-        $paid               =   round($customer_account->paid,2);
+        $paid               =   round($customer_account->paid, 2);
         $amount_pay         =   round($data['cantidad'], 2);
         $new_balance        =   $balance - $amount_pay;
         $new_paid           =   $paid + $amount_pay;
         $new_status         =   $new_balance == 0 ? 'PAGADO' : 'PENDIENTE';
 
-        $dto_account        =   ['balance' => $new_balance, 'status' => $new_status,'paid'=>$new_paid];
+        $dto_account        =   ['balance' => $new_balance, 'status' => $new_status, 'paid' => $new_paid];
         $this->s_repository->updateCustomerAccount($data['id'], $dto_account);
-        
+
         $data['balance']    =   $new_balance;
         $data['paid']       =   $new_paid;
         $dto    =   $this->s_dto->getDtoPay($data);
@@ -106,5 +107,55 @@ class CustomerAccountService
             'detalle'   => $detalle
         ])->setPaper('a4');
         return $pdf->stream('CUENTA-' . $cuenta->id . '.pdf');
+    }
+
+    public function updateFromWorkOrder(array $dto)
+    {
+        $account        =   $this->s_repository->findByWorkOrder($dto['work_order_id']);
+        $work_order     =   WorkOrder::findOrFail($dto['work_order_id']);
+
+        $total_order    =   round($work_order->total, 2);
+        $amount         =   round($account->amount, 2);
+        $paid           =   round($account->paid, 2);
+        $new_amount     =   round($account->amount, 2);
+        $new_balance    =   round($account->balance, 2);
+        $new_status     =   $account->status;
+
+        if ($total_order === $amount) {
+            return;
+        }
+
+        if ($total_order > $amount) {
+            $amount         =   round($account->amount, 2);
+            $new_amount     =   $total_order;
+            $new_balance    =   round($new_amount - $account->paid, 2);
+            $new_status     =   'PENDIENTE';
+        }
+
+        if ($total_order < $amount) {
+            if ($total_order < $paid) {
+                throw new Exception(
+                    "EL TOTAL DE LA ORDEN DEBE SER MAYOR A LO PAGADO EN LA CUENTA: " .
+                        number_format($total_order, 2, ',', '.') .
+                        " - " .
+                        number_format($paid, 2, ',', '.')
+                );
+            } else {
+                $new_amount     =   $total_order;
+                $new_balance    =   round($new_amount - $account->paid, 2);
+            }
+        }
+
+        if ($new_balance == 0) {
+            $new_status =   'PAGADO';
+        }
+
+        $dto    =   [
+            'amount'    =>  $new_amount,
+            'balance'   =>  $new_balance,
+            'status'    =>  $new_status
+        ];
+
+        return $this->s_repository->updateCustomerAccount($account->id, $dto);
     }
 }

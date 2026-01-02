@@ -3,6 +3,7 @@
 namespace App\Http\Services\Tenant\WorkShop\WorkOrders;
 
 use App\Http\Services\Tenant\Inventory\WarehouseProduct\WarehouseProductService;
+use App\Models\Tenant\Accounts\CustomerAccount;
 use App\Models\Tenant\Configuration;
 use App\Models\Tenant\WorkShop\Quote\Quote;
 use App\Models\Tenant\WorkShop\WorkOrder\WorkOrder;
@@ -47,6 +48,7 @@ class WorkOrderValidation
     {
         $data = $this->validationStore($data);
 
+        //========== VALIDATE ORDER STATUS ========
         $order  =   WorkOrder::findOrFail($id);
         if ($order->status === 'ANULADO') {
             throw new Exception("NO SE PUEDE MODIFICAR UNA ORDEN DE TRABAJO ANULADA");
@@ -56,8 +58,15 @@ class WorkOrderValidation
             throw new Exception("NO SE PUEDE MODIFICAR UNA ORDEN DE TRABAJO EXPIRADA");
         }
 
+        //========= ACCOUNT STATUS =========
+        $account    =   CustomerAccount::where('work_order_id', $order->id)->first();
+
+        if ($account->status !== 'PENDIENTE') {
+            throw new Exception("ESTA ORDEN TIENE UNA CUENTA CON ESTADO: " . $account->status . ", NO SE PERMITE EDITAR");
+        }
+       
         $data['validation_stock']           =   Configuration::findOrFail(2)->property === '1' ? true : false;
-        $data['validation_stock_preview']   =   $order->validation_stock?true:false;
+        $data['validation_stock_preview']   =   $order->validation_stock ? true : false;
 
         return $data;
     }
@@ -81,34 +90,35 @@ class WorkOrderValidation
         }
     }
 
-    public function validationInvoice(array $data){
+    public function validationInvoice(array $data)
+    {
         $work_order_id  =   $data['work_order_id'];
         $lst_products   =   json_decode($data['lst_products']);
         $lst_services   =   json_decode($data['lst_services']);
 
-        if(count($lst_products) === 0 && count($lst_services) === 0){
+        if (count($lst_products) === 0 && count($lst_services) === 0) {
             throw new Exception("LA ORDEN DE TRABAJO ESTÁ VACÍA");
         }
 
         foreach ($lst_products as $item) {
-            $exists =   WorkOrderProduct::where('work_order_id',$work_order_id)
-                        ->where('product_id',$item->id)
-                        ->where('invoiced',true)
-                        ->exists();
+            $exists =   WorkOrderProduct::where('work_order_id', $work_order_id)
+                ->where('product_id', $item->id)
+                ->where('invoiced', true)
+                ->exists();
 
-            if($exists){
-                throw new Exception($item->name.',YA FUE FACTURADO EN ESTA ORDEN: OT-'.$work_order_id->id);
+            if ($exists) {
+                throw new Exception($item->name . ',YA FUE FACTURADO EN ESTA ORDEN: OT-' . $work_order_id->id);
             }
         }
 
         foreach ($lst_services as $item) {
-            $exists =   WorkOrderService::where('work_order_id',$work_order_id)
-                        ->where('service_id',$item->id)
-                        ->where('invoiced',true)
-                        ->exists();
+            $exists =   WorkOrderService::where('work_order_id', $work_order_id)
+                ->where('service_id', $item->id)
+                ->where('invoiced', true)
+                ->exists();
 
-            if($exists){
-                throw new Exception($item->name.',YA FUE FACTURADO EN ESTA ORDEN: OT-'.$work_order_id->id);
+            if ($exists) {
+                throw new Exception($item->name . ',YA FUE FACTURADO EN ESTA ORDEN: OT-' . $work_order_id->id);
             }
         }
 
@@ -116,6 +126,5 @@ class WorkOrderValidation
         $data['lst_services']   =   $lst_services;
 
         return $data;
-
     }
 }

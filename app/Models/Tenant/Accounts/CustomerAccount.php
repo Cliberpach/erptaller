@@ -17,7 +17,7 @@ class CustomerAccount extends Model
         'document_number',
         'document_date',
         'amount',
-        'agreement',
+        'paid',
         'balance',
         'status',
         'work_order_id',

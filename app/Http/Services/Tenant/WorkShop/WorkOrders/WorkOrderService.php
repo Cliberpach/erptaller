@@ -17,6 +17,7 @@ use App\Models\Department;
 use App\Models\District;
 use App\Models\Landlord\Color;
 use App\Models\Province;
+use App\Models\Tenant\Accounts\CustomerAccount;
 use App\Models\Tenant\Configuration;
 use App\Models\Tenant\Sale;
 use App\Models\Tenant\Warehouse;
@@ -48,10 +49,10 @@ class WorkOrderService
 
     public function store(array $data): WorkOrder
     {
-        $data           =   $this->s_validation->validationStore($data);
-        $dto            =   $this->s_dto->getDtoStore($data);
+        $data               =   $this->s_validation->validationStore($data);
+        $dto                =   $this->s_dto->getDtoStore($data);
 
-        $work_order     =   $this->s_repository->insertWorkOrder($dto);
+        $work_order         =   $this->s_repository->insertWorkOrder($dto);
 
         $dto_inventory      =   $this->s_dto->getDtoInventory($data['inventory_items'] ?? [], $work_order);
         $dto_technicians    =   $this->s_dto->getDtoTechnicians($data['technicians'] ?? [], $work_order);
@@ -71,19 +72,22 @@ class WorkOrderService
 
     public function update(array $data, int $id): WorkOrder
     {
+        //========== VALIDACIÓN ========
         $data       =   $this->s_validation->validationUpdate($data, $id);
 
+        //======== DTO ========
         $dto        =   $this->s_dto->getDtoStore($data);
 
+        //======== UPDATE =========
         $work_order =   $this->s_repository->updateWorkOrder($dto, $id);
 
+        //========= INCREASE STOCK ==========
         if ($data['validation_stock_preview']) {
             $products_preview   =   $this->s_repository->getWorkProducts($id);
             foreach ($products_preview as $item) {
                 $this->s_warehouse_product->increaseStock($item->warehouse_id, $item->product_id, $item->quantity);
             }
         }
-
 
         $this->s_repository->deleteDetailProduct($id);
         $this->s_repository->deleteDetailService($id);
@@ -97,6 +101,10 @@ class WorkOrderService
         $dto_technicians    =   $this->s_dto->getDtoTechnicians($data['technicians'] ?? [], $work_order);
         $this->s_repository->insertWorkTechnicians($dto_technicians);
 
+        //========== ACCOUNT ==========
+        $this->s_customer_account->updateFromWorkOrder(['work_order_id'=>$work_order->id]);
+
+        //======== IMGS ========
         $this->updateWorkImages($id, $data['vehicle_images'] ?? []);
 
         return $work_order;
@@ -121,7 +129,7 @@ class WorkOrderService
         $order  =   $this->s_repository->finish($id);
 
         $this->s_kardex->storeFromWorkOrder($order);
-      
+
         return $order;
     }
 
