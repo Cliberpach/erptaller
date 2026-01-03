@@ -115,20 +115,12 @@
                     <div class="d-flex align-items-center mb-2">
                         <input id="image_edit" name="image_edit" class="form-control form-control-sm mr-2"
                             type="file" accept="image/*">
-                        <button type="button" class="btn btn-danger btnSetImgEditDefault" title="Quitar imagen">
-                            <i class="fa-solid fa-trash-can"></i>
-                        </button>
+
                     </div>
                     <span class="image_edit_error msgError text-danger"></span>
-                    <div id="img_preview_container"
-                        class="border rounded d-flex align-items-center justify-content-center"
-                        style="height:160px; width:100%; border: 2px dashed #ddd; padding: 10px; text-align: center;">
-                        <img class="imgShowLightBox" src="{{ asset('assets/img/products/img_default.png') }}"
-                            id="img_vista_previa_edit"
-                            style="height: 160px; max-width:260px; object-fit: cover; cursor:pointer;">
-                    </div>
                 </div>
             </div>
+            
         </div>
     </div>
 </form>

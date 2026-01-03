@@ -13,6 +13,8 @@
     @include('product.modals.mdl_create')
     @include('product.modals.mdl_edit')
     @include('product.modals.mdl_import')
+    @include('utils.modals.categories.mdl_create')
+    @include('utils.modals.brands.mdl_create')
 
     <x-card>
         <x-slot name="headerCard">
@@ -59,6 +61,8 @@
             eventsMdlCreateProduct();
             eventsMdlEditProduct();
             eventsMdlImportarProductos();
+            eventsMdlCategory();
+            eventsMdlBrand();
         }
 
         function loadDtProducts() {

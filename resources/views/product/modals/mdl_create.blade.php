@@ -32,11 +32,15 @@
 </div>
 
 <script>
+    let pondImg = null;
+
     function openMdlCreate() {
         $('#mdl-create-product').modal('show');
     }
 
     function eventsMdlCreateProduct() {
+        loadFilePound();
+
         document.querySelector('#form-create-product').addEventListener('submit', (e) => {
             e.preventDefault();
             registrarProducto(e.target);
@@ -70,6 +74,29 @@
 
         $('#mdl-create-product').on('hidden.bs.modal', function() {
             clearMdlCreateProduct();
+        });
+    }
+
+    function loadFilePound() {
+        const inputImg = document.querySelector('#image');
+
+        pondImg = FilePond.create(inputImg, {
+            allowImagePreview: true,
+            imagePreviewHeight: 120,
+            imageCropAspectRatio: '1:1',
+            styleLayout: 'compact',
+            stylePanelAspectRatio: 0.5,
+            storeAsFile: true,
+
+            maxFileSize: '2MB',
+            acceptedFileTypes: [
+                'image/jpeg',
+                'image/png',
+                'image/webp',
+                'image/avif'
+            ],
+            labelFileTypeNotAllowed: 'Formato no permitido',
+            labelMaxFileSizeExceeded: 'El archivo supera los 2 MB',
         });
     }
 
@@ -164,6 +191,8 @@
         window.brandSelect.clear();
         setText(window.categorySelect, 'REPUESTO');
         setText(window.brandSelect, 'NACIONAL');
-        document.querySelector('.btnSetImgDefault').click();
+        if (pondImg) {
+            pondImg.removeFiles();
+        }
     }
 </script>

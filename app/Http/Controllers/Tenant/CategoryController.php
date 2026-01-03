@@ -30,7 +30,7 @@ class CategoryController extends Controller
             'id',
             'name'
         )
-        ->where('status', 'ACTIVE');
+            ->where('status', 'ACTIVE');
 
         return DataTables::of($categories)->make(true);
     }
@@ -52,20 +52,14 @@ array:2 [ // app\Http\Controllers\Tenant\CategoryController.php:36
 
             $category       =   Category::create($data);
 
-            // Responder con JSON en caso de éxito
-            if ($request->ajax()) {
-                return response()->json([
-                    'type' => 'success',
-                    'message' => 'Categoría creada exitosamente.',
-                    'data' => [
-                        'id' => $category->id,
-                        'name' => $category->name
-                    ]
-                ]);
-            }
-
             DB::commit();
-            return response()->json(['success' => true, 'message' => 'CATEGORÍA REGISTRADA CON ÉXITO']);
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'CATEGORÍA REGISTRADA CON ÉXITO',
+                'category' => $category
+            ]);
+
         } catch (Throwable $th) {
             DB::rollBack();
 
@@ -141,7 +135,7 @@ array:2 [ // app\Http\Controllers\Tenant\CategoryController.php:36
         return Excel::download(new CategoryFormatExport(), 'formato_import_categorias.xlsx');
     }
 
-/*
+    /*
 array:1 [ // app\Http\Controllers\Tenant\CategoryController.php:146
   "categorias_import_excel" =>
 Illuminate\Http\UploadedFile {#1885

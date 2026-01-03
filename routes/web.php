@@ -4,19 +4,13 @@ use App\Http\Controllers\LandLord\ApiController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Tenant\UserController;
 use App\Http\Controllers\Tenant\BookController;
-use App\Http\Controllers\Tenant\BrandController;
 use App\Http\Controllers\Tenant\Cash\PettyCashController;
-use App\Http\Controllers\Tenant\CategoryController;
 use App\Http\Controllers\Tenant\FieldController;
 use App\Http\Controllers\Tenant\Consultas\ConsultasCreditosController;
 use App\Http\Controllers\Tenant\Consultas\QueryReservationController;
 use App\Http\Controllers\Tenant\CustomerController;
-use App\Http\Controllers\Tenant\InventoryController;
-use App\Http\Controllers\Tenant\KardexController;
 use App\Http\Controllers\Tenant\Maintenance\BankAccountController;
 use App\Http\Controllers\Tenant\ModuleController;
-use App\Http\Controllers\Tenant\NoteIncomeController;
-use App\Http\Controllers\Tenant\NoteReleaseController;
 use App\Http\Controllers\Tenant\PettyCashBookController;
 use App\Http\Controllers\Tenant\ProductController;
 use App\Http\Controllers\Tenant\Purchase\PurchaseDocumentoController;
@@ -26,7 +20,6 @@ use App\Http\Controllers\Tenant\Reports\ReportFieldController;
 use App\Http\Controllers\Tenant\Reports\ReportSaleController;
 use App\Http\Controllers\Tenant\Reports\ReservationDocumentController;
 use App\Http\Controllers\Tenant\SupplierController;
-use App\Http\Controllers\Tenant\ValuedKardexController;
 use App\Http\Controllers\Tenant\WorkShop\ModelController;
 use App\Http\Controllers\Tenant\WorkShop\ServiceController;
 use App\Http\Controllers\Tenant\WorkShop\VehicleController;
@@ -92,71 +85,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
         });
     });
 
-    Route::group(["prefix" => "inventarios", 'middleware' => 'validar.plan:inventario'], function () {
 
-        Route::get('productos/categoria', [CategoryController::class, 'index'])->name('tenant.inventarios.productos.categoria');
-        Route::get('productos/categoria/get-all', [CategoryController::class, 'getAll'])->name('tenant.inventarios.productos.categoria.get-all');
-        Route::post('productos/registrar-categoria', [CategoryController::class, 'store'])->name('tenant.inventarios.productos.categoria.store');
-        Route::put('productos/actualizar-categoria/{id}', [CategoryController::class, 'update'])->name('tenant.inventarios.productos.categoria.update');
-        Route::delete('productos/eliminar-categoria/{id}', [CategoryController::class, 'destroy'])->name('tenant.inventarios.productos.categoria.destroy');
-        Route::get('/get-format-excel', [CategoryController::class, 'getFormatExcel'])->name('tenant.inventarios.productos.categoria.get-format-excel');
-        Route::post('/import-categories-excel', [CategoryController::class, 'importCategoriesExcel'])->name('tenant.inventarios.productos.categoria.import-categories-excel');
-
-        Route::get('productos/marca', [BrandController::class, 'index'])->name('tenant.inventarios.productos.marca');
-        Route::get('productos/marca/get-all', [BrandController::class, 'getAll'])->name('tenant.inventarios.productos.marca.get-all');
-        Route::post('productos/registrar-marca', [BrandController::class, 'store'])->name('tenant.inventarios.productos.marca.store');
-        Route::put('productos/actualizar-marca/{id}', [BrandController::class, 'update'])->name('tenant.inventarios.productos.marca.update');
-        Route::delete('productos/eliminar-marca/{id}', [BrandController::class, 'destroy'])->name('tenant.inventarios.productos.marca.destroy');
-        Route::get('/marca/get-format-excel', [BrandController::class, 'getFormatExcel'])->name('tenant.inventarios.productos.marca.get-format-excel');
-        Route::post('/marca/import-marcas-excel', [BrandController::class, 'importExcel'])->name('tenant.inventarios.productos.marca.import-excel');
-
-        Route::get('productos/producto', [ProductController::class, 'index'])->name('tenant.inventarios.productos.producto');
-        Route::get('productos/producto/get-all', [ProductController::class, 'getAll'])->name('tenant.inventarios.productos.producto.get-all');
-        Route::post('productos/registrar-producto', [ProductController::class, 'store'])->name('tenant.inventarios.productos.store');
-        Route::put('productos/actualizar-producto/{id}', [ProductController::class, 'update'])->name('tenant.inventarios.productos.update');
-        Route::delete('productos/eliminar-producto/{id}', [ProductController::class, 'destroy'])->name('tenant.inventarios.productos.destroy');
-        Route::get('/producto/get-format-excel', [ProductController::class, 'getFormatExcel'])->name('tenant.inventarios.productos.producto.get-format-excel');
-        Route::post('/producto/import-producto-excel', [ProductController::class, 'importExcel'])->name('tenant.inventarios.productos.producto.import-excel');
-        Route::post('/producto/export-producto-excel', [ProductController::class, 'exportExcel'])->name('tenant.inventarios.productos.producto.export-excel');
-
-
-        Route::get('servicio', [InventoryController::class, 'service'])->name('tenant.inventarios.servicio');
-        Route::get('movimiento', [InventoryController::class, 'movement'])->name('tenant.inventarios.movimiento');
-        Route::get('devolucion-proveedor', [InventoryController::class, 'supplierReturn'])->name('tenant.inventarios.devolucion_proveedor');
-
-        //============ KARDEX ============
-        Route::get('kardex', [KardexController::class, 'index'])->name('tenant.inventory.kardex.index');
-        Route::get('getKardex', [KardexController::class, 'getKardex'])->name('tenant.inventory.kardex.getKardex');
-        Route::get('kardex/excel', [KardexController::class, 'excel'])->name('tenant.inventory.kardex.excel');
-        Route::get('kardex/pdf', [KardexController::class, 'pdf'])->name('tenant.inventory.kardex.pdf');
-
-        Route::get('inventario', [InventoryController::class, 'index'])->name('tenant.inventarios.inventario');
-        Route::get('inventario/getInventory', [InventoryController::class, 'getInventory'])->name('tenant.inventarios.inventario.getInventory');
-        Route::get('inventario/excel', [InventoryController::class, 'excel'])->name('tenant.inventarios.inventario.excel');
-        Route::get('inventario/pdf', [InventoryController::class, 'pdf'])->name('tenant.inventarios.inventario.pdf');
-
-        Route::get('kardex-valor/index', [ValuedKardexController::class, 'index'])->name('tenant.inventarios.kardex_valorizado');
-        Route::get('kardex-valor/getValuedKardex', [ValuedKardexController::class, 'getValuedKardex'])->name('tenant.inventarios.kardex_valorizado.getValuedKardex');
-        Route::get('kardex-valor/pdf', [ValuedKardexController::class, 'pdf'])->name('tenant.inventarios.kardex_valorizado.pdf');
-
-        //============ NOTA INGRESO ========
-        Route::get('nota_ingreso', [NoteIncomeController::class, 'index'])->name('tenant.inventarios.nota_ingreso');
-        Route::get('getNoteIncome', [NoteIncomeController::class, 'getNoteIncome'])->name('tenant.inventarios.nota_ingreso.getNoteIncome');
-        Route::get('nota_ingreso/create', [NoteIncomeController::class, 'create'])->name('tenant.inventarios.nota_ingreso.create');
-        Route::post('nota_ingreso/store', [NoteIncomeController::class, 'store'])->name('tenant.inventarios.nota_ingreso.store');
-        Route::get('getProducts', [NoteIncomeController::class, 'getProducts'])->name('tenant.inventarios.nota_ingreso.getProducts');
-        Route::get('nota_ingreso/show/{id}', [NoteIncomeController::class, 'show'])->name('tenant.inventarios.nota_ingreso.show');
-
-
-        //============ NOTA SALIDA ========
-        Route::get('nota_salida', [NoteReleaseController::class, 'index'])->name('tenant.inventarios.nota_salida');
-        Route::get('nota_salida/create', [NoteReleaseController::class, 'create'])->name('tenant.inventarios.nota_salida.create');
-        Route::get('nota_salida/getProducts', [NoteReleaseController::class, 'getProducts'])->name('tenant.inventarios.nota_salida.getProducts');
-        Route::get('nota_salida/validateStock/{product_id}/{quantity}', [NoteReleaseController::class, 'validateStock'])->name('tenant.inventarios.nota_salida.validateStock');
-        Route::post('nota_salida/store', [NoteReleaseController::class, 'store'])->name('tenant.inventarios.nota_salida.store');
-        Route::get('getNotesRelease', [NoteReleaseController::class, 'getNotesRelease'])->name('tenant.inventarios.nota_salida.getNotesRelease');
-        Route::get('nota_salida/show/{id}', [NoteReleaseController::class, 'show'])->name('tenant.inventarios.nota_salida.show');
-    });
 
     Route::group(["prefix" => "campos"], function () {
         Route::post('tipo-campo', [FieldController::class, 'fieldType'])->name('tenant.campos.tipo_campo');
@@ -236,6 +165,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     require __DIR__ . '/tenant/sales/web.php';
     require __DIR__ . '/tenant/accounts/web.php';
     require __DIR__ . '/tenant/queries/web.php';
+    require __DIR__ . '/tenant/inventory/web.php';
 
 
     Route::get("landlord/ruc/{ruc}", [ApiController::class, 'apiRuc']);

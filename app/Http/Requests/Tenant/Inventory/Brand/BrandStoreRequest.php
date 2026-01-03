@@ -16,6 +16,22 @@ class BrandStoreRequest extends FormRequest
         return true;
     }
 
+      protected function prepareForValidation(): void
+    {
+        $data = $this->all();
+
+        foreach ($data as $key => $value) {
+            if (str_ends_with($key, '_mdlbrand')) {
+                $newKey = str_replace('_mdlbrand', '', $key);
+
+                $data[$newKey] = $value;
+                unset($data[$key]);
+            }
+        }
+
+        $this->replace($data);
+    }
+
     /**
      * Get the validation rules that apply to the request.
      *

@@ -35,7 +35,6 @@ class BrandController extends Controller
         return DataTables::of($categories)->make(true);
     }
 
-    // Almacenar una nueva marca
     public function store(BrandStoreRequest $request)
     {
 
@@ -45,13 +44,13 @@ class BrandController extends Controller
 
             $brand          =   Brand::create($data);
 
-            // Responder con JSON en caso de éxito
-            if ($request->ajax()) {
-                return response()->json(['type' => 'success', 'data' => $brand, 'message' => 'Marca registrada exitosamente.']);
-            }
-
             DB::commit();
-            return response()->json(['success' => true, 'message' => 'MARCA REGISTRADA CON ÉXITO']);
+            return response()->json([
+                'success' => true,
+                'message' => 'MARCA REGISTRADA CON ÉXITO',
+                'brand' => $brand
+            ]);
+
         } catch (Throwable $th) {
             DB::rollBack();
             if ($request->ajax()) {
@@ -125,7 +124,7 @@ class BrandController extends Controller
         return Excel::download(new BrandFormatExport(), 'formato_import_marcas.xlsx');
     }
 
-/*
+    /*
 array:1 [ // app\Http\Controllers\Tenant\CategoryController.php:146
   "marcas_import_excel" =>
 Illuminate\Http\UploadedFile {#1885

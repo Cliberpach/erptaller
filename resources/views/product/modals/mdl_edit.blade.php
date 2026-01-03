@@ -30,6 +30,8 @@
 </div>
 
 <script>
+    let pondImgEdit = null;
+
     const parameters = {
         id: null,
         row: null,
@@ -38,6 +40,7 @@
 
     function eventsMdlEditProduct() {
         loadTomSelectEdit();
+        loadFilePoundEdit();
 
         document.querySelector('#form-edit-product').addEventListener('submit', (e) => {
             e.preventDefault();
@@ -154,6 +157,29 @@
         $('#mdl-edit-product').modal('show');
     }
 
+    function loadFilePoundEdit() {
+        const inputImg = document.querySelector('#image_edit');
+
+        pondImgEdit = FilePond.create(inputImg, {
+            allowImagePreview: true,
+            imagePreviewHeight: 120,
+            imageCropAspectRatio: '1:1',
+            styleLayout: 'compact',
+            stylePanelAspectRatio: 0.5,
+            storeAsFile: true,
+
+            maxFileSize: '2MB',
+            acceptedFileTypes: [
+                'image/jpeg',
+                'image/png',
+                'image/webp',
+                'image/avif'
+            ],
+            labelFileTypeNotAllowed: 'Formato no permitido',
+            labelMaxFileSizeExceeded: 'El archivo supera los 2 MB',
+        });
+    }
+
     function setFormEdit(row) {
         document.querySelector('#name_edit').value = row.name;
         document.querySelector('#description_edit').value = row.description;
@@ -166,13 +192,14 @@
         window.categoryEditSelect.setValue(row.category_id);
         window.brandEditSelect.setValue(row.brand_id);
 
-        const imgPreview = document.querySelector('#img_vista_previa_edit');
+        if (!pondImgEdit) return;
+        pondImgEdit.removeFiles();
+
         if (row.img_route) {
-            console.log(@json(asset('')) + row.img_route);
-            imgPreview.src = @json(asset('')) + row.img_route;
-        } else {
-            imgPreview.src = "{{ asset('assets/img/products/img_default.png') }}";
-        }
+            pondImgEdit.addFile(
+                @json(asset('')) + row.img_route
+            );
+        } 
     }
 
     function updateProduct(formUpdateProduct) {

@@ -73,6 +73,9 @@
             <div class="col-lg-12 col-md-12 mb-3">
                 <label for="category_id" class="form-label required_field">Categoría</label>
 
+                <i class="fas fa-plus btn btn-warning btn-sm" onclick="openMdlCreateCategory();"
+                    style="margin-left:4px;"></i>
+
                 <select name="category_id" style="text-transform: uppercase;" id="category_id"
                     class="select2_form form-select" aria-label="Default select example">
                     <option value=""></option>
@@ -87,6 +90,9 @@
 
             <div class="col-lg-12 col-md-12 mb-3">
                 <label for="brand" class="form-label required_field">Marca</label>
+                <i class="fas fa-plus btn btn-warning btn-sm" onclick="openMdlCreateBrand();"
+                    style="margin-left:4px;"></i>
+
                 <select name="brand_id" style="text-transform: uppercase;" id="brand_id"
                     class="brand select2_form form-select" aria-label="Default select example">
                     <option value=""></option>
@@ -104,21 +110,13 @@
                     <label for="image" class="font-weight-bold" style="font-weight: bold;">IMAGEN</label>
                     <div class="d-flex align-items-center mb-2">
                         <input id="image" name="image" class="form-control form-control-sm mr-2"
-                            type="file" accept="image/*">
-                        <button type="button" class="btn btn-danger btnSetImgDefault" title="Quitar imagen">
-                            <i class="fa-solid fa-trash-can"></i>
-                        </button>
+                            type="file"
+                            accept=".jpg,.jpeg,.png,.webp,.avif,image/jpeg,image/png,image/webp,image/avif">
                     </div>
                     <span class="image_error msgError text-danger"></span>
-                    <div id="img_preview_container"
-                        class="d-flex align-items-center justify-content-center rounded border"
-                        style="height:160px; width:100%; border: 2px dashed #ddd; padding: 10px; text-align: center;">
-                        <img class="imgShowLightBox" src="{{ asset('assets/img/products/img_default.png') }}"
-                            id="img_vista_previa"
-                            style="height: 160px; max-width:260px; object-fit: cover; cursor:pointer;">
-                    </div>
                 </div>
             </div>
+
         </div>
     </div>
 </form>
