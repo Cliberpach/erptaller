@@ -9,7 +9,7 @@
 @endsection
 
 @section('content')
-    @include('utils.spinners.spinner_1')
+    @include('utils.modals.vehicles.mdl_create_vehicle')
 
     <x-card style="margin-top: 0;width:100%;">
         @csrf
@@ -56,6 +56,7 @@
 
         function events() {
 
+            eventsMdlVehicle();
             eventsMdlCreateCustomer();
 
             //========== SELECT2 BÚSQUEDA CLIENTE ======

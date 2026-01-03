@@ -81,6 +81,7 @@
                 </div>
 
             </div>
+
         </div>
         <div class="card-body p-0 pb-2">
 
@@ -93,6 +94,7 @@
             </div>
 
         </div>
+
     </div>
 @endsection
 
@@ -346,7 +348,6 @@
                 }
             });
         }
-
 
         function goToSaleCreate() {
             const route = @json(route('tenant.ventas.comprobante_venta.create'));

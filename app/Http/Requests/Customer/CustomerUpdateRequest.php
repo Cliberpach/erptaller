@@ -8,7 +8,7 @@ use Illuminate\Validation\Rule;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Support\Facades\DB;
 
-class CustomerStoreRequest extends FormRequest
+class CustomerUpdateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -55,7 +55,8 @@ class CustomerStoreRequest extends FormRequest
                     }
                 },
                 Rule::unique('landlord.customers', 'document_number')
-                    ->where('status', 'ACTIVO'),
+                ->where('status', 'ACTIVO')
+                ->ignore($this->route('id')),
             ],
             'name'    => ['required', 'string', 'max:160'],
             'address' => ['nullable', 'string', 'max:160'],

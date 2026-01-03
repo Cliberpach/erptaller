@@ -4,28 +4,59 @@ namespace App\Http\Controllers\Tenant;
 
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\LandLord\ApiController;
+use App\Http\Controllers\UtilController;
 use App\Http\Requests\Customer\CustomerStoreRequest;
+use App\Http\Requests\Customer\CustomerUpdateRequest;
 use App\Http\Requests\CustomerRequest;
+use App\Models\Department;
+use App\Models\District;
 use App\Models\Landlord\Customer;
 use App\Models\Landlord\TypeIdentityDocument;
+use App\Models\Province;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Spatie\Multitenancy\Models\Tenant;
 use Throwable;
+use Yajra\DataTables\Facades\DataTables;
 
 class CustomerController extends Controller
 {
     //
     public function index()
     {
-        $customersList = DB::connection('landlord')->select('select * from customers');
-        $customer = Customer::all();
-        return view('customer.index', compact('customersList', 'customer'));
+        return view('sales.customers.index');
     }
     public function create()
     {
-        return view('customer.create-customer-modal');
+        $types_identity_documents   =   UtilController::getIdentityDocuments();
+        $departments                =   Department::all();
+        $provinces                  =   Province::all();
+        $districts                  =   District::all();
+
+        return view('sales.customers.create', compact(
+            'types_identity_documents',
+            'departments',
+            'provinces',
+            'districts'
+        ));
+    }
+
+    public function getAll(Request $request)
+    {
+        $customer_id    =   $request->get('customer_id');
+
+        $items          =   Customer::from('erptaller.customers as c')
+            ->where('status', 'ACTIVO')
+            ->select(
+                'c.*'
+            );
+
+        if ($customer_id) {
+            $items->where('c.id', $customer_id);
+        }
+
+        return DataTables::of($items)->make(true);
     }
 
     /*
@@ -44,6 +75,21 @@ class CustomerController extends Controller
     */
 
     /*
+    array:10 [ // app\Http\Controllers\Tenant\CustomerController.php:88
+        "_token" => "Du7MC6WLcLFE0xbbeCZAD4KgZNkb8emP0HA2F1ed"
+        "type_identity_document" => "3"
+        "nro_document" => "20156003060"
+        "name" => "MUNICIPALIDAD PROVINCIAL BAGUA"
+        "address" => "AV. HEROES DEL CENEPA NRO. 1060, AMAZONAS - BAGUA - BAGUA"
+        "phone" => null
+        "email" => "municipalidadbagua@gmail.com"
+        "department" => "01"
+        "province" => "0102"
+        "district" => "010201"
+    ]
+    */
+
+    /*
         TIPOS DE DOCUMENTO IDENTIDAD SEGÚN SUNAT:
         01 - DNI
         04 - CARNET EXTRANJERÍA
@@ -58,13 +104,15 @@ class CustomerController extends Controller
 
         try {
 
+            $department                             =   Department::findOrFail($request->get('department'));
+            $province                               =   Province::findOrFail($request->get('province'));
+            $district                               =   District::findOrFail($request->get('district'));
+            $type_identity_document                 =   TypeIdentityDocument::findOrFail($request->get('type_identity_document'));
+
             $customer                               =   new Customer();
             $customer->document_number              =   mb_strtoupper($request->get('nro_document'), 'UTF-8');
             $customer->name                         =   mb_strtoupper($request->get('name'), 'UTF-8');
             $customer->phone                        =   $request->get('phone');
-
-            //======== GRABANDO EL TIPO DE DOCUMENTO DE IDENTIDAD ========
-            $type_identity_document                 =   TypeIdentityDocument::findOrFail($request->get('type_identity_document'));
 
             $customer->type_identity_document_id    =   $request->get('type_identity_document');
             $customer->type_document_name           =   $type_identity_document->name;
@@ -78,81 +126,127 @@ class CustomerController extends Controller
             $customer->province_id                  =   $request->get('province');
             $customer->district_id                  =   $request->get('district');
 
-            $department         =   DB::select(
-                'select
-                                    d.name,
-                                    d.zone
-                                    from departments as d
-                                    where d.id = ?',
-                [$request->get('department')]
-            )[0];
+            $customer->department_name              =   $department->name;
+            $customer->province_name                =   $province->name;
+            $customer->district_name                =   $district->name;
 
-            $customer->department_name  =   $department->name;
-
-            $customer->province_name    =   DB::select(
-                'select
-                                            p.name
-                                            from provinces as p
-                                            where p.id = ?',
-                [$request->get('province')]
-            )[0]->name;
-
-            $customer->district_name    =   DB::select(
-                'select
-                                            d.name
-                                            from districts as d
-                                            where d.id = ?',
-                [$request->get('district')]
-            )[0]->name;
-
-            $customer->zone             =   $department->zone;
-            $customer->ubigeo           =   $request->get('district');
+            $customer->zone                         =   $department->zone;
+            $customer->ubigeo                       =   $request->get('district');
             $customer->save();
 
             DB::commit();
-            return response()->json(['success' => true, 'message' => 'CLIENTE REGISTRADO!!!', 'customer' => $customer]);
+            return response()->json([
+                'success' => true,
+                'message' => 'CLIENTE REGISTRADO!!!',
+                'customer' => $customer
+            ]);
         } catch (Throwable $th) {
             DB::rollBack();
-            return response()->json(['success' => false, 'message' => $th->getMessage(), 'line' => $th->getLine(), 'file' => $th->getFile()]);
+            return response()->json([
+                'success' => false,
+                'message' => $th->getMessage(),
+                'line' => $th->getLine(),
+                'file' => $th->getFile()
+            ]);
         }
     }
 
     public function edit($id)
     {
-        $customer = Customer::findOrFail($id);
-        return view('customer.update-customer-modal', compact('customer'));
+        $customer                   =   Customer::findOrFail($id);
+        $types_identity_documents   =   UtilController::getIdentityDocuments();
+        $departments                =   Department::all();
+        $provinces                  =   Province::all();
+        $districts                  =   District::all();
+        return view('sales.customers.edit', compact(
+            'customer',
+            'types_identity_documents',
+            'departments',
+            'provinces',
+            'districts'
+        ));
     }
 
-    public function update(CustomerRequest $request, $id)
+    /*
+array:10 [ // app\Http\Controllers\Tenant\CustomerController.php:173
+  "_token" => "Du7MC6WLcLFE0xbbeCZAD4KgZNkb8emP0HA2F1ed"
+  "type_identity_document" => "3"
+  "nro_document" => "20156003060"
+  "name" => "MUNICIPALIDAD PROVINCIAL BAGUA"
+  "address" => "AV. HEROES DEL CENEPA NRO. 1060, AMAZONAS - BAGUA - BAGUA"
+  "phone" => null
+  "email" => "MUNICIPALIDADBAGUA@GMAIL.COM"
+  "department" => "1"
+  "province" => "103"
+  "district" => "10304"
+]
+*/
+    public function update(CustomerUpdateRequest $request, $id)
     {
-        $request->validated();
+        DB::beginTransaction();
+        try {
 
-        $customer = Customer::findOrFail($id);
-        $customer->document_number = $request->document_number;
-        $customer->name = $request->name;
-        $customer->phone = $request->phone;
-        $customer->save();
+            $department                             =   Department::findOrFail($request->get('department'));
+            $province                               =   Province::findOrFail($request->get('province'));
+            $district                               =   District::findOrFail($request->get('district'));
+            $type_identity_document                 =   TypeIdentityDocument::findOrFail($request->get('type_identity_document'));
 
-        return redirect()->route('customers.index')->with('datos', 'Cliente actualizado');
+            $customer                               =   Customer::findOrFail($id);
+            $customer->document_number              =   mb_strtoupper($request->get('nro_document'), 'UTF-8');
+            $customer->name                         =   mb_strtoupper($request->get('name'), 'UTF-8');
+            $customer->phone                        =   $request->get('phone');
+
+            $customer->type_identity_document_id    =   $request->get('type_identity_document');
+            $customer->type_document_name           =   $type_identity_document->name;
+            $customer->type_document_abbreviation   =   $type_identity_document->abbreviation;
+            $customer->type_document_code           =   $type_identity_document->code;
+
+            $customer->address                      =   mb_strtoupper($request->get('address'), 'UTF-8');
+            $customer->email                        =   mb_strtoupper($request->get('email'), 'UTF-8');
+
+            $customer->department_id                =   $request->get('department');
+            $customer->province_id                  =   $request->get('province');
+            $customer->district_id                  =   $request->get('district');
+
+            $customer->department_name              =   $department->name;
+            $customer->province_name                =   $province->name;
+            $customer->district_name                =   $district->name;
+
+            $customer->zone                         =   $department->zone;
+            $customer->ubigeo                       =   $request->get('district');
+            $customer->save();
+
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'CLIENTE ACTUALIZADO CON ÉXITO'
+            ]);
+        } catch (Throwable $th) {
+
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => $th->getMessage()
+            ]);
+        }
     }
 
     public function destroy($id)
     {
-        // Encuentra el cliente
-        $customer = Customer::findOrFail($id);
+        DB::beginTransaction();
+        try {
+            $cliente            =   Customer::findOrFail($id);
+            $cliente->status    =   'ANULADO';
+            $cliente->update();
 
-        // Elimina todas las reservas asociadas a este cliente
-        $customer->bookings()->each(function ($booking) {
-
-            $booking->bookingDetails()->delete();
-
-            $booking->delete();
-        });
-
-        //eliminar el cliente
-        $customer->delete();
-
-        return back()->with('datos', 'Cliente eliminado');
+            DB::commit();
+            return response()->json(['success' => true, 'message' => 'CLIENTE ELIMINADO']);
+        } catch (Throwable $th) {
+            DB::rollBack();
+            return response()->json(['success' => false, 'message' => $th->getMessage()]);
+        }
     }
 
     //========== CONSULTAR DOCUMENTO ==========
@@ -227,7 +321,7 @@ class CustomerController extends Controller
             }
 
             if ($type_identity_document == 3) {
-                
+
                 $api_controller     =   new ApiController();
                 $res_consult_api    =   $api_controller->apiRuc($nro_document);
                 $res_consult_api    =   json_decode($res_consult_api);
@@ -251,7 +345,7 @@ class CustomerController extends Controller
             $listCustomers  =   Customer::where('status', 'ACTIVO')->get();
 
             return response()->json(['success' => true, 'listCustomers' => $listCustomers]);
-        } catch (\Throwable $th) {
+        } catch (Throwable $th) {
             return response()->json(['success' => false, 'message' => $th->getMessage()]);
         }
     }

@@ -80,8 +80,8 @@
         //======= CONSULTAR API DOCUMENTO DNI ========
         document.querySelector('#btn_search_nro_document').addEventListener('click', () => {
 
-            const nro_document = document.querySelector('#nro_document').value;
-            const type_identity_document = document.querySelector('#type_identity_document').value;
+            const nro_document              = document.querySelector('#nro_document').value;
+            const type_identity_document    = document.querySelector('#type_identity_document').value;
             toastr.clear();
 
             if (type_identity_document != 1 && type_identity_document != 3) {

@@ -8,44 +8,65 @@
     @include('accounts.customer_accounts.modalDetalle')
 
     <div class="card">
-        <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
-            <h4 class="card-title mb-md-0 mb-2">LISTA DE CUENTAS CLIENTE</h4>
+        <div class="card-header">
 
-            <div class="d-flex flex-wrap gap-2">
-                <div class="row">
-                    {{-- <div class="col-md-4">
-                        <div class="form-group">
-                            <label for="" class="required">Cliente</label>
-                            <select name="cliente_b" id="cliente_b" class="select2_form form-control">
-                                <option value=""></option>
-
-                            </select>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="form-group">
-                            <label for="" class="required">Estado</label>
-                            <select name="estado_b" id="estado_b" class="select2_form form-control">
-                                <option value=""></option>
-                                <option selected value="PENDIENTE">PENDIENTES</option>
-                                <option value="PAGADO">PAGADOS</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="col-md-2">
-                        <div class="form-group">
-                            <button class="btn btn-primary btn-block" id="btn_buscar" type="button"><i
-                                    class="fa fa-search"></i> Buscar</button>
-                        </div>
-                    </div>
-                    <div class="col-md-2">
-                        <div class="form-group">
-                            <button class="btn btn-danger btn-block" id="btn_pdf" type="button"><i
-                                    class="fa fa-file-pdf-o"></i> PDF</button>
-                        </div>
-                    </div> --}}
+            <!-- Fila 1: Título + Botón -->
+            <div class="row align-items-center mb-3">
+                <div class="col-lg-6 col-md-6 col-sm-12">
+                    <h6 class="card-title mb-0">LISTA DE CUENTAS CLIENTE</h6>
                 </div>
             </div>
+
+            <!-- Fila 2: Filtro Cliente -->
+            <div class="row">
+
+                <!-- Cliente -->
+                <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 mb-2">
+                    <label class="form-label fw-bold">
+                        <i class="fas fa-user text-primary mr-1"></i> Cliente:
+                    </label>
+                    <select class="form-control" id="customer_id" name="customer_id">
+                        <option value="">Seleccionar</option>
+                    </select>
+                    <p class="customer_id_error msgError mb-0"></p>
+                </div>
+
+                <!-- Fecha Inicio -->
+                <div class="col-lg-2 col-md-3 col-sm-6 col-xs-12 mb-2">
+                    <label class="form-label fw-bold">
+                        <i class="fas fa-calendar-alt text-success mr-1"></i> Fecha inicio:
+                    </label>
+                    <input type="date" class="form-control" id="start_date" name="start_date">
+                </div>
+
+                <!-- Fecha Fin -->
+                <div class="col-lg-2 col-md-3 col-sm-6 col-xs-12 mb-2">
+                    <label class="form-label fw-bold">
+                        <i class="fas fa-calendar-check text-danger mr-1"></i> Fecha fin:
+                    </label>
+                    <input type="date" class="form-control" id="end_date" name="end_date">
+                </div>
+
+                <!-- Estado -->
+                <div class="col-lg-2 col-md-3 col-sm-12 col-xs-12 mb-2">
+                    <label class="form-label fw-bold">
+                        <i class="fas fa-tasks text-info mr-1"></i> Estado:
+                    </label>
+                    <select class="form-control" id="status" name="status">
+                        <option value="">Todo</option>
+                        <option selected value="PENDIENTE">Pendiente</option>
+                        <option value="PAGADO">Pagado</option>
+                    </select>
+                </div>
+
+                <div class="col-lg-2 col-md-3 col-sm-12 col-xs-12 mb-2 text-end">
+                    <button type="button" id="btn-filter" class="btn btn-primary btn-block" onclick="filterData();">
+                        <i class="fas fa-filter mr-1"></i> Filtrar
+                    </button>
+                </div>
+
+            </div>
+
         </div>
         <div class="card-body">
             <div class="row">
@@ -72,6 +93,7 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             iniciarDtCuentasCliente();
+            loadTomSelect();
             events();
             setDatosDefault();
         })
@@ -93,8 +115,10 @@
                 ajax: {
                     url: "{{ route('tenant.cuentas.cliente.getCustomerAccounts') }}",
                     data: function(d) {
-                        d.customer = $("#cliente_b").val();
-                        d.status = $("#estado_b").val();
+                        d.customer_id = $('#customer_id').val();
+                        d.start_date = $('#start_date').val();
+                        d.end_date = $('#end_date').val();
+                        d.status = $('#status').val();
                     }
                 },
                 columns: [{
@@ -223,7 +247,48 @@
         }
 
 
-
+        function loadTomSelect() {
+            window.clientSelect = new TomSelect('#customer_id', {
+                valueField: 'id',
+                labelField: 'full_name',
+                searchField: ['full_name'],
+                plugins: ['clear_button'],
+                placeholder: 'Seleccione un cliente',
+                maxOptions: 20,
+                create: false,
+                preload: false,
+                onType: (str) => {
+                    lastCustomerQuery = str;
+                },
+                load: async (query, callback) => {
+                    if (!query.length) return callback();
+                    try {
+                        const url = `{{ route('tenant.utils.searchCustomer') }}?q=${encodeURIComponent(query)}`;
+                        const response = await fetch(url);
+                        if (!response.ok) throw new Error('Error al buscar clientes');
+                        const data = await response.json();
+                        const results = data.data ?? [];
+                        callback(results);
+                        if (results.length === 0) {
+                            customerParams.documentSearchCustomer = lastCustomerQuery;
+                            console.log("No se encontró en BD. Guardado:", window.typedCustomer);
+                        }
+                    } catch (error) {
+                        console.error('Error cargando clientes:', error);
+                        callback();
+                    }
+                },
+                render: {
+                    option: (item, escape) => `
+                        <div>
+                            <strong>${escape(item.full_name)}</strong><br>
+                            <small>${escape(item.email ?? '')}</small>
+                        </div>
+                    `,
+                    item: (item, escape) => `<div>${escape(item.full_name)}</div>`
+                }
+            });
+        }
 
         //------------------------------
         $('.dataTables-detalle').DataTable({
@@ -280,6 +345,23 @@
 
         function setDatosDefault() {
             window.modoPagoSelect.setValue(3);
+        }
+
+        function filterData() {
+            const startDate = document.getElementById('start_date')?.value;
+            const endDate = document.getElementById('end_date')?.value;
+
+            if (startDate && endDate) {
+                if (startDate > endDate) {
+                    toastr.error(
+                        'La fecha inicio no puede ser mayor que la fecha fin',
+                        'Fechas inválidas'
+                    );
+                    return;
+                }
+            }
+
+            dtCuentasCliente.ajax.reload();
         }
     </script>
 @endsection

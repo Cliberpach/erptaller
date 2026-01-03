@@ -26,14 +26,15 @@ Route::group(["prefix" => "ventas"], function () {
     });
 
     Route::group(["prefix" => "clientes"], function () {
-        Route::get('cliente', [CustomerController::class, 'index'])->name('tenant.ventas.cliente');
-        Route::get('nuevo-cliente/registrar', [CustomerController::class, 'create'])->name('tenant.ventas.cliente.create');
-        Route::post('nuevo-cliente/guardar', [CustomerController::class, 'store'])->name('tenant.ventas.cliente.store');
-        Route::get('editar-cliente/{id}/editar', [CustomerController::class, 'edit'])->name('tenant.ventas.cliente.edit');
-        Route::put('editar-cliente/{id}/actualizar', [CustomerController::class, 'update'])->name('tenant.ventas.cliente.update');
-        Route::delete('cliente/{id}/eliminar', [CustomerController::class, 'destroy'])->name('tenant.ventas.cliente.delete');
+        Route::get('index', [CustomerController::class, 'index'])->name('tenant.ventas.cliente');
+        Route::get('create', [CustomerController::class, 'create'])->name('tenant.ventas.cliente.create');
+        Route::post('store', [CustomerController::class, 'store'])->name('tenant.ventas.cliente.store');
+        Route::get('edit/{id}', [CustomerController::class, 'edit'])->name('tenant.ventas.cliente.edit');
+        Route::put('update/{id}', [CustomerController::class, 'update'])->name('tenant.ventas.cliente.update');
+        Route::delete('destroy/{id}', [CustomerController::class, 'destroy'])->name('tenant.ventas.cliente.destroy');
         Route::get('consult_document', [CustomerController::class, 'consult_document'])->name('tenant.ventas.cliente.consult_document');
         Route::get('getListCustomers', [CustomerController::class, 'getListCustomers'])->name('tenant.ventas.cliente.getListCustomers');
+        Route::get('getAll', [CustomerController::class, 'getAll'])->name('tenant.ventas.cliente.getAll');
     });
 
     Route::group(["prefix" => "metodos_pago"], function () {

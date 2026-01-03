@@ -32,8 +32,10 @@ class CustomerAccountController extends Controller
     public function getCustomerAccounts(Request $request)
     {
 
-        $customer_id =   $request->get('customer');
-        $status     =   $request->get('status');
+        $customer_id    =   $request->get('customer');
+        $status         =   $request->get('status');
+        $start_date     =   $request->get('start_date');
+        $end_date       =   $request->get('end_date');
 
         $customer_accounts    =   DB::table('customer_accounts as ca')
             ->leftJoin('work_orders as wo', 'wo.id', 'ca.work_order_id')
@@ -53,7 +55,22 @@ class CustomerAccountController extends Controller
             ->where('ca.status', '<>', 'ANULADO');
 
         if ($customer_id) {
-            $customer_accounts->where('wo.customer_id', $customer_id);
+            $customer_accounts->where(function ($q) use ($customer_id) {
+                $q->whereNotNull('ca.work_order_id')
+                    ->where('wo.customer_id', $customer_id);
+            })->orWhere(function ($q) use ($customer_id) {
+                $q->whereNotNull('ca.sale_id')
+                    ->where('sd.customer_id', $customer_id);
+            });
+        }
+        if ($status) {
+            $customer_accounts->where('ca.status', $status);
+        }
+        if ($start_date) {
+            $customer_accounts->whereDate('ca.created_date', '>=', $start_date);
+        }
+        if ($end_date) {
+            $customer_accounts->whereDate('ca.created_date', '<=', $end_date);
         }
         if ($status) {
             $customer_accounts->where('ca.status', $status);

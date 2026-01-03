@@ -9,6 +9,7 @@ use App\Http\Requests\Sale\SaleStoreRequest;
 use App\Http\Services\Tenant\Sale\Sale\SaleManager;
 use App\Models\Company;
 use App\Models\CompanyInvoice;
+use App\Models\Landlord\Color;
 use App\Models\Landlord\Customer;
 use App\Models\Tenant\PaymentMethod;
 use App\Models\Tenant\Sale;
@@ -70,8 +71,8 @@ class SaleController extends Controller
         if ($end_date) {
             $sales->whereDate('sd.created_date', '<=', $end_date);
         }
-        if($status){
-            $sales->where('sd.sunat_status',$status);
+        if ($status) {
+            $sales->where('sd.sunat_status', $status);
         }
 
         return DataTables::of($sales)->make(true);
@@ -99,6 +100,9 @@ class SaleController extends Controller
         $customer_formatted =   FormatController::getFormatInitialCustomer(1);
         $payment_conditions =   UtilController::getPaymentConditions();
 
+        $years                      =   UtilController::getYears();
+        $colors                     =   Color::where('status', 'ACTIVE')->get();
+
         return view(
             'sales.sale_document.create',
             compact(
@@ -115,7 +119,9 @@ class SaleController extends Controller
                 'company_invoice',
                 'invoice_types',
                 'customer_formatted',
-                'payment_conditions'
+                'payment_conditions',
+                'years',
+                'colors'
             )
         );
     }
