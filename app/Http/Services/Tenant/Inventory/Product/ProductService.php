@@ -14,11 +14,13 @@ class ProductService
     private NoteIncomeService $s_note_income;
     private WarehouseProductService $s_warehouse_product;
     private ProductRepository $s_repository;
+    private ProductDto $s_dto;
 
     public function __construct() {
         $this->s_note_income        =   new NoteIncomeService();
         $this->s_warehouse_product  =   new WarehouseProductService();
         $this->s_repository         =   new ProductRepository();
+        $this->s_dto                =   new ProductDto();
     }
 
     public function getProduct(int $product_id)
@@ -40,8 +42,10 @@ class ProductService
 
     public function store(array $data):Product
     {
+        $dto    =   $this->s_dto->getDtoStore($data);
+
         //======== REGISTRAR PRODUCTO =======
-        $product    =   $this->s_repository->insertProduct($data);
+        $product    =   $this->s_repository->insertProduct($dto);
 
         //======= CREAR NOTA INGRESO O REGISTRAR PRODUCTO CON STOCK 0 ======
         if($product->stock == 0){

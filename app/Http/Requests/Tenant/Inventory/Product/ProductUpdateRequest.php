@@ -29,8 +29,8 @@ class ProductUpdateRequest extends FormRequest
                 'required',
                 'string',
                 'min:3',
-                'max:160',
-                Rule::unique('products', 'name')->ignore($this->route('id')) ->where('status', 'ACTIVE'),
+                'max:500',
+                Rule::unique('products', 'name')->ignore($this->route('id'))->where('status', 'ACTIVE'),
             ],
             'description' => 'nullable|string|max:200',
             'sale_price' => 'required|numeric|min:1|max:99999999',
@@ -46,6 +46,10 @@ class ProductUpdateRequest extends FormRequest
             'brand_id' => [
                 'required',
                 Rule::exists('brands', 'id')->where('status', 'ACTIVE')
+            ],
+            'unit_id' => [
+                'required',
+                Rule::exists('landlord.general_table_details', 'id')->where('status', 'ACTIVO')
             ]
         ];
     }
@@ -55,7 +59,7 @@ class ProductUpdateRequest extends FormRequest
         return [
             'name.required' => 'El nombre es obligatorio.',
             'name.min' => 'El nombre debe tener al menos 3 caracteres.',
-            'name.max' => 'El nombre no debe exceder los 160 caracteres.',
+            'name.max' => 'El nombre no debe exceder los 500 caracteres.',
             'name.unique' => 'Ya existe un producto con ese nombre en estado activo.',
 
             'description.max' => 'La descripción no debe exceder los 200 caracteres.',
@@ -91,6 +95,9 @@ class ProductUpdateRequest extends FormRequest
 
             'brand_id.required' => 'La marca es obligatoria.',
             'brand_id.exists' => 'La marca seleccionada no es válida.',
+
+            'unit_id.required' => 'La unidad es obligatoria.',
+            'unit_id.exists' => 'La unidad seleccionada no es válida.',
         ];
     }
 

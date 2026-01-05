@@ -1,5 +1,6 @@
 <ul class="menubar">
-    <li class="menu-item menu-arrow">
+
+    {{-- <li class="menu-item menu-arrow">
         <a class="menu-link" href="javascript:void(0);" role="button">
             <i class="fi fi-rr-apps"></i>
             <span class="menu-label">Dashboard</span>
@@ -10,7 +11,7 @@
                     <span class="menu-label">Dashboard</span>
                 </a>
             </li>
-            {{-- <li class="menu-item">
+            <li class="menu-item">
                 <a class="menu-link" href="index-rtl.html">
                     <span class="menu-label">Dashboard RTL</span>
                 </a>
@@ -49,14 +50,16 @@
                 <a class="menu-link" href="task-management.html">
                     <span class="menu-label">Task Management</span>
                 </a>
-            </li> --}}
-            {{-- <li class="menu-item">
+            </li>
+             <li class="menu-item">
                 <a class="menu-link" href="analytics.html">
                     <span class="menu-label">Analytics</span>
                 </a>
-            </li> --}}
+            </li> --
         </ul>
-    </li>
+    </li> --}}
+
+
     <li class="menu-heading">
         <span class="menu-label">Menu</span>
     </li>

@@ -136,6 +136,37 @@
                 }
             });
         }
+
+        const unitEditSelect = document.getElementById('unit_id_edit');
+        if (unitEditSelect && !unitEditSelect.tomselect) {
+            window.unitEditSelect = new TomSelect(unitEditSelect, {
+                valueField: 'id',
+                labelField: 'description',
+                searchField: ['description', 'id'],
+                placeholder: 'Seleccionar',
+                create: false,
+                sortField: {
+                    field: 'id',
+                    direction: 'desc'
+                },
+                plugins: ['clear_button'],
+                render: {
+                    option: (item, escape) => `
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-ruler-combined me-2 text-primary"></i>
+                                ${escape(item.description)}
+                            </div>
+                        `,
+                    item: (item, escape) => `
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-ruler-combined me-2 text-primary"></i>
+                                ${escape(item.description)}
+                            </div>
+                        `
+                }
+            });
+        }
+
     }
 
     function openMdlEdit(id) {
@@ -191,6 +222,7 @@
 
         window.categoryEditSelect.setValue(row.category_id);
         window.brandEditSelect.setValue(row.brand_id);
+        window.unitEditSelect.setValue(row.unit_id);
 
         if (!pondImgEdit) return;
         pondImgEdit.removeFiles();
@@ -199,7 +231,7 @@
             pondImgEdit.addFile(
                 @json(asset('')) + row.img_route
             );
-        } 
+        }
     }
 
     function updateProduct(formUpdateProduct) {

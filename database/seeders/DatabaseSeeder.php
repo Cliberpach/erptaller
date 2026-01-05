@@ -73,7 +73,6 @@ class DatabaseSeeder extends Seeder
 
     public function runLandlordSpecificSeeders()
     {
-        // example: $this->call(ModuleSeeder::class);
         // note: no olvida llamar al seeder en use part
         $this->call(ModuleSeeder::class);
         $this->call(PermissionSeeder::class);
@@ -90,5 +89,6 @@ class DatabaseSeeder extends Seeder
         $this->call(TypeIdentityDocumentSeeder::class);
         $this->call(BankSeeder::class);
         $this->call(InvoiceTypeSeeder::class);
+        $this->call(UnitMeasurementSeeder::class);
     }
 }

@@ -203,45 +203,56 @@ class UtilController extends Controller
         return $years;
     }
 
-    public static function getCategoriesProducts(){
-        $categories =   Category::where('status','ACTIVE')->get();
+    public static function getCategoriesProducts()
+    {
+        $categories =   Category::where('status', 'ACTIVE')->get();
         return $categories;
     }
 
-    public static function getBrandsProducts(){
-        $brands =   Brand::where('status','ACTIVE')->get();
+    public static function getBrandsProducts()
+    {
+        $brands =   Brand::where('status', 'ACTIVE')->get();
         return $brands;
     }
 
-    public static function getBanks(){
-        $banks  =   GeneralTableDetail::where('general_table_id',3)->where('status','ACTIVO')->get();
+    public static function getBanks()
+    {
+        $banks  =   GeneralTableDetail::where('general_table_id', 3)->where('status', 'ACTIVO')->get();
         return $banks;
     }
 
-    public static function getInvoiceTypes(){
-        $invoice_types  =   GeneralTableDetail::where('general_table_id',4)->where('status','ACTIVO')->get();
+    public static function getInvoiceTypes()
+    {
+        $invoice_types  =   GeneralTableDetail::where('general_table_id', 4)->where('status', 'ACTIVO')->get();
         return $invoice_types;
     }
 
-    public function isActiveInvoiceType(int $id){
+    public function isActiveInvoiceType(int $id)
+    {
         try {
 
             $invoice_type   =   GeneralTableDetail::findOrFail($id);
-            $exists         =   DocumentSerialization::where('document_type_id',$id)->exists();
+            $exists         =   DocumentSerialization::where('document_type_id', $id)->exists();
 
-            if(!$exists){
-                throw new Exception($invoice_type->name.", NO ESTÁ ACTIVO EN LA EMPRESA");
+            if (!$exists) {
+                throw new Exception($invoice_type->name . ", NO ESTÁ ACTIVO EN LA EMPRESA");
             }
 
-            return response()->json([ 'success'=>true,'message'=>$invoice_type->name.",ACTIVO EN LA EMPRESA"]);
-
+            return response()->json(['success' => true, 'message' => $invoice_type->name . ",ACTIVO EN LA EMPRESA"]);
         } catch (Throwable $th) {
-            return response()->json(['success'=>false,'message'=>$th->getMessage()]);
+            return response()->json(['success' => false, 'message' => $th->getMessage()]);
         }
     }
 
-    public static function getPaymentConditions(){
-        $payment_conditions =   PaymentCondition::where('status','ACTIVO')->get();
+    public static function getPaymentConditions()
+    {
+        $payment_conditions =   PaymentCondition::where('status', 'ACTIVO')->get();
         return $payment_conditions;
+    }
+
+    public static function getUnitsMeasurement()
+    {
+        $data   =   GeneralTableDetail::where('general_table_id', 5)->get();
+        return $data;
     }
 }

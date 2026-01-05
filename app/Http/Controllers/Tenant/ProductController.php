@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Tenant;
 
 use App\Exports\Tenant\Inventory\Producto\ProductoExport;
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\UtilController;
 use App\Http\Requests\Tenant\Inventory\Product\ProductoImportExcelRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -11,6 +12,7 @@ use App\Http\Requests\Tenant\Inventory\Product\ProductStoreRequest;
 use App\Http\Requests\Tenant\Inventory\Product\ProductUpdateRequest;
 use App\Http\Services\Tenant\Inventory\Product\ProductManager;
 use App\Imports\Inventory\Producto\ProductoImport;
+use App\Models\Landlord\GeneralTable\GeneralTableDetail;
 use App\Models\Product;
 use App\Models\Tenant\WarehouseProduct;
 use App\Models\Tenant\WorkShop\WorkOrder\WorkOrderProduct;
@@ -34,9 +36,16 @@ class ProductController extends Controller
     {
         $urlImagen = asset('assets/img/products/img_default.png');
 
-        $categories = DB::select('SELECT * FROM categories as c where c.status = "ACTIVE"');
-        $brands     = DB::select('SELECT * FROM brands b WHERE b.status = "ACTIVE"');
-        return view('product.index', compact('urlImagen', 'categories', 'brands'));
+        $categories =   DB::select('SELECT * FROM categories as c where c.status = "ACTIVE"');
+        $brands     =   DB::select('SELECT * FROM brands b WHERE b.status = "ACTIVE"');
+        $units      =   UtilController::getUnitsMeasurement();
+
+        return view('product.index', compact(
+            'urlImagen',
+            'categories',
+            'brands',
+            'units'
+        ));
     }
 
     public function getAll(Request $request)
@@ -58,8 +67,10 @@ class ProductController extends Controller
                 'p.stock_min',
                 'p.code_factory',
                 'p.code_bar',
-                'p.img_route'
-            )->where('p.status', 'ACTIVE');
+                'p.img_route',
+                'p.unit_id',
+                'p.unit_symbol'
+            )->where('p.status', 'ACTIVO');
 
         return DataTables::of($products)->make(true);
     }
@@ -78,6 +89,7 @@ array:12 [ // app\Http\Controllers\Tenant\ProductController.php:74
   "code_bar" => null
   "category_id" => "1"
   "brand_id" => "1"
+   "unit_id" => "121"
   "image" =>Illuminate\Http\UploadedFile
 */
     public function store(ProductStoreRequest $request)
@@ -117,7 +129,8 @@ array:11 [ // app\Http\Controllers\Tenant\ProductController.php:127
   "category_id_edit" => "2"
   "brand_id_edit" => "2"
   "deleteImg"   =>  1
-  "image_edit" => Illuminate\Http\UploadedFile
+   "unit_id" => "97"
+   "image_edit" => Illuminate\Http\UploadedFile
 ]
 */
     public function update($id, ProductUpdateRequest $request)
@@ -126,6 +139,11 @@ array:11 [ // app\Http\Controllers\Tenant\ProductController.php:127
         try {
 
             $data       =   $request->validated();
+            $unit       =   GeneralTableDetail::findOrfail($request->get('unit_id'));
+
+            $data['unit_symbol']    =   $unit->symbol;
+            $data['unit_name']      =   $unit->name;
+            
             $product    =   Product::findOrFail($id);
 
             //====== ELIMINAR IMAGEN PREVIA ========
@@ -256,7 +274,7 @@ array:1 [ // app\Http\Controllers\Tenant\ProductController.php:190
                     ->orWhere('c.name', 'LIKE', "%{$query}%")
                     ->orWhere('b.name', 'LIKE', "%{$query}%");
             })
-            ->where('wp.warehouse_id',$warehouse_id)
+            ->where('wp.warehouse_id', $warehouse_id)
             ->orWhereNull('wp.warehouse_id')
             ->limit(20)
             ->select(

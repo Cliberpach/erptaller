@@ -32,7 +32,7 @@ class InvoiceTypeSeeder extends Seeder
         $tipo_doc->general_table_id =   $master->id;
         $tipo_doc->name             =   'BOLETA ELECTRÓNICA';
         $tipo_doc->description      =   'BOLETA ELECTRÓNICA';
-        $tipo_doc->symbol           =   '09';
+        $tipo_doc->symbol           =   '03';
         $tipo_doc->parameter        =   'B';
         $tipo_doc->editable         =   false;
         $tipo_doc->save();

@@ -14,6 +14,20 @@ class ModuleSeeder extends Seeder
      */
     public function run(): void
     {
+        // Dashboard
+        $dashboard = Module::create([
+            'description'   =>  'Dashboard',
+            'order'         =>  '1',
+            'icon'          =>  'dashboard-graph-analytics-report-svgrepo-com.svg'
+        ]);
+
+        ModuleChild::create([
+            'module_id' => $dashboard->id,
+            'description' => 'Dashboard',
+            'route_name' => 'dashboard.dashboard.index',
+            'order' => '2'
+        ]);
+
         // Caja
         $petty_cash = Module::create([
             'description'   =>  'Cajas',
@@ -47,7 +61,7 @@ class ModuleSeeder extends Seeder
         $taller = Module::create([
             'description'   =>  'Taller',
             'order'         =>  '1',
-            'icon'          =>  'car-wash-svgrepo-com.svg'
+            'icon'          =>  'a-car.svg'
         ]);
 
         ModuleChild::create([
@@ -371,7 +385,7 @@ class ModuleSeeder extends Seeder
             'order' => '2'
         ]);
 
-         ModuleChild::create([
+        ModuleChild::create([
             'module_id' => $consultas->id,
             'description' => 'Vehículos',
             'route_name' => 'consultas.vehiculos.index',

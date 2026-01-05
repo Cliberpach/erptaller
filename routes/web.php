@@ -166,6 +166,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     require __DIR__ . '/tenant/accounts/web.php';
     require __DIR__ . '/tenant/queries/web.php';
     require __DIR__ . '/tenant/inventory/web.php';
+    require __DIR__ . '/tenant/dashboard/web.php';
 
 
     Route::get("landlord/ruc/{ruc}", [ApiController::class, 'apiRuc']);
@@ -173,7 +174,6 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
 
     Route::get("/logout", [ModuleController::class, 'logout'])->name('module.logout');
 
-    Route::post('/closeCashBook', [PettyCashBookController::class, 'closeCashBook']);
 });
 
 Route::group(["prefix" => "utils"], function () {

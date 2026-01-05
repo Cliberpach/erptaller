@@ -66,6 +66,7 @@ return new class extends Migration
             $table->string('serie', 100);
 
             $table->enum('sunat_status', ['ACEPTADO','PENDIENTE', 'ENVIADO', 'RECHAZADO','ANULADO','ANULADO PARCIAL'])->default('PENDIENTE');
+            $table->enum('status', ['ACTIVO','ANULADO'])->default('ACTIVO');
 
             //======= FACTURACIÓN ========
             $table->tinyInteger('response_cdrZip')->nullable();

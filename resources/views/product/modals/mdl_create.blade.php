@@ -189,8 +189,10 @@
         document.querySelector('#code_bar').value = '';
         window.categorySelect.clear();
         window.brandSelect.clear();
+        window.unitSelect.clear();
         setText(window.categorySelect, 'REPUESTO');
         setText(window.brandSelect, 'NACIONAL');
+        setText(window.unitSelect, 'NIU-UNIDAD');
         if (pondImg) {
             pondImg.removeFiles();
         }
