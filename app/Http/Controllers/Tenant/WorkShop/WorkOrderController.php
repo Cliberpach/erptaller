@@ -115,6 +115,7 @@ class WorkOrderController extends Controller
         $categories                 =   UtilController::getCategoriesProducts();
         $brands                     =   UtilController::getBrandsProducts();
         $configuration              =   Configuration::findOrFail(2);
+        $units                      =   UtilController::getUnitsMeasurement();
 
         return view('workshop.work_orders.create', compact(
             'igv',
@@ -132,7 +133,8 @@ class WorkOrderController extends Controller
             'colors',
             'categories',
             'brands',
-            'configuration'
+            'configuration',
+            'units'
         ));
     }
 
@@ -216,6 +218,7 @@ array:18 [ // app\Http\Controllers\Tenant\WorkShop\WorkOrderController.php:102
         $categories                 =   UtilController::getCategoriesProducts();
         $brands                     =   UtilController::getBrandsProducts();
         $configuration              =   Configuration::findOrFail(2);
+        $units                      =   UtilController::getUnitsMeasurement();
 
         return view(
             'workshop.work_orders.edit',
@@ -242,7 +245,8 @@ array:18 [ // app\Http\Controllers\Tenant\WorkShop\WorkOrderController.php:102
                 'colors',
                 'categories',
                 'brands',
-                'configuration'
+                'configuration',
+                'units'
             )
         );
     }

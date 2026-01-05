@@ -99,6 +99,21 @@
             </div>
 
             <div class="col-lg-12 col-md-12 mb-3">
+                <label for="unit_id_mdlproduct" class="form-label required_field">Unidad</label>
+
+                <select name="unit_id_mdlproduct" style="text-transform: uppercase;" id="unit_id_mdlproduct"
+                    class="brand select2_form form-select" aria-label="Default select example">
+                    <option value=""></option>
+                    @foreach ($units as $unit)
+                        <option @if ($unit->name === 'UNIDAD') selected @endif style="text-transform: uppercase;"
+                            value="{{ $unit->id }}">{{ $unit->symbol . '-' . $unit->name }}
+                        </option>
+                    @endforeach
+                </select>
+                <p class="msgError unit_id_mdlproduct_error"></p>
+            </div>
+
+            <div class="col-lg-12 col-md-12 mb-3">
                 <div class="form-group">
                     <label for="image_mdlproduct" class="font-weight-bold" style="font-weight: bold;">IMAGEN</label>
                     <div class="d-flex align-items-center mb-2">

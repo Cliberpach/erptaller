@@ -113,6 +113,7 @@ class QuoteController extends Controller
 
         $categories                 =   UtilController::getCategoriesProducts();
         $brands                     =   UtilController::getBrandsProducts();
+        $units                      =   UtilController::getUnitsMeasurement();
 
         return view('workshop.quotes.create', compact(
             'igv',
@@ -126,7 +127,8 @@ class QuoteController extends Controller
             'colors',
             'customer_formatted',
             'categories',
-            'brands'
+            'brands',
+            'units'
         ));
     }
 
@@ -183,6 +185,7 @@ array:17 [ // app\Http\Controllers\Tenant\WorkShop\QuoteController.php:91
         $colors                     =   Color::where('status', 'ACTIVE')->get();
         $categories                 =   UtilController::getCategoriesProducts();
         $brands                     =   UtilController::getBrandsProducts();
+        $units                      =   UtilController::getUnitsMeasurement();
 
         $customer_formatted = FormatController::getFormatInitialCustomer($quote->customer_id);
         $vehicle_formatted = FormatController::getFormatInitialVehicle($quote->vehicle_id);
@@ -207,7 +210,8 @@ array:17 [ // app\Http\Controllers\Tenant\WorkShop\QuoteController.php:91
                 'years',
                 'colors',
                 'categories',
-                'brands'
+                'brands',
+                'units'
             )
         );
     }

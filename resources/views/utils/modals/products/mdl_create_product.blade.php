@@ -144,6 +144,37 @@
                 }
             });
         }
+
+        const unitSelect = document.getElementById('unit_id_mdlproduct');
+        if (unitSelect && !unitSelect.tomselect) {
+            window.unitSelect = new TomSelect(unitSelect, {
+                valueField: 'id',
+                labelField: 'description',
+                searchField: ['description', 'id'],
+                placeholder: 'Seleccionar',
+                create: false,
+                sortField: {
+                    field: 'id',
+                    direction: 'desc'
+                },
+                plugins: ['clear_button'],
+                render: {
+                    option: (item, escape) => `
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-ruler-combined me-2 text-primary"></i>
+                                ${escape(item.description)}
+                            </div>
+                        `,
+                    item: (item, escape) => `
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-ruler-combined me-2 text-primary"></i>
+                                ${escape(item.description)}
+                            </div>
+                        `
+                }
+            });
+        }
+
     }
 
     function storeProduct(formRegistrarProducto) {
