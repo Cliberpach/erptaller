@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\View;
 use App\Models\Module;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
+use Spatie\Multitenancy\Models\Tenant;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -20,30 +21,37 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        $databaseConnection = (parse_url(config("app.url"), PHP_URL_HOST) === request()->getHost())
-            ? 'landlord'
-            : 'tenant';
+        $host    = request()->getHost();
+        $appHost = parse_url(config('app.url'), PHP_URL_HOST);
 
+        // Detectar landlord vs tenant
+        $isLandlord = $host === $appHost;
+        $base = $isLandlord ? 'landlord' : 'tenant';
+
+        // 🔌 Cambiar conexión por defecto (TU enfoque)
+        $databaseConnection = $isLandlord ? 'landlord' : 'tenant';
         config(['database.default' => $databaseConnection]);
 
-        $base = ($databaseConnection === 'landlord') ? 'landlord' : 'tenant';
+        // 🔐 Tenant ID (solo para cache / lógica)
+        $tenantId = $isLandlord
+            ? 'landlord'
+            : (Tenant::current()?->id ?? 'tenant');
 
         $modules = Cache::remember(
-            "modules_menu_{$base}",
+            "modules_menu_{$tenantId}_{$base}",
             now()->addHours(6),
             function () use ($base) {
                 return Module::where('show', $base)
-                    ->with(['children' => function ($query) use ($base) {
-                        $query->where('show', $base);
-                    }, 'children.grandchildren' => function ($query) use ($base) {
-                        $query->where('show', $base);
-                    }])
+                    ->with([
+                        'children' => fn($q) => $q->where('show', $base),
+                        'children.grandchildren' => fn($q) => $q->where('show', $base),
+                    ])
                     ->get();
             }
         );
 
         $lst_search_modules = Cache::remember(
-            "modules_search_{$base}",
+            "modules_search_{$tenantId}_{$base}",
             now()->addHours(6),
             fn() => $this->getLstSearchModules($base)
         );
