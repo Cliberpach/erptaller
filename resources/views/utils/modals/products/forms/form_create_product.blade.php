@@ -4,7 +4,7 @@
         <div class="row">
             <div class="col-lg-12 col-md-12 mb-3">
                 <label for="name_mdlproduct" class="form-label required_field">Nombre</label>
-                <input placeholder="Nombre máximo 160 caracteres" name="name_mdlproduct" required maxlength="160"
+                <input placeholder="Nombre máximo 500 caracteres" name="name_mdlproduct" required maxlength="500"
                     type="text" class="form-control name" id="name_mdlproduct" aria-describedby="emailHelp"
                     oninput="this.value = this.value.toUpperCase()">
                 <p class="msgError name_mdlproduct_error"></p>
