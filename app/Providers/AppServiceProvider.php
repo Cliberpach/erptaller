@@ -42,6 +42,8 @@ class AppServiceProvider extends ServiceProvider
             }
         );
 
+        dd($modules);
+
         $lst_search_modules = Cache::remember(
             "modules_search_{$base}",
             now()->addHours(6),
