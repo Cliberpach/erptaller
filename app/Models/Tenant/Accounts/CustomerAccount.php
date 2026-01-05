@@ -21,6 +21,7 @@ class CustomerAccount extends Model
         'balance',
         'status',
         'work_order_id',
+        'customer_id',
 
         'creator_user_id',
         'editor_user_id',

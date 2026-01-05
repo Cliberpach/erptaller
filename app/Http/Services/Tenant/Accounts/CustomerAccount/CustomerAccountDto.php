@@ -28,6 +28,7 @@ class CustomerAccountDto
         $dto['amount']          =   $work_order->total;
         $dto['balance']         =   $work_order->total;
         $dto['paid']            =   0;
+        $dto['customer_id']     =   $work_order->customer_id;
 
         return $dto;
     }
@@ -44,6 +45,7 @@ class CustomerAccountDto
         $dto['amount']          =   $sale->total;
         $dto['balance']         =   $sale->total;
         $dto['paid']            =   0;
+        $dto['customer_id']     =   $sale->customer_id;
 
         return $dto;
     }
