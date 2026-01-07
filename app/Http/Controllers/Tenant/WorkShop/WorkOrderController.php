@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Tenant\WorkShop;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\FormatController;
 use App\Http\Controllers\UtilController;
+use App\Http\Requests\Tenant\Notification\NotificationStoreRequest;
 use App\Http\Services\Tenant\Alerts\AlertManager;
 use App\Http\Services\Tenant\WorkShop\WorkOrders\WorkOrderManager;
 use App\Models\Company;
@@ -404,17 +405,16 @@ array:7 [ // app\Http\Controllers\Tenant\WorkShop\WorkOrderController.php:402
   "description" => "PROXIMA ATENCIÓN"
   "notice_date" => "2026-01-20"
   "advance_date" => "2026-01-18"
-  "work_order_id" => "1"
+  "object_id" => "1"
 ]
 */
-    public function alertStore(Request $request)
+    public function alertStore(NotificationStoreRequest $request)
     {
         DB::beginTransaction();
         try {
 
             $s_alert    =   new AlertManager();
             $alert      =   $s_alert->store($request->toArray());
-
 
             DB::commit();
             return response()->json([

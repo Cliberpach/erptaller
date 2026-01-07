@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\LandLord\ApiController;
+use App\Http\Controllers\Notifications\NotificationController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Tenant\UserController;
 use App\Http\Controllers\Tenant\BookController;
@@ -158,6 +159,11 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
         Route::get('downloadCdr/{id}', [ReservationDocumentController::class, 'downloadCdr'])->name('tenant.reportes.comprobantes_reservas.downloadCdr');
     });
 
+
+    Route::get('/notifications', [NotificationController::class, 'getNotifications'])->name('notifications.index');
+    Route::get('/notifications/count', [NotificationController::class, 'getNotificationsCount'])->name('notifications.count');
+    Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
+    Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.readAll');
 
     require __DIR__ . '/tenant/taller/web.php';
     require __DIR__ . '/tenant/mantenimiento/web.php';

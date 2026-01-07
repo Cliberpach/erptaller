@@ -39,8 +39,13 @@
     "css": [
       "assets/app-c1078029.css"
     ],
-    "file": "assets/app-ebd3c116.js",
+    "file": "assets/app-7db75b26.js",
     "isEntry": true,
     "src": "resources/js/app.js"
+  },
+  "resources/js/notifications/main.js": {
+    "file": "assets/main-b836b095.js",
+    "isEntry": true,
+    "src": "resources/js/notifications/main.js"
   }
 }

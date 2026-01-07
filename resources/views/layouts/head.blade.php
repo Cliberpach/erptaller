@@ -296,5 +296,32 @@
     }
 </style>
 
+
+<style>
+    .notification-badge {
+        font-size: 0.65rem;
+        padding: 0.2rem 0.4rem;
+        transform: translate(25%, -25%);
+    }
+
+    .notification-item {
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+
+    .notification-item:hover {
+        background-color: #f8f9fa;
+    }
+
+    .mark-as-read {
+        opacity: 0;
+        transition: opacity 0.2s;
+    }
+
+    .notification-item:hover .mark-as-read {
+        opacity: 1;
+    }
+</style>
+
 @yield('css')
 @stack('styles')

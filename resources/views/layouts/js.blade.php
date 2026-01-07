@@ -30,18 +30,21 @@
             Notification.requestPermission();
         }
 
-        document.body.addEventListener('click', enableAudio, {
-            once: true
-        });
-
         mostrarSessionMessages();
         eventsA();
         eventAlerts();
+        events();
     })
 
     function enableAudio() {
         audioEnabled = true;
-        console.log('✅ Audio habilitado');
+    }
+
+    // 🎯 Manejar evento de scroll
+
+
+    function events() {
+
     }
 
     function eventsA() {
@@ -58,7 +61,6 @@
         const messageSuccess = "{{ Session::get('message_success') }}";
         const messageError = "{{ Session::get('message_error') }}";
 
-        console.log(messageSuccess);
         if (messageSuccess) {
             Swal.fire({
                 icon: 'success',
@@ -102,10 +104,10 @@
     };
 
     function eventAlerts() {
-        console.log('🧪 LISTEN READY');
 
-        // Verificar estado de conexión
-        console.log('Echo state:', window.Echo.connector.pusher.connection.state);
+        document.body.addEventListener('click', enableAudio, {
+            once: true
+        });
 
         // Eventos de conexión
         window.Echo.connector.pusher.connection.bind('connected', () => {
@@ -122,8 +124,6 @@
 
         // Suscripción al canal
         const channel = Echo.channel('alerts');
-
-        console.log('Canal alerts:', channel);
 
         channel.subscribed(() => {
             console.log('✅ SUSCRITO AL CANAL alerts');
@@ -208,35 +208,6 @@
         }, 5000);
     }
 
-    function getIconForType(typeObject) {
-        const icons = {
-            'ORDEN_TRABAJO': {
-                icon: 'fi fi-rr-tool-box',
-                bgClass: 'bg-primary'
-            },
-            'COTIZACION': {
-                icon: 'fi fi-rr-calculator',
-                bgClass: 'bg-info'
-            },
-            'VENTA': {
-                icon: 'fi fi-rr-shopping-cart',
-                bgClass: 'bg-success'
-            },
-            'PRODUCCION': {
-                icon: 'fi fi-rr-settings',
-                bgClass: 'bg-warning'
-            },
-            'COMPRA': {
-                icon: 'fi fi-rr-shopping-bag',
-                bgClass: 'bg-secondary'
-            },
-        };
-
-        return icons[typeObject] || {
-            icon: 'fi fi-rr-bell',
-            bgClass: 'bg-dark'
-        };
-    }
 
     function updateNotificationBadge() {
         notificationCount++;
@@ -329,6 +300,81 @@
 
         return icons[typeObject] || 'warning';
     }
+
+    // Marcar como leída
+    async function markAsRead(notificationId) {
+        try {
+            await axios.post(`/notifications/${notificationId}/read`);
+            await loadNotifications();
+            await updateNotificationCount();
+        } catch (error) {
+            console.error('Error al marcar como leída:', error);
+        }
+    }
+
+    // Marcar todas como leídas
+    async function markAllAsRead() {
+        try {
+            await axios.post('{{ route('notifications.readAll') }}');
+            await loadNotifications();
+            await updateNotificationCount();
+        } catch (error) {
+            console.error('Error al marcar todas como leídas:', error);
+        }
+    }
+
+    // Navegar a notificación
+    function navigateToNotification(type, objectId) {
+        const routes = {
+            'ORDEN_TRABAJO': `/orden-trabajo/${objectId}`,
+            'COTIZACION': `/cotizacion/${objectId}`,
+            'VENTA': `/venta/${objectId}`,
+            'PRODUCCION': `/produccion/${objectId}`,
+            'COMPRA': `/compra/${objectId}`
+        };
+
+        const url = routes[type];
+        if (url) window.location.href = url;
+    }
+
+    // Obtener iconos
+    function getIconForType(typeObject) {
+        const icons = {
+            'ORDEN_TRABAJO': {
+                icon: 'fi fi-rr-tool-box',
+                bgClass: 'bg-primary'
+            },
+            'COTIZACION': {
+                icon: 'fi fi-rr-calculator',
+                bgClass: 'bg-info'
+            },
+            'VENTA': {
+                icon: 'fi fi-rr-shopping-cart',
+                bgClass: 'bg-success'
+            },
+            'PRODUCCION': {
+                icon: 'fi fi-rr-settings',
+                bgClass: 'bg-warning'
+            },
+            'COMPRA': {
+                icon: 'fi fi-rr-shopping-bag',
+                bgClass: 'bg-secondary'
+            },
+        };
+
+        return icons[typeObject] || {
+            icon: 'fi fi-rr-bell',
+            bgClass: 'bg-dark'
+        };
+    }
+
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+
 </script>
 
 @yield('js')

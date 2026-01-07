@@ -104,6 +104,44 @@
             </a> --}}
 
             <div class="dropdown text-end">
+                <button type="button"
+                    class="btn btn-icon btn-action-gray rounded-circle waves-effect waves-light position-relative"
+                    data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false"
+                    id="notificationButton">
+                    <i class="fi fi-rr-bell"></i>
+                    <span class="badge badge-sm rounded-pill bg-danger position-absolute notification-badge end-0 top-0"
+                        id="notificationCount" style="display: none;">0</span>
+                </button>
+                <div class="dropdown-menu dropdown-menu-lg-end w-300px mt-2 p-0">
+                    <div class="border-bottom d-flex justify-content-between align-items-center px-3 py-3">
+                        <h6 class="mb-0">Notificaciones
+                            <span class="badge badge-sm rounded-pill bg-primary ms-2"
+                                id="notificationCountHeader">0</span>
+                        </h6>
+                        <i class="bi bi-check2-all cursor-pointer" id="markAllAsRead"
+                            title="Marcar todas como leídas"></i>
+                    </div>
+                    <div class="p-2" style="height: 300px;" data-simplebar>
+                        <ul class="list-group list-group-hover list-group-smooth list-group-unlined"
+                            id="notificationList">
+                            <!-- Las notificaciones se cargarán aquí dinámicamente -->
+                            <li class="list-group-item text-muted text-center" id="emptyNotifications">
+                                <i class="fi fi-rr-bell fs-3 d-block mb-2"></i>
+                                No hay notificaciones
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="p-2">
+                        <a href="{{ route('tenant.consultas.notificaciones.index') }}"
+                            class="btn w-100 btn-primary waves-effect waves-light menu-click">
+                            Ver todas las notificaciones
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+
+            {{-- <div class="dropdown text-end">
                 <button type="button" class="btn btn-icon btn-action-gray rounded-circle waves-effect waves-light"
                     data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="true">
                     <i class="fi fi-rr-bell"></i>
@@ -186,11 +224,11 @@
                         </ul>
                     </div>
                     <div class="p-2">
-                        <a href="javascript:void(0);" class="btn w-100 btn-primary waves-effect waves-light">View all
+                        <a href="javascript:void(0);" class="btn w-100 btn-primary waves-effect waves-light">Ver todo
                             notifications</a>
                     </div>
                 </div>
-            </div>
+            </div> --}}
 
             {{-- <a href="calendar.html" class="btn btn-icon btn-action-gray rounded-circle waves-effect waves-light">
                 <i class="fi fi-rr-calendar"></i>
@@ -257,7 +295,8 @@
                     <div class="dropdown-divider my-1"></div>
                 </li>
                 <li>
-                    <a class="dropdown-item d-flex align-items-center text-danger gap-2" href="{{ route('logout') }}">
+                    <a class="dropdown-item d-flex align-items-center text-danger gap-2"
+                        href="{{ route('logout') }}">
                         <i class="fi fi-sr-exit scale-1x"></i> Cerrar Sesión
                     </a>
                 </li>
