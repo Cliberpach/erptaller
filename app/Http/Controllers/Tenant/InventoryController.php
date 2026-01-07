@@ -16,11 +16,11 @@ class InventoryController extends Controller
 {
     public function index()
     {
-        $products   =   DB::select('select 
+        $products   =   DB::select('SELECT
                         p.id,
-                        p.name 
+                        p.name
                         from products as p
-                        where p.estado = "ACTIVO"');
+                        where p.status = "ACTIVO"');
         return view('inventory.inventory.index',compact('products'));
     }
 
@@ -29,7 +29,7 @@ class InventoryController extends Controller
         $inventory   =   $this->queryInventory($request);
 
         return DataTables::of($inventory)->make(true);
-    
+
     }
 
     public static function queryInventory(Request $request){
@@ -49,18 +49,18 @@ class InventoryController extends Controller
                             'p.purchase_price'
                         )
                         ->where('wp.warehouse_id','1')
-                        ->where('p.estado','!=','ANULADO')
+                        ->where('p.status','!=','ANULADO')
                         ->orderByDesc('p.created_at');
 
-        if($request->get('filter_stock') == '2'){  
+        if($request->get('filter_stock') == '2'){
             $inventory =   $inventory->where('wp.stock','0');
         }
 
-        if($request->get('filter_stock') == '3'){  
+        if($request->get('filter_stock') == '3'){
             $inventory =   $inventory->where('wp.stock','>','0');
         }
 
-        if($request->get('filter_stock') == '4'){  
+        if($request->get('filter_stock') == '4'){
             $inventory =   $inventory->where('wp.stock','<','p.stock_min');
         }
 
@@ -74,7 +74,7 @@ class InventoryController extends Controller
         $inventory =   $this->queryInventory($request);
 
         $inventory->transform(function ($item) {
-            unset($item->id); 
+            unset($item->id);
             return $item;
         });
 
@@ -85,20 +85,20 @@ class InventoryController extends Controller
     public function pdf(Request $request){
 
         $company                =   Company::find(1);
-        
+
         $report_inventory            =   $this->queryInventory($request);
 
         $report_inventory->transform(function ($item) {
-            unset($item->id); 
+            unset($item->id);
             return $item;
         });
 
-        
+
         $pdf = Pdf::loadview('inventory.inventory.pdf.pdf', [
                 'company'               =>  $company,
                 'report_inventory'      =>  $report_inventory,
                 'filters'               =>  $request
-              
+
             ])->setPaper('a4', 'portrait');
 
 

@@ -21,7 +21,7 @@ class ValuedKardexController extends Controller
         $valued_kardex  =   $this->queryValuedKardex($request);
 
         return DataTables::of($valued_kardex)->make(true);
-    
+
     }
 
     public static function queryValuedKardex($request){
@@ -39,16 +39,16 @@ class ValuedKardexController extends Controller
                                 'wp.stock as current_stock',
                                 'p.sale_price',
                                 'p.purchase_price',
-                                DB::raw('ROUND(wp.stock * p.sale_price, 2) AS value')                         
+                                DB::raw('ROUND(wp.stock * p.sale_price, 2) AS value')
                             )
                             ->where('wp.warehouse_id','1')
-                            ->where('p.estado','!=','ANULADO')
+                            ->where('p.status','!=','ANULADO')
                             ->orderByDesc('p.created_at');
 
         if($request->get('date_start')){
             $valued_kardex = $valued_kardex->whereRaw('DATE(p.created_at) >= ?', [$request->get('date_start')]);
         }
-            
+
         if($request->get('date_end')){
             $valued_kardex = $valued_kardex->whereRaw('DATE(p.created_at) <= ?', [$request->get('date_end')]);
         }
@@ -61,20 +61,20 @@ class ValuedKardexController extends Controller
     public function pdf(Request $request){
 
         $company                =   Company::find(1);
-        
+
         $report_kardex_value          =   $this->queryValuedKardex($request);
 
         $report_kardex_value->transform(function ($item) {
-            unset($item->id); 
+            unset($item->id);
             return $item;
         });
 
-        
+
         $pdf = Pdf::loadview('inventory.valued_kardex.pdf.pdf', [
                 'company'               =>  $company,
                 'report_kardex_value'   =>  $report_kardex_value,
                 'filters'               =>  $request
-              
+
             ])->setPaper('a4', 'landscape');
 
 

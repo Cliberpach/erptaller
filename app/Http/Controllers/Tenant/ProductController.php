@@ -143,7 +143,7 @@ array:11 [ // app\Http\Controllers\Tenant\ProductController.php:127
 
             $data['unit_symbol']    =   $unit->symbol;
             $data['unit_name']      =   $unit->name;
-            
+
             $product    =   Product::findOrFail($id);
 
             //====== ELIMINAR IMAGEN PREVIA ========
@@ -258,7 +258,7 @@ array:1 [ // app\Http\Controllers\Tenant\ProductController.php:190
      */
     public function searchProduct(Request $request)
     {
-        $query = trim($request->get('q', ''));
+        $query          =   trim($request->get('q', ''));
         $warehouse_id   =   $request->get('warehouse_id');
 
         if (empty($query)) {
@@ -274,8 +274,10 @@ array:1 [ // app\Http\Controllers\Tenant\ProductController.php:190
                     ->orWhere('c.name', 'LIKE', "%{$query}%")
                     ->orWhere('b.name', 'LIKE', "%{$query}%");
             })
-            ->where('wp.warehouse_id', $warehouse_id)
-            ->orWhereNull('wp.warehouse_id')
+            ->where(function ($q) use ($warehouse_id) {
+                $q->where('wp.warehouse_id', $warehouse_id)
+                    ->orWhereNull('wp.warehouse_id');
+            })
             ->limit(20)
             ->select(
                 'wp.warehouse_id',
@@ -294,10 +296,14 @@ array:1 [ // app\Http\Controllers\Tenant\ProductController.php:190
             'sale_price' =>  $p->sale_price,
             'name'  =>  $p->name,
             'category_name' =>  $p->category_name,
-            'brand_name'    =>  $p->brand_name
+            'brand_name'    =>  $p->brand_name,
+            'stock'         =>  $p->stock
         ]);
 
-        return response()->json(['data' => $data]);
+        return response()->json([
+            'success' => true,
+            'data' => $data
+        ]);
     }
 
     public function searchProductStock(Request $request)

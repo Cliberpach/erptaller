@@ -50,6 +50,7 @@
 
         function iniciarDtServices() {
             dtServices = new DataTable('#dt-services', {
+                responsive:true,
                 "processing": true,
                 "ajax": '{{ route('tenant.taller.servicios.getServices') }}',
                 "columns": [{
@@ -63,14 +64,13 @@
                         name: 's.name',
                         searchable: true,
                         orderable: true,
-                        className: "text-center"
                     },
                     {
                         data: 'price',
                         name: 's.price',
                         searchable: false,
                         orderable: true,
-                        className: "text-center",
+                        className: "text-right",
                         render: function(data) {
                             return "S/ " + formatSoles(data);
                         }
@@ -80,12 +80,10 @@
                         name: 's.description',
                         searchable: true,
                         orderable: true,
-                        className: "text-center"
                     },
                     {
                         searchable: false,
                         data: null,
-                        className: "text-center",
                         render: function(data) {
                             return `
                             <div class="btn-group">

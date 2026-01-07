@@ -264,7 +264,7 @@
             window.productSelect = new TomSelect('#product_id', {
                 valueField: 'id',
                 labelField: 'text',
-                searchField: ['text'],
+                searchField: ['name','subtext'],
                 placeholder: 'Seleccione un producto',
                 maxOptions: 20,
                 create: false,

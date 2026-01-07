@@ -21,7 +21,7 @@
     <!-- PRECIO -->
     <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
         <label class="form-label fw-bold">Precio:</label>
-        <input type="text" class="form-control inputDecimalPositivo" id="product_price" name="product_price"
+        <input disabled type="text" class="form-control inputDecimalPositivo" id="product_price" name="product_price"
             placeholder="0.00">
         <p class="product_price_error msgError mb-0"></p>
     </div>

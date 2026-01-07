@@ -108,6 +108,7 @@ class QuoteService
         $colors                     =   Color::where('status', 'ACTIVE')->get();
         $categories                 =   UtilController::getCategoriesProducts();
         $brands                     =   UtilController::getBrandsProducts();
+        $units                      =   UtilController::getUnitsMeasurement();
         $configuration              =   $data_validated['configuration'];
 
         return view(
@@ -131,7 +132,8 @@ class QuoteService
                 'colors',
                 'categories',
                 'brands',
-                'configuration'
+                'configuration',
+                'units'
             )
         );
     }

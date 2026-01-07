@@ -255,7 +255,7 @@
             window.productSelect = new TomSelect('#product_id', {
                 valueField: 'id',
                 labelField: 'text',
-                searchField: ['text'],
+                searchField: ['name', 'subtext'],
                 placeholder: 'Seleccione un producto',
                 maxOptions: 20,
                 create: false,
@@ -506,7 +506,8 @@
             const item = productSelect.options[value];
 
             if (item && item.sale_price) {
-                document.querySelector('#product_price').value = item.sale_price;
+                document.querySelector('#product_price').value = formatSoles(item.sale_price);
+                document.querySelector('#product_quantity').value = 1;
             }
         }
 
@@ -666,7 +667,8 @@
             const item = serviceSelect.options[value];
 
             if (item && item.sale_price) {
-                document.querySelector('#service_price').value = item.sale_price;
+                document.querySelector('#service_price').value = formatSoles(item.sale_price);
+                document.querySelector('#service_quantity').value = 1;
             }
         }
 

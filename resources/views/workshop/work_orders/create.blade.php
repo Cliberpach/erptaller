@@ -194,7 +194,6 @@
                         callback(results);
                         if (results.length === 0) {
                             customerParams.documentSearchCustomer = lastCustomerQuery;
-                            console.log("No se encontró en BD. Guardado:", window.typedCustomer);
                         }
                     } catch (error) {
                         console.error('Error cargando clientes:', error);
@@ -244,7 +243,6 @@
                         callback(results);
                         if (results.length === 0) {
                             vehicleParams.plateSearchVehicle = lastVehicleQuery;
-                            console.log("No se encontró en BD. Guardado:", window.typedCustomer);
                         }
                     } catch (error) {
                         console.error('Error cargando vehiculos:', error);
@@ -279,7 +277,7 @@
             window.productSelect = new TomSelect('#product_id', {
                 valueField: 'id',
                 labelField: 'text',
-                searchField: ['text'],
+                searchField: ['name','subtext'],
                 placeholder: 'Seleccione un producto',
                 maxOptions: 20,
                 create: false,
@@ -349,7 +347,6 @@
                         callback(results);
                         if (results.length === 0) {
                             serviceParams.name = lastServiceQuery;
-                            console.log("No se encontró en BD. Guardado:", window.typedCustomer);
                         }
                     } catch (error) {
                         console.error('Error cargando servicios:', error);
@@ -465,7 +462,6 @@
             if (!value) return;
 
             const item = productSelect.options[value];
-
             if (item && item.sale_price) {
                 document.querySelector('#product_price').value = item.sale_price;
                 document.querySelector('#product_quantity').value = 1;
@@ -768,7 +764,6 @@
 
             toastr.clear();
             const id = btn.getAttribute('data-id');
-            console.log(id);
 
             const indexItem = lstItems.findIndex(i => i.id == id);
             if (indexItem === -1) {
@@ -949,6 +944,7 @@
                 clearTable('dt-orders-products');
                 paintOrderProducts(lstProducts);
                 dtProducts = loadDataTableSimple('dt-orders-products');
+                paintCantProducts();
 
                 //======= SERVICES =======
                 const lstServicesBD = @json($lst_services ?? null);
@@ -958,6 +954,7 @@
                 clearTable('dt-orders-services');
                 paintOrderServices(lstServices);
                 dtServices = loadDataTableSimple('dt-orders-services');
+                paintCantServices();
 
                 calculateAmounts();
                 paintAmounts();

@@ -25,9 +25,6 @@
                     </label>
                     <select data-placeholder="Seleccionar" id="product_id" class="form-select">
                         <option value=""></option>
-                        @foreach ($products as $product)
-                            <option value="{{ $product->id }}">{{ $product->name }}</option>
-                        @endforeach
                     </select>
                 </div>
 
@@ -94,11 +91,45 @@
 
         function loadTomSelect() {
             window.productSelect = new TomSelect('#product_id', {
+                valueField: 'id',
+                labelField: 'text',
+                searchField: ['name','subtext'],
+                placeholder: 'Seleccionar',
+                maxOptions: 20,
                 create: false,
+                preload: false,
                 plugins: ['clear_button'],
-                sortField: {
-                    field: "text",
-                    direction: "asc"
+                loadThrottle: 600,
+                load: async (query, callback) => {
+                    if (!query.length) return callback([]);
+                    try {
+
+                        const urlSearchProduct = 'tenant.utils.searchProduct';
+
+                        const url = route(urlSearchProduct, {
+                            q: query,
+                            warehouse_id: 1
+                        });
+                        const response = await fetch(url);
+                        if (!response.ok) throw new Error('Error al buscar productos');
+                        const data = await response.json();
+                        const results = data.data ?? [];
+                        console.log('results', results)
+                        callback(results);
+
+                    } catch (error) {
+                        console.error('Error cargando productos:', error);
+                        callback();
+                    }
+                },
+                render: {
+                    option: (item, escape) => `
+                        <div>
+                            <strong>${escape(item.text)}</strong><br>
+                            <small>${escape(item.subtext ?? '')}</small>
+                        </div>
+                    `,
+                    item: (item, escape) => `<div>${escape(item.text)}</div>`
                 }
             });
         }
@@ -276,7 +307,7 @@
             const url = @json(route('tenant.inventory.kardex.excel'));
 
             const params = {
-                warehouse_id:1,
+                warehouse_id: 1,
                 product_id: document.querySelector('#product_id').value,
                 start_date: document.querySelector('#date_start').value,
                 end_date: document.querySelector('#date_end').value
@@ -294,7 +325,7 @@
             const url = @json(route('tenant.inventory.kardex.pdf'));
 
             const params = {
-                 warehouse_id:1,
+                warehouse_id: 1,
                 product_id: document.querySelector('#product_id').value,
                 start_date: document.querySelector('#date_start').value,
                 end_date: document.querySelector('#date_end').value

@@ -20,14 +20,7 @@ class KardexController extends Controller
 
     public function index()
     {
-
-        $products   =   DB::select('select
-                        p.id,
-                        p.name
-                        from products as p
-                        where p.status = "ACTIVE"');
-
-        return view('inventory.kardex.index', compact('products'));
+        return view('inventory.kardex.index');
     }
 
     public function getKardex(Request $request)
@@ -51,9 +44,6 @@ class KardexController extends Controller
 
         return $kardex;
     }
-
-
-
 
     /*
 array:14 [ // app\Http\Controllers\Tenant\KardexController.php:11
