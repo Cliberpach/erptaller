@@ -51,6 +51,7 @@ class SaleDetailService
             $detail->category_id        =   $product_exists->category_id;
             $detail->category_name      =   $product_exists->category_name;
             $detail->quantity           =   $product->cant;
+            $detail->net_quantity       =   $product->cant;
             $detail->price_sale         =   $product_exists->sale_price;
             $detail->amount             =   $product->cant * $product_exists->sale_price;
 
@@ -73,11 +74,11 @@ class SaleDetailService
 
             //====== GUARDANDO KARDEX DEL DETALLE ======
             $this->s_kardex->store($sale, $detail, 'OUT', 'SALE');
-
         }
     }
 
-    public function storeDetailReservations(Sale $sale,object $validated_data){
+    public function storeDetailReservations(Sale $sale, object $validated_data)
+    {
         foreach ($validated_data->lstSale as $booking) {
 
             //======= GRABAR DETALLE DE VENTA =======
@@ -103,7 +104,6 @@ class SaleDetailService
             $detail->total_impuestos        =   (float)($detail->amount) - (float)($detail->amount / 1.18);
             $detail->mto_precio_unitario    =   (float)($booking->sale_price);
             $detail->save();
-
         }
     }
 }

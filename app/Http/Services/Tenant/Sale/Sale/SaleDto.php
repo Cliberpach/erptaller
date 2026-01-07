@@ -193,6 +193,7 @@ class SaleDto
             $s_dto['category_name']             =     $category->name;
             $s_dto['brand_name']                =     $brand->name;
             $s_dto['quantity']                  =     $item->quantity;
+            $s_dto['net_quantity']              =     $item->quantity;
 
             $s_dto['price_sale']                =     $item->sale_price;
             $s_dto['amount']                    =     $item->quantity * $item->sale_price;

@@ -173,8 +173,26 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::get("landlord/dni/{dni}", [ApiController::class, 'apiDni']);
 
     Route::get("/logout", [ModuleController::class, 'logout'])->name('module.logout');
-
 });
+
+use App\Events\AlertCreated;
+use App\Events\TestSocketEvent;
+use App\Models\Tenant\Alerts\Alert;
+use Spatie\Multitenancy\Models\Tenant;
+
+Route::get('/test-broadcast', function () {
+    event(new AlertCreated(Alert::findOrFail(2)));
+
+    return 'Evento enviado';
+});
+
+Route::get('/test-socket', function () {
+
+    event(new TestSocketEvent());
+    return 'OK';
+});
+
+
 
 Route::group(["prefix" => "utils"], function () {
     Route::get('cash-available-search', [PettyCashController::class, 'searchCashAvailable'])->name('tenant.utils.searchCashAvailable');
@@ -187,6 +205,6 @@ Route::group(["prefix" => "utils"], function () {
     Route::get('get-years/{model}', [YearController::class, 'getYearsModel'])->name('tenant.utils.getYearsModel');
     Route::get('serch-plate/{placa}', [VehicleController::class, 'searchPlate'])->name('tenant.utils.searchPlate');
     Route::get('validated-product/stock', [ProductController::class, 'validatedProductStock'])->name('tenant.utils.validatedProductStock');
-    Route::get('getListBankAccounts', [BankAccountController::class,'getListBankAccounts'])->name('tenant.utils.getListBankAccounts');
+    Route::get('getListBankAccounts', [BankAccountController::class, 'getListBankAccounts'])->name('tenant.utils.getListBankAccounts');
     Route::get('is-active-invoice/{id}', [UtilController::class, 'isActiveInvoiceType'])->name('tenant.utils.isActiveInvoiceType');
 });

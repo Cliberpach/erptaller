@@ -102,6 +102,7 @@
                     <span class="visually-hidden">New alerts</span>
                 </span>
             </a> --}}
+
             <div class="dropdown text-end">
                 <button type="button" class="btn btn-icon btn-action-gray rounded-circle waves-effect waves-light"
                     data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="true">
@@ -110,7 +111,7 @@
                 <div class="dropdown-menu dropdown-menu-lg-end w-300px mt-2 p-0">
                     <div class="border-bottom d-flex justify-content-between align-items-center px-3 py-3">
                         <h6 class="mb-0">Notifications <span
-                                class="badge badge-sm rounded-pill bg-primary ms-2">9</span>
+                                class="badge badge-sm rounded-pill bg-primary ms-2">0</span>
                         </h6>
                         <i class="bi bi-x-lg cursor-pointer"></i>
                     </div>
@@ -190,9 +191,11 @@
                     </div>
                 </div>
             </div>
+
             {{-- <a href="calendar.html" class="btn btn-icon btn-action-gray rounded-circle waves-effect waves-light">
                 <i class="fi fi-rr-calendar"></i>
             </a> --}}
+
         </div>
         <div class="vr my-3"></div>
         <div class="dropdown ms-sm-3 ms-lg-4 ms-2 text-end">

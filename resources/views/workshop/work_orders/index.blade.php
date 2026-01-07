@@ -6,6 +6,8 @@
 
 @section('content')
     @include('workshop.work_orders.modals.mdl_show_order')
+    @include('workshop.work_orders.modals.mdl_alert')
+
     <div class="card overflow-hidden">
         <div class="card-header">
 
@@ -65,8 +67,7 @@
                 </div>
 
                 <div class="col-lg-2 col-md-3 col-sm-12 col-xs-12 mb-2 text-end">
-                    <button type="button" id="btn-filter" class="btn btn-primary btn-block"
-                        onclick="filterData();">
+                    <button type="button" id="btn-filter" class="btn btn-primary btn-block" onclick="filterData();">
                         <i class="fas fa-filter mr-1"></i> Filtrar
                     </button>
                 </div>
@@ -95,11 +96,10 @@
             loadDtOrders();
             loadTomSelect();
             events();
-            initTooltips();
-
         })
 
         function events() {
+            eventsMdlAlert();
         }
 
         function loadTomSelect() {
@@ -149,6 +149,7 @@
             dtOrders = new DataTable('#dt-orders', {
                 "serverSide": true,
                 "processing": true,
+                responsive: true,
                 ajax: {
                     url: '{{ route('tenant.taller.ordenes_trabajo.getWorkOrders') }}',
                     data: function(d) {
@@ -322,6 +323,11 @@
                                             <li>
                                                 <a class="dropdown-item" href="#" onclick="openMdlShowOrder(${data.id})">
                                                     <i class="fa fa-eye me-2"></i> Ver
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item" href="#" onclick="openMdlAlertOrder(${data.id})">
+                                                    <i class="fa fa-bell me-2"></i> Alerta
                                                 </a>
                                             </li>
                                         `;

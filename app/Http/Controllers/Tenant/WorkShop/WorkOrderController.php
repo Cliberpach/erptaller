@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Tenant\WorkShop;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\FormatController;
 use App\Http\Controllers\UtilController;
+use App\Http\Services\Tenant\Alerts\AlertManager;
 use App\Http\Services\Tenant\WorkShop\WorkOrders\WorkOrderManager;
 use App\Models\Company;
 use App\Models\CompanyInvoice;
@@ -62,17 +63,17 @@ class WorkOrderController extends Controller
             )
             ->where('o.status', '<>', 'ANULADO');
 
-        if($customer_id){
-            $orders->where('o.customer_id',$customer_id);
+        if ($customer_id) {
+            $orders->where('o.customer_id', $customer_id);
         }
-        if($start_date){
-            $orders->whereDate('o.created_at','>=',$start_date);
+        if ($start_date) {
+            $orders->whereDate('o.created_at', '>=', $start_date);
         }
-        if($end_date){
-            $orders->whereDate('o.created_at','<=',$end_date);
+        if ($end_date) {
+            $orders->whereDate('o.created_at', '<=', $end_date);
         }
-        if($status){
-            $orders->where('o.status','=',$status);
+        if ($status) {
+            $orders->where('o.status', '=', $status);
         }
 
         return DataTables::of($orders)
@@ -385,7 +386,46 @@ array:16 [ // app\Http\Controllers\Tenant\WorkShop\WorkOrderController.php:327
         } catch (Throwable $th) {
             DB::rollBack();
 
-            Session::flash('message_error',$th->getMessage());
+            Session::flash('message_error', $th->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => $th->getMessage(),
+                'file' => $th->getFile(),
+                'line' => $th->getLine()
+            ]);
+        }
+    }
+
+    /*
+array:7 [ // app\Http\Controllers\Tenant\WorkShop\WorkOrderController.php:402
+  "_token" => "VO3tu9VpoEbCcn3e6HwfCzyrtSlRH88cBvxzeHTo"
+  "_method" => "POST"
+  "name" => "PROXIMA ATENCIÓN"
+  "description" => "PROXIMA ATENCIÓN"
+  "notice_date" => "2026-01-20"
+  "advance_date" => "2026-01-18"
+  "work_order_id" => "1"
+]
+*/
+    public function alertStore(Request $request)
+    {
+        DB::beginTransaction();
+        try {
+
+            $s_alert    =   new AlertManager();
+            $alert      =   $s_alert->store($request->toArray());
+
+
+            DB::commit();
+            return response()->json([
+                'success'   =>  true,
+                'message'   =>  'ALERTA REGISTRADA CON ÉXITO'
+
+            ]);
+        } catch (Throwable $th) {
+            DB::rollBack();
+
+            Session::flash('message_error', $th->getMessage());
             return response()->json([
                 'success' => false,
                 'message' => $th->getMessage(),

@@ -11,7 +11,7 @@ window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 
 import TomSelect from "tom-select";
 import "tom-select/dist/css/tom-select.bootstrap5.css";
-window.TomSelect   =   TomSelect;
+window.TomSelect = TomSelect;
 
 import * as FilePond from "filepond";
 import "filepond/dist/filepond.min.css";
@@ -80,12 +80,26 @@ window.Swal = Swal;
  * allows your team to easily build robust real-time web applications.
  */
 
-// import Echo from 'laravel-echo';
+import Echo from 'laravel-echo';
+import Pusher from 'pusher-js';
 
-// import Pusher from 'pusher-js';
-// window.Pusher = Pusher;
+window.Pusher = Pusher;
+Pusher.logToConsole = true;
 
-// window.Echo = new Echo({
+window.Echo = new Echo({
+    broadcaster: 'pusher',
+    key: import.meta.env.VITE_PUSHER_APP_KEY,
+    cluster: 'mt1',
+    wsHost:  '127.0.0.1',
+    wsPort: 6001,
+    forceTLS: false,
+    encrypted: false,
+    disableStats: true,
+    enabledTransports: ['ws'],
+});
+
+
+//window.Echo = new Echo({
 //     broadcaster: 'pusher',
 //     key: import.meta.env.VITE_PUSHER_APP_KEY,
 //     cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER ?? 'mt1',

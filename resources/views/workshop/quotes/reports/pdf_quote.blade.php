@@ -122,10 +122,17 @@
             <tr>
 
                 <!-- COLUMNA 1: LOGO -->
-                <td style="width: 20%; text-align: left; vertical-align: top;">
-                    <img src="{{ public_path($company->logo_url) }}" alt="Logo"
-                        style="height: 100px; object-fit: contain; max-width: 120px;">
-                </td>
+                @if ($company->logo_url)
+                    <td style="width: 20%; text-align: left; vertical-align: top;">
+                        <img src="{{ public_path($company->logo_url) }}" alt="Logo"
+                            style="height: 100px; object-fit: contain; max-width: 120px;">
+                    </td>
+                @else
+                    <td style="width: 20%; text-align: left; vertical-align: top;">
+                        <img src="{{ public_path('assets/images/tu_logo.jpg') }}" alt="Logo"
+                            style="height: 100px; object-fit: contain; max-width: 120px;">
+                    </td>
+                @endif
 
                 <!-- COLUMNA 2: INFO DE LA EMPRESA -->
                 <td style="width: 60%; text-align: left; vertical-align: top;">

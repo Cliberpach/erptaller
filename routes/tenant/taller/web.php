@@ -27,6 +27,7 @@ Route::group(["prefix" => "taller"], function () {
 
         Route::get('invoice-create/{id}', [WorkOrderController::class, 'invoiceCreate'])->name('tenant.taller.ordenes_trabajo.invoiceCreate');
         Route::post('invoice-store', [WorkOrderController::class, 'invoiceStore'])->name('tenant.taller.ordenes_trabajo.invoiceStore');
+        Route::post('alert/store', [WorkOrderController::class, 'alertStore'])->name('tenant.taller.ordenes_trabajo.alertStore');
     });
 
     Route::group(["prefix" => "cotizaciones"], function () {
