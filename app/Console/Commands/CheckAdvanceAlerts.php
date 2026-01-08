@@ -1,4 +1,5 @@
 <?php
+namespace App\Console\Commands;
 
 use App\Events\AlertCreated;
 use App\Models\Tenant\Alerts\Alert;
