@@ -3,7 +3,7 @@
 namespace App\Events;
 
 use App\Models\Tenant\Alerts\Alert;
-use App\Models\User; // O tu modelo de usuario
+use App\Models\Tenant\User;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
@@ -15,7 +15,7 @@ class AlertCreated implements ShouldBroadcastNow
     use Dispatchable, SerializesModels;
 
     public Alert $alert;
-    public User $user; 
+    public User $user;
 
     public function __construct(Alert $alert, User $user)
     {
