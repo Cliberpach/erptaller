@@ -1,13 +1,12 @@
 <?php
 
-namespace App\Console\Commands;
-
 use App\Events\AlertCreated;
 use App\Models\Tenant\Alerts\Alert;
 use App\Models\Tenant\Alerts\AlertUser;
-use App\Models\User;
+use App\Models\Tenant\User;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Log;
 
 class CheckAdvanceAlerts extends Command
 {
@@ -16,17 +15,16 @@ class CheckAdvanceAlerts extends Command
 
     public function handle()
     {
-        $this->info('🔍 Verificando alertas activas...');
+        Log::channel('alerts')->info('🔍 Iniciando verificación de alertas');
 
         $today = Carbon::today();
 
-        // Alertas que ya deben mostrarse
         $alerts = Alert::where('status', 'ACTIVO')
             ->whereDate('advance_date', '<=', $today)
             ->get();
 
         if ($alerts->isEmpty()) {
-            $this->info('✅ No hay alertas pendientes');
+            Log::channel('alerts')->info('✅ No hay alertas pendientes');
             return Command::SUCCESS;
         }
 
@@ -39,18 +37,25 @@ class CheckAdvanceAlerts extends Command
                     ->where('user_id', $user->id)
                     ->first();
 
-                // Si ya fue notificado → no emitir
                 if ($alertUser && $alertUser->notified_at) {
+                    Log::channel('alerts')->info('⏭️ Omitida (ya notificada)', [
+                        'alert_id' => $alert->id,
+                        'user_id'  => $user->id,
+                    ]);
                     continue;
                 }
 
                 event(new AlertCreated($alert, $user));
 
-                $this->line("📢 Emitida alerta {$alert->id} → Usuario {$user->id}");
+                Log::channel('alerts')->info('📢 Alerta emitida', [
+                    'alert_id' => $alert->id,
+                    'user_id'  => $user->id,
+                ]);
             }
         }
 
-        $this->info('🎉 Proceso finalizado');
+        Log::channel('alerts')->info('🎉 Proceso finalizado');
+
         return Command::SUCCESS;
     }
 }
