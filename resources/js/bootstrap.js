@@ -106,7 +106,7 @@ console.log('🔧 Variables de entorno cargadas:', {
     VITE_PUSHER_APP_CLUSTER: import.meta.env.VITE_PUSHER_APP_CLUSTER,
 });
 
-const echoConfig = {
+/*const echoConfig = {
     broadcaster: 'pusher',
     key: import.meta.env.VITE_PUSHER_APP_KEY,
     cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER ?? 'mt1',
@@ -114,6 +114,19 @@ const echoConfig = {
     wsPort: import.meta.env.VITE_PUSHER_PORT ?? 443,
     wssPort: import.meta.env.VITE_PUSHER_PORT ?? 443,
     forceTLS: (import.meta.env.VITE_PUSHER_SCHEME ?? 'https') === 'https',
+    encrypted: true,
+    disableStats: true,
+    enabledTransports: ['ws', 'wss'],
+};*/
+
+const echoConfig = {
+    broadcaster: 'pusher',
+    key: 'app-key',                   
+    cluster: 'mt1',
+    wsHost: 'tallersuite.store',
+    wsPort: 443,
+    wssPort: 443,
+    forceTLS: true,
     encrypted: true,
     disableStats: true,
     enabledTransports: ['ws', 'wss'],
