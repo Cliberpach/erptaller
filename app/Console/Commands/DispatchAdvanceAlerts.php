@@ -3,8 +3,8 @@
 namespace App\Console\Commands;
 
 use App\Jobs\CheckTenantAlertsJob;
+use App\Models\Tenant;
 use Illuminate\Console\Command;
-use Spatie\Multitenancy\Models\Tenant;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
