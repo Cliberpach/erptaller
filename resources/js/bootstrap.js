@@ -121,7 +121,7 @@ console.log('🔧 Variables de entorno cargadas:', {
 
 const echoConfig = {
     broadcaster: 'pusher',
-    key: 'app-key',                   
+    key: 'app-key',
     cluster: 'mt1',
     wsHost: 'tallersuite.store',
     wsPort: 443,
@@ -144,4 +144,8 @@ window.Echo.connector.pusher.connection.bind('state_change', (states) => {
 
 window.Echo.connector.pusher.connection.bind('error', (err) => {
     console.error('❌ WebSocket error:', err);
+});
+
+window.Echo.connector.pusher.connection.bind('connected', () => {
+    console.log('✅ WebSocket conectado exitosamente!');
 });
