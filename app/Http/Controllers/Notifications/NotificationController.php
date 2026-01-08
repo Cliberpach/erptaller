@@ -188,13 +188,33 @@ class NotificationController extends Controller
             }
 
             DB::commit();
-            
+
             return response()->json([
                 'success' => true,
                 'message' => 'Alerta marcada como notificada',
             ]);
-
         } catch (Throwable $th) {
+            return response()->json(['success' => false, 'message' => $th->getMessage(), 'line' => $th->getLine(), 'file' => $th->getFile()]);
+        }
+    }
+
+    public function finish(Request $request,int $id)
+    {
+        DB::beginTransaction();
+        try {
+
+            $alert          =   Alert::findOrFail($id);
+            $alert->status  =   'FINALIZADO';
+            $alert->save();
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Alerta marcada como finalizada',
+            ]);
+        } catch (Throwable $th) {
+            DB::rollBack();
             return response()->json(['success' => false, 'message' => $th->getMessage(), 'line' => $th->getLine(), 'file' => $th->getFile()]);
         }
     }

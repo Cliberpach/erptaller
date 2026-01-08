@@ -4,6 +4,7 @@
 @endsection
 
 @section('content')
+    @csrf
     <div class="card overflow-hidden">
         <div class="card-header">
 
@@ -201,9 +202,37 @@
                         orderable: false,
                         render: function(data) {
                             return `
-                        <span class="badge ${data === 'ACTIVO' ? 'bg-success' : 'bg-danger'}">
-                            ${data}
-                        </span>`;
+                            <span class="badge ${data === 'ACTIVO' ? 'bg-primary' : 'bg-danger'}">
+                                ${data}
+                            </span>`;
+                        }
+                    },
+                    {
+                        data: null,
+                        name: 'options',
+                        searchable: false,
+                        orderable: false,
+                        render: function(data, type, row) {
+                            return `
+                                <div class="dropdown">
+                                    <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton${row.id}" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="fa-solid fa-ellipsis-vertical"></i>
+                                    </button>
+                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton${row.id}">
+                                        <li>
+                                            <a class="dropdown-item" href="javascript:void(0)" onclick="verDetalle(${row.id})">
+                                                <i class="fa-solid fa-eye me-2"></i> VER
+                                            </a>
+                                        </li>
+                                        ${row.status === 'ACTIVO' ? `
+                                            <li>
+                                                <a class="dropdown-item" href="javascript:void(0)" onclick="finishAlert(${row.id})">
+                                                    <i class="fa-solid fa-check me-2"></i> FINALIZAR
+                                                </a>
+                                            </li>` : ''}
+                                    </ul>
+                                </div>
+                            `;
                         }
                     }
                 ],
@@ -213,14 +242,14 @@
 
                     if (!$('#search-help').length) {
                         input.after(`
-                    <small id="search-help" class="text-black d-block mt-1">
-                        Buscar por:
-                        <strong>Nombre</strong>,
-                        <strong>Descripción</strong>,
-                        <strong>Tipo</strong>,
-                        <strong>Usuario</strong>
-                    </small>
-                `);
+                        <small id="search-help" class="text-black d-block mt-1">
+                            Buscar por:
+                            <strong>Nombre</strong>,
+                            <strong>Descripción</strong>,
+                            <strong>Tipo</strong>,
+                            <strong>Usuario</strong>
+                        </small>
+                    `);
                     }
                 },
 
@@ -247,6 +276,80 @@
         function filterDataTable() {
             dtQuery.ajax.reload();
         }
+
+        function finishAlert(id) {
+            toastr.clear();
+            let row = getRowById(dtQuery, id);
+            let messageHtml = `
+                <i class="fa-solid fa-bell me-2 text-warning"></i>
+                <strong>${row.name}</strong>
+            `;
+
+            Swal.fire({
+                title: 'DESEA FINALIZAR LA ALERTA?',
+                html: `
+                    ${messageHtml}
+                    <p class="mt-2">Operación <strong>no reversible</strong>!</p>
+                `,
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonText: "Sí, finalizar!",
+                cancelButtonText: "No, cancelar!",
+                reverseButtons: true
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+
+                    Swal.fire({
+                        title: 'Cargando...',
+                        html: 'Finalizando alerta...',
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+
+                    try {
+
+                        let url = `{{ route('notifications.finish', ['id' => ':id']) }}`;
+                        url = url.replace(':id', id);
+                        const token = document.querySelector('input[name="_token"]').value;
+
+                        const response = await fetch(url, {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': token,
+                                'X-HTTP-Method-Override': 'PUT'
+                            }
+                        });
+
+                        const res = await response.json();
+
+                        if (res.success) {
+                            dtQuery.ajax.reload();
+                            toastr.success(res.message, 'OPERACIÓN COMPLETADA');
+                        } else {
+                            toastr.error(res.message, 'ERROR EN EL SERVIDOr');
+                        }
+
+                    } catch (error) {
+                        toastr.error(error, 'ERROR EN LA PETICIÓN FINALIZAR ALERTA');
+                    } finally {
+                        Swal.close();
+                    }
+
+                } else if (
+                    /* Read more about handling dismissals below */
+                    result.dismiss === Swal.DismissReason.cancel
+                ) {
+                    Swal.fire({
+                        title: "Operación cancelada",
+                        text: "No se realizaron acciones",
+                        icon: "error"
+                    });
+                }
+            });
+        }
+
 
         // function downloadExcel() {
 

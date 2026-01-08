@@ -14,7 +14,7 @@ class QNotificationController extends Controller
     {
         return view('consultas.alerts.index');
     }
-    
+
     public function getAll(Request $request)
     {
         $items  =   $this->queryNotifications($request);
@@ -41,7 +41,8 @@ class QNotificationController extends Controller
                 'a.status',
                 'a.created_at',
             ])
-            ->where('a.status', 'ACTIVO');
+            ->where('a.status', '<>', 'ANULADO')
+            ->orderByDesc('a.id');
 
 
         if ($start_date) {

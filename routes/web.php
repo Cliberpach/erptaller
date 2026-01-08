@@ -164,6 +164,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
     Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.readAll');
     Route::post('/notifications/notified', [NotificationController::class, 'notified'])->name('notifications.notified');
+    Route::put('/notifications/finish/{id}', [NotificationController::class, 'finish'])->name('notifications.finish');
 
     require __DIR__ . '/tenant/taller/web.php';
     require __DIR__ . '/tenant/mantenimiento/web.php';

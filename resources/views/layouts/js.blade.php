@@ -33,6 +33,7 @@
         showMessages();
         eventsMenu();
         eventAlerts();
+        
     })
 
     function eventsMenu() {
@@ -104,7 +105,6 @@
             document.body.style.overflow = '';
         }
     }
-
 
     window.onload = function() {
         hideLoader()

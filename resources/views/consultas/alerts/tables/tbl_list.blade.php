@@ -9,6 +9,7 @@
             <th>Objeto ID</th>
             <th>Usuario</th>
             <th>Estado</th>
+            <th>Acción</th>
         </tr>
     </thead>
     <tbody>
