@@ -11,6 +11,7 @@ class Alert extends Model
 
     protected $guarded = [''];
     protected $table = 'alerts';
+    protected $connection   = 'tenant';
 
     protected $fillable = [
         'name',

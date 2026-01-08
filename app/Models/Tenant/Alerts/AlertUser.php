@@ -10,6 +10,7 @@ class AlertUser extends Model
     use HasFactory;
 
     protected $table = 'alert_user';
+    protected $connection   = 'tenant';
 
     protected $fillable = [
         'alert_id',
