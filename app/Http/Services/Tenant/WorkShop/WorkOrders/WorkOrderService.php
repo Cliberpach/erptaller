@@ -259,6 +259,7 @@ class WorkOrderService
         $work_order                 =   $order['order'];
         $lst_products               =   FormatController::formatLstProducts($order['products']->toArray());
         $lst_services               =   FormatController::formatLstServices($order['services']->toArray());
+        $units                      =   UtilController::getUnitsMeasurement();
 
         return view('sales.sale_document.create-ot', compact(
             'igv',
@@ -278,7 +279,8 @@ class WorkOrderService
             'configuration',
             'lst_products',
             'lst_services',
-            'work_order'
+            'work_order',
+            'units'
         ));
     }
 
