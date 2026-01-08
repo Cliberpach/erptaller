@@ -3,9 +3,9 @@
 namespace App\Console\Commands;
 
 use App\Jobs\CheckTenantAlertsJob;
+use App\Models\Tenant;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
-use Spatie\Multitenancy\Models\Tenant;
 use Throwable;
 
 class CheckAdvanceAlerts extends Command
