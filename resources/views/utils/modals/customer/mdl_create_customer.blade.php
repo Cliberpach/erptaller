@@ -190,9 +190,9 @@
 
         //======= ESTABLECIENDO UBIGEO =====
         const ubigeo = data.ubigeo;
-        const ubigeo_department_id = ubigeo[0];
-        const ubigeo_province_id = ubigeo[1];
-        const ubigeo_district_id = ubigeo[2];
+        const ubigeo_department_id = parseInt(ubigeo[0]);
+        const ubigeo_province_id = parseInt(ubigeo[1]);
+        const ubigeo_district_id = parseInt(ubigeo[2]);
 
         if (!ubigeo_department_id || !ubigeo_province_id || !ubigeo_district_id) {
             toastr.info('NO SE OBTUVO EL UBIGEO!!!');
