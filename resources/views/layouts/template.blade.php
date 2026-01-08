@@ -5,7 +5,7 @@
     <!-- Scripts -->
     @routes
     @include('layouts.head')
-    @vite(['resources/css/app.css', 'resources/js/app.js','resources/js/notifications/main.js'])
+    @vite(['resources/css/app.css', 'resources/js/app.js', 'resources/js/notifications/main.js'])
 </head>
 
 <body>

@@ -5,7 +5,7 @@
 @endsection
 
 @section('content')
-    @include('utils.modals.customer.mdl_create_customer')
+     @include('utils.modals.customer.mdl_create_customer')
     @include('utils.modals.vehicles.mdl_create_vehicle')
     @include('utils.modals.products.mdl_create_product')
     @include('utils.modals.services.mdl_create_service')
@@ -57,6 +57,8 @@
 
 @section('js')
     <script>
+
+
         const lstProducts = [];
         const lstServices = [];
         let dtProducts = null;
@@ -257,7 +259,7 @@
             window.productSelect = new TomSelect('#product_id', {
                 valueField: 'id',
                 labelField: 'text',
-                searchField: ['name','subtext'],
+                searchField: ['name', 'subtext'],
                 placeholder: 'Seleccione un producto',
                 maxOptions: 20,
                 create: false,
@@ -610,8 +612,8 @@
 
             const item = serviceSelect.options[value];
             if (item && item.sale_price) {
-                document.querySelector('#service_price').value      =   formatSoles(item.sale_price);
-                document.querySelector('#service_quantity').value   =   1;
+                document.querySelector('#service_price').value = formatSoles(item.sale_price);
+                document.querySelector('#service_quantity').value = 1;
             }
         }
 
@@ -876,7 +878,6 @@
                 window.clientSelect.off('change');
                 window.clientSelect.setValue(customer[0].id);
                 window.clientSelect.on('change', actionChangeClient);
-
             }
         }
     </script>

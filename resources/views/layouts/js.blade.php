@@ -30,24 +30,12 @@
             Notification.requestPermission();
         }
 
-        mostrarSessionMessages();
-        eventsA();
+        showMessages();
+        eventsMenu();
         eventAlerts();
-        events();
     })
 
-    function enableAudio() {
-        audioEnabled = true;
-    }
-
-    // 🎯 Manejar evento de scroll
-
-
-    function events() {
-
-    }
-
-    function eventsA() {
+    function eventsMenu() {
         document.addEventListener('click', function(e) {
 
             const menuLink = e.target.closest('.menu-click');
@@ -57,7 +45,26 @@
         });
     }
 
-    function mostrarSessionMessages() {
+
+    function hideLoader() {
+        const loader = document.querySelector('.loader-overlay');
+        if (loader) {
+            loader.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+    }
+
+    function enableAudio() {
+        audioEnabled = true;
+    }
+
+
+    window.onload = function() {
+        hideLoader()
+    };
+
+
+    function showMessages() {
         const messageSuccess = "{{ Session::get('message_success') }}";
         const messageError = "{{ Session::get('message_error') }}";
 
@@ -207,7 +214,6 @@
             notificationItem.classList.remove('notification-new');
         }, 5000);
     }
-
 
     function updateNotificationBadge() {
         notificationCount++;
@@ -373,8 +379,6 @@
         div.textContent = text;
         return div.innerHTML;
     }
-
-
 </script>
 
 @yield('js')
