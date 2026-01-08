@@ -86,7 +86,7 @@ import Pusher from 'pusher-js';
 window.Pusher = Pusher;
 Pusher.logToConsole = true;
 
-const echoConfig = {
+/*const echoConfig = {
     broadcaster: 'pusher',
     key: import.meta.env.VITE_PUSHER_APP_KEY,
     cluster: 'mt1',
@@ -102,7 +102,7 @@ const echoConfig = {
             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
         }
     }
-};
+};*/
 
 console.log('🔧 Variables de entorno cargadas:', {
     VITE_PUSHER_APP_KEY: import.meta.env.VITE_PUSHER_APP_KEY,
@@ -125,7 +125,7 @@ console.log('🔧 Variables de entorno cargadas:', {
     enabledTransports: ['ws', 'wss'],
 };*/
 
-/*const echoConfig = {
+const echoConfig = {
     broadcaster: 'pusher',
     key: 'app-key',
     cluster: 'mt1',
@@ -137,10 +137,15 @@ console.log('🔧 Variables de entorno cargadas:', {
     encrypted: true,
     disableStats: true,
     enabledTransports: ['ws', 'wss'],
-};*/
+    authEndpoint: '/broadcasting/auth',
+    auth: {
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+        }
+    }
+};
 
 console.log('🔧 Configuración de Echo:', echoConfig);
-
 
 window.Echo = new Echo(echoConfig);
 
