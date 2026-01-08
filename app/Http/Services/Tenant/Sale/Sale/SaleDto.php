@@ -9,7 +9,9 @@ use App\Models\Product;
 use App\Models\Tenant\Cash\PettyCash;
 use App\Models\Tenant\Cash\PettyCashBook;
 use App\Models\Tenant\Sale;
+use App\Models\Tenant\Sale\PaymentCondition\PaymentCondition;
 use App\Models\Tenant\WorkShop\Service;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 
 class SaleDto
@@ -86,7 +88,6 @@ class SaleDto
         return $dto;
     }
 
-
     public function getDtoStoreFromOrder(array $data)
     {
         $dto    =   [];
@@ -100,14 +101,14 @@ class SaleDto
         $dto['customer_phone']              =   $customer->phone;
 
         $user_recorder                      =   Auth::user();
-        $dto['user_recorder_id']           =   $user_recorder->id;
+        $dto['user_recorder_id']            =   $user_recorder->id;
         $dto['user_recorder_name']          =   $user_recorder->name;
 
-        $petty_cash                         =   PettyCash::where('type', 'FICTICIO')->first();
+        $petty_cash                         =   PettyCash::where('type', 'FICTICIO')->where('status', 'ANULADO')->first();
         $dto['petty_cash_id']               =   $petty_cash->id;
         $dto['petty_cash_name']             =   $petty_cash->name;
 
-        $petty_cash_book                    =   PettyCashBook::where('type', 'FICTICIO')->first();
+        $petty_cash_book                    =   PettyCashBook::where('type', 'FICTICIO')->where('status', 'ANULADO')->first();
         $dto['petty_cash_book_id']          =   $petty_cash_book->id;
 
         $invoice_type                       =   $data['invoice_type'];
@@ -119,6 +120,14 @@ class SaleDto
         $dto['subtotal']                    =   $data['subtotal'];
         $dto['igv_amount']                  =   $data['igv_amount'];
         $dto['total']                       =   $data['total'];
+
+        $payment_condition                  =   PaymentCondition::findOrFail(1);
+        $dto['payment_condition_id']       =   $payment_condition->id;
+        $dto['payment_condition_name']      =   $payment_condition->name;
+        $dto['payment_condition_days']      =   $payment_condition->nro_days;
+
+        $dto['expiration_date']             = Carbon::now();
+        $dto['registration_date']           = Carbon::now();
 
         $legend                 =   NumberToLettersController::numberToLetters($data['total']);
         $dto['legend']          =   $legend;

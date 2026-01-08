@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('type', 100);
             $table->unsignedInteger('nro_days');
             $table->enum('status', ['ACTIVO', 'ANULADO'])->default('ACTIVO');
+            $table->boolean('editable')->default(true);
             $table->timestamps();
         });
     }

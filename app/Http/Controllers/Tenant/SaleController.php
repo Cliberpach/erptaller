@@ -13,6 +13,8 @@ use App\Models\Landlord\Color;
 use App\Models\Landlord\Customer;
 use App\Models\Tenant\PaymentMethod;
 use App\Models\Tenant\Sale;
+use App\Models\Tenant\Sale\SaleService;
+use App\Models\Tenant\SaleDetail;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Exception;
@@ -249,6 +251,9 @@ array:10 [ // app\Http\Controllers\Tenant\SaleController.php:202
 
             $company                =   Company::find(1);
             $sale_document          =   Sale::findOrFail($sale_id);
+            $sale_products          =   SaleDetail::where('sale_document_id',$sale_id)->get();
+            $sale_services          =   SaleService::where('sale_document_id',$sale_id)->get();
+
             $sale_document_detail   =   DB::select('SELECT *
                                         FROM sales_documents_details AS sdd
                                         WHERE sdd.sale_document_id = ?', [$sale_id]);
@@ -289,7 +294,9 @@ array:10 [ // app\Http\Controllers\Tenant\SaleController.php:202
                 'company'               =>  $company,
                 'sale_document'         =>  $sale_document,
                 'customer'              =>  $customer,
-                'sale_document_detail'  =>  $sale_document_detail
+                'sale_document_detail'  =>  $sale_document_detail,
+                'sale_products'         =>  $sale_products,
+                'sale_services'         =>  $sale_services
             ]);
 
             $pdf->setPaper($pdf_size);

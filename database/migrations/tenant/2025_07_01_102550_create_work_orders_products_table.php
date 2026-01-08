@@ -41,6 +41,9 @@ return new class extends Migration
             $table->decimal('amount', 16, 6)->unsigned();
 
             $table->enum('status', ['ACTIVO', 'ANULADO'])->default('ACTIVO');
+            $table->boolean('invoiced')->default(false);
+            $table->unsignedBigInteger('invoiced_sale_id')->nullable();
+            $table->string('invoiced_sale_serie',100)->nullable();
 
             $table->primary(['work_order_id', 'product_id']);
 

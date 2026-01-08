@@ -61,7 +61,8 @@
         }
 
         .tbl-report-sale {
-            margin-top: 20px;
+            margin-top: 0px;
+            margin-bottom: 20px;
             width: 100%;
             border: 1px solid #ccc;
         }
@@ -79,6 +80,15 @@
             padding: 6px;
             border: 1px solid #ccc;
             font-size: 10px;
+        }
+
+        .subtitle {
+            font-weight: 600;
+            font-size: 12px;
+            color: #444;
+            text-transform: uppercase;
+            border-bottom: 1px solid #ccc;
+            margin-bottom: 4px;
         }
 
         /*======== FOOTER ==========*/
@@ -149,10 +159,10 @@
                         display: inline-block;
                         width: 100%;
                     ">
-                        DOCUMENTO DE VENTA<br>
-                        {{-- <span style="font-size: 14px;">
-                            DOC-{{ str_pad($data_quote['quote']->id, 8, '0', STR_PAD_LEFT) }}
-                        </span> --}}
+                        {{$sale_document->type_sale_name}}
+                        <span style="font-size: 14px;">
+                            {{ $sale_document->serie . '-' . $sale_document->correlative }}
+                        </span>
                     </div>
                 </td>
 
@@ -166,15 +176,27 @@
                 <td class="label">FECHA IMPRESIÓN:</td>
                 <td>{{ now()->format('Y-m-d H:i:s') }}</td>
             </tr>
-            {{-- <tr>
-                <td class="label">FECHA REGISTRO:</td>
-                <td>{{ $data_quote['quote']->created_at }}</td>
-            </tr>
 
             <tr>
                 <td class="label">CLIENTE:</td>
-                <td>{{ $data_quote['quote']->customer_name }}</td>
+                <td>{{ $sale_document->customer_name }}</td>
             </tr>
+            <tr>
+                <td class="label"> DOC CLIENTE:</td>
+                <td>{{ $sale_document->customer_type_document }}-{{ $sale_document->customer_document_number }}</td>
+            </tr>
+
+            <tr>
+                <td class="label">ATENDIDO POR:</td>
+                <td>{{ $sale_document->user_recorder_name }}</td>
+            </tr>
+
+            <tr>
+                <td class="label">FECHA REGISTRO:</td>
+                <td>{{ $sale_document->created_at }}</td>
+            </tr>
+
+            {{--
 
             <tr>
                 <td class="label">DOCUMENTO:</td>
@@ -187,11 +209,122 @@
                 <td>{{ $data_quote['quote']->plate }}</td>
             </tr>
 
-            <tr>
-                <td class="label">USUARIO CREACIÓN:</td>
-                <td>{{ $data_quote['quote']->create_user_name }}</td>
-            </tr> --}}
+           --}}
 
+        </table>
+
+
+        @if (count($sale_products) > 0)
+            <h4 class="subtitle">Productos</h4>
+
+            <!-- Tercera tabla: Reporte Productos -->
+            <table class="tbl-report-sale">
+                <thead>
+                    <tr>
+                        <th>CANT</th>
+                        <th>PRODUCTO</th>
+                        <th>P. VENTA</th>
+                        <th>MONTO</th>
+
+                        {{-- <th>CATEGORÍA</th>
+                        <th>MARCA</th> --}}
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @foreach ($sale_products as $item)
+                        <tr>
+
+                            <!-- Cantidad con 2 decimales -->
+                            <td style="text-align:left;">
+                                {{ number_format(round($item->quantity, 2), 2, '.', ',') }}
+                            </td>
+
+                            <td style="text-align:left;">
+                                {{ $item->product_name }}</style=>
+
+                                <!-- Precio venta con formato -->
+                            <td style="text-align:right;">
+                                {{ number_format(round($item->price_sale, 2), 2, '.', ',') }}
+                            </td>
+
+                            <!-- Monto total -->
+                            <td style="text-align:right;">
+                                {{ number_format(round($item->amount, 2), 2, '.', ',') }}
+                            </td>
+
+                            {{-- <td>{{ $item->category_name }}</td>
+                            <td>{{ $item->brand_name }}</td> --}}
+
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        @endif
+
+
+        @if (count($sale_services) > 0)
+            <h4 class="subtitle">Servicios</h4>
+
+            <!-- Cuarta tabla: Reporte Servicios -->
+            <table class="tbl-report-sale">
+                <thead>
+                    <tr>
+                        <th>CANT</th>
+                        <th>SERVICIO</th>
+                        <th>P. VENTA</th>
+                        <th>MONTO</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @foreach ($sale_services as $srv)
+                        <tr>
+
+                            <!-- Cantidad -->
+                            <td style="text-align:left;">
+                                {{ number_format(round($srv->quantity, 2), 2, '.', ',') }}
+                            </td>
+
+                            <!-- Nombre del servicio -->
+                            <td style="text-align:left;">
+                                {{ $srv->service_name }}
+                            </td>
+
+                            <!-- Precio venta -->
+                            <td style="text-align:right;">
+                                {{ number_format(round($srv->price_sale, 2), 2, '.', ',') }}
+                            </td>
+
+                            <!-- Importe -->
+                            <td style="text-align:right;">
+                                {{ number_format(round($srv->amount, 2), 2, '.', ',') }}
+                            </td>
+
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        @endif
+
+
+
+        <table style="width: 100%; margin-top: 20px;">
+             <tr>
+                <td style="text-align: right; font-weight: bold; font-size: 12px;">
+                    SUBTOTAL: S/ {{ number_format(round($sale_document->subtotal, 2), 2, '.', ',') }}
+                </td>
+            </tr>
+             <tr>
+                <td style="text-align: right; font-weight: bold; font-size: 12px;">
+                    IGV({{number_format(round($sale_document->igv_percentage, 2), 2, '.', ',').'%' }}): {{ 'S/ '.number_format(round($sale_document->igv_amount, 2), 2, '.', ',') }}
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align: right; font-weight: bold; font-size: 12px;">
+                    TOTAL: S/ {{ number_format(round($sale_document->total, 2), 2, '.', ',') }}
+                </td>
+            </tr>
         </table>
 
         <!-- Footer -->
