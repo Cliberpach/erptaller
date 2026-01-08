@@ -22,6 +22,7 @@ return new class extends Migration
 
             $table->date('notice_date')->comment('FECHA DE NOTIFICACION');
             $table->date('advance_date')->comment('FECHA ANTICIPADA');
+            $table->unsignedBigInteger('advance_days');
 
             $table->enum('status', ['ACTIVO', 'ANULADO'])->default('ACTIVO');
 

@@ -12,7 +12,6 @@ use App\Http\Controllers\Tenant\Consultas\QueryReservationController;
 use App\Http\Controllers\Tenant\CustomerController;
 use App\Http\Controllers\Tenant\Maintenance\BankAccountController;
 use App\Http\Controllers\Tenant\ModuleController;
-use App\Http\Controllers\Tenant\PettyCashBookController;
 use App\Http\Controllers\Tenant\ProductController;
 use App\Http\Controllers\Tenant\Purchase\PurchaseDocumentoController;
 use App\Http\Controllers\Tenant\PurchaseController;
@@ -164,6 +163,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::get('/notifications/count', [NotificationController::class, 'getNotificationsCount'])->name('notifications.count');
     Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
     Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.readAll');
+    Route::post('/notifications/notified', [NotificationController::class, 'notified'])->name('notifications.notified');
 
     require __DIR__ . '/tenant/taller/web.php';
     require __DIR__ . '/tenant/mantenimiento/web.php';
@@ -184,10 +184,11 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
 use App\Events\AlertCreated;
 use App\Events\TestSocketEvent;
 use App\Models\Tenant\Alerts\Alert;
-use Spatie\Multitenancy\Models\Tenant;
+use Illuminate\Support\Facades\Auth;
 
 Route::get('/test-broadcast', function () {
-    event(new AlertCreated(Alert::findOrFail(2)));
+    $user = Auth::user();
+    event(new AlertCreated(Alert::findOrFail(2),$user));
 
     return 'Evento enviado';
 });

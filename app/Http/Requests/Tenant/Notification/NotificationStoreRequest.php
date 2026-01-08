@@ -6,6 +6,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Validation\ValidationException;
 use Carbon\Carbon;
+use Illuminate\Validation\Validator as ValidationValidator;
 
 class NotificationStoreRequest extends FormRequest
 {
@@ -40,12 +41,12 @@ class NotificationStoreRequest extends FormRequest
                 'date',
                 'after_or_equal:' . $today,
             ],
-            'advance_date' => [
+            'advance_days' => [
                 'required',
-                'date',
-                'after_or_equal:' . $today,
-                'after_or_equal:notice_date',
-            ],
+                'integer',
+                'min:0',
+                'max:30',
+            ]
         ];
     }
 
@@ -64,10 +65,34 @@ class NotificationStoreRequest extends FormRequest
             'notice_date.date' => 'La fecha de notificación no es válida.',
             'notice_date.after_or_equal' => 'La fecha de notificación debe ser igual o mayor a la fecha actual.',
 
-            'advance_date.required' => 'La fecha anticipada es obligatoria.',
-            'advance_date.date' => 'La fecha anticipada no es válida.',
-            'advance_date.after_or_equal' => 'La fecha anticipada debe ser igual o mayor a la fecha actual y a la fecha de notificación.',
+            'advance_days.required' => 'Los días anticipados son obligatorios.',
+            'advance_days.integer'  => 'Los días anticipados deben ser un número entero.',
+            'advance_days.min'      => 'Los días anticipados no pueden ser negativos.',
+            'advance_days.max'      => 'Los días anticipados no pueden ser mayores a 30.',
+
         ];
+    }
+
+
+    public function withValidator(ValidationValidator $validator)
+    {
+        $validator->after(function ($validator) {
+            if ($this->notice_date !== null && $this->advance_days !== null) {
+
+                $noticeDate = Carbon::parse($this->notice_date);
+                $advanceDays = (int) $this->advance_days;
+
+                // notice_date - advance_days
+                $advanceDate = $noticeDate->copy()->subDays($advanceDays);
+
+                if ($advanceDate->lt(Carbon::today())) {
+                    $validator->errors()->add(
+                        'advance_days',
+                        'La fecha anticipada resultante no puede ser menor a la fecha actual.'
+                    );
+                }
+            }
+        });
     }
 
     /**

@@ -14,7 +14,7 @@ class Kernel extends ConsoleKernel
     {
         // $schedule->command('inspire')->hourly();
         $schedule->command('alerts:check')
-            ->hourly()
+            ->everyMinute()
             ->withoutOverlapping();
     }
 

@@ -2,6 +2,8 @@
 <html lang="en">
 
 <head>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
     <!-- Scripts -->
     @routes
     @include('layouts.head')
@@ -9,7 +11,6 @@
 </head>
 
 <body>
-
     <div class="row">
         <div class="col-12">
             @include('utils.spinners.spinner_1')

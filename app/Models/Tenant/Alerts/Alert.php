@@ -21,6 +21,7 @@ class Alert extends Model
 
         'notice_date',
         'advance_date',
+        'advance_days',
         'status',
 
         'creator_user_id',

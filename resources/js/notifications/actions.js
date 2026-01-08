@@ -2,7 +2,7 @@ import { route } from "ziggy-js";
 import { elements, notificationState } from "./states";
 import { appendLoadingIndicator, paintNotificationCount, removeLoadingIndicator, showErrorInList, showLoadNotify, updateNotificationUI } from "./ui";
 import { routes } from "./routes";
-import { getNotificationCount, getNotifications } from "./fetch";
+import { getNotificationCount, getNotifications, setNotified } from "./fetch";
 
 export async function loadNotifications() {
 
@@ -140,4 +140,12 @@ async function loadMoreNotifications() {
         notificationState.isLoading = false;
     }
 }
+
+
+async function markAsNotified(alertId) {
+    const data = await setNotified(alertId);
+}
+
+window.markAsNotified = markAsNotified;
+
 

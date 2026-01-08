@@ -109,13 +109,27 @@
                     data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false"
                     id="notificationButton">
                     <i class="fi fi-rr-bell"></i>
-                    <span class="badge badge-sm rounded-pill bg-danger position-absolute notification-badge end-0 top-0"
-                        id="notificationCount" style="display: none;">0</span>
+
+                    <span class="badge rounded-pill bg-danger position-absolute" id="notificationCount"
+                        style="
+                            top: 4px;
+                            right: 4px;
+                            min-width: 16px;
+                            height: 16px;
+                            font-size: 10px;
+                            line-height: 16px;
+                            padding: 0 4px;
+                            transform: translate(50%, -50%);
+                            z-index: 999999999;
+                        ">
+                        1
+                    </span>
+
                 </button>
                 <div class="dropdown-menu dropdown-menu-lg-end w-300px mt-2 p-0">
                     <div class="border-bottom d-flex justify-content-between align-items-center px-3 py-3">
                         <h6 class="mb-0">Notificaciones
-                            <span class="badge badge-sm rounded-pill bg-primary ms-2"
+                            <span class="badge badge-sm rounded-pill bg-primary ms-2 d-none"
                                 id="notificationCountHeader">0</span>
                         </h6>
                         <i class="bi bi-check2-all cursor-pointer" id="markAllAsRead"

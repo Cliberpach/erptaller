@@ -1,4 +1,3 @@
-<!-- Modal para visualizar orden de trabajo -->
 <div class="modal fade" id="mdl_alert_order" tabindex="-1" aria-labelledby="mdl_alert_order_label" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content">
@@ -61,8 +60,11 @@
             e.preventDefault();
             storeAlert(e.target);
         })
-    }
 
+        $('#mdl_alert_order').on('hidden.bs.modal', function() {
+            clearMdlAlert();
+        });
+    }
 
     function paintOrderMaster() {
         const row = getRowById(dtOrders, paramsMdlAlertOrder.id);
@@ -81,6 +83,8 @@
             reverseButtons: true
         }).then(async (result) => {
             if (result.isConfirmed) {
+
+                clearValidationErrors('msgError');
 
                 Swal.fire({
                     title: "Registrando alerta...",
@@ -144,5 +148,13 @@
                 });
             }
         });
+    }
+
+    function clearMdlAlert() {
+        document.querySelector('#name').value = '';
+        document.querySelector('#description').value = '';
+        document.querySelector('#notice_date').value = '';
+        document.querySelector('#advance_days').value = '';
+        clearValidationErrors('msgError');
     }
 </script>

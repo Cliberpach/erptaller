@@ -39,12 +39,12 @@
     "css": [
       "assets/app-c1078029.css"
     ],
-    "file": "assets/app-48cfe188.js",
+    "file": "assets/app-cd5fddba.js",
     "isEntry": true,
     "src": "resources/js/app.js"
   },
   "resources/js/notifications/main.js": {
-    "file": "assets/main-ffb99785.js",
+    "file": "assets/main-f493254a.js",
     "isEntry": true,
     "src": "resources/js/notifications/main.js"
   }

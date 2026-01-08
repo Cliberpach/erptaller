@@ -130,21 +130,21 @@
         });
 
         // Suscripción al canal
-        const channel = Echo.channel('alerts');
+        const userId    =   {{ auth()->id() }};
+        const channel   =   Echo.private(`user.${userId}`);
 
         channel.subscribed(() => {
-            console.log('✅ SUSCRITO AL CANAL alerts');
+            console.log('✅ SUSCRITO AL CANAL PRIVADO user.' + userId);
         });
 
         channel.error((error) => {
-            console.error('❌ ERROR EN CANAL:', error);
+            console.error('❌ ERROR EN CANAL PRIVADO:', error);
         });
 
-        channel.listen('.AlertCreated', alert => {
-            console.log('🔥 FUNCIONA:', alert);
-            console.log('data', alert);
-
-            emitAlert(alert);
+        channel.listen('.alert.created', (data) => {
+            console.log('🔥 ALERTA RECIBIDA:', data);
+            console.log('📋 Datos completos:', data.alert);
+            emitAlert(data.alert);
         });
 
     }
@@ -163,6 +163,9 @@
 
         // 4. Animar el icono de campana
         animateBellIcon();
+
+        // NOTIFIED
+        window.markAsNotified(alert.id);
     }
 
     function playNotificationSound() {

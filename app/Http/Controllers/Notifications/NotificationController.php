@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Notifications;
 
 use App\Http\Controllers\Controller;
 use App\Models\Tenant\Alerts\Alert;
+use App\Models\Tenant\Alerts\AlertUser;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Throwable;
 
 class NotificationController extends Controller
 {
@@ -158,6 +160,42 @@ class NotificationController extends Controller
         } else {
             $diff = $now->diffInDays($noticeDate);
             return "Hace {$diff} días";
+        }
+    }
+
+    public function notified(Request $request)
+    {
+        DB::beginTransaction();
+        try {
+            $alert_id   =   $request->get('alert_id');
+            $userId     =   auth()->id();
+
+            $alert  =   Alert::findOrFail($alert_id);
+            $alertUser = AlertUser::firstOrCreate(
+                [
+                    'alert_id' => $alert->id,
+                    'user_id'  => $userId,
+                ],
+                [
+                    'notification_channel' => 'WEB',
+                ]
+            );
+
+            if (is_null($alertUser->notified_at)) {
+                $alertUser->update([
+                    'notified_at' => Carbon::now(),
+                ]);
+            }
+
+            DB::commit();
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Alerta marcada como notificada',
+            ]);
+
+        } catch (Throwable $th) {
+            return response()->json(['success' => false, 'message' => $th->getMessage(), 'line' => $th->getLine(), 'file' => $th->getFile()]);
         }
     }
 }
