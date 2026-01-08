@@ -17,8 +17,7 @@ class DispatchAdvanceAlerts extends Command
     {
         try {
 
-            Tenant::where('status', 'ACTIVO')
-                ->chunk(50, function ($tenants) {
+            Tenant::chunk(50, function ($tenants) {
                     foreach ($tenants as $tenant) {
                         dispatch(new CheckTenantAlertsJob($tenant->id));
                     }
