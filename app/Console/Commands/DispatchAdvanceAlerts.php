@@ -4,19 +4,17 @@ namespace App\Console\Commands;
 
 use App\Jobs\CheckTenantAlertsJob;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Log;
 use Spatie\Multitenancy\Models\Tenant;
+use Illuminate\Support\Facades\Log;
 use Throwable;
 
-class CheckAdvanceAlerts extends Command
+class DispatchAdvanceAlerts extends Command
 {
-    protected $signature = 'alerts:check';
-    protected $description = 'Verifica y notifica alertas activas según advance_date';
+    protected $signature = 'alerts:dispatch';
+    protected $description = 'Despacha jobs de alertas por tenant';
 
     public function handle()
     {
-        Log::channel('alerts')->info('🔍 Iniciando verificación de alertas');
-
         try {
 
             Tenant::where('status', 'ACTIVO')
@@ -45,5 +43,7 @@ class CheckAdvanceAlerts extends Command
 
             return Command::FAILURE;
         }
+
+        $this->info('🚀 Jobs de alertas despachados');
     }
 }
