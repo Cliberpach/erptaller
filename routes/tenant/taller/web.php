@@ -112,7 +112,7 @@ Route::group(["prefix" => "taller"], function () {
         Route::get('getEvents', [AppointmentController::class, 'getEvents'])->name('tenant.taller.citas.getEvents');
         Route::post('store', [AppointmentController::class, 'store'])->name('tenant.taller.citas.store');
         // Route::get('getYear/{id}', [YearController::class, 'getYear'])->name('tenant.taller.years.getYear');
-        // Route::delete('delete/{id}', [YearController::class, 'destroy'])->name('tenant.taller.years.destroy');
+        Route::delete('delete/{id}', [AppointmentController::class, 'destroy'])->name('tenant.taller.citas.destroy');
         Route::put('update/{id}', [AppointmentController::class, 'update'])->name('tenant.taller.citas.update');
     });
 });

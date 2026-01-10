@@ -20,7 +20,7 @@
                 <button type="button" class="btn btn-primary" id="btnEditEvent">
                     <i class="fa-solid fa-pen me-2"></i>Editar
                 </button>
-                <button type="button" class="btn btn-danger" id="deleteEventFromDetailBtn">
+                <button type="button" class="btn btn-danger" id="btnDeleteEvent">
                     <i class="fa-solid fa-trash me-2"></i>Eliminar
                 </button>
             </div>
@@ -38,6 +38,11 @@
         function eventsMdlShowEvent() {
             document.querySelector('#btnEditEvent').addEventListener('click', (e) => {
                 openMdlEditEvent(paramsMdlShowEvent.event);
+            })
+
+
+            document.querySelector('#btnDeleteEvent').addEventListener('click', (e) => {
+                destroyAppointment(paramsMdlShowEvent.event);
             })
         }
 
@@ -132,6 +137,103 @@
                 'bg-secondary'
             );
 
+        }
+
+        function destroyAppointment(event) {
+            toastr.clear();
+
+            let message = `
+                    <div class="text-center">
+
+                        <h5 class="fw-bold mb-3">
+                            <i class="fa-solid fa-calendar-check text-primary me-2"></i>
+                            ${event.name}
+                        </h5>
+
+                        <div class="mb-2">
+                            <i class="fa-solid fa-user text-info me-2"></i>
+                            <strong>Cliente:</strong> ${event.customer_name ?? '-'}
+                        </div>
+
+                        <div class="mb-2">
+                            <i class="fa-solid fa-calendar-day text-success me-2"></i>
+                            <strong>Inicio:</strong>
+                            ${event.start_date} &nbsp;
+                            <i class="fa-solid fa-clock text-secondary me-1"></i>
+                            ${event.start_time}
+                        </div>
+
+                        <div class="mb-2">
+                            <i class="fa-solid fa-calendar-xmark text-danger me-2"></i>
+                            <strong>Fin:</strong>
+                            ${event.end_date} &nbsp;
+                            <i class="fa-solid fa-clock text-secondary me-1"></i>
+                            ${event.end_time}
+                        </div>
+
+                        <hr class="my-3">
+
+                        <p class="text-danger fw-semibold mb-0">
+                            <i class="fa-solid fa-triangle-exclamation me-2"></i>
+                            Esta acción no se puede deshacer
+                        </p>
+
+                    </div>
+                `;
+
+            Swal.fire({
+                title: 'DESEA ELIMINAR LA CITA',
+                html: message,
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonText: "Sí, eliminar!",
+                cancelButtonText: "No, cancelar!",
+                reverseButtons: true
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+
+                    Swal.fire({
+                        title: 'Cargando...',
+                        html: 'Eliminando Cita...',
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+
+                    try {
+
+                        let url = `{{ route('tenant.taller.citas.destroy', ['id' => ':id']) }}`;
+                        url = url.replace(':id', event.id);
+
+                        const res = await axios.delete(url);
+
+                        if (res.data.success) {
+                            toastr.success(res.data.message, 'OPERACIÓN COMPLETADA');
+                            $('#mdlShowEvent').modal('hide');
+                            loadEventsFromServer();
+
+                        } else {
+                            toastr.error(res.data.message, 'ERROR EN EL SERVIDOR AL ELIMINAR CITA');
+                        }
+
+                    } catch (error) {
+                        toastr.error(error, 'ERROR EN LA PETICIÓN ELIMINAR CITA');
+                    } finally {
+                        Swal.close();
+                    }
+
+                } else if (
+                    /* Read more about handling dismissals below */
+                    result.dismiss === Swal.DismissReason.cancel
+                ) {
+                    Swal.fire({
+                        title: "Operación cancelada",
+                        text: "No se realizaron acciones",
+                        icon: "error"
+                    });
+                }
+            });
         }
     </script>
 @endpush

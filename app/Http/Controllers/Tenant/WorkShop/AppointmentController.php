@@ -130,6 +130,24 @@ array:12 [ // app\Http\Controllers\Tenant\WorkShop\AppointmentController.php:119
     }
 
 
+    public function destroy($id)
+    {
+        DB::beginTransaction();
+        try {
+            $item            =   Appointment::findOrFail($id);
+            $item->status    =   'ANULADO';
+            $item->update();
+
+
+            DB::commit();
+            return response()->json(['success' => true, 'message' => "CITA ELIMINADA CON ÉXITO"]);
+        } catch (Throwable $th) {
+            DB::rollBack();
+            return response()->json(['success' => false, 'message' => $th->getMessage()]);
+        }
+    }
+
+
 
     private function getBackgroundColor($type)
     {

@@ -16,9 +16,6 @@
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                     <i class="fa-solid fa-xmark me-2"></i>Cancelar
                 </button>
-                <button type="button" class="btn btn-danger" id="deleteEventBtnEdit" style="display: none;">
-                    <i class="fa-solid fa-trash me-2"></i>Eliminar
-                </button>
                 <button type="submit" form="formEditEvent" class="btn btn-primary" id="saveEventBtnEdit">
                     <i class="fa-solid fa-floppy-disk me-2"></i>Actualizar
                 </button>
@@ -39,7 +36,6 @@
         const eventEndTimeEdit = document.getElementById('end_time_event');
         const eventLocationEdit = document.getElementById('location_event');
         const eventDescriptionEdit = document.getElementById('description_event');
-        const saveEventBtnEdit = document.getElementById('saveEventBtnEdit');
         const deleteEventBtnEdit = document.getElementById('deleteEventBtnEdit');
         const modalTitleEdit = document.getElementById('modalTitleEdit');
         const startTimeContainerEdit = document.getElementById('startTimeContainerEdit');
