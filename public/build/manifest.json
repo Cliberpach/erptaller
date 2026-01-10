@@ -20,7 +20,7 @@
     "src": "node_modules/lightgallery/images/loading.gif"
   },
   "resources/css/app.css": {
-    "file": "assets/app-e3b0c442.css",
+    "file": "assets/app-1cdd5ea5.css",
     "isEntry": true,
     "src": "resources/css/app.css"
   },
@@ -39,7 +39,7 @@
     "css": [
       "assets/app-c1078029.css"
     ],
-    "file": "assets/app-3628de3e.js",
+    "file": "assets/app-7ba0aa27.js",
     "isEntry": true,
     "src": "resources/js/app.js"
   },

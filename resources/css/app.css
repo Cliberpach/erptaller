@@ -10,3 +10,139 @@
 .collapse {
     visibility: visible !important;
 } */
+
+
+@import '@toast-ui/calendar/dist/toastui-calendar.min.css';
+
+.toastui-calendar-popup {
+    font-family: inherit !important;
+}
+
+.toastui-calendar-popup .toastui-calendar-popup-container {
+    width: 520px !important;
+    max-width: 95vw !important;
+    padding: 0 !important;
+}
+
+.toastui-calendar-popup .toastui-calendar-section {
+    padding: 16px 24px !important;
+    border-bottom: 1px solid #e5e7eb !important;
+}
+
+.toastui-calendar-popup .toastui-calendar-section:last-child {
+    border-bottom: none !important;
+}
+
+/* Fix para los labels */
+.toastui-calendar-popup .toastui-calendar-icon {
+    width: 20px !important;
+    margin-right: 8px !important;
+    display: inline-block !important;
+    vertical-align: middle !important;
+}
+
+/* Fix para todos los inputs de texto */
+.toastui-calendar-popup input[type="text"] {
+    width: 100% !important;
+    height: 38px !important;
+    padding: 6px 12px !important;
+    font-size: 14px !important;
+    line-height: 1.5 !important;
+    color: #212529 !important;
+    background-color: #fff !important;
+    border: 1px solid #ced4da !important;
+    border-radius: 0.375rem !important;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out !important;
+    box-sizing: border-box !important;
+}
+
+.toastui-calendar-popup input[type="text"]:focus {
+    color: #212529 !important;
+    background-color: #fff !important;
+    border-color: #86b7fe !important;
+    outline: 0 !important;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
+}
+
+/* Fix para la sección de fechas - CRÍTICO */
+.toastui-calendar-popup .toastui-calendar-section-date {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    gap: 10px !important;
+    width: 100% !important;
+}
+
+.toastui-calendar-popup .toastui-calendar-section-date-date {
+    flex: 0 0 65% !important;
+    max-width: 65% !important;
+}
+
+.toastui-calendar-popup .toastui-calendar-section-date-time {
+    flex: 0 0 calc(35% - 10px) !important;
+    max-width: calc(35% - 10px) !important;
+}
+
+.toastui-calendar-popup .toastui-calendar-section-start-date,
+.toastui-calendar-popup .toastui-calendar-section-end-date {
+    display: block !important;
+    margin-bottom: 12px !important;
+}
+
+/* Fix para los inputs dentro de las fechas */
+.toastui-calendar-popup .toastui-calendar-section-date input {
+    width: 100% !important;
+    min-width: 0 !important;
+}
+
+/* Fix para el datepicker y timepicker */
+.toastui-calendar-popup .toastui-calendar-datepicker-input,
+.toastui-calendar-popup .toastui-calendar-timepicker-input {
+    width: 100% !important;
+}
+
+/* Fix para los calendarios desplegables */
+.toastui-calendar-datepicker,
+.toastui-calendar-timepicker {
+    z-index: 10000 !important;
+}
+
+/* Fix para el checkbox "All day" */
+.toastui-calendar-popup .toastui-calendar-section-allday {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+}
+
+.toastui-calendar-popup .toastui-calendar-checkbox {
+    margin: 0 !important;
+}
+
+/* Fix para el select de calendario */
+.toastui-calendar-popup .toastui-calendar-dropdown {
+    width: 100% !important;
+    height: 38px !important;
+    padding: 6px 12px !important;
+    font-size: 14px !important;
+    border: 1px solid #ced4da !important;
+    border-radius: 0.375rem !important;
+    background-color: #fff !important;
+}
+
+/* Fix para los botones del popup */
+.toastui-calendar-popup .toastui-calendar-popup-save,
+.toastui-calendar-popup .toastui-calendar-popup-close,
+.toastui-calendar-popup .toastui-calendar-popup-delete {
+    padding: 8px 16px !important;
+    font-size: 14px !important;
+    border-radius: 0.375rem !important;
+}
+
+.toastui-calendar-popup .toastui-calendar-popup-save {
+    background-color: #0d6efd !important;
+    border-color: #0d6efd !important;
+}
+
+.toastui-calendar-popup .toastui-calendar-popup-save:hover {
+    background-color: #0b5ed7 !important;
+    border-color: #0a58ca !important;
+}

@@ -161,3 +161,8 @@ window.Echo.connector.pusher.connection.bind('error', (err) => {
 window.Echo.connector.pusher.connection.bind('connected', () => {
     console.log('✅ WebSocket conectado exitosamente!');
 });
+
+//======== CALENDAR ========
+import Calendar from '@toast-ui/calendar';
+window.Calendar = Calendar;
+

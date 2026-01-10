@@ -57,22 +57,15 @@
 
         const modeloNombre = document.querySelector('#description').value;
 
-        const swalWithBootstrapButtons = Swal.mixin({
-            customClass: {
-                confirmButton: "btn btn-success",
-                cancelButton: "btn btn-danger"
-            },
-            buttonsStyling: false
-        });
-        swalWithBootstrapButtons.fire({
+        Swal.fire({
             title: "Desea registrar el año?",
             html: `
-            <div style="text-align: center; margin-top: 10px;">
-                <p style="font-size: 16px; margin-bottom: 10px;">
-                    <strong>Nombre:</strong> ${modeloNombre}
-                </p>
-            </div>
-        `,
+                <div style="text-align: center; margin-top: 10px;">
+                    <p style="font-size: 16px; margin-bottom: 10px;">
+                        <strong>Nombre:</strong> ${modeloNombre}
+                    </p>
+                </div>
+            `,
             icon: "warning",
             showCancelButton: true,
             confirmButtonText: "Sí!",
@@ -132,7 +125,7 @@
                 }
 
             } else if (result.dismiss === Swal.DismissReason.cancel) {
-                swalWithBootstrapButtons.fire({
+                Swal.fire({
                     title: "Operación cancelada",
                     text: "No se realizaron acciones",
                     icon: "error"

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Tenant\WorkShop\AppointmentController;
 use App\Http\Controllers\Tenant\WorkShop\BrandController;
 use App\Http\Controllers\Tenant\WorkShop\ColorController;
 use App\Http\Controllers\Tenant\WorkShop\ModelController;
@@ -103,5 +104,15 @@ Route::group(["prefix" => "taller"], function () {
         Route::get('getYear/{id}', [YearController::class, 'getYear'])->name('tenant.taller.years.getYear');
         Route::delete('delete/{id}', [YearController::class, 'destroy'])->name('tenant.taller.years.destroy');
         Route::put('update/{id}', [YearController::class, 'update'])->name('tenant.taller.years.update');
+    });
+
+    Route::group(["prefix" => "citas"], function () {
+
+        Route::get('index', [AppointmentController::class, 'index'])->name('tenant.taller.citas.index');
+        Route::get('getEvents', [AppointmentController::class, 'getEvents'])->name('tenant.taller.citas.getEvents');
+        Route::post('store', [AppointmentController::class, 'store'])->name('tenant.taller.citas.store');
+        // Route::get('getYear/{id}', [YearController::class, 'getYear'])->name('tenant.taller.years.getYear');
+        // Route::delete('delete/{id}', [YearController::class, 'destroy'])->name('tenant.taller.years.destroy');
+        // Route::put('update/{id}', [YearController::class, 'update'])->name('tenant.taller.years.update');
     });
 });

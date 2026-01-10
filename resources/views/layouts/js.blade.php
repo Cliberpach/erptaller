@@ -33,7 +33,7 @@
         showMessages();
         eventsMenu();
         eventAlerts();
-        
+
     })
 
     function eventsMenu() {
@@ -385,3 +385,4 @@
 </script>
 
 @yield('js')
+@stack('js-script')
