@@ -2,13 +2,13 @@
 
 namespace App\Http\Requests\Tenant\WorkShop\Appointment;
 
-use Carbon\Carbon;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Rule;
 use Illuminate\Contracts\Validation\Validator;
+use Carbon\Carbon;
 
-class AppointmentStoreRequest extends FormRequest
+class AppointmentUpdateRequest extends FormRequest
 {
     public function authorize(): bool
     {
@@ -20,8 +20,8 @@ class AppointmentStoreRequest extends FormRequest
         $this->replace(
             collect($this->all())->mapWithKeys(function ($value, $key) {
 
-                if (str_ends_with($key, '_event')) {
-                    $newKey = str_replace('_event', '', $key);
+                if (str_ends_with($key, '_event_edit')) {
+                    $newKey = str_replace('_event_edit', '', $key);
                     return [$newKey => $value];
                 }
 
@@ -58,7 +58,6 @@ class AppointmentStoreRequest extends FormRequest
             'start_date' => [
                 'required',
                 'date',
-                'after_or_equal:today',
             ],
 
             'start_time' => [
@@ -69,7 +68,6 @@ class AppointmentStoreRequest extends FormRequest
             'end_date' => [
                 'required',
                 'date',
-                'after_or_equal:today',
                 'after_or_equal:start_date',
             ],
 
@@ -92,43 +90,9 @@ class AppointmentStoreRequest extends FormRequest
         ];
     }
 
-
-    public function messages(): array
-    {
-        return [
-
-            'name.required' => 'El nombre del evento es obligatorio.',
-            'name.max'      => 'El nombre del evento no debe superar los 500 caracteres.',
-
-            'customer_id.required' => 'El cliente es obligatorio.',
-            'customer_id.exists'   => 'El cliente seleccionado no existe o no está activo.',
-
-            'vehicle_id.exists'  => 'El vehículo seleccionado no existe o no está activo.',
-
-            'type_calendar.required' => 'El tipo de calendario es obligatorio.',
-            'type_calendar.in'       => 'El tipo de calendario debe ser PERSONAL o TRABAJO.',
-
-            'start_date.required'        => 'La fecha de inicio es obligatoria.',
-            'start_date.date'            => 'La fecha de inicio no es válida.',
-            'start_date.after_or_equal'  => 'La fecha de inicio no puede ser menor a hoy.',
-
-            'start_time.required'     => 'La hora de inicio es obligatoria.',
-            'start_time.date_format'  => 'La hora de inicio debe tener el formato HH:MM.',
-
-            'end_date.required'        => 'La fecha de fin es obligatoria.',
-            'end_date.date'            => 'La fecha de fin no es válida.',
-            'end_date.after_or_equal'  => 'La fecha de fin no puede ser menor a la fecha de inicio.',
-
-            'end_time.required'     => 'La hora de fin es obligatoria.',
-            'end_time.date_format'  => 'La hora de fin debe tener el formato HH:MM.',
-
-            'location.max' => 'La ubicación no debe superar los 500 caracteres.',
-
-            'description.max' => 'La descripción no debe superar los 500 caracteres.',
-        ];
-    }
-
-
+    /**
+     * Validaciones avanzadas
+     */
     public function withValidator($validator)
     {
         $validator->after(function ($validator) {
@@ -150,6 +114,40 @@ class AppointmentStoreRequest extends FormRequest
                 }
             }
         });
+    }
+
+    public function messages(): array
+    {
+        return [
+
+            'name.required' => 'El nombre del evento es obligatorio.',
+            'name.max'      => 'El nombre del evento no debe superar los 500 caracteres.',
+
+            'customer_id.required' => 'El cliente es obligatorio.',
+            'customer_id.exists'   => 'El cliente seleccionado no existe o no está activo.',
+
+            'vehicle_id.exists'  => 'El vehículo seleccionado no existe o no está activo.',
+
+            'type_calendar.required' => 'El tipo de calendario es obligatorio.',
+            'type_calendar.in'       => 'El tipo de calendario debe ser PERSONAL o TRABAJO.',
+
+            'start_date.required' => 'La fecha de inicio es obligatoria.',
+            'start_date.date'     => 'La fecha de inicio no es válida.',
+
+            'start_time.required'    => 'La hora de inicio es obligatoria.',
+            'start_time.date_format' => 'La hora de inicio debe tener el formato HH:MM.',
+
+            'end_date.required' => 'La fecha de fin es obligatoria.',
+            'end_date.date'     => 'La fecha de fin no es válida.',
+            'end_date.after_or_equal' =>
+            'La fecha de fin no puede ser menor a la fecha de inicio.',
+
+            'end_time.required'    => 'La hora de fin es obligatoria.',
+            'end_time.date_format' => 'La hora de fin debe tener el formato HH:MM.',
+
+            'location.max' => 'La ubicación no debe superar los 500 caracteres.',
+            'description.max' => 'La descripción no debe superar los 500 caracteres.',
+        ];
     }
 
     protected function failedValidation(Validator $validator)

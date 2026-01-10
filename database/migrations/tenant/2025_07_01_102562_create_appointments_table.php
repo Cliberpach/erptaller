@@ -18,6 +18,16 @@ return new class extends Migration
             $table->string('name', 500);
             $table->string('description', 500)->nullable();
 
+            $table->unsignedBigInteger('customer_id');
+            $table->string('customer_name', 160);
+            $table->string('customer_type_document_abbreviation', 20);
+            $table->string('customer_document_number', 20);
+
+            $table->unsignedBigInteger('vehicle_id')->nullable();
+            $table->foreign('vehicle_id')->references('id')->on('vehicles');
+
+            $table->string('plate', 8);
+
             $table->date('start_date');
             $table->date('end_date');
 

@@ -25,12 +25,12 @@ class AppointmentService
     }
 
 
-
     public function update(array $data, int $id): Appointment
     {
         $dto        =   $this->s_dto->getDtoStore($data);
-        $service    =   $this->s_repository->updateService($dto, $id);
-        return $service;
+       
+        $item    =   $this->s_repository->update($dto, $id);
+        return $item;
     }
 
     public function destroy(int $id): Appointment

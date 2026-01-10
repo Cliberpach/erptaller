@@ -19,11 +19,11 @@ class AppointmentRepository
         return Appointment::create($dto);
     }
 
-    public function updateService(array $dto,int $id): Service
+    public function update(array $dto,int $id): Appointment
     {
-        $service    =   Service::findOrFail($id);
-        $service->update($dto);
-        return $service;
+        $item    =   Appointment::findOrFail($id);
+        $item->update($dto);
+        return $item;
     }
 
     public function destroy(int $id):Service{

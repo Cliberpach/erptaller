@@ -113,6 +113,6 @@ Route::group(["prefix" => "taller"], function () {
         Route::post('store', [AppointmentController::class, 'store'])->name('tenant.taller.citas.store');
         // Route::get('getYear/{id}', [YearController::class, 'getYear'])->name('tenant.taller.years.getYear');
         // Route::delete('delete/{id}', [YearController::class, 'destroy'])->name('tenant.taller.years.destroy');
-        // Route::put('update/{id}', [YearController::class, 'update'])->name('tenant.taller.years.update');
+        Route::put('update/{id}', [AppointmentController::class, 'update'])->name('tenant.taller.citas.update');
     });
 });

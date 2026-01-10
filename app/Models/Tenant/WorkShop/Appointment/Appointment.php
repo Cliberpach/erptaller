@@ -27,6 +27,13 @@ class Appointment extends Model
         'location',
         'status',
 
+        'customer_id',
+        'customer_name',
+        'customer_type_document_abbreviation',
+        'customer_document_number',
+        'vehicle_id',
+        'plate',
+
         // ====== AUDITORÍA ======
         'creator_user_id',
         'editor_user_id',

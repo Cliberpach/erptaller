@@ -7,7 +7,8 @@
 @section('content')
     @include('workshop.quotes.modals.mdl_show_quote')
     @include('workshop.appointments.modals.mdl_create_event')
-
+    @include('workshop.appointments.modals.mdl_show_event')
+    @include('workshop.appointments.modals.mdl_edit_event')
     <div class="card overflow-hidden">
         <div class="card-header">
             <!-- Fila 1: Título + Botón -->
@@ -31,10 +32,10 @@
                     <label class="form-label fw-bold">
                         <i class="fas fa-user text-primary mr-1"></i> Cliente:
                     </label>
-                    <select class="form-control" id="client_id" name="client_id">
+                    <select class="form-control" id="filter_client_id" name="filter_client_id">
                         <option value="">Seleccione un cliente</option>
                     </select>
-                    <p class="client_id_error msgError mb-0"></p>
+                    <p class="filter_client_id_error msgError mb-0"></p>
                 </div>
 
                 <!-- Fecha Inicio -->
@@ -96,7 +97,6 @@
         let calendar = null;
 
         document.addEventListener('DOMContentLoaded', () => {
-            loadTomSelect();
             loadCalendar();
             loadEventsFromServer();
             events();
@@ -106,7 +106,7 @@
             calendar = new Calendar('#calendar', {
                 defaultView: 'week',
                 useFormPopup: false,
-                useDetailPopup: true,
+                useDetailPopup: false,
                 isReadOnly: false,
                 week: {
                     showTimezoneCollapseButton: false,
@@ -165,6 +165,8 @@
         function events() {
 
             eventsMdlCreateEvent();
+            eventsMdlShowEvent();
+            eventsMdlEditEvent()
 
             calendar.on('beforeCreateEvent', (event) => {
                 console.log('Creando evento:', event);
@@ -201,10 +203,11 @@
             }, ]);
 
             const timedEvent = calendar.getEvent('1', 'cal1');
-            calendar.on('clickEvent', ({
-                event
-            }) => {
-                console.log('HAS CLICKEADO EN UN EVENT', event);
+            calendar.on('clickEvent', (info) => {
+                console.log('HAS CLICKEADO EN UN EVENT', info.event);
+                console.log(info.event.raw);
+
+                openMdlShowEvent(info.event.raw.item);
             });
 
             calendar.on('selectDateTime', (info) => {
@@ -261,48 +264,6 @@
             }
         }
 
-        function loadTomSelect() {
-            window.clientSelect = new TomSelect('#client_id', {
-                valueField: 'id',
-                labelField: 'full_name',
-                searchField: ['full_name'],
-                plugins: ['clear_button'],
-                placeholder: 'Seleccione un cliente',
-                maxOptions: 20,
-                create: false,
-                preload: false,
-                onType: (str) => {
-                    lastCustomerQuery = str;
-                },
-                load: async (query, callback) => {
-                    if (!query.length) return callback();
-                    try {
-                        const url = `{{ route('tenant.utils.searchCustomer') }}?q=${encodeURIComponent(query)}`;
-                        const response = await fetch(url);
-                        if (!response.ok) throw new Error('Error al buscar clientes');
-                        const data = await response.json();
-                        const results = data.data ?? [];
-                        callback(results);
-                        if (results.length === 0) {
-                            customerParams.documentSearchCustomer = lastCustomerQuery;
-                            console.log("No se encontró en BD. Guardado:", window.typedCustomer);
-                        }
-                    } catch (error) {
-                        console.error('Error cargando clientes:', error);
-                        callback();
-                    }
-                },
-                render: {
-                    option: (item, escape) => `
-                        <div>
-                            <strong>${escape(item.full_name)}</strong><br>
-                            <small>${escape(item.email ?? '')}</small>
-                        </div>
-                    `,
-                    item: (item, escape) => `<div>${escape(item.full_name)}</div>`
-                }
-            });
-        }
 
         function eliminar(id) {
             const fila = getRowById(dtQuotes, id);
