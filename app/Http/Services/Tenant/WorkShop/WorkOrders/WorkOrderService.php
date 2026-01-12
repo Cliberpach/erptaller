@@ -102,7 +102,7 @@ class WorkOrderService
         $this->s_repository->insertWorkTechnicians($dto_technicians);
 
         //========== ACCOUNT ==========
-        $this->s_customer_account->updateFromWorkOrder(['work_order_id'=>$work_order->id]);
+        $this->s_customer_account->updateFromWorkOrder(['work_order_id' => $work_order->id]);
 
         //======== IMGS ========
         $this->updateWorkImages($id, $data['vehicle_images'] ?? []);
@@ -225,10 +225,15 @@ class WorkOrderService
 
     public function pdfOne(int $id)
     {
-        $data_order =   $this->getWorkOrder($id);
-        $company    =   Company::findOrFail(1);
+        $data_order         =   $this->getWorkOrder($id);
+        $company            =   Company::findOrFail(1);
+        $customer_account   =   $this->s_repository->getCustomerAccount($id);
 
-        return $pdf = Pdf::loadView('workshop.work_orders.reports.pdf_order', compact('data_order', 'company'));
+        return $pdf =   Pdf::loadView('workshop.work_orders.reports.pdf_order', compact(
+            'data_order',
+            'company',
+            'customer_account'
+        ));
     }
 
     public function invoiceCreate(int $id)
@@ -250,8 +255,8 @@ class WorkOrderService
 
         $order                      =   $this->getWorkOrder($id);
         $work_order                 =   $order['order'];
-        $order['products']          =   $order['products']->where('invoiced',false);
-        $order['services']          =   $order['services']->where('invoiced',false);
+        $order['products']          =   $order['products']->where('invoiced', false);
+        $order['services']          =   $order['services']->where('invoiced', false);
 
         $customer_formatted         =   FormatController::getFormatInitialCustomer($work_order->customer_id);
         $vehicle_formatted          =   FormatController::getFormatInitialVehicle($work_order->vehicle_id);
@@ -307,20 +312,20 @@ array:17 [ // app\Http\Services\Tenant\WorkShop\WorkOrders\WorkOrderService.php:
   "work_order_id" => "37"
 ]
 */
-    public function invoiceStore($data):Sale
+    public function invoiceStore($data): Sale
     {
         $data   =   $this->s_validation->validationInvoice($data);
         $sale   =   $this->s_sale->storeFromOrder($data);
         $this->s_repository->setInvoicedWorkProducts($data['work_order_id'], $sale, $data['lst_products']);
         $this->s_repository->setInvoicedWorkServices($data['work_order_id'], $sale, $data['lst_services']);
 
-        $cant_products_not_invoiced  =   $this->s_repository->getWorkProducts($data['work_order_id'])->where('invoiced',false)->count();
-        $cant_services_not_invoiced  =   $this->s_repository->getWorkServices($data['work_order_id'])->where('invoiced',false)->count();
+        $cant_products_not_invoiced  =   $this->s_repository->getWorkProducts($data['work_order_id'])->where('invoiced', false)->count();
+        $cant_services_not_invoiced  =   $this->s_repository->getWorkServices($data['work_order_id'])->where('invoiced', false)->count();
 
-        if($cant_products_not_invoiced + $cant_services_not_invoiced === 0 ){
-            $this->s_repository->setWorkStatusInvoice($data['work_order_id'],'FACTURADO');
-        }else{
-            $this->s_repository->setWorkStatusInvoice($data['work_order_id'],'FACTURADO PARCIAL');
+        if ($cant_products_not_invoiced + $cant_services_not_invoiced === 0) {
+            $this->s_repository->setWorkStatusInvoice($data['work_order_id'], 'FACTURADO');
+        } else {
+            $this->s_repository->setWorkStatusInvoice($data['work_order_id'], 'FACTURADO PARCIAL');
         }
 
         return $sale;

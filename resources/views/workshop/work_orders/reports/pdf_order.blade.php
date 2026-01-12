@@ -148,26 +148,51 @@
         <!-- Encabezado con logo e información de la company -->
         <table class="header-table">
             <tr>
-                <!-- Columna 1: Imagen -->
-                <td style="width: 20%; text-align: left;">
-                    <img src="{{ $company->logo_ruta }}" alt="Logo"
-                        style="height: 100px; object-fit: contain; max-width: 120px;">
+
+                <!-- COLUMNA 1: LOGO -->
+                @if ($company->logo_url)
+                    <td style="width: 20%; text-align: left; vertical-align: top;">
+                        <img src="{{ public_path($company->logo_url) }}" alt="Logo"
+                            style="height: 100px; object-fit: contain; max-width: 120px;">
+                    </td>
+                @else
+                    <td style="width: 20%; text-align: left; vertical-align: top;">
+                        <img src="{{ public_path('assets/images/tu_logo.jpg') }}" alt="Logo"
+                            style="height: 100px; object-fit: contain; max-width: 120px;">
+                    </td>
+                @endif
+
+                <!-- COLUMNA 2: INFO DE LA EMPRESA -->
+                <td style="width: 60%; text-align: left; vertical-align: top;">
+                    <h2 style="margin: 0; font-size: 14px; color: #3a6ea5;">
+                        {{ $company->business_name }}
+                    </h2>
+                    <p style="margin: 0; font-size: 12px; color: #555;">RUC: {{ $company->ruc }}</p>
+                    <p style="margin: 0; font-size: 12px; color: #555;">{{ $company->fiscal_address }}</p>
+                    <p style="margin: 0; font-size: 12px; color: #555;">Teléfono: {{ $company->phone }}</p>
+                    <p style="margin: 0; font-size: 12px; color: #555;">Email: {{ $company->email }}</p>
                 </td>
 
-                <!-- Columna 2: Información de la company -->
-                <td style="width: 80%; text-align: left;">
-                    <h2 style="margin: 0; font-size: 14px; color: #3a6ea5;">{{ $company->business_name }}</h2>
-                    <p style="margin: 0; font-size: 14px; color: #555;">RUC: {{ $company->ruc }}</p>
-                    <p style="margin: 0; font-size: 14px; color: #555;">{{ $company->fiscal_address }}</p>
-                    <p style="margin: 0; font-size: 14px; color: #555;">Teléfono: {{ $company->phone }}</p>
-                    <p style="margin: 0; font-size: 14px; color: #555;">EMAIL: {{ $company->email }}</p>
+                <!-- COLUMNA 3: RECUADRO COTIZACIÓN -->
+                <td style="width: 20%; text-align: center; vertical-align: top;">
+                    <div
+                        style="
+                            border: 1px solid #000;
+                            padding: 10px 5px;
+                            font-size: 12px;
+                            font-weight: bold;
+                            display: inline-block;
+                            width: 100%;
+                        ">
+                        ORDEN DE TRABAJO<br>
+                        <span style="font-size: 14px;">
+                            OT-{{ str_pad($data_order['order']->id, 8, '0', STR_PAD_LEFT) }}
+                        </span>
+                    </div>
                 </td>
+
             </tr>
         </table>
-
-        <div style="text-align: right; font-size: 14px; font-weight: bold; margin-top: 20px; margin-bottom: 10px;">
-            ORDEN DE TRABAJO N°{{ $data_order['order']->id }}
-        </div>
 
         <!-- Segunda tabla: Información adicional -->
         <table class="info-table-custom">
@@ -217,7 +242,7 @@
                 <td>{{ $data_order['order']->status }}</td>
             </tr>
 
-            <tr>
+            {{-- <tr>
                 <td class="label" style="font-weight:bold; padding-top: 10px;">SUBTOTAL:</td>
                 <td style="text-align: right; font-weight:bold;">
                     {{ number_format(round($data_order['order']->subtotal, 2), 2, '.', ',') }}
@@ -229,16 +254,10 @@
                 <td style="text-align: right; font-weight:bold;">
                     {{ number_format(round($data_order['order']->igv, 2), 2, '.', ',') }}
                 </td>
-            </tr>
+            </tr> --}}
 
-            <tr>
-                <td class="label" style="font-weight:bold;">TOTAL:</td>
-                <td style="text-align: right; font-weight:bold;">
-                    {{ number_format(round($data_order['order']->total, 2), 2, '.', ',') }}
-                </td>
-            </tr>
+
         </table>
-
 
         <!-- Tercera tabla: Reporte Productos -->
         <table class="tbl-report-sale">
@@ -396,7 +415,87 @@
 
         </div>
 
-
+        <table
+            style="
+                width: 100%;
+                margin-top: 15px;
+                border-collapse: collapse;
+                font-family: DejaVu Sans, sans-serif;
+            ">
+            <tbody>
+                <tr>
+                    <td></td>
+                    <td
+                        style="
+                            width: 220px;
+                            text-align: right;
+                            font-weight: bold;
+                            font-size: 10px;
+                            padding: 6px;
+                        ">
+                        TOTAL:
+                    </td>
+                    <td
+                        style="
+                            width: 120px;
+                            text-align: right;
+                            font-weight: bold;
+                            font-size: 11px;
+                            padding: 6px;
+                        ">
+                        {{ number_format(round($data_order['order']->total, 2), 2, '.', ',') }}
+                    </td>
+                </tr>
+                @if ($customer_account)
+                    <tr>
+                        <td></td>
+                        <td
+                            style="
+                                width: 220px;
+                                text-align: right;
+                                font-weight: bold;
+                                font-size: 10px;
+                                padding: 6px;
+                            ">
+                            A CUENTA:
+                        </td>
+                        <td
+                            style="
+                                width: 120px;
+                                text-align: right;
+                                font-weight: bold;
+                                font-size: 10px;
+                                padding: 6px;
+                            ">
+                            {{ number_format(round($customer_account->paid, 2), 2, '.', ',') }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td
+                            style="
+                                width: 220px;
+                                text-align: right;
+                                font-weight: bold;
+                                font-size: 10px;
+                                padding: 6px;
+                            ">
+                            SALDO:
+                        </td>
+                        <td
+                            style="
+                                width: 120px;
+                                text-align: right;
+                                font-weight: bold;
+                                font-size: 11px;
+                                padding: 6px;
+                            ">
+                            {{ number_format(round($customer_account->balance, 2), 2, '.', ',') }}
+                        </td>
+                    </tr>
+                @endif
+            </tbody>
+        </table>
 
         <!-- Footer -->
         <footer>

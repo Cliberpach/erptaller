@@ -67,7 +67,7 @@
             const tipo_documento = document.querySelector('#document_type').value;
             toastr.clear();
 
-            if (tipo_documento != 39) {
+            if (tipo_documento != 1) {
                 toastr.error('SOLO SE PUEDE CONSULTAR TIPO DE DOCUMENTO DNI');
                 return;
             }
@@ -174,14 +174,8 @@
     }
 
     function actualizarColaborador() {
-        const swalWithBootstrapButtons = Swal.mixin({
-            customClass: {
-                confirmButton: "btn btn-success",
-                cancelButton: "btn btn-danger"
-            },
-            buttonsStyling: false
-        });
-        swalWithBootstrapButtons.fire({
+
+        Swal.fire({
             title: "DESEA ACTUALIZAR EL COLABORADOR?",
             text: "Se actualizaran los datos del colaborador!",
             icon: "warning",
@@ -207,12 +201,12 @@
 
                 try {
 
-                    const id = @json($colaborador->id);
-                    let urlUpdateColaborador =
-                        `{{ route('tenant.mantenimientos.colaboradores.update', ['id' => ':id']) }}`;
-                    urlUpdateColaborador = urlUpdateColaborador.replace(':id', id);
+                    const id    = @json($colaborador->id);
+                    const url   = route('tenant.mantenimientos.colaboradores.update', {
+                        id
+                    });
 
-                    const response = await fetch(urlUpdateColaborador, {
+                    const response = await fetch(url, {
                         method: 'POST',
                         headers: {
                             'X-CSRF-TOKEN': token,
@@ -240,7 +234,6 @@
                         Swal.close();
                     }
 
-
                 } catch (error) {
                     toastr.error(error, 'ERROR EN LA PETICIÓN ACTUALIZAR COLABORADOR');
                     Swal.close();
@@ -248,7 +241,7 @@
 
 
             } else if (result.dismiss === Swal.DismissReason.cancel) {
-                swalWithBootstrapButtons.fire({
+                Swal.fire({
                     title: "OPERACIÓN CANCELADA",
                     text: "NO SE REALIZARON ACCIONES",
                     icon: "error"
@@ -264,7 +257,7 @@
         const btnConsultarDocumento = document.querySelector('#btn_consultar_documento');
 
         //======== DNI =======
-        if (tipo_documento == 39) {
+        if (tipo_documento == 1) {
             inputNroDoc.value = '';
             inputNroDoc.readOnly = false;
             inputNroDoc.maxLength = 8;
@@ -272,7 +265,7 @@
         }
 
         //====== CARNET EXTRANJERÍA =====
-        if (tipo_documento == 41) {
+        if (tipo_documento != 1) {
             inputNroDoc.value = '';
             inputNroDoc.readOnly = false;
             inputNroDoc.maxLength = 20;
@@ -285,9 +278,11 @@
         mostrarAnimacion1();
         try {
             const token = document.querySelector('input[name="_token"]').value;
-            const urlApiDni = `/grifo_colaboradores/consultarDni/${encodeURIComponent(dni)}`;
+            const url = route('tenant.mantenimientos.colaboradores.searchDocument', {
+                document_number: dni
+            });
 
-            const response = await fetch(urlApiDni, {
+            const response = await fetch(url, {
                 method: 'GET',
                 headers: {
                     'X-CSRF-TOKEN': token
@@ -319,7 +314,7 @@
         const nombre_completo = `${data.nombres} ${data.apellido_paterno} ${data.apellido_materno}`;
         const direccion = data.direccion;
 
-        document.querySelector('#nombre').value = nombre_completo;
-        document.querySelector('#direccion').value = direccion;
+        document.querySelector('#full_name').value = nombre_completo;
+        document.querySelector('#address').value = direccion;
     }
 </script>

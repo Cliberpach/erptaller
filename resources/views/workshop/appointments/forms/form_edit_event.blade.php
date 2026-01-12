@@ -35,7 +35,7 @@
         </div>
 
         <!-- Calendario -->
-        <div class="col-12 mb-3">
+        <div class="col-12 mb-3 d-none">
             <label for="type_calendar_event_edit" class="form-label">
                 <i class="fa-solid fa-calendar text-success me-2"></i>Calendario
             </label>
@@ -90,7 +90,7 @@
         </div>
 
         <!-- Ubicación -->
-        <div class="col-12 mb-3">
+        <div class="col-12 mb-3 d-none">
             <label for="location_event_edit" class="form-label">
                 <i class="fa-solid fa-location-dot text-secondary me-2"></i>Ubicación
             </label>

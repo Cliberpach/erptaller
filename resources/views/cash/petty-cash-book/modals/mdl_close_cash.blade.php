@@ -146,14 +146,7 @@
 
     function closeCash() {
 
-        const swalWithBootstrapButtons = Swal.mixin({
-            customClass: {
-                confirmButton: "btn btn-success",
-                cancelButton: "btn btn-danger"
-            },
-            buttonsStyling: false
-        });
-        swalWithBootstrapButtons.fire({
+        Swal.fire({
             title: "Desea cerrar la caja?",
             message: `OPERACIÓN NO REVERSIBLE`,
             icon: "warning",
@@ -219,7 +212,7 @@
                 }
 
             } else if (result.dismiss === Swal.DismissReason.cancel) {
-                swalWithBootstrapButtons.fire({
+                Swal.fire({
                     title: "Operación cancelada",
                     text: "No se realizaron acciones",
                     icon: "error"

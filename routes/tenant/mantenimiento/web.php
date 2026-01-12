@@ -7,17 +7,17 @@ use App\Http\Controllers\Tenant\Maintenance\BankAccountController;
 use App\Http\Controllers\Tenant\Maintenance\CollaboratorController;
 use App\Http\Controllers\Tenant\Maintenance\ConfigurationController;
 use App\Http\Controllers\Tenant\Maintenance\PositionController;
+use App\Http\Controllers\Tenant\Maintenance\UserController;
 use App\Http\Controllers\Tenant\PlanController;
 use App\Http\Controllers\Tenant\RoleController;
-use App\Http\Controllers\Tenant\UserController;
 
 Route::group(["prefix" => "mantenimiento"], function () {
 
     Route::group(["prefix" => "cuentas"], function () {
         Route::get('index', [BankAccountController::class, 'index'])->name('tenant.mantenimientos.cuentas.index');
-        Route::get('getCuentas', [BankAccountController::class,'getBankAccounts'])->name('tenant.mantenimiento.cuentas.getBankAccounts');
-        Route::post('store',[BankAccountController::class,'store'])->name('tenant.mantenimiento.cuentas.store');
-        Route::put('update/{id}', [BankAccountController::class,'update'])->name('tenant.mantenimiento.cuentas.update');
+        Route::get('getCuentas', [BankAccountController::class, 'getBankAccounts'])->name('tenant.mantenimiento.cuentas.getBankAccounts');
+        Route::post('store', [BankAccountController::class, 'store'])->name('tenant.mantenimiento.cuentas.store');
+        Route::put('update/{id}', [BankAccountController::class, 'update'])->name('tenant.mantenimiento.cuentas.update');
         Route::delete('/destroy/{id}', [BankAccountController::class, 'destroy'])->name('tenant.mantenimiento.cuentas.destroy');
     });
 
@@ -48,6 +48,7 @@ Route::group(["prefix" => "mantenimiento"], function () {
         Route::delete('destroy/{id}', [CollaboratorController::class, 'destroy'])->name('tenant.mantenimientos.colaboradores.destroy');
         Route::get('create', [CollaboratorController::class, 'create'])->name('tenant.mantenimientos.colaboradores.create');
         Route::post('store', [CollaboratorController::class, 'store'])->name('tenant.mantenimientos.colaboradores.store');
+        Route::get('search-document', [CollaboratorController::class, 'searchDocument'])->name('tenant.mantenimientos.colaboradores.searchDocument');
     });
 
     Route::group(["prefix" => "plan"], function () {
@@ -55,7 +56,13 @@ Route::group(["prefix" => "mantenimiento"], function () {
     });
 
     Route::group(["prefix" => "usuario"], function () {
-        Route::get('usuario', [UserController::class, 'index'])->name('tenant.mantenimientos.usuario');
+        Route::get('index', [UserController::class, 'index'])->name('tenant.mantenimientos.usuario.index');
+        Route::get('create', [UserController::class, 'create'])->name('tenant.mantenimientos.usuario.create');
+        Route::get('getAll', [UserController::class, 'getAll'])->name('tenant.mantenimientos.usuario.getAll');
+        Route::get('edit/{id}', [UserController::class, 'edit'])->name('tenant.mantenimientos.usuario.edit');
+        Route::delete('destroy/{id}', [UserController::class, 'destroy'])->name('tenant.mantenimientos.usuario.destroy');
+        Route::post('store', [UserController::class, 'store'])->name('tenant.mantenimientos.usuario.store');
+        Route::put('update/{id}', [UserController::class, 'update'])->name('tenant.mantenimientos.usuario.update');
     });
 
     Route::group(["prefix" => "configuracion"], function () {

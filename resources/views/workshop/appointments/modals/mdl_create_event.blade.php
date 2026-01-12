@@ -54,25 +54,19 @@
             })
 
             window.customerSelect.on('change', function(value) {
-                actionChangeClient(value,window.vehicleSelect);
+                actionChangeClient(value, window.vehicleSelect);
             });
 
             window.vehicleSelect.on('change', function(value) {
                 actionChangeVehicle(value);
             });
-        }
 
-        function resetForm() {
-            document.getElementById('formCreateEvent').reset();
-            modalTitle.textContent = 'Crear Evento';
-            deleteEventBtn.style.display = 'none';
-            startTimeContainer.style.display = 'block';
-            endTimeContainer.style.display = 'block';
+            $('#eventModal').on('hidden.bs.modal', function() {
+                clearMdlCreateEvent();
+            });
         }
-
 
         function openMdlCreateEvent(info) {
-            resetForm();
             setFormData(info);
 
             eventAllDay.dispatchEvent(new Event('change'));
@@ -290,7 +284,7 @@
             });
         }
 
-        async function actionChangeClient(value,_vehicleSelect) {
+        async function actionChangeClient(value, _vehicleSelect) {
 
             if (!value) return;
 
@@ -381,6 +375,12 @@
                 _customerSelect.setValue(customer[0].id);
                 _customerSelect.on('change', actionChangeClient);
             }
+        }
+
+        function clearMdlCreateEvent() {
+            document.getElementById('formCreateEvent').reset();
+            window.customerSelect.clear();
+            window.vehicleSelect.clear();
         }
     </script>
 @endpush

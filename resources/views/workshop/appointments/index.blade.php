@@ -132,12 +132,29 @@
                     },
                     time(event) {
                         const {
+                            raw,
+                            title
+                        } = event;
+
+                        return `
+                                <div style="
+                                    color: white;
+                                    font-size: 12px;
+                                    line-height: 1.3;
+                                ">
+                                    <div><strong>${raw.item.plate}</strong></div>
+                                    <div>${raw.item.customer_name}</div>
+                                </div>
+                            `;
+                    },
+                    /*time(event) {
+                        const {
                             start,
                             end,
                             title
                         } = event;
                         return `<span style="color: white;">${formatTime(start)}~${formatTime(end)} ${title}</span>`;
-                    },
+                    },*/
                     allday(event) {
                         return `<span style="color: gray;">${event.title}</span>`;
                     },

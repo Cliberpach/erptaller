@@ -7,8 +7,8 @@
                 data-placeholder="Seleccionar" onchange="changeTipoDoc()">
                 <option></option>
                 @foreach ($tipos_documento as $tipo_documento)
-                    @if ($tipo_documento->id != 40)
-                        <option value="{{ $tipo_documento->id }}">{{ $tipo_documento->name }}</option>
+                    @if ($tipo_documento->id != 3)
+                        <option value="{{ $tipo_documento->id }}">{{ $tipo_documento->abbreviation }}</option>
                     @endif
                 @endforeach
             </select>

@@ -28,7 +28,6 @@
         </div>
     </div>
 
-    <!-- end card -->
 @endsection
 
 <style>

@@ -32,7 +32,6 @@
         </div>
     </div>
 
-    <!-- end card -->
 @endsection
 
 <style>
@@ -67,7 +66,7 @@
             const tipo_documento = document.querySelector('#document_type').value;
             toastr.clear();
 
-            if (tipo_documento != 39) {
+            if (tipo_documento != 1) {
                 toastr.error('SOLO SE PUEDE CONSULTAR TIPO DE DOCUMENTO DNI');
                 return;
             }
@@ -256,12 +255,12 @@
 
     //======== CHANGE TIPO DOCUMENTO ======
     function changeTipoDoc(params) {
-        const tipo_documento = document.querySelector('#document_type').value;
-        const inputNroDoc = document.querySelector('#document_number');
+        const tipo_documento        = document.querySelector('#document_type').value;
+        const inputNroDoc           = document.querySelector('#document_number');
         const btnConsultarDocumento = document.querySelector('#btn_consultar_documento');
 
         //======== DNI =======
-        if (tipo_documento == 39) {
+        if (tipo_documento == 1) {
             inputNroDoc.value = '';
             inputNroDoc.readOnly = false;
             inputNroDoc.maxLength = 8;
@@ -269,7 +268,7 @@
         }
 
         //====== CARNET EXTRANJERÍA =====
-        if (tipo_documento == 41) {
+        if (tipo_documento != 1) {
             inputNroDoc.value = '';
             inputNroDoc.readOnly = false;
             inputNroDoc.maxLength = 20;
@@ -282,9 +281,11 @@
         mostrarAnimacion1();
         try {
             const token = document.querySelector('input[name="_token"]').value;
-            const urlApiDni = `/grifo_colaboradores/consultarDni/${encodeURIComponent(dni)}`;
+            const url   = route('tenant.mantenimientos.colaboradores.searchDocument', {
+                document_number: dni
+            });
 
-            const response = await fetch(urlApiDni, {
+            const response = await fetch(url, {
                 method: 'GET',
                 headers: {
                     'X-CSRF-TOKEN': token
@@ -313,10 +314,10 @@
     }
 
     function setDatosDni(data) {
-        const nombre_completo = `${data.nombres} ${data.apellido_paterno} ${data.apellido_materno}`;
-        const direccion = data.direccion;
+        const nombre_completo   = `${data.nombres} ${data.apellido_paterno} ${data.apellido_materno}`;
+        const direccion         = data.direccion;
 
-        document.querySelector('#nombre').value = nombre_completo;
-        document.querySelector('#direccion').value = direccion;
+        document.querySelector('#full_name').value  = nombre_completo;
+        document.querySelector('#address').value    = direccion;
     }
 </script>

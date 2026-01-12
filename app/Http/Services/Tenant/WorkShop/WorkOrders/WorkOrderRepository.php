@@ -3,6 +3,7 @@
 namespace App\Http\Services\Tenant\WorkShop\WorkOrders;
 
 use App\Http\Services\Tenant\Inventory\WarehouseProduct\WarehouseProductService;
+use App\Models\Tenant\Accounts\CustomerAccount;
 use App\Models\Tenant\Sale;
 use App\Models\Tenant\WorkShop\WorkOrder\WorkOrder;
 use App\Models\Tenant\WorkShop\WorkOrder\WorkOrderImage;
@@ -164,7 +165,7 @@ class WorkOrderRepository
         return WorkOrderProduct::where('work_order_id', $id)->get();
     }
 
-      public function getWorkServices(int $id)
+    public function getWorkServices(int $id)
     {
         return WorkOrderService::where('work_order_id', $id)->get();
     }
@@ -215,11 +216,16 @@ class WorkOrderRepository
         }
     }
 
-     public function setWorkStatusInvoice(int $id,string $status): WorkOrder
+    public function setWorkStatusInvoice(int $id, string $status): WorkOrder
     {
         $work_order                     =   WorkOrder::findOrFail($id);
         $work_order->status_invoice     =   $status;
         $work_order->save();
         return $work_order;
+    }
+
+    public function getCustomerAccount(int $work_order_id): ?CustomerAccount
+    {
+        return CustomerAccount::where('work_order_id', $work_order_id)->where('status', '<>', 'ANULADO')->first();
     }
 }

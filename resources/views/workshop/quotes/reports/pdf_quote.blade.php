@@ -149,13 +149,13 @@
                 <td style="width: 20%; text-align: center; vertical-align: top;">
                     <div
                         style="
-                        border: 1px solid #000;
-                        padding: 10px 5px;
-                        font-size: 12px;
-                        font-weight: bold;
-                        display: inline-block;
-                        width: 100%;
-                    ">
+                            border: 1px solid #000;
+                            padding: 10px 5px;
+                            font-size: 12px;
+                            font-weight: bold;
+                            display: inline-block;
+                            width: 100%;
+                        ">
                         COTIZACIÓN<br>
                         <span style="font-size: 14px;">
                             COT-{{ str_pad($data_quote['quote']->id, 8, '0', STR_PAD_LEFT) }}

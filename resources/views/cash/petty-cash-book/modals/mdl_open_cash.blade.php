@@ -5,7 +5,6 @@
                 <h5 class="modal-title" id="exampleModalLabel">Aperturar Caja </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <hr>
             <div class="modal-body">
                 <div class="container-fluid">
                     <div class="row">
@@ -15,20 +14,20 @@
                     </div>
                 </div>
             </div>
-            <hr>
             <div class="modal-footer">
-                <div class="row footer-row">
-                    <div class="col-5 col-info">
-                        <i class="fas fa-info-circle"></i>
-                        <p>Los campos marcados con asterisco (*) son obligatorios.</p>
-                    </div>
-                    <div class="col-7 col-botones">
+                <div class="row">
+
+                    <div class="col-12 text-end">
                         <button type="button" class="btn btn-secondary btnCancelar" data-bs-dismiss="modal">
-                            <i class="fas fa-window-close"></i>Cancelar
+                            <i class="fas fa-window-close"></i> Cancelar
                         </button>
                         <button form="form-open-cash" type="submit" class="btn btn-primary">
-                            <i class="fas fa-save"></i>Guardar
+                            <i class="fas fa-save"></i> Guardar
                         </button>
+                    </div>
+                    <div class="col-12">
+                        <i class="fas fa-info-circle"></i>
+                        <p>Los campos marcados con asterisco (*) son obligatorios.</p>
                     </div>
 
                 </div>
@@ -56,22 +55,15 @@
 
         console.log(item);
 
-        const swalWithBootstrapButtons = Swal.mixin({
-            customClass: {
-                confirmButton: "btn btn-success",
-                cancelButton: "btn btn-danger"
-            },
-            buttonsStyling: false
-        });
-        swalWithBootstrapButtons.fire({
+        Swal.fire({
             title: "Desea aperturar la caja?",
             html: `
-            <div style="text-align: center; margin-top: 10px;">
-                <p style="font-size: 16px; margin-bottom: 10px;">
-                    <strong>Nombre:</strong> ${item.name}
-                </p>
-            </div>
-        `,
+                <div style="text-align: center; margin-top: 10px;">
+                    <p style="font-size: 16px; margin-bottom: 10px;">
+                        <strong>Nombre:</strong> ${item.name}
+                    </p>
+                </div>
+            `,
             icon: "warning",
             showCancelButton: true,
             confirmButtonText: "Sí!",
@@ -131,7 +123,7 @@
                 }
 
             } else if (result.dismiss === Swal.DismissReason.cancel) {
-                swalWithBootstrapButtons.fire({
+                Swal.fire({
                     title: "Operación cancelada",
                     text: "No se realizaron acciones",
                     icon: "error"

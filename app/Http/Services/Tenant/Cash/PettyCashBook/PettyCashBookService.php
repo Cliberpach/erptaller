@@ -154,7 +154,7 @@ class PettyCashBookService
 
     public function getReportSales($payment_methods, int $id)
     {
-        $sales  =   Sale::where('petty_cash_book_id', $id)->where('estado', '<>', 'ANULADO')->get();
+        $sales  =   Sale::where('petty_cash_book_id', $id)->where('status', '<>', 'ANULADO')->get();
         $report_sales   =   [];
         foreach ($payment_methods as $payment_method) {
             $item   =   [];

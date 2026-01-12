@@ -40,6 +40,7 @@ class CashRepository
                 $join->on('pc.id', '=', 'pcb.petty_cash_id')
                     ->where('pcb.status', 'ABIERTO');
             })
+            ->where('pc.status','<>','ANULADO')
             ->whereNull('pcb.id')
             ->when($search, function ($q) use ($search) {
                 $q->where('pc.name', 'like', "%{$search}%");

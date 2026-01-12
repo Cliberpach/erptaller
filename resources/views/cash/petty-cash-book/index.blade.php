@@ -253,14 +253,6 @@
             }
         }
 
-        const swalWithBootstrapButtons = Swal.mixin({
-            customClass: {
-                confirmButton: 'btn btn-success',
-                cancelButton: 'btn btn-danger',
-            },
-            buttonsStyling: false
-        })
-
         function eliminar(id) {
             const fila = getRowById(dtCash, id);
             const name = fila.name;
@@ -273,16 +265,7 @@
                 </div>
             `;
 
-            const swalWithBootstrapButtons = Swal.mixin({
-                customClass: {
-                    confirmButton: 'btn btn-success me-2',
-                    cancelButton: 'btn btn-danger',
-                    actions: 'd-flex justify-content-center gap-2 mt-3'
-                },
-                buttonsStyling: false // Necesario para que Bootstrap controle el estilo
-            });
-
-            swalWithBootstrapButtons.fire({
+            Swal.fire({
                 title: '¿Desea eliminar la caja?',
                 html: messageHtml,
                 icon: 'question',
@@ -320,7 +303,7 @@
                     }
 
                 } else if (result.dismiss === Swal.DismissReason.cancel) {
-                    swalWithBootstrapButtons.fire({
+                    Swal.fire({
                         title: 'Cancelado',
                         text: 'La solicitud ha sido cancelada.',
                         icon: 'error',

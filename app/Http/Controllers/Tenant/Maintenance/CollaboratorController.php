@@ -4,21 +4,15 @@ namespace App\Http\Controllers\Tenant\Maintenance;
 
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\UtilController;
-use App\Http\Requests\General\Herramientas\Colaboradores\ColaboradorStoreRequest;
-use App\Http\Requests\Market\Herramientas\Colaboradores\ColaboradorUpdateRequest;
 use App\Http\Requests\Tenant\Maintenance\Collaborator\CollaboratorStoreRequest;
 use App\Http\Requests\Tenant\Maintenance\Collaborator\CollaboratorUpdateRequest;
-use App\Models\Herramientas\Cargo;
-use App\Models\Herramientas\Colaborador;
-use App\Models\Herramientas\TipoDocumento;
+use App\Models\Landlord\TypeIdentityDocument;
 use App\Models\Tenant\Maintenance\Collaborator\Collaborator;
-use App\Models\Tenant\Maintenance\Position;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Exception;
 use Yajra\DataTables\Facades\DataTables;
-use Illuminate\Support\Str;
 use Throwable;
 
 class CollaboratorController extends Controller
@@ -59,6 +53,7 @@ class CollaboratorController extends Controller
 
         return view('maintenance.collaborators.create', compact('tipos_documento', 'cargos'));
     }
+
     /*
 array:10 [ // app\Http\Controllers\Tenant\Maintenance\CollaboratorController.php:68
   "_token" => "dAPIUyXAaWjvf8ytLrmFQa3b5NU9bt2CSRc6c2k7"
@@ -79,20 +74,22 @@ array:10 [ // app\Http\Controllers\Tenant\Maintenance\CollaboratorController.php
         DB::beginTransaction();
         try {
 
-            $colaborador = new Collaborator();
+            $type_document                              =   TypeIdentityDocument::findOrFail($request->get('document_type'));
 
-            $colaborador->document_type_id = $request->get('document_type');
-            $colaborador->document_number  = $request->get('document_number');
+            $colaborador                                =   new Collaborator();
+            $colaborador->document_type_id              =   $request->get('document_type');
+            $colaborador->document_type_abbreviation    =   $type_document->abbreviation;
+            $colaborador->document_number               =   $request->get('document_number');
 
-            $colaborador->full_name = mb_strtoupper($request->get('full_name'), 'UTF-8');
+            $colaborador->full_name                     =   mb_strtoupper($request->get('full_name'), 'UTF-8');
 
-            $colaborador->position_id = $request->get('position');
+            $colaborador->position_id                   =   $request->get('position');
 
-            $colaborador->address = mb_strtoupper($request->get('address'), 'UTF-8');
-            $colaborador->phone   = $request->get('phone');
+            $colaborador->address                       =   mb_strtoupper($request->get('address'), 'UTF-8');
+            $colaborador->phone                         =   $request->get('phone');
 
-            $colaborador->work_days = $request->get('work_days');
-            $colaborador->rest_days = $request->get('rest_days');
+            $colaborador->work_days                     =   $request->get('work_days');
+            $colaborador->rest_days                     =   $request->get('rest_days');
 
             $colaborador->monthly_salary = $request->get('monthly_salary');
             $colaborador->daily_salary   = $request->get('monthly_salary') / 30;
@@ -135,17 +132,20 @@ array:11 [ // app\Http\Controllers\General\Herramientas\ColaboradorController.ph
 
         DB::beginTransaction();
         try {
-            $colaborador                    =   Collaborator::find($id);
 
-            $colaborador->document_type_id = $request->get('document_type');
-            $colaborador->document_number  = $request->get('document_number');
+            $type_document                              =   TypeIdentityDocument::findOrFail($request->get('document_type'));
+            $colaborador                                =   Collaborator::find($id);
 
-            $colaborador->full_name = mb_strtoupper($request->get('full_name'), 'UTF-8');
+            $colaborador->document_type_id              =   $request->get('document_type');
+            $colaborador->document_type_abbreviation    =   $type_document->abbreviation;
+            $colaborador->document_number               =   $request->get('document_number');
 
-            $colaborador->position_id = $request->get('position');
+            $colaborador->full_name                     =   mb_strtoupper($request->get('full_name'), 'UTF-8');
 
-            $colaborador->address = mb_strtoupper($request->get('address'), 'UTF-8');
-            $colaborador->phone   = $request->get('phone');
+            $colaborador->position_id                   =   $request->get('position');
+
+            $colaborador->address                       =   mb_strtoupper($request->get('address'), 'UTF-8');
+            $colaborador->phone                         =   $request->get('phone');
 
             $colaborador->work_days = $request->get('work_days');
             $colaborador->rest_days = $request->get('rest_days');
@@ -156,7 +156,7 @@ array:11 [ // app\Http\Controllers\General\Herramientas\ColaboradorController.ph
 
             DB::commit();
             return response()->json(['success' => true, 'message' => 'COLABORADOR ACTUALIZADO']);
-        } catch (\Throwable $th) {
+        } catch (Throwable $th) {
             DB::rollBack();
             return response()->json(['success' => false, 'message' => $th->getMessage()]);
         }
@@ -171,8 +171,8 @@ array:11 [ // app\Http\Controllers\General\Herramientas\ColaboradorController.ph
             $colaborador->status            =   'ANULADO';
             $colaborador->update();
 
-            $user   =   User::where('collaborator_id',$id)->where('status','ACTIVO')->first();
-            if($user){
+            $user   =   User::where('collaborator_id', $id)->where('status', 'ACTIVO')->first();
+            if ($user) {
                 $user->status = 'ANULADO';
                 $user->save();
             }
@@ -186,41 +186,44 @@ array:11 [ // app\Http\Controllers\General\Herramientas\ColaboradorController.ph
     }
 
     //======== VALIDAR DNI ÚNICO EN LA BASE DE DATOS, COLABORADORES ========
-    public function consultarDni($dni)
+    public function searchDocument(Request $request)
     {
 
         try {
+
+            $document_number    =   $request->get('document_number');
+
             //======== VALIDANDO FORMATO DNI ========
-            if (strlen($dni) !== 8) {
+            if (strlen($document_number) !== 8) {
                 throw new Exception("EL DNI DEBE CONTAR CON 8 DÍGITOS");
             }
 
             //======== VALIDAR DNI ÚNICO =========
-            $existe =   DB::select(
-                'select
-                        c.id
-                        from colaboradores as c
-                        where c.nro_documento = ?
-                        and c.estado = "ACTIVO"',
-                [$dni]
-            );
+            $existe =   Collaborator::where('document_number', $document_number)->where('status', 'ACTIVO')->first();
 
-            if (count($existe) > 0) {
+            if ($existe) {
                 throw new Exception('El dni ya existe en la tabla colaboradores');
             }
 
             //======== CONSULTANDO DNI EN API RENIEC ========
-            $res_consulta_api   =   UtilController::apiDni($dni);
+            $res_consulta_api   =   UtilController::apiDni($document_number);
             $res                =   $res_consulta_api->getData();
 
             //======= EN CASO LA CONSULTA FUE EXITOSA =====
             if ($res->success) {
-                return response()->json(['success' => true, 'data' => $res->data, 'message' => 'OPERACIÓN COMPLETADA']);
+                return response()->json([
+                    'success' => true,
+                    'data' => $res->data,
+                    'message' => 'OPERACIÓN COMPLETADA'
+                ]);
             } else {
                 throw new Exception($res->message);
             }
-        } catch (\Throwable $th) {
-            return response()->json(['success' => false, 'message' => $th->getMessage()]);
+        } catch (Throwable $th) {
+            return response()->json([
+                'success' => false,
+                'message' => $th->getMessage()
+            ]);
         }
     }
 }
