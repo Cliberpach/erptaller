@@ -22,8 +22,9 @@ class WorkOrderValidation
 
     public function validationStore(array $data): array
     {
-        $lst_products  =  json_decode($data['lst_products']);
-        $lst_services  =  json_decode($data['lst_services']);
+        $lst_products       =   json_decode($data['lst_products']);
+        $lst_services       =   json_decode($data['lst_services']);
+        $lst_technicians    =   json_decode($data['lst_technicians']) ?? [];
 
         if (count($lst_products) === 0 && count($lst_services) === 0) {
             throw new Exception("DEBE INGRESAR POR LO MENOS UN PRODUCTO O SERVICIO A LA ORDEN DE TRABAJO");
@@ -37,8 +38,13 @@ class WorkOrderValidation
             }
         }
 
+        if (count($lst_technicians) > 3) {
+            throw new Exception("SOLO SE PERMITEN MÁXIMO 3 TÉCNICOS POR ORDEN DE TRABAJO");
+        }
+
         $data['lst_products']       =   $lst_products;
         $data['lst_services']       =   $lst_services;
+        $data['lst_technicians']    =   $lst_technicians;
         $data['validation_stock']   =   Configuration::findOrFail(2)->property === '1' ? true : false;
 
         return $data;
@@ -64,7 +70,7 @@ class WorkOrderValidation
         if ($account->status !== 'PENDIENTE') {
             throw new Exception("ESTA ORDEN TIENE UNA CUENTA CON ESTADO: " . $account->status . ", NO SE PERMITE EDITAR");
         }
-       
+
         $data['validation_stock']           =   Configuration::findOrFail(2)->property === '1' ? true : false;
         $data['validation_stock_preview']   =   $order->validation_stock ? true : false;
 

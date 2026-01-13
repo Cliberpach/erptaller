@@ -156,9 +156,7 @@ array:18 [ // app\Http\Controllers\Tenant\WorkShop\WorkOrderController.php:102
     5 => "23"
   ]
   "fuel_level" => "-1"
-  "technicians" => array:1 [
-    0 => "17"
-  ]
+  "lst_technicians" => "["18","17","19"]"
   "product_id" => "1"
   "product_quantity" => "2"
   "product_price" => "14.99"
@@ -229,7 +227,7 @@ array:18 [ // app\Http\Controllers\Tenant\WorkShop\WorkOrderController.php:102
         $brands                     =   UtilController::getBrandsProducts();
         $configuration              =   Configuration::findOrFail(2);
         $units                      =   UtilController::getUnitsMeasurement();
-       
+
         return view(
             'workshop.work_orders.edit',
             compact(
@@ -280,6 +278,7 @@ array:17 [ // app\Http\Controllers\Tenant\WorkShop\QuoteController.php:145
   "dt-quotes-services_length" => "10"
   "lst_products" => "[{"id":1,"name":"BUJÍA 20 MM","category_name":"BUJÍAS","brand_name":"ASUS","sale_price":"14.990000","quantity":"3.000000","total":"44.970000"}]"
   "lst_services" => "[{"id":1,"name":"LAVADO DE AUTOS","sale_price":"30.000000","quantity":"1.000000","total":"30.000000"}]"
+  "lst_technicians" => "[17,19,20]"
   "vehicle_images" => array:2 [
     0 =>Illuminate\Http\UploadedFile {#2238}
     4 =>Illuminate\Http\UploadedFile {#2243}
@@ -289,7 +288,6 @@ array:17 [ // app\Http\Controllers\Tenant\WorkShop\QuoteController.php:145
     {
         DB::beginTransaction();
         try {
-
             $work_order  =   $this->s_order->update($request->toArray(), $id);
 
             Session::flash('message_success', 'ORDEND DE TRABAJO ACTUALIZADA CON ÉXITO');

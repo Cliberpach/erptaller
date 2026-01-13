@@ -17,7 +17,6 @@ use App\Models\Department;
 use App\Models\District;
 use App\Models\Landlord\Color;
 use App\Models\Province;
-use App\Models\Tenant\Accounts\CustomerAccount;
 use App\Models\Tenant\Configuration;
 use App\Models\Tenant\Sale;
 use App\Models\Tenant\Warehouse;
@@ -55,7 +54,7 @@ class WorkOrderService
         $work_order         =   $this->s_repository->insertWorkOrder($dto);
 
         $dto_inventory      =   $this->s_dto->getDtoInventory($data['inventory_items'] ?? [], $work_order);
-        $dto_technicians    =   $this->s_dto->getDtoTechnicians($data['technicians'] ?? [], $work_order);
+        $dto_technicians    =   $this->s_dto->getDtoTechnicians($data['lst_technicians'] ?? [], $work_order);
 
         $this->s_repository->insertWorkOrderDetail($data['lst_products'], $data['lst_services'], $work_order);
         $this->s_repository->insertWorkInventory($dto_inventory);
@@ -98,7 +97,7 @@ class WorkOrderService
         $this->s_repository->insertWorkInventory($dto_inventory);
 
         $this->s_repository->deleteDetailTechnical($id);
-        $dto_technicians    =   $this->s_dto->getDtoTechnicians($data['technicians'] ?? [], $work_order);
+        $dto_technicians    =   $this->s_dto->getDtoTechnicians($data['lst_technicians'] ?? [], $work_order);
         $this->s_repository->insertWorkTechnicians($dto_technicians);
 
         //========== ACCOUNT ==========

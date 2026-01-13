@@ -59,6 +59,7 @@
     <script src="https://unpkg.com/justgage@latest/dist/justgage.umd.js"></script>
 
     <script>
+        const lstTechnicians = [];
         let lstProducts = [];
         let lstServices = [];
         let dtProducts = null;
@@ -150,6 +151,12 @@
                     actionDeleteService(btnDeleteService, lstServices);
                 }
             });
+
+            document.addEventListener('change', (e) => {
+                if (e.target.classList.contains('chk-technical')) {
+                    actionChangeTechnical(e.target);
+                }
+            })
 
         }
 
@@ -273,7 +280,7 @@
             window.productSelect = new TomSelect('#product_id', {
                 valueField: 'id',
                 labelField: 'text',
-                searchField: ['name','subtext'],
+                searchField: ['name', 'subtext'],
                 placeholder: 'Seleccione un producto',
                 maxOptions: 20,
                 create: false,
@@ -362,13 +369,13 @@
 
         }
 
-        function loadDtTechnicians(){
-            dtTechnicians   =   loadDataTableSimple('dt-technicians');
+        function loadDtTechnicians() {
+            dtTechnicians = loadDataTableSimple('dt-technicians');
         }
 
         function validationStoreQuote() {
             if (lstProducts.length === 0 && lstServices.length === 0) {
-                toastr.error('DEBE AGREGAR AL MENOS UN PRODUCTO O SERVICIO A LA COTIZACIÓN');
+                toastr.error('DEBE AGREGAR AL MENOS UN PRODUCTO O SERVICIO A LA ORDEN DE TRABAJO');
                 return false;
             }
             return true;
@@ -416,6 +423,7 @@
                     const formData = new FormData(formCreateQuote);
                     formData.append('lst_products', JSON.stringify(lstProducts));
                     formData.append('lst_services', JSON.stringify(lstServices));
+                    formData.append('lst_technicians', JSON.stringify(lstTechnicians));
 
                     const quoteId = @json($quote->id ?? null);
                     if (quoteId !== null) {
@@ -959,6 +967,64 @@
                 calculateAmounts();
                 paintAmounts();
 
+            }
+        }
+
+        function validationAddTechnical(lstItems, id) {
+            const exists = lstItems.findIndex(i => i == id);
+            if (exists !== -1) {
+                toastr.error('TÉCNICO YA FUE ELEGIDO');
+                return false;
+            }
+
+            if (lstItems.length >= 3) {
+                toastr.error('SOLO SE PERMITEN 3 TÉCNICOS COMO MÁXIMO POR ORDEN DE TRABAJO');
+                return false;
+            }
+            return true;
+        }
+
+        function addTechnical(lstItems, id) {
+            lstItems.push(id);
+        }
+
+        function validationRemoveTechnical(lstItems, id) {
+            const exists = lstItems.findIndex(i => i == id);
+            if (exists === -1) {
+                toastr.error('TÉCNICO NO EXISTE EN EL LISTADO');
+                return false;
+            }
+            return true;
+        }
+
+        function removeTechnical(lstItems, id) {
+            const index = lstItems.indexOf(id);
+            if (index > -1) {
+                lstItems.splice(index, 1);
+            }
+        }
+
+        function actionChangeTechnical(chkTechnical) {
+            toastr.clear();
+            const technicalId = chkTechnical.getAttribute('data-id');
+            const check = chkTechnical.checked;
+
+            if (check) {
+                const validation = validationAddTechnical(lstTechnicians, technicalId);
+                if (!validation) {
+                    chkTechnical.checked = false;
+                    return;
+                }
+
+                addTechnical(lstTechnicians, technicalId);
+            } else {
+
+                const validation = validationRemoveTechnical(lstTechnicians, technicalId);
+                if (!validation) {
+                    chkTechnical.checked = true;
+                    return;
+                }
+                removeTechnical(lstTechnicians, technicalId);
             }
         }
     </script>

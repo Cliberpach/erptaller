@@ -3,7 +3,6 @@
 namespace App\Http\Services\Tenant\WorkShop\WorkOrders;
 
 use App\Models\Tenant\Sale;
-use App\Models\Tenant\WorkShop\Quote\Quote;
 use App\Models\Tenant\WorkShop\WorkOrder\WorkOrder;
 
 class WorkOrderManager

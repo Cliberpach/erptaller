@@ -59,6 +59,7 @@
     <script src="https://unpkg.com/justgage@latest/dist/justgage.umd.js"></script>
 
     <script>
+        const lstTechnicians = [];
         const lstProducts = @json($lst_products);
         const lstServices = @json($lst_services);
         let dtTechnicians = null;
@@ -151,6 +152,12 @@
                     actionDeleteService(btnDeleteService, lstServices);
                 }
             });
+
+            document.addEventListener('change', (e) => {
+                if (e.target.classList.contains('chk-technical')) {
+                    actionChangeTechnical(e.target);
+                }
+            })
 
         }
 
@@ -465,6 +472,7 @@
                     const formData = new FormData(formCreateQuote);
                     formData.append('lst_products', JSON.stringify(lstProducts));
                     formData.append('lst_services', JSON.stringify(lstServices));
+                    formData.append('lst_technicians', JSON.stringify(lstTechnicians));
                     formData.append('_method', 'PUT');
                     const res = await axios.post(route('tenant.taller.ordenes_trabajo.update', id), formData);
 
@@ -984,17 +992,18 @@
             })
 
             //======= TECHNICIANS ========
-            const lstTechnicians = @json($lst_technicians);
+            const lstTechniciansBD = @json($lst_technicians);
             dtTechnicians.rows().every(function() {
                 const rowNode = this.node();
                 const rowData = this.data();
 
                 const technicianId = parseInt(rowData[0]);
 
-                if (lstTechnicians.includes(technicianId)) {
+                if (lstTechniciansBD.includes(technicianId)) {
                     const checkbox = rowNode.querySelector('input[type="checkbox"]');
                     if (checkbox) {
                         checkbox.checked = true;
+                        addTechnical(lstTechnicians, technicianId);
                     }
                 }
             });
@@ -1040,6 +1049,65 @@
                 return null;
             } finally {
                 ocultarAnimacion1();
+            }
+        }
+
+        function validationAddTechnical(lstItems, id) {
+            const exists = lstItems.findIndex(i => i == id);
+            if (exists !== -1) {
+                toastr.error('TÉCNICO YA FUE ELEGIDO');
+                return false;
+            }
+
+            if (lstItems.length >= 3) {
+                toastr.error('SOLO SE PERMITEN 3 TÉCNICOS COMO MÁXIMO POR ORDEN DE TRABAJO');
+                return false;
+            }
+            return true;
+        }
+
+        function addTechnical(lstItems, id) {
+            lstItems.push(id);
+        }
+
+        function validationRemoveTechnical(lstItems, id) {
+            const exists = lstItems.findIndex(i => i == id);
+            if (exists === -1) {
+                toastr.error('TÉCNICO NO EXISTE EN EL LISTADO');
+                return false;
+            }
+            return true;
+        }
+
+        function removeTechnical(lstItems, id) {
+            const index = lstItems.findIndex(i => i == id);
+            if (index > -1) {
+                lstItems.splice(index, 1);
+            }
+        }
+
+        function actionChangeTechnical(chkTechnical) {
+            toastr.clear();
+            const technicalId = chkTechnical.getAttribute('data-id');
+            const check = chkTechnical.checked;
+
+            if (check) {
+                const validation = validationAddTechnical(lstTechnicians, technicalId);
+                if (!validation) {
+                    chkTechnical.checked = false;
+                    return;
+                }
+
+                addTechnical(lstTechnicians, technicalId);
+            } else {
+
+                const validation = validationRemoveTechnical(lstTechnicians, technicalId);
+                if (!validation) {
+                    chkTechnical.checked = true;
+                    return;
+                }
+                console.log('false')
+                removeTechnical(lstTechnicians, technicalId);
             }
         }
     </script>

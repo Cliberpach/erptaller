@@ -26,8 +26,8 @@
                                 <td class="text-center">{{ $tec->id }}</td>
 
                                 <td class="text-center">
-                                    <input type="checkbox" name="technicians[]" value="{{ $tec->id }}"
-                                        class="form-check-input">
+                                    <input type="checkbox" value="{{ $tec->id }}"
+                                        class="form-check-input chk-technical" data-id="{{ $tec->id }}">
                                 </td>
 
                                 <td>{{ $tec->name }}</td>
@@ -48,5 +48,4 @@
 
 
     </div>
-
 </div>
