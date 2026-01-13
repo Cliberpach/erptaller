@@ -184,10 +184,13 @@ class UtilController extends Controller
         $technicians   =   DB::table('users as u')
             ->join('model_has_roles as mhr', 'mhr.model_id', 'u.id')
             ->join('roles as r', 'r.id', 'mhr.role_id')
+            ->join('collaborators as c','c.id','u.collaborator_id')
             ->where('r.name', 'TECNICO')
             ->select(
                 'u.id',
-                'u.name'
+                'u.name',
+                'c.document_type_abbreviation',
+                'c.document_number'
             )
             ->get();
         return $technicians;

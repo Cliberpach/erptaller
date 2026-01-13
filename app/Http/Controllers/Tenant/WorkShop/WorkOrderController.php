@@ -156,7 +156,9 @@ array:18 [ // app\Http\Controllers\Tenant\WorkShop\WorkOrderController.php:102
     5 => "23"
   ]
   "fuel_level" => "-1"
-  "technicians" => "1"
+  "technicians" => array:1 [
+    0 => "17"
+  ]
   "product_id" => "1"
   "product_quantity" => "2"
   "product_price" => "14.99"
@@ -184,7 +186,13 @@ array:18 [ // app\Http\Controllers\Tenant\WorkShop\WorkOrderController.php:102
 
             Session::flash('success', 'ORDEN DE TRABAJO REGISTRADA CON ÉXITO');
             DB::commit();
-            return response()->json(['success' => true, 'message' => 'ORDEN DE TRABAJO REGISTRADA CON ÉXITO', 'pdf_url' => $pdf_url]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'ORDEN DE TRABAJO REGISTRADA CON ÉXITO',
+                'pdf_url' => $pdf_url
+            ]);
+
         } catch (Throwable $th) {
             DB::rollBack();
             return response()->json(['success' => false, 'message' => $th->getMessage(), 'file' => $th->getFile(), 'line' => $th->getLine()]);
@@ -221,7 +229,7 @@ array:18 [ // app\Http\Controllers\Tenant\WorkShop\WorkOrderController.php:102
         $brands                     =   UtilController::getBrandsProducts();
         $configuration              =   Configuration::findOrFail(2);
         $units                      =   UtilController::getUnitsMeasurement();
-
+       
         return view(
             'workshop.work_orders.edit',
             compact(

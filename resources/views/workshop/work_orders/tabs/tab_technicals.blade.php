@@ -6,17 +6,46 @@
 
     <div class="row g-3">
 
-        <div class="col-lg-4 col-md-6 col-sm-12">
-            <label class="form-label small fw-bold">Técnico</label>
-            <select id="technicians" name="technicians[]" class="select2-tecnicos form-select">
-                <option value="">Seleccionar</option>
+        <div class="col-12">
+            <label class="form-label small fw-bold">Técnicos</label>
 
-                @foreach ($technicians as $tec)
-                    <option value="{{ $tec->id }}">{{ $tec->name }}</option>
-                @endforeach
+            <div class="table-responsive">
+                <table class="table-bordered table-hover table-sm table align-middle" id="dt-technicians">
+                    <thead class="table-light text-center">
+                        <tr>
+                            <th>ID</th>
+                            <th>Seleccionar</th>
+                            <th>Nombre</th>
+                            <th>Tipo Doc.</th>
+                            <th>N° Documento</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($technicians as $tec)
+                            <tr>
+                                <td class="text-center">{{ $tec->id }}</td>
 
-            </select>
+                                <td class="text-center">
+                                    <input type="checkbox" name="technicians[]" value="{{ $tec->id }}"
+                                        class="form-check-input">
+                                </td>
+
+                                <td>{{ $tec->name }}</td>
+
+                                <td class="text-center">
+                                    {{ $tec->document_type_abbreviation }}
+                                </td>
+
+                                <td class="text-center">
+                                    {{ $tec->document_number }}
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
         </div>
+
 
     </div>
 

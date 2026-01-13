@@ -62,6 +62,7 @@
         let lstProducts = [];
         let lstServices = [];
         let dtProducts = null;
+        let dtTechnicians = null;
         let dtServices = null;
         const amounts = {
             subTotal: 0,
@@ -90,6 +91,7 @@
 
             loadTomSelect();
             loadFilePound();
+            loadDtTechnicians();
             events();
             setQuote();
         })
@@ -152,12 +154,6 @@
         }
 
         function loadTomSelect() {
-
-            window.techniciansSelect = new TomSelect("#technicians", {
-                create: false,
-                maxItems: 3,
-                plugins: ['remove_button']
-            });
 
             window.warehouseSelect = new TomSelect('#warehouse_id', {
                 create: false,
@@ -364,6 +360,10 @@
                 }
             });
 
+        }
+
+        function loadDtTechnicians(){
+            dtTechnicians   =   loadDataTableSimple('dt-technicians');
         }
 
         function validationStoreQuote() {

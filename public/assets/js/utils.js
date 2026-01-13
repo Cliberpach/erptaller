@@ -189,6 +189,7 @@ function paintValidationErrors(objValidationErrors, suffix) {
 
 function loadDataTableSimple(id) {
     const dtTable = new DataTable(`#${id}`, {
+        pageLength:50,
         language: {
             "lengthMenu": "Mostrar _MENU_ registros por página",
             "zeroRecords": "No se encontraron resultados",

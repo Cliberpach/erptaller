@@ -41,6 +41,7 @@
     }
 </style>
 
+@push('js-script')
 <script>
     const paramsMdlShowOrder = {
         id: null,
@@ -59,7 +60,7 @@
             mostrarAnimacion1();
             const res = await axios.get(route('tenant.taller.ordenes_trabajo.getWorkOrder', id));
             if (res.data.success) {
-                paintOrderMaster(res.data.data.order);
+                _paintOrderMaster(res.data.data.order);
                 paintOrderProducts(res.data.data.products);
                 paintOrderServices(res.data.data.services);
                 paintOrderTechnicians(res.data.data.technicians);
@@ -79,7 +80,7 @@
         }
     }
 
-    function paintOrderMaster(order) {
+    function _paintOrderMaster(order) {
         document.getElementById('show_order_id').innerText = order.id;
 
         document.getElementById('show_warehouse_name').innerText = order.warehouse_name;
@@ -100,7 +101,6 @@
         spanValidationStock.textContent = order.validation_stock == '1' ? 'VALIDADO' : 'NO VALIDADO';
         spanValidationStock.classList.remove('bg-primary', 'bg-danger');
         spanValidationStock.classList.add(order.validation_stock === '1' ? 'bg-primary' : 'bg-danger');
-
     }
 
     function paintOrderProducts(products) {
@@ -216,3 +216,4 @@
 
     }
 </script>
+@endpush

@@ -61,6 +61,7 @@
     <script>
         const lstProducts = @json($lst_products);
         const lstServices = @json($lst_services);
+        let dtTechnicians = null;
         let dtProducts = null;
         let dtServices = null;
         const amounts = {
@@ -90,6 +91,7 @@
 
             loadTomSelect();
             loadFilePound();
+            dtTechnicians = loadDataTableSimple('dt-technicians');
             loadPreviewData();
             events();
 
@@ -153,12 +155,6 @@
         }
 
         function loadTomSelect() {
-
-            window.techniciansSelect = new TomSelect("#technicians", {
-                create: false,
-                maxItems: 3,
-                plugins: ['remove_button']
-            });
 
             window.warehouseSelect = new TomSelect('#warehouse_id', {
                 create: false,
@@ -264,7 +260,7 @@
             window.productSelect = new TomSelect('#product_id', {
                 valueField: 'id',
                 labelField: 'text',
-                searchField: ['name','subtext'],
+                searchField: ['name', 'subtext'],
                 placeholder: 'Seleccione un producto',
                 maxOptions: 20,
                 create: false,
@@ -989,7 +985,20 @@
 
             //======= TECHNICIANS ========
             const lstTechnicians = @json($lst_technicians);
-            window.techniciansSelect.setValue(lstTechnicians);
+            dtTechnicians.rows().every(function() {
+                const rowNode = this.node();
+                const rowData = this.data();
+
+                const technicianId = parseInt(rowData[0]);
+
+                if (lstTechnicians.includes(technicianId)) {
+                    const checkbox = rowNode.querySelector('input[type="checkbox"]');
+                    if (checkbox) {
+                        checkbox.checked = true;
+                    }
+                }
+            });
+
 
             //======== IMAGES =======
             const lstImages = @json($lst_images);

@@ -118,7 +118,7 @@ class WorkOrderDto
             $user  =   User::where('id', $item)->where('status', 'ACTIVO')->first();
             $_item      =   [
                 'work_order_id'     =>  $work_order->id,
-                'technical_id'     =>  $item,
+                'technical_id'      =>  $item,
                 'technical_name'    =>  $user->name,
             ];
             $items[]    =   $_item;
