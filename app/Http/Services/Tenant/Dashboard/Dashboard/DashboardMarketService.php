@@ -42,7 +42,7 @@ class DashboardMarketService
         $cant_comprobantes_mes  =   $this->getCantComprobantesMes($anio, $mes);
         $total_boletas_mes      =   $this->getTotalBoletasMes($anio, $mes);
         $total_facturas_mes     =   $this->getTotalFacturasMes($anio, $mes);
-        $total_nota_credito_mes =   $this->getTotalNotaCreditoMes($anio,$mes);
+        $total_nota_credito_mes =   $this->getTotalNotaCreditoMes($anio, $mes);
 
         $data       =   (object)[
             'ventas_mes'            =>  $ventas_mes,
@@ -453,10 +453,11 @@ class DashboardMarketService
     {
         $facturas               =   $this->getFacturasRentabilidad($anio, $mes);
         $boletas                =   $this->getBoletasRentabilidad($anio, $mes);
+        $notas_venta            =   $this->getNotasVentaRentabilidad($anio,$mes);
         $notas_credito          =   $this->getNotasCreditoRentabilidad($anio, $mes);
-        $totales                =   $this->getTotalesRentabilidad($facturas, $boletas, $notas_credito);
+        $totales                =   $this->getTotalesRentabilidad($facturas, $boletas, $notas_venta, $notas_credito);
 
-        return (object)['datos' => [$facturas, $boletas, $notas_credito], 'totales' => $totales];
+        return (object)['datos' => [$facturas, $boletas, $notas_venta, $notas_credito], 'totales' => $totales];
     }
 
     public function getAnalisisTributario(string $anio, string $mes): object
@@ -494,7 +495,7 @@ class DashboardMarketService
 
     public function getRentaTributario(float $igv_ventas, float $igv_compras, float $total_ventas): object
     {
-        $renta  =   Company::find(1)->renta??1;
+        $renta  =   Company::find(1)->renta ?? 1;
         return (object)[
             'igv_pagar' =>  $igv_ventas - $igv_compras,
             'renta'     =>  round($total_ventas * $renta, 2)
@@ -552,6 +553,13 @@ class DashboardMarketService
         $facturas_rentabiidad   =   $this->getComprobanteRentabilidad($anio, $mes, '01');
 
         return $facturas_rentabiidad;
+    }
+
+    public function getNotasVentaRentabilidad(string $anio, string $mes): object
+    {
+
+        $notas_rentabilidad   =   $this->getComprobanteRentabilidad($anio, $mes, 'NV');
+        return $notas_rentabilidad;
     }
 
     public function getNotasCreditoRentabilidad(string $anio, string $mes): object
@@ -639,6 +647,9 @@ class DashboardMarketService
         if ($codigo_doc === '03') {
             $documento  =   'BOLETAS';
         }
+        if ($codigo_doc === 'NV') {
+            $documento  =   'NOTAS_DE_VENTA';
+        }
 
         return (object)[
             'documento'         => $documento,
@@ -649,14 +660,14 @@ class DashboardMarketService
         ];
     }
 
-    public function getTotalesRentabilidad(object $facturas, object $boletas, object $notas_credito): object
+    public function getTotalesRentabilidad(object $facturas, object $boletas, object $notas_venta, object $notas_credito): object
     {
         return (object)[
             'documento'         =>  'TOTAL',
-            'operaciones'       =>  $facturas->operaciones + $boletas->operaciones + $notas_credito->operaciones,
-            'ventas'            =>  $facturas->ventas + $boletas->ventas - $notas_credito->ventas,
-            'costos'            =>  $facturas->costos + $boletas->costos - $notas_credito->costos,
-            'utilidad_bruta'    =>  $facturas->utilidad_bruta + $boletas->utilidad_bruta - $notas_credito->utilidad_bruta
+            'operaciones'       =>  $facturas->operaciones + $boletas->operaciones + $notas_venta->operaciones + $notas_credito->operaciones,
+            'ventas'            =>  $facturas->ventas + $boletas->ventas + $notas_venta->ventas - $notas_credito->ventas,
+            'costos'            =>  $facturas->costos + $boletas->costos + $notas_venta->costos - $notas_credito->costos,
+            'utilidad_bruta'    =>  $facturas->utilidad_bruta + $boletas->utilidad_bruta + $notas_venta->utilidad_bruta - $notas_credito->utilidad_bruta
         ];
     }
 
@@ -827,7 +838,7 @@ class DashboardMarketService
 
     public function getCobranzaAnt(string $anio, string $mes)
     {
-                        //--ccd.status <> "ANULADO"
+        //--ccd.status <> "ANULADO"
 
         $consulta   =   DB::select('SELECT
                         IFNULL(SUM(ccd.amount),0) as cobranza
