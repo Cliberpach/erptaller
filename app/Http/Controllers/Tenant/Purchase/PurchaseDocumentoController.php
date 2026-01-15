@@ -32,7 +32,19 @@ class PurchaseDocumentoController extends Controller
 
     public function getPurchaseDocuments(Request $request)
     {
-        $purchase_documents  =    DB::table('purchase_documents as pd')
+        $items  =   $this->queryAll($request);
+
+        return DataTables::of($items)->make(true);
+    }
+
+    public function queryAll(Request $request)
+    {
+        $supplier_id    =   $request->get('supplier');
+        $status         =   $request->get('status');
+        $start_date     =   $request->get('start_date');
+        $end_date       =   $request->get('end_date');
+
+        $items  =    DB::table('purchase_documents as pd')
             ->select(
                 'pd.id',
                 'pd.delivery_date',
@@ -46,11 +58,23 @@ class PurchaseDocumentoController extends Controller
                 'pd.observation',
                 'pd.payment_status',
                 'pd.payment_condition_name',
-                'pd.payment_status'
             )
             ->where('pd.status', '!=', 'ANULADO');
 
-        return DataTables::of($purchase_documents)->make(true);
+        if ($supplier_id) {
+            $items->where('pd.supplier_id', $supplier_id);
+        }
+        if ($status) {
+            $items->where('pd.payment_status', $status);
+        }
+        if ($start_date) {
+            $items->whereDate('pd.created_at', '>=', $start_date);
+        }
+        if ($end_date) {
+            $items->whereDate('pd.created_at', '<=', $end_date);
+        }
+
+        return $items;
     }
 
     public function getProducts(Request $request)

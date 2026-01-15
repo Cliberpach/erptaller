@@ -76,9 +76,6 @@ class SupplierAccountController extends Controller
         if ($end_date) {
             $accounts->whereDate('sa.created_at', '<=', $end_date);
         }
-        if ($status) {
-            $accounts->where('sa.status', $status);
-        }
 
         return $accounts;
     }

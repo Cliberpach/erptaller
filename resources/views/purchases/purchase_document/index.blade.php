@@ -10,18 +10,74 @@
 
     <div class="card">
         @csrf
-        <div class="card-header d-flex justify-content-between flex-row">
-            <h6>Documento Compra <i class="fa-solid fa-truck-field"></i></h6>
+        <div class="card-header">
 
-            <div class="input-group-append">
-                <button onclick="goToPurchaseDocumentCreate()" type="button" data-bs-whatever="Nueva caja"
-                    class="btn btn-primary btn-add-new" data-bs-toggle="modal" data-bs-target="#exampleModal">
-                    <div class="lign-items-center d-flex align-items-center">
-                        <i class="fas fa-plus pe-1"></i>
-                        <p class="mb-0 ml-2"> NUEVO</p>
+            <div class="row align-items-center mb-3">
+                <div class="col-lg-6 col-md-6 col-sm-12">
+                    <h6>Documento Compra <i class="fa-solid fa-truck-field"></i></h6>
+                </div>
+                <div class="col-lg-6 text-end">
+                    <div class="input-group-append">
+                        <button onclick="goToPurchaseDocumentCreate()" type="button" data-bs-whatever="Nueva caja"
+                            class="btn btn-primary btn-add-new" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                            <div class="lign-items-center d-flex align-items-center">
+                                <i class="fas fa-plus pe-1"></i>
+                                <p class="mb-0 ml-2"> NUEVO</p>
+                            </div>
+                        </button>
                     </div>
-                </button>
+                </div>
             </div>
+
+            <div class="row">
+
+                <!-- Cliente -->
+                <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 mb-2">
+                    <label class="form-label fw-bold">
+                        <i class="fas fa-user text-primary mr-1"></i> Proveedor:
+                    </label>
+                    <select class="form-control" id="supplier" name="supplier">
+                        <option value="">Seleccionar</option>
+                    </select>
+                    <p class="filterSupplier_error msgError mb-0"></p>
+                </div>
+
+                <!-- Fecha Inicio -->
+                <div class="col-lg-2 col-md-3 col-sm-6 col-xs-12 mb-2">
+                    <label class="form-label fw-bold">
+                        <i class="fas fa-calendar-alt text-success mr-1"></i> Fecha inicio:
+                    </label>
+                    <input type="date" class="form-control" id="start_date" name="start_date">
+                </div>
+
+                <!-- Fecha Fin -->
+                <div class="col-lg-2 col-md-3 col-sm-6 col-xs-12 mb-2">
+                    <label class="form-label fw-bold">
+                        <i class="fas fa-calendar-check text-danger mr-1"></i> Fecha fin:
+                    </label>
+                    <input type="date" class="form-control" id="end_date" name="end_date">
+                </div>
+
+                <!-- Estado -->
+                <div class="col-lg-2 col-md-3 col-sm-12 col-xs-12 mb-2">
+                    <label class="form-label fw-bold">
+                        <i class="fas fa-tasks text-info mr-1"></i> Estado:
+                    </label>
+                    <select class="form-control" id="status" name="status">
+                        <option value="">Todo</option>
+                        <option selected value="PENDIENTE">Pendiente</option>
+                        <option value="PAGADO">Pagado</option>
+                    </select>
+                </div>
+
+                <div class="col-lg-2 col-md-3 col-sm-12 col-xs-12 mb-2 text-end">
+                    <button type="button" id="btn-filter" class="btn btn-primary btn-block" onclick="filterData();">
+                        <i class="fas fa-filter mr-1"></i> Filtrar
+                    </button>
+                </div>
+
+            </div>
+
         </div>
         <div class="card-body">
 
@@ -42,11 +98,12 @@
         let dtPurchaseDocuments = null;
 
         document.addEventListener('DOMContentLoaded', () => {
-            loadDataTablePurchaseDocuments();
+            loadDtPurchases();
+            loadTomSelect();
             eventsMdlPurchaseDocumentShow();
         })
 
-        function loadDataTablePurchaseDocuments() {
+        function loadDtPurchases() {
             const urlGetPurchaseDocuments = '{{ route('tenant.compras.documento_compra.getPurchaseDocuments') }}';
 
             dtPurchaseDocuments = new DataTable('#tbl_list_purchase_document', {
@@ -55,6 +112,12 @@
                 ajax: {
                     url: urlGetPurchaseDocuments,
                     type: 'GET',
+                    data: function(d) {
+                        d.supplier = document.querySelector('#supplier').value;
+                        d.status = document.querySelector('#status').value;
+                        d.start_date = $('#start_date').val();
+                        d.end_date = $('#end_date').val();
+                    }
                 },
                 order: [
                     [0, 'desc']
@@ -180,6 +243,45 @@
                         "sortAscending": ": activar para ordenar la columna de manera ascendente",
                         "sortDescending": ": activar para ordenar la columna de manera descendente"
                     }
+                }
+            });
+        }
+
+        function loadTomSelect() {
+            window.supplierSelect = new TomSelect('#supplier', {
+                valueField: 'id',
+                labelField: 'full_name',
+                searchField: ['full_name'],
+                plugins: ['clear_button'],
+                placeholder: 'Seleccione un proveedor',
+                maxOptions: 20,
+                create: false,
+                preload: false,
+                onType: (str) => {
+                    lastCustomerQuery = str;
+                },
+                load: async (query, callback) => {
+                    if (!query.length) return callback();
+                    try {
+                        const url = `{{ route('tenant.utils.searchSupplier') }}?q=${encodeURIComponent(query)}`;
+                        const response = await fetch(url);
+                        if (!response.ok) throw new Error('Error al buscar proveedores');
+                        const data = await response.json();
+                        const results = data.data ?? [];
+                        callback(results);
+                    } catch (error) {
+                        console.error('Error cargando clientes:', error);
+                        callback();
+                    }
+                },
+                render: {
+                    option: (item, escape) => `
+                        <div>
+                            <strong>${escape(item.full_name)}</strong><br>
+                            <small>${escape(item.email ?? '')}</small>
+                        </div>
+                    `,
+                    item: (item, escape) => `<div>${escape(item.full_name)}</div>`
                 }
             });
         }
@@ -333,6 +435,25 @@
                     });
                 }
             });
+        }
+
+
+        function filterData() {
+            toastr.clear();
+            const startDate = document.getElementById('start_date')?.value;
+            const endDate = document.getElementById('end_date')?.value;
+
+            if (startDate && endDate) {
+                if (startDate > endDate) {
+                    toastr.error(
+                        'La fecha inicio no puede ser mayor que la fecha fin',
+                        'Fechas inválidas'
+                    );
+                    return;
+                }
+            }
+
+            dtPurchaseDocuments.ajax.reload();
         }
     </script>
 @endsection
