@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('alerts', function (Blueprint $table) {
 
+            $table->id();
             $table->string('name', 500);
             $table->string('description', 500)->nullable();
 

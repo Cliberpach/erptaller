@@ -5,7 +5,6 @@ namespace App\Http\Controllers\LandLord;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CompanyStoreRequest;
 use App\Models\Company;
-use App\Models\CompanyInvoice;
 use App\Models\Landlord\Company as LandlordCompany;
 use App\Models\Landlord\GeneralTable\GeneralTableDetail;
 use App\Models\Module;
@@ -13,13 +12,11 @@ use App\Models\ModuleChild;
 use App\Models\ModuleGrandChild;
 use App\Models\Plan;
 use App\Models\Tenant;
-use App\Models\Tenant\DocumentSerialization;
 use App\Models\Tenant\Maintenance\Collaborator\Collaborator;
-use App\Models\User;
+use App\Models\Tenant\User;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
@@ -220,10 +217,15 @@ class CompanyController extends Controller
 
             Session::flash('message_success', 'EMPRESA REGISTRADA CON ÉXITO');
             return response()->json(['success' => true, 'message' => 'EMPRESA REGISTRADA CON ÉXITO']);
-        } catch (Exception $ex) {
+        } catch (Throwable $th) {
             DB::rollback();
-            Session::flash('message_error', $ex->getMessage());
-            return response()->json(['success' => false, 'message' => $ex->getMessage()]);
+            Session::flash('message_error', $th->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => $th->getMessage(),
+                'file' => $th->getFile(),
+                'line' => $th->getLine()
+            ]);
         }
     }
 
@@ -232,7 +234,14 @@ class CompanyController extends Controller
         $serializable_document  =   GeneralTableDetail::where('symbol', 'NV')->where('parameter', 'NV')->first();
         $files_route            =   $request->get('files_route');
 
-        DB::statement("use $database");
+        config([
+            'database.default' => $database
+        ]);
+
+        DB::purge('tenant');
+        DB::reconnect('tenant');
+
+        DB::setDefaultConnection('tenant');
 
         $company                                =   new Company();
         $company->ruc                           =   $request->get("ruc");
@@ -281,17 +290,18 @@ class CompanyController extends Controller
         ]);
 
         //========= CREANDO USUARIO PARA EL TENANT ========
-        $collaborator                   =   new Collaborator();
-        $collaborator->full_name        =   'LUIS DANIEL ALVA LUJAN';
-        $collaborator->document_type_id =   39;
-        $collaborator->document_number  =   77412431;
-        $collaborator->address          =   'AV HUSARES 123';
-        $collaborator->phone            =   '989392912';
-        $collaborator->work_days        =   30;
-        $collaborator->rest_days        =   20;
-        $collaborator->monthly_salary   =   12000;
-        $collaborator->daily_salary     =   400;
-        $collaborator->position_id      =   1;
+        $collaborator                               =   new Collaborator();
+        $collaborator->full_name                    =   'LUIS DANIEL ALVA LUJAN';
+        $collaborator->document_type_id             =   1;
+        $collaborator->document_number              =   77412431;
+        $collaborator->address                      =   'AV HUSARES 123';
+        $collaborator->phone                        =   '989392912';
+        $collaborator->work_days                    =   30;
+        $collaborator->rest_days                    =   20;
+        $collaborator->monthly_salary               =   12000;
+        $collaborator->daily_salary                 =   400;
+        $collaborator->position_id                  =   1;
+        $collaborator->document_type_abbreviation   =   'DNI';
         $collaborator->save();
 
         $user                       =   new User();

@@ -19,7 +19,7 @@ return new class extends Migration
 
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users');
-            
+
             $table->timestamp('notified_at')->nullable();
             $table->timestamp('read_at')->nullable();
             $table->timestamp('dismissed_at')->nullable();
