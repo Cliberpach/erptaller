@@ -54,7 +54,6 @@ return new class extends Migration
             $table->index(['start_date', 'end_date'], 'idx_dates_range');
             $table->index('status', 'idx_status');
 
-
             $table->timestamps();
         });
     }

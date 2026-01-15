@@ -21,17 +21,23 @@ return new class extends Migration
             $table->foreign('petty_cash_book_id')->references('id')->on('petty_cash_books');
 
             $table->date('date');
-            $table->text('observation')->nullable();
+            $table->string('observation',500)->nullable();
             $table->longText('img_route')->nullable();
             $table->longText('img_name')->nullable();
 
             $table->unsignedBigInteger('payment_method_id');
             $table->foreign('payment_method_id')->references('id')->on('payment_methods');
 
-            $table->unsignedDecimal('cash', 15, 6)->nullable()->default(0.00);
+            $table->unsignedDecimal('cash', 16, 6)->nullable()->default(0.00);
             $table->unsignedDecimal('amount', 16, 6)->nullable()->default(0.00);
             $table->unsignedDecimal('balance', 16, 6)->nullable();
             $table->unsignedDecimal('total', 16, 6)->nullable();
+
+            $table->unsignedBigInteger('creator_user_id')->nullable();
+            $table->string('creator_user_name')->nullable();
+
+            $table->string('payment_method_name',160);
+            $table->unsignedDecimal('paid', 16, 6)->nullable();
 
             $table->timestamps();
         });

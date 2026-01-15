@@ -20,6 +20,7 @@ return new class extends Migration
             $table->foreign('position_id')->references('id')->on('positions');
 
             $table->string('document_number', 20)->unique();
+            $table->string('document_type_abbreviation', 20);
 
             $table->string('full_name', 260);
             $table->string('address', 200)->nullable();
