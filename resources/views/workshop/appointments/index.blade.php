@@ -9,6 +9,8 @@
 @endpush
 
 @section('content')
+    @include('utils.modals.vehicles.mdl_create_vehicle')
+    @include('utils.modals.customer.mdl_create_customer')
     @include('workshop.quotes.modals.mdl_show_quote')
     @include('workshop.appointments.modals.mdl_create_event')
     @include('workshop.appointments.modals.mdl_show_event')
@@ -84,7 +86,6 @@
                     <div id="calendar" style="height: 800px"></div>
                 </div>
             </div>
-            {{-- @include('workshop.quotes.tables.tbl_list_quotes') --}}
         </div>
     </div>
 @endsection
@@ -187,7 +188,9 @@
 
             eventsMdlCreateEvent();
             eventsMdlShowEvent();
-            eventsMdlEditEvent()
+            eventsMdlEditEvent();
+            eventsMdlCreateCustomer();
+            eventsMdlVehicle();
 
             calendar.on('beforeCreateEvent', (event) => {
                 console.log('Creando evento:', event);

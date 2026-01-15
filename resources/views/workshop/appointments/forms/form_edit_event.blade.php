@@ -14,7 +14,7 @@
         <!-- Cliente -->
         <div class="col-lg-6 col-md-8 col-sm-12 mb-3">
             <label class="form-label fw-bold required_field">Cliente:</label>
-            <i class="fas fa-plus btn btn-warning btn-sm" onclick="openMdlNewCustomer();" style="margin-left:4px;"></i>
+            {{-- <i class="fas fa-plus btn btn-warning btn-sm" onclick="openMdlNewCustomer();" style="margin-left:4px;"></i> --}}
 
             <select class="form-control" id="customer_id_event_edit" name="customer_id_event_edit" required>
                 <option value="">Seleccione un cliente</option>
@@ -25,8 +25,8 @@
         <!-- Vehículo -->
         <div class="col-lg-6 col-md-8 col-sm-12 mb-3">
             <label class="form-label fw-bold">Vehículo:</label>
-            <i class="fas fa-plus btn btn-warning btn-sm" onclick="openMdlCreateVehicle();"
-                style="margin-left:4px;"></i>
+            {{-- <i class="fas fa-plus btn btn-warning btn-sm" onclick="openMdlCreateVehicle();"
+                style="margin-left:4px;"></i> --}}
 
             <select class="form-control" id="vehicle_id_event_edit" name="vehicle_id_event_edit">
                 <option value="">Seleccionar</option>

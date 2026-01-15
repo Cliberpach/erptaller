@@ -34,6 +34,12 @@
     </div>
 </div>
 
+<style>
+    #mdlCreateVehicle {
+        z-index: 9999;
+    }
+</style>
+
 <script>
     let vehicleParams = {
         plateSearchVehicle: null
@@ -370,9 +376,19 @@
     function setDefaultMdlVehicle() {
         window.clientMdlVehicleSelect.clear();
 
-        const clientId = window.clientSelect.getValue();
-        if (!clientId) return;
-        const clientItem = window.clientSelect.options[clientId];
+        let clientId = null;
+        let clientItem = null;
+        if (window.clientSelect) {
+            clientId = window.clientSelect.getValue();
+            if (!clientId) return;
+            clientItem = window.clientSelect.options[clientId];
+        }
+        if (window.customerSelect) {
+            clientId = window.customerSelect.getValue();
+            if (!clientId) return;
+            clientItem = window.customerSelect.options[clientId];
+        }
+
         window.clientMdlVehicleSelect.addOption(clientItem);
         window.clientMdlVehicleSelect.setValue(clientId);
     }

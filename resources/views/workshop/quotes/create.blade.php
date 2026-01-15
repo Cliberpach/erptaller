@@ -5,7 +5,7 @@
 @endsection
 
 @section('content')
-     @include('utils.modals.customer.mdl_create_customer')
+    @include('utils.modals.customer.mdl_create_customer')
     @include('utils.modals.vehicles.mdl_create_vehicle')
     @include('utils.modals.products.mdl_create_product')
     @include('utils.modals.services.mdl_create_service')
@@ -57,8 +57,6 @@
 
 @section('js')
     <script>
-
-
         const lstProducts = [];
         const lstServices = [];
         let dtProducts = null;

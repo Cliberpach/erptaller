@@ -323,18 +323,22 @@
         }
 
         async function actionChangeVehicle(value) {
-            document.querySelector('#plate').value = '';
+            //document.querySelector('#plate').value = '';
+
+            /*
             const vehicleInfo = document.querySelector('#vehicle_info');
             vehicleInfo.classList.add('d-none');
             vehicleInfo.querySelector('.fw-semibold').textContent = '';
-
+            */
 
             if (!value) return;
             const vehicle = window.vehicleSelect.options[value];
-            document.querySelector('#plate').value = vehicle.text;
+            //document.querySelector('#plate').value = vehicle.text;
 
+            /*
             vehicleInfo.classList.remove('d-none');
             vehicleInfo.querySelector('.fw-semibold').textContent = vehicle.subtext;
+            */
 
             //========= TRAER CLIENTES ==========
             mostrarAnimacion1();

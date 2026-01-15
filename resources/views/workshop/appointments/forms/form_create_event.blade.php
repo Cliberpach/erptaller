@@ -27,12 +27,11 @@
             <i class="fas fa-plus btn btn-warning btn-sm" onclick="openMdlCreateVehicle();"
                 style="margin-left:4px;"></i>
 
-            <select class="form-control" id="vehicle_id_event" name="vehicle_id_event">
+            <select required class="form-control" id="vehicle_id_event" name="vehicle_id_event">
                 <option value="">Seleccionar</option>
             </select>
             <p class="vehicle_id_event_error msgError mb-0"></p>
         </div>
-
 
         <!-- Calendario -->
         <div class="col-12 mb-3 d-none">

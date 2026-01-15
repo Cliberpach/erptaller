@@ -12,7 +12,7 @@
         /* Centrar horizontalmente */
         align-items: center;
         /* Centrar verticalmente */
-        z-index: 9999;
+        z-index: 10000;
         /* Asegura que el overlay esté por encima de otros elementos */
         display: none;
         /* Ocultar el overlay por defecto */

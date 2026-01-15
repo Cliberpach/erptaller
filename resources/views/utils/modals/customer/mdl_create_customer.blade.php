@@ -34,6 +34,12 @@
     </div>
 </div>
 
+<style>
+    #mdlCreateCustomer {
+        z-index: 9999;
+    }
+</style>
+
 <script>
     let customerParams = {
         documentSearchCustomer: null
@@ -72,7 +78,7 @@
 
             $('#type_identity_document').val('1').trigger('change');
 
-            customerParams.documentSearchCustomer   =   null;
+            customerParams.documentSearchCustomer = null;
             clearValidationErrors('msgErrorCustomer');
 
         });
@@ -80,8 +86,8 @@
         //======= CONSULTAR API DOCUMENTO DNI ========
         document.querySelector('#btn_search_nro_document').addEventListener('click', () => {
 
-            const nro_document              = document.querySelector('#nro_document').value;
-            const type_identity_document    = document.querySelector('#type_identity_document').value;
+            const nro_document = document.querySelector('#nro_document').value;
+            const type_identity_document = document.querySelector('#type_identity_document').value;
             toastr.clear();
 
             if (type_identity_document != 1 && type_identity_document != 3) {
@@ -385,7 +391,6 @@
         });
     }
 
-
     function setCustomerNew(customerNew) {
         const option = {
             id: customerNew.id,
@@ -393,12 +398,20 @@
             email: customerNew.email ?? ''
         };
 
-        if (!window.clientSelect.options[option.id]) {
-            window.clientSelect.addOption(option);
+        if (window.clientSelect) {
+            if (!window.clientSelect.options[option.id]) {
+                window.clientSelect.addOption(option);
+            }
+            window.clientSelect.setValue(option.id);
         }
 
-        window.clientSelect.setValue(option.id);
 
+        if (window.customerSelect) {
+            if (!window.customerSelect.options[option.id]) {
+                window.customerSelect.addOption(option);
+            }
+            window.customerSelect.setValue(option.id);
+        }
     }
 
     function setDefaultData() {

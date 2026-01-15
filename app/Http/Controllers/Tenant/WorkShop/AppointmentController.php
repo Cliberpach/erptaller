@@ -8,6 +8,11 @@ use App\Http\Controllers\UtilController;
 use App\Http\Requests\Tenant\WorkShop\Appointment\AppointmentStoreRequest;
 use App\Http\Requests\Tenant\WorkShop\Appointment\AppointmentUpdateRequest;
 use App\Http\Services\Tenant\WorkShop\Appointments\AppointmentManager;
+use App\Models\CompanyInvoice;
+use App\Models\Department;
+use App\Models\District;
+use App\Models\Landlord\Color;
+use App\Models\Province;
 use App\Models\Tenant\WorkShop\Appointment\Appointment;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -26,8 +31,24 @@ class AppointmentController extends Controller
     public function index()
     {
         $customer_formatted         =   FormatController::getFormatInitialCustomer(1);
+        $types_identity_documents   =   UtilController::getIdentityDocuments();
+        $departments                =   Department::all();
+        $districts                  =   District::all();
+        $provinces                  =   Province::all();
+        $company_invoice            =   CompanyInvoice::find(1);
+        $years                      =   UtilController::getYears();
+        $colors                     =   Color::where('status', 'ACTIVE')->get();
 
-        return view('workshop.appointments.index', compact('customer_formatted'));
+        return view('workshop.appointments.index', compact(
+            'customer_formatted',
+            'types_identity_documents',
+            'departments',
+            'districts',
+            'provinces',
+            'company_invoice',
+            'colors',
+            'years'
+        ));
     }
 
     public function getEvents(Request $request)
