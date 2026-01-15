@@ -8,6 +8,7 @@
     @routes
     @include('layouts.head')
     @vite(['resources/css/app.css', 'resources/js/app.js', 'resources/js/notifications/main.js'])
+    @stack('js-head')
 </head>
 
 <body>

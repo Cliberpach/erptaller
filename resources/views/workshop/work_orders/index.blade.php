@@ -4,6 +4,10 @@
     Órdenes Trabajo
 @endsection
 
+@push('js-head')
+    @vite(['resources/js/libs/lightgalery.js'])
+@endpush
+
 @section('content')
     @include('workshop.work_orders.modals.mdl_show_order')
     @include('workshop.work_orders.modals.mdl_alert')

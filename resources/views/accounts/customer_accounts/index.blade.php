@@ -4,6 +4,10 @@
     Cuentas Cliente
 @endsection
 
+@push('js-head')
+    @vite(['resources/js/libs/filepond.js'])
+@endpush
+
 @section('content')
     @include('accounts.customer_accounts.modalDetalle')
 
@@ -65,6 +69,17 @@
                     </button>
                 </div>
 
+            </div>
+
+            <div class="row">
+                <div class="col-lg-12 d-flex align-items-end justify-content-end">
+                    <button class="btn btn-success" style="margin-right: 10px;" onclick="downloadExcel();">
+                        <i class="fas fa-file-excel"></i> EXCEL
+                    </button>
+                    <button class="btn btn-danger" onclick="downloadPdf()">
+                        <i class="fas fa-file-pdf"></i> PDF
+                    </button>
+                </div>
             </div>
 
         </div>
@@ -246,7 +261,6 @@
             });
         }
 
-
         function loadTomSelect() {
             window.clientSelect = new TomSelect('#customer_id', {
                 valueField: 'id',
@@ -362,6 +376,32 @@
             }
 
             dtCuentasCliente.ajax.reload();
+        }
+
+        function downloadPdf() {
+
+            const url = route('tenant.cuentas.cliente.pdfAll', {
+                customer_id: document.querySelector('#customer_id').value,
+                status: document.querySelector('#status').value,
+                start_date: $('#start_date').val(),
+                end_date: $('#end_date').val()
+            });
+
+            window.open(url, '_blank');
+
+        }
+
+        function downloadExcel() {
+
+            const url = route('tenant.cuentas.cliente.excelAll', {
+                customer_id: document.querySelector('#customer_id').value,
+                status: document.querySelector('#status').value,
+                start_date: $('#start_date').val(),
+                end_date: $('#end_date').val()
+            });
+
+            window.open(url, '_blank');
+
         }
     </script>
 @endsection

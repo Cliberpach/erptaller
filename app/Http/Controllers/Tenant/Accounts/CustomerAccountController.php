@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers\Tenant\Accounts;
 
+use App\Exports\Tenant\Accounts\CustomerAccount\CustomerAccountExport;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Accounts\CustomerAccount\PayStoreRequest;
 use App\Http\Services\Tenant\Accounts\CustomerAccount\CustomerAccountManager;
+use App\Models\Company;
+use App\Models\Landlord\Customer;
 use App\Models\Tenant\Accounts\CustomerAccountDetail;
 use App\Models\Tenant\PaymentMethod;
 use Exception;
@@ -12,6 +15,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Throwable;
 use Yajra\DataTables\DataTables;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
+use Maatwebsite\Excel\Facades\Excel;
 
 class CustomerAccountController extends Controller
 {
@@ -31,7 +37,13 @@ class CustomerAccountController extends Controller
 
     public function getCustomerAccounts(Request $request)
     {
+        $customer_accounts  =   $this->queryAll($request);
 
+        return DataTables::of($customer_accounts)->make(true);
+    }
+
+    public function queryAll(Request $request)
+    {
         $customer_id    =   $request->get('customer');
         $status         =   $request->get('status');
         $start_date     =   $request->get('start_date');
@@ -49,8 +61,8 @@ class CustomerAccountController extends Controller
                 'ca.paid',
                 'ca.balance',
                 'ca.status',
-                DB::raw('(ca.amount - ca.balance) as paid_amount'),
-
+                'ca.paid as paid_amount',
+                'ca.creator_user_name'
             )
             ->where('ca.status', '<>', 'ANULADO');
 
@@ -76,7 +88,7 @@ class CustomerAccountController extends Controller
             $customer_accounts->where('ca.status', $status);
         }
 
-        return DataTables::of($customer_accounts)->make(true);
+        return $customer_accounts;
     }
 
     public function store(Request $request)
@@ -129,7 +141,7 @@ class CustomerAccountController extends Controller
         }
     }
 
-/*
+    /*
 array:11 [ // app\Http\Controllers\Tenant\Accounts\CustomerAccountController.php:115
   "_token" => "OUiVLJK4B1xxUcncLt4KMQWShWUygPIGMkm5ZTu4"
   "pago" => "A CUENTA"
@@ -165,5 +177,48 @@ array:11 [ // app\Http\Controllers\Tenant\Accounts\CustomerAccountController.php
         } catch (Throwable $th) {
             return response()->json(['success' => false, 'message' => $th->getMessage()]);
         }
+    }
+
+    public function pdfAll(Request $request)
+    {
+
+        $company     =   Company::findOrFail(1);
+
+        $data        =   $this->queryAll($request)->get();
+
+        $customer    =   null;
+
+        if ($request->get('customer_id')) {
+            $customer    =   Customer::findOrFail($request->get('customer_id'));
+        }
+
+        $request->merge(['customer' => $customer]);
+
+        $pdf = Pdf::loadview('accounts.customer_accounts.reports.pdf-all', [
+            'company'               =>  $company,
+            'data'                  =>  $data,
+            'filters'               =>  $request
+
+        ])->setPaper('a4', 'landscape');
+
+
+        return $pdf->stream('cuentas_cliente_' . Carbon::now()->format('Y_m_d_H_i_s') . '.pdf');
+    }
+
+    public function excelAll(Request $request)
+    {
+
+        $company        =   Company::find(1);
+
+        $data           =   $this->queryAll($request)->get();
+
+        $customer        =   null;
+        if ($request->get('customer_id')) {
+            $customer    =   Customer::findOrFail($request->get('customer_id'));
+        }
+
+        $request->merge(['customer' => $customer]);
+
+        return Excel::download(new CustomerAccountExport($data, $request, $company), 'cuentas_cliente_' . Carbon::now()->format('Y-m-d') . '.xlsx');
     }
 }

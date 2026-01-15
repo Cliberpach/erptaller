@@ -13,6 +13,8 @@ Route::group(["prefix" => "cuentas"], function () {
         Route::get('getCustomerAccount/{id}', [CustomerAccountController::class, 'getCustomerAccount'])->name('tenant.cuentas.cliente.getCustomerAccount');
         Route::post('store-pago', [CustomerAccountController::class, 'storePago'])->name('tenant.cuentas.cliente.storePago');
         Route::get('pdf-one/{id}', [CustomerAccountController::class, 'pdfOne'])->name('tenant.cuentas.cliente.pdfOne');
+        Route::get('/pdf-all', [CustomerAccountController::class, 'pdfAll'])->name('tenant.cuentas.cliente.pdfAll');
+        Route::get('/excel-all', [CustomerAccountController::class, 'excelAll'])->name('tenant.cuentas.cliente.excelAll');
     });
 
     Route::group(["prefix" => "proveedor"], function () {
@@ -21,7 +23,7 @@ Route::group(["prefix" => "cuentas"], function () {
         Route::get('/getSupplierAccount/{id}', [SupplierAccountController::class, 'getSupplierAccount'])->name('tenant.cuentas.proveedor.getSupplierAccount');
         Route::post('/store-pago', [SupplierAccountController::class, 'storePago'])->name('tenant.cuentas.proveedor.storePago');
         Route::get('/pdf-one', [SupplierAccountController::class, 'pdfOne'])->name('tenant.cuentas.proveedor.pdfOne');
-        Route::get('/reporteExcel', [SupplierAccountController::class, 'reporteExcel'])->name('grifo.contabilidad.cuentas_pagar.reporteExcel');
-        Route::get('/reportePdf', [SupplierAccountController::class, 'reportePdf'])->name('grifo.contabilidad.cuentas_pagar.reportePdf');
+        Route::get('/pdf-all', [SupplierAccountController::class, 'pdfAll'])->name('tenant.cuentas.proveedor.pdfAll');
+        Route::get('/excel-all', [SupplierAccountController::class, 'excelAll'])->name('tenant.cuentas.proveedor.excelAll');
     });
 });

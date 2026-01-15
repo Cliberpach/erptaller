@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers\Tenant\Accounts;
 
+use App\Exports\Tenant\Accounts\SupplierAccount\SupplierAccountExport;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Tenant\Accounts\SupplierAccount\PayStoreRequest;
 use App\Http\Services\Tenant\Accounts\SupplierAccount\SupplierAccountManager;
 use App\Models\Company;
+use App\Models\Supplier;
 use App\Models\Tenant\Accounts\SupplierAccount\SupplierAccountDetail;
 use Illuminate\Http\Request;
 use App\Models\Tenant\PaymentMethod;
@@ -15,6 +17,7 @@ use Illuminate\Support\Facades\DB;
 use Throwable;
 use Yajra\DataTables\DataTables;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Maatwebsite\Excel\Facades\Excel;
 
 class SupplierAccountController extends Controller
 {
@@ -33,7 +36,13 @@ class SupplierAccountController extends Controller
 
     public function getAll(Request $request)
     {
+        $accounts   =   $this->queryAll($request);
 
+        return DataTables::of($accounts)->make(true);
+    }
+
+    public function queryAll(Request $request)
+    {
         $supplier_id    =   $request->get('supplier');
         $status         =   $request->get('status');
         $start_date     =   $request->get('start_date');
@@ -51,7 +60,7 @@ class SupplierAccountController extends Controller
                 'sa.balance',
                 'sa.status',
                 'sa.paid',
-
+                'sa.creator_user_name'
             )
             ->where('sa.status', '<>', 'ANULADO');
 
@@ -62,18 +71,17 @@ class SupplierAccountController extends Controller
             $accounts->where('sa.status', $status);
         }
         if ($start_date) {
-            $accounts->whereDate('sa.created_date', '>=', $start_date);
+            $accounts->whereDate('sa.created_at', '>=', $start_date);
         }
         if ($end_date) {
-            $accounts->whereDate('sa.created_date', '<=', $end_date);
+            $accounts->whereDate('sa.created_at', '<=', $end_date);
         }
         if ($status) {
             $accounts->where('sa.status', $status);
         }
 
-        return DataTables::of($accounts)->make(true);
+        return $accounts;
     }
-
 
     public function getSupplierAccount(int $id)
     {
@@ -178,5 +186,49 @@ array:1 [▼ // app\Http\Controllers\Tenant\Accounts\SupplierAccountController.p
         ])->setPaper('a4');
 
         return $pdf->stream('reporte_cuenta_proveedor' . Carbon::now()->format('Y_m_d_H_i_s') . '.pdf');
+    }
+
+    public function pdfAll(Request $request)
+    {
+
+        $company     =   Company::findOrFail(1);
+
+        $data        =   $this->queryAll($request)->get();
+
+        $supplier    =   null;
+
+        if ($request->get('supplier')) {
+            $supplier    =   Supplier::findOrFail($request->get('supplier'));
+        }
+
+
+        $request->merge(['supplier' => $supplier]);
+
+        $pdf = Pdf::loadview('accounts.supplier_accounts.reports.pdf-all', [
+            'company'               =>  $company,
+            'data'                  =>  $data,
+            'filters'               =>  $request
+
+        ])->setPaper('a4', 'landscape');
+
+
+        return $pdf->stream('cuentas_proveedor_' . Carbon::now()->format('Y_m_d_H_i_s') . '.pdf');
+    }
+
+     public function excelAll(Request $request)
+    {
+
+        $company        =   Company::find(1);
+
+        $data           =   $this->queryAll($request)->get();
+
+        $supplier        =   null;
+        if ($request->get('supplier')) {
+            $supplier    =   Supplier::findOrFail($request->get('supplier'));
+        }
+
+        $request->merge(['supplier' => $supplier]);
+
+        return Excel::download(new SupplierAccountExport($data, $request, $company), 'cuentas_proveedor_' . Carbon::now()->format('Y-m-d') . '.xlsx');
     }
 }

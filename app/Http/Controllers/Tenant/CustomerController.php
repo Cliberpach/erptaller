@@ -7,7 +7,6 @@ use App\Http\Controllers\LandLord\ApiController;
 use App\Http\Controllers\UtilController;
 use App\Http\Requests\Customer\CustomerStoreRequest;
 use App\Http\Requests\Customer\CustomerUpdateRequest;
-use App\Http\Requests\CustomerRequest;
 use App\Models\Department;
 use App\Models\District;
 use App\Models\Landlord\Customer;

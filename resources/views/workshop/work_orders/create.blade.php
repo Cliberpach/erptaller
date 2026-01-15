@@ -4,6 +4,10 @@
     Órdenes de Trabajo
 @endsection
 
+@push('js-head')
+    @vite(['resources/js/libs/filepond.js'])
+@endpush
+
 @section('content')
     @include('utils.modals.customer.mdl_create_customer')
     @include('utils.modals.vehicles.mdl_create_vehicle')

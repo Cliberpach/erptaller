@@ -4,6 +4,10 @@
     Citas
 @endsection
 
+@push('js-head')
+    @vite(['resources/js/libs/calendar.js'])
+@endpush
+
 @section('content')
     @include('workshop.quotes.modals.mdl_show_quote')
     @include('workshop.appointments.modals.mdl_create_event')
@@ -17,11 +21,11 @@
                     <h6 class="card-title mb-0">LISTA DE CITAS</h6>
                 </div>
 
-                <div class="col-lg-6 col-md-6 col-sm-12 text-md-right mt-md-0 mt-2" style="text-align:end;">
+                {{-- <div class="col-lg-6 col-md-6 col-sm-12 text-md-right mt-md-0 mt-2" style="text-align:end;">
                     <a href="{{ route('tenant.taller.cotizaciones.create') }}" class="btn btn-primary text-white">
                         <i class="fas fa-plus-circle"></i> Nuevo
                     </a>
-                </div>
+                </div> --}}
             </div>
 
             <!-- Fila 2: Filtro Cliente -->

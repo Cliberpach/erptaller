@@ -88,65 +88,66 @@
     </div>
 </div>
 
-<script>
-    async function openMdlVerCobranza(cuentaProveedorId) {
+@push('js-script')
+    <script>
+        async function openMdlVerCobranza(cuentaProveedorId) {
 
-        const resGetCobranza = await getCobranza(cuentaProveedorId);
-        if (!resGetCobranza) {
-            return;
+            const resGetCobranza = await getCobranza(cuentaProveedorId);
+            if (!resGetCobranza) {
+                return;
+            }
+
+            if (resGetCobranza.success) {
+                const cobranza = resGetCobranza.data.cuenta;
+                console.log(cobranza)
+                const detalle = resGetCobranza.data.detalle;
+
+                pintarVerCobranza(cobranza);
+                pintarTablaDetalleCuenta(detalle);
+                toastr.success(resGetCobranza.message, 'OPERACIÓN COMPLETADA');
+                $('#mdlVerCobranza').modal('show');
+
+            } else {
+                toastr.error(resGetCobranza.message, 'ERROR EN EL SERVIDOR');
+            }
+
         }
 
-        if (resGetCobranza.success) {
-            const cobranza = resGetCobranza.data.cuenta;
-            console.log(cobranza)
-            const detalle = resGetCobranza.data.detalle;
-
-            pintarVerCobranza(cobranza);
-            pintarTablaDetalleCuenta(detalle);
-            toastr.success(resGetCobranza.message, 'OPERACIÓN COMPLETADA');
-            $('#mdlVerCobranza').modal('show');
-
-        } else {
-            toastr.error(resGetCobranza.message, 'ERROR EN EL SERVIDOR');
+        function pintarVerCobranza(cobranza) {
+            document.getElementById('mdlVer_proveedor_id').innerText = cobranza.supplier_id;
+            document.getElementById('mdlVer_proveedor_nombre').innerText = cobranza.supplier_name;
+            document.getElementById('mdlVer_documento').innerText = cobranza.document_number;
+            document.getElementById('mdlVer_estado').innerText = cobranza.status;
+            document.getElementById('mdlVer_monto').innerText = formatSoles(cobranza.amount);
+            document.getElementById('mdlVer_saldo').innerText = formatSoles(cobranza.balance)
+            document.getElementById('mdlVer_created_at').innerText = cobranza.created_at;
+            document.getElementById('mdlVer_updated_at').innerText = cobranza.updated_at;
+            document.getElementById('mdlVer_compra_id').innerText = cobranza.purchase_id;
         }
 
-    }
+        function pintarTablaDetalleCuenta(detalle) {
+            let filas = ``;
+            const tbody = document.querySelector('#tbl_detalle_cuenta tbody');
 
-    function pintarVerCobranza(cobranza) {
-        document.getElementById('mdlVer_proveedor_id').innerText = cobranza.supplier_id;
-        document.getElementById('mdlVer_proveedor_nombre').innerText = cobranza.supplier_name;
-        document.getElementById('mdlVer_documento').innerText = cobranza.document_number;
-        document.getElementById('mdlVer_estado').innerText = cobranza.status;
-        document.getElementById('mdlVer_monto').innerText = formatSoles(cobranza.amount);
-        document.getElementById('mdlVer_saldo').innerText = formatSoles(cobranza.balance)
-        document.getElementById('mdlVer_created_at').innerText = cobranza.created_at;
-        document.getElementById('mdlVer_updated_at').innerText = cobranza.updated_at;
-        document.getElementById('mdlVer_compra_id').innerText = cobranza.purchase_id;
-    }
-
-    function pintarTablaDetalleCuenta(detalle) {
-        let filas = ``;
-        const tbody = document.querySelector('#tbl_detalle_cuenta tbody');
-
-        const BASE_STORAGE_URL = @json(asset(''));
+            const BASE_STORAGE_URL = @json(asset(''));
 
 
-        detalle.forEach((d) => {
+            detalle.forEach((d) => {
 
-            let imagenHTML = '-';
+                let imagenHTML = '-';
 
-            if (d.img_route) {
-                const link_img = `${BASE_STORAGE_URL}${d.img_route}`;
+                if (d.img_route) {
+                    const link_img = `${BASE_STORAGE_URL}${d.img_route}`;
 
-                imagenHTML = `
+                    imagenHTML = `
                                 <a href="${link_img}" target="_blank">
                                     <img src="${link_img}"
                                         style="width:80px; height:80px; object-fit:contain; border-radius:4px; border:1px solid #ddd;" />
                                 </a>
                             `;
-            }
+                }
 
-            filas += `<tr>
+                filas += `<tr>
                         <td style="text-align:left;">${d.date}</td>
                         <td style="text-align:left;">${d.petty_cash_name}</td>
                         <td style="text-align:left;">${d.creator_user_name}</td>
@@ -161,8 +162,9 @@
                         </td>
                         <td style="text-align:left;">${formatDateTime(d.created_at)}</td>
                     </tr>`;
-        })
+            })
 
-        tbody.innerHTML = filas;
-    }
-</script>
+            tbody.innerHTML = filas;
+        }
+    </script>
+@endpush

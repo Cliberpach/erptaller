@@ -189,7 +189,7 @@ use Illuminate\Support\Facades\Auth;
 
 Route::get('/test-broadcast', function () {
     $user = Auth::user();
-    event(new AlertCreated(Alert::findOrFail(2),$user));
+    event(new AlertCreated(Alert::findOrFail(2), $user));
 
     return 'Evento enviado';
 });
@@ -215,4 +215,5 @@ Route::group(["prefix" => "utils"], function () {
     Route::get('validated-product/stock', [ProductController::class, 'validatedProductStock'])->name('tenant.utils.validatedProductStock');
     Route::get('getListBankAccounts', [BankAccountController::class, 'getListBankAccounts'])->name('tenant.utils.getListBankAccounts');
     Route::get('is-active-invoice/{id}', [UtilController::class, 'isActiveInvoiceType'])->name('tenant.utils.isActiveInvoiceType');
+    Route::get('search-supplier', [SupplierController::class, 'searchSupplier'])->name('tenant.utils.searchSupplier');
 });
