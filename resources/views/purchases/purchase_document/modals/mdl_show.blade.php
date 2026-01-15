@@ -111,14 +111,12 @@
 
                 destroyDataTable(dtPurchaseDocumentShow);
                 clearTable('tbl_purchase_document_show');
-                dtPurchaseDocumentShow = loadDataTableSimple(dtPurchaseDocumentShow, 'tbl_purchase_document_show');
+                dtPurchaseDocumentShow = loadDataTableSimple('tbl_purchase_document_show');
             });
         }
 
         function openMdlShowPurchaseDocument(purchase_document_id) {
-
             getPurchaseDocument(purchase_document_id);
-
         }
 
         async function getPurchaseDocument(purchase_document_id) {
@@ -139,12 +137,13 @@
                 const res = await response.json();
 
                 if (res.success) {
+
                     paintPurchaseDocument(res.purchase_document);
 
-                    destroyDataTable(dtPurchaseDocumentShow);
+                    dtPurchaseDocumentShow = destroyDataTable(dtPurchaseDocumentShow);
                     clearTable('tbl_purchase_document_show');
                     paintPurchaseDocumentDetail(res.detail);
-                    dtPurchaseDocumentShow = loadDataTableSimple(dtPurchaseDocumentShow, 'tbl_purchase_document_show');
+                    dtPurchaseDocumentShow = loadDataTableSimple('tbl_purchase_document_show');
 
                     $('#mdlShowPurchaseDocument').modal('show');
                     toastr.success('MOSTRANDO DOCUMENTO DE COMPRA');
