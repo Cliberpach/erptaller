@@ -17,5 +17,11 @@ Route::group(["prefix" => "cuentas"], function () {
 
     Route::group(["prefix" => "proveedor"], function () {
         Route::get('index', [SupplierAccountController::class, 'index'])->name('tenant.cuentas.proveedor.index');
+        Route::get('/getAll', [SupplierAccountController::class, 'getAll'])->name('tenant.cuentas.proveedor.getAll');
+        Route::get('/getSupplierAccount/{id}', [SupplierAccountController::class, 'getSupplierAccount'])->name('tenant.cuentas.proveedor.getSupplierAccount');
+        Route::post('/store-pago', [SupplierAccountController::class, 'storePago'])->name('tenant.cuentas.proveedor.storePago');
+        Route::get('/pdf-one', [SupplierAccountController::class, 'pdfOne'])->name('tenant.cuentas.proveedor.pdfOne');
+        Route::get('/reporteExcel', [SupplierAccountController::class, 'reporteExcel'])->name('grifo.contabilidad.cuentas_pagar.reporteExcel');
+        Route::get('/reportePdf', [SupplierAccountController::class, 'reportePdf'])->name('grifo.contabilidad.cuentas_pagar.reportePdf');
     });
 });

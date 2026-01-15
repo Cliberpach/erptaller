@@ -120,8 +120,8 @@ class KardexDto
             $_item['sale_price']            =   $product->sale_price;
             $_item['purchase_price']        =   $item->purchase_price;
             $_item['amount']                =   $item->subtotal;
-            $_item['creator_user_id']       =   $purchase->user_recorder_id;
-            $_item['creator_user_name']     =   $purchase->user_recorder_name;
+            $_item['creator_user_id']       =   $purchase->creator_user_id;
+            $_item['creator_user_name']     =   $purchase->creator_user_name;
 
             $dto[]  =   $_item;
         }

@@ -47,23 +47,25 @@ class CheckTenantAlertsJob implements ShouldQueue
                 ->whereDate('advance_date', '<=', $today)
                 ->get();
 
+            $users  =   User::where('status', 'ACTIVO')->get();
+
             foreach ($alerts as $alert) {
-                foreach (User::where('status', 'ACTIVO')->get() as $user) {
+                foreach ($users as $user) {
 
-                    $alertUser = AlertUser::firstOrCreate([
-                        'alert_id' => $alert->id,
-                        'user_id' => $user->id,
-                    ]);
+                    $alertUser = AlertUser::firstOrCreate(
+                        [
+                            'alert_id' => $alert->id,
+                            'user_id'  => $user->id,
+                        ]
+                    );
 
-                    if ($alertUser->notified_at) {
-                        continue;
+                    if (is_null($alertUser->notified_at)) {
+                        event(new AlertCreated($alert, $user));
+
+                        $alertUser->update([
+                            'notified_at' => now(),
+                        ]);
                     }
-
-                    event(new AlertCreated($alert, $user));
-
-                    $alertUser->update([
-                        'notified_at' => now(),
-                    ]);
                 }
             }
 
@@ -77,7 +79,7 @@ class CheckTenantAlertsJob implements ShouldQueue
                 'file' => $e->getFile(),
             ]);
 
-            throw $e; 
+            throw $e;
         }
     }
 }

@@ -316,7 +316,6 @@
 
             document.querySelector('#payment_condition_id').addEventListener('change', setExpirationDate);
 
-
             window.clientSelect.on('change', function(value) {
                 actionChangeClient(value);
             });

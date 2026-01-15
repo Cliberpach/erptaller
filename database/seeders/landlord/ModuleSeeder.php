@@ -14,7 +14,7 @@ class ModuleSeeder extends Seeder
      */
     public function run(): void
     {
-        // Dashboard
+        //============ DASHBOARD ============
         $dashboard = Module::create([
             'description'   =>  'Dashboard',
             'order'         =>  '1',
@@ -28,7 +28,7 @@ class ModuleSeeder extends Seeder
             'order' => '2'
         ]);
 
-        // Caja
+        //========== CAJA =========
         $petty_cash = Module::create([
             'description'   =>  'Cajas',
             'order'         =>  '1',
@@ -57,7 +57,7 @@ class ModuleSeeder extends Seeder
         ]);
 
 
-        // Taller
+        //=========== TALLER ==========
         $taller = Module::create([
             'description'   =>  'Taller',
             'order'         =>  '1',
@@ -120,7 +120,14 @@ class ModuleSeeder extends Seeder
             'order'         => '2'
         ]);
 
-        // Ventas
+        ModuleChild::create([
+            'module_id'     => $taller->id,
+            'description'   => 'Citas',
+            'route_name'    => 'taller.citas.index',
+            'order'         => '2'
+        ]);
+
+        //========== VENTAS ============
         $sale = Module::create([
             'description'   => 'Ventas',
             'order'         => '1',
@@ -177,7 +184,7 @@ class ModuleSeeder extends Seeder
             'order'         => '2'
         ]);
 
-        // Inventario
+        //=========== INVENTARIO =========
         $inventory = Module::create([
             'description'   =>  'Inventario',
             'order'         =>  '1',
@@ -246,7 +253,7 @@ class ModuleSeeder extends Seeder
             'order'         => '2'
         ]);
 
-        // Compras
+        //============= COMPRAS =============
         $purchase = Module::create([
             'description'   =>  'Compras',
             'order'         =>  '1',
@@ -270,7 +277,7 @@ class ModuleSeeder extends Seeder
         ]);
 
 
-        // Reportes
+        //=========== REPORTES =========
         $report = Module::create([
             'description'   =>  'Reportes',
             'order'         =>  '1',
@@ -292,7 +299,7 @@ class ModuleSeeder extends Seeder
         ]);
 
 
-        // Mantenimiento
+        //========= MANTENIMIENTO ===========
         $maintenance = Module::create([
             'description'   =>  'Mantenimiento',
             'order'         =>  '1',
@@ -371,7 +378,7 @@ class ModuleSeeder extends Seeder
             'order'         => '2'
         ]);
 
-        // Consultas
+        //========== CONSULTAS ===========
         $consultas = Module::create([
             'description'   =>  'Consultas',
             'order'         =>  '1',
@@ -389,6 +396,13 @@ class ModuleSeeder extends Seeder
             'module_id' => $consultas->id,
             'description' => 'Vehículos',
             'route_name' => 'consultas.vehiculos.index',
+            'order' => '2'
+        ]);
+
+        ModuleChild::create([
+            'module_id' => $consultas->id,
+            'description' => 'Alertas',
+            'route_name' => 'consultas.notificaciones.index',
             'order' => '2'
         ]);
     }

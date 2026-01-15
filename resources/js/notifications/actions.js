@@ -1,7 +1,5 @@
-import { route } from "ziggy-js";
 import { elements, notificationState } from "./states";
 import { appendLoadingIndicator, paintNotificationCount, removeLoadingIndicator, showErrorInList, showLoadNotify, updateNotificationUI } from "./ui";
-import { routes } from "./routes";
 import { getNotificationCount, getNotifications, setNotified } from "./fetch";
 
 export async function loadNotifications() {

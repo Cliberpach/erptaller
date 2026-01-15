@@ -1,44 +1,27 @@
 <?php
 
-namespace App\Models\Tenant;
+namespace App\Models\Tenant\Accounts\SupplierAccount;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class PurchaseDocument extends Model
+class SupplierAccount extends Model
 {
     use HasFactory;
-    protected $table = 'purchase_documents';
+
+    protected $guarded = [''];
+    protected $table = 'supplier_accounts';
 
     protected $fillable = [
-        'warehouse_id',
-        'warehouse_name',
-        'delivery_date',
-        'supplier_id',
-        'supplier_name',
-        'supplier_type_document_abbreviation',
-        'supplier_document_number',
-        'user_recorder_id',
-        'user_recorder_name',
-        'condition',
-        'currency',
-        'document_type',
-        'serie',
-        'correlative',
-        'observation',
-        'prices_with_igv',
-        'igv',
-        'subtotal',
-        'amount_igv',
-        'total',
+        'purchase_id',
+        'document_number',
+        'document_date',
+        'amount',
+        'paid',
+        'balance',
         'status',
-
-        'payment_condition_id',
-        'payment_condition_name',
-        'payment_condition_days',
-        'payment_status',
-        'registration_date',
-        'expiration_date',
+        'work_order_id',
+        // 'customer_id',
 
         'creator_user_id',
         'editor_user_id',

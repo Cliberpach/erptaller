@@ -129,7 +129,7 @@ class CustomerAccountController extends Controller
         }
     }
 
-    /*
+/*
 array:11 [ // app\Http\Controllers\Tenant\Accounts\CustomerAccountController.php:115
   "_token" => "OUiVLJK4B1xxUcncLt4KMQWShWUygPIGMkm5ZTu4"
   "pago" => "A CUENTA"

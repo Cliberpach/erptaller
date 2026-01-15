@@ -23,7 +23,7 @@ return new class extends Migration
             $table->string('customer_type_document_abbreviation', 20);
             $table->string('customer_document_number', 20);
 
-            $table->unsignedBigInteger('vehicle_id')->nullable();
+            $table->unsignedBigInteger('vehicle_id');
             $table->foreign('vehicle_id')->references('id')->on('vehicles');
 
             $table->string('plate', 8);

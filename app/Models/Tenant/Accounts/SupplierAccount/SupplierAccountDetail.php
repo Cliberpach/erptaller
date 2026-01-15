@@ -1,52 +1,33 @@
 <?php
 
-namespace App\Models\Tenant;
+namespace App\Models\Tenant\Accounts\SupplierAccount;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class PurchaseDocument extends Model
+class SupplierAccountDetail extends Model
 {
     use HasFactory;
-    protected $table = 'purchase_documents';
+
+    protected $guarded = [''];
+    protected $table = 'supplier_accounts_details';
 
     protected $fillable = [
-        'warehouse_id',
-        'warehouse_name',
-        'delivery_date',
-        'supplier_id',
-        'supplier_name',
-        'supplier_type_document_abbreviation',
-        'supplier_document_number',
-        'user_recorder_id',
-        'user_recorder_name',
-        'condition',
-        'currency',
-        'document_type',
-        'serie',
-        'correlative',
+        'supplier_account_id',
+        'petty_cash_book_id',
+        'date',
         'observation',
-        'prices_with_igv',
-        'igv',
-        'subtotal',
-        'amount_igv',
+        'img_route',
         'total',
-        'status',
-
-        'payment_condition_id',
-        'payment_condition_name',
-        'payment_condition_days',
-        'payment_status',
-        'registration_date',
-        'expiration_date',
-
+        'payment_method_id',
+        'cash',
+        'amount',
+        'paid',
+        'balance',
+        'img_name',
+        'payment_method_name',
         'creator_user_id',
-        'editor_user_id',
-        'delete_user_id',
-
-        'delete_user_name',
-        'editor_user_name',
-        'creator_user_name',
+        'creator_user_name'
     ];
 
     protected static function boot()
@@ -60,7 +41,7 @@ class PurchaseDocument extends Model
             }
         });
 
-        static::updating(function ($model) {
+        /*static::updating(function ($model) {
             if (auth()->check()) {
                 $model->editor_user_id = auth()->id();
                 $model->editor_user_name = auth()->user()->name;
@@ -71,6 +52,6 @@ class PurchaseDocument extends Model
                     $model->delete_user_name = auth()->user()->name;
                 }
             }
-        });
+        });*/
     }
 }

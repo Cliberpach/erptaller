@@ -105,6 +105,8 @@
                 }
             })
 
+            document.querySelector('#payment_condition_id').addEventListener('change', setExpirationDate);
+
         }
 
         function loadSelect2() {
@@ -478,7 +480,26 @@
                 maximumFractionDigits: 2
             }).format(amount);
         }
+
+        function setExpirationDate() {
+
+            const selectCondicion = document.getElementById('payment_condition_id');
+            const inputFechaRegistro = document.querySelector('#fecha_registro');
+            const inputFechaVencimiento = document.querySelector('#expiration_date');
+
+            const selectedOption = selectCondicion.options[selectCondicion.selectedIndex];
+            const days = parseInt(selectedOption.dataset.days || 0, 10);
+
+            const [year, month, day] = inputFechaRegistro.value.split('-');
+            const fechaBase = new Date(year, month - 1, day);
+
+            fechaBase.setDate(fechaBase.getDate() + days);
+
+            const yyyy = fechaBase.getFullYear();
+            const mm = String(fechaBase.getMonth() + 1).padStart(2, '0');
+            const dd = String(fechaBase.getDate()).padStart(2, '0');
+
+            inputFechaVencimiento.value = `${yyyy}-${mm}-${dd}`;
+        }
     </script>
-    <script src="{{ asset('assets/js/utils.js') }}"></script>
-    <script src="{{ asset('assets/js/extended-ui-perfect-scrollbar.js') }}"></script>
 @endsection

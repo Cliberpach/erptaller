@@ -265,7 +265,6 @@
         window.cuentaSelect.addOptions(cuentas);
 
         window.cuentaSelect.refreshOptions(false);
-
     }
 
     function changeEfectivo() {
@@ -338,16 +337,6 @@
             }
         });
 
-        // window.mododDespachoSelect = new TomSelect("#modo_despacho", {
-        //     placeholder: "SELECCIONAR",
-        //     allowEmptyOption: false,
-        //     create: false,
-        //     maxOptions: null,
-        //     sortField: {
-        //         field: "text",
-        //         direction: "asc"
-        //     }
-        // });
     }
 
     async function getCuentasPorMetodoPago(metodoPagoId) {

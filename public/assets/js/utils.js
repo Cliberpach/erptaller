@@ -189,7 +189,7 @@ function paintValidationErrors(objValidationErrors, suffix) {
 
 function loadDataTableSimple(id) {
     const dtTable = new DataTable(`#${id}`, {
-        pageLength:50,
+        pageLength: 50,
         language: {
             "lengthMenu": "Mostrar _MENU_ registros por página",
             "zeroRecords": "No se encontraron resultados",
@@ -295,3 +295,20 @@ function setText(selectInstance, text) {
         }
     }
 }
+
+
+function formatDateTime(dateString) {
+    if (!dateString) return '';
+
+    const date = new Date(dateString);
+
+    return date.toLocaleString('es-PE', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+    });
+}
+

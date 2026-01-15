@@ -170,8 +170,8 @@ class NotificationController extends Controller
             $alert_id   =   $request->get('alert_id');
             $userId     =   auth()->id();
 
-            $alert  =   Alert::findOrFail($alert_id);
-            $alertUser = AlertUser::firstOrCreate(
+            $alert      =   Alert::findOrFail($alert_id);
+            $alertUser  =   AlertUser::firstOrCreate(
                 [
                     'alert_id' => $alert->id,
                     'user_id'  => $userId,
