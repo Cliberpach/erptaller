@@ -29,7 +29,6 @@ class PurchaseDto
         $dto['supplier_name']                       =   $supplier->name;
         $dto['supplier_type_document_abbreviation'] =   $supplier->type_document_abbreviation;
         $dto['supplier_document_number']            =   $supplier->document_number;
-        $dto['condition']                           =   'CONTADO';
         $dto['currency']                            =   $data['moneda'];
         $dto['document_type']                       =   $data['tipo_doc'];
         $dto['serie']                               =   $data['serie'];
@@ -53,6 +52,8 @@ class PurchaseDto
         $dto['payment_condition_name']  =   $payment_condition->name;
         $dto['payment_condition_days']  =   $payment_condition->nro_days;
         $dto['expiration_date']         =   $expiration_date;
+
+        $dto['payment_status']          =   $payment_condition->name === 'CONTADO' ? 'PAGADO' : 'PENDIENTE';
         return $dto;
     }
 

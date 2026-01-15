@@ -61,15 +61,15 @@
                 ],
                 columns: [{
                         data: 'id',
-                        name: 'id',
-                        searchable:false,
-                        orderable:true
+                        name: 'pd.id',
+                        searchable: false,
+                        orderable: true
                     },
                     {
                         data: 'delivery_date',
-                        name: 'delivery_date',
-                        searchable:true,
-                        orderable:true
+                        name: 'pd.delivery_date',
+                        searchable: true,
+                        orderable: true
                     },
                     {
                         data: null,
@@ -85,16 +85,16 @@
                         searchable: false
                     },
                     {
-                        data: 'condition',
-                        name: 'condition',
-                        searchable:true,
-                        orderable:true
+                        data: 'payment_condition_name',
+                        name: 'pd.payment_condition_name',
+                        searchable: true,
+                        orderable: true
                     },
                     {
                         data: 'currency',
-                        name: 'currency',
-                        searchable:false,
-                        orderable:false
+                        name: 'pd.currency',
+                        searchable: false,
+                        orderable: false
                     },
                     {
                         data: null,
@@ -110,10 +110,27 @@
                         searchable: false
                     },
                     {
+                        data: 'payment_status',
+                        name: 'pd.payment_status',
+                        searchable: false,
+                        orderable: false,
+                        render: function(data) {
+                            if (data === 'PAGADO') {
+                                return '<span class="badge bg-primary">PAGADO</span>';
+                            }
+
+                            if (data === 'PENDIENTE') {
+                                return '<span class="badge bg-danger">PENDIENTE</span>';
+                            }
+
+                            return data;
+                        }
+                    },
+                    {
                         data: 'observation',
-                        name: 'observation',
-                        searchable:false,
-                        orderable:false
+                        name: 'pd.observation',
+                        searchable: false,
+                        orderable: false
                     },
                     {
                         data: null,

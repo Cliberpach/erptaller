@@ -32,21 +32,23 @@ class PurchaseDocumentoController extends Controller
 
     public function getPurchaseDocuments(Request $request)
     {
-        $purchase_documents  =    DB::table('purchase_documents as dp')
+        $purchase_documents  =    DB::table('purchase_documents as pd')
             ->select(
-                'dp.id',
-                'dp.delivery_date',
-                'dp.supplier_name',
-                'dp.supplier_type_document_abbreviation',
-                'dp.supplier_document_number',
-                'dp.condition',
-                'dp.currency',
-                'dp.document_type',
-                'dp.serie',
-                'dp.correlative',
-                'dp.observation'
+                'pd.id',
+                'pd.delivery_date',
+                'pd.supplier_name',
+                'pd.supplier_type_document_abbreviation',
+                'pd.supplier_document_number',
+                'pd.currency',
+                'pd.document_type',
+                'pd.serie',
+                'pd.correlative',
+                'pd.observation',
+                'pd.payment_status',
+                'pd.payment_condition_name',
+                'pd.payment_status'
             )
-            ->where('dp.status', '!=', 'ANULADO');
+            ->where('pd.status', '!=', 'ANULADO');
 
         return DataTables::of($purchase_documents)->make(true);
     }

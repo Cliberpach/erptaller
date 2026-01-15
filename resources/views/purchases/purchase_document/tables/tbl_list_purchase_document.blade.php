@@ -7,6 +7,7 @@
         <th class="minw-100px">CONDICIÓN</th>
         <th class="minw-100px">MONEDA</th>
         <th class="minw-100px">DOCUMENTO</th>
+        <th class="minw-200px">PAGO</th>
         <th class="minw-200px">OBS</th>
         <th scope="col">ACCIÓN</th>
       </tr>
