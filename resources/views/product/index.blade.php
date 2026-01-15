@@ -8,6 +8,10 @@
     <link rel="stylesheet" href="{{ asset('assets/css/styles.css') }}">
 @endsection
 
+@push('js-head')
+    @vite(['resources/js/libs/filepond.js'])
+@endpush
+
 @section('content')
     @include('utils.lightbox.lightbox')
     @include('product.modals.mdl_create')
