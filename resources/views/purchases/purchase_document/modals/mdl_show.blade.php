@@ -91,107 +91,107 @@
     </div>
 </div>
 
+@push('js-script')
+    <script>
+        let dtPurchaseDocumentShow = null;
 
-<script>
-    let dtPurchaseDocumentShow = null;
+        function eventsMdlPurchaseDocumentShow() {
+            document.getElementById('mdlShowPurchaseDocument').addEventListener('hidden.bs.modal', () => {
 
-    function eventsMdlPurchaseDocumentShow() {
-        document.getElementById('mdlShowPurchaseDocument').addEventListener('hidden.bs.modal', () => {
+                const dataFields = [
+                    'noteId', 'userRecorderName', 'observation', 'estado',
+                    'createdAt', 'updatedAt', 'supplierName', 'supplierDocument',
+                    'condition', 'currency', 'documentType', 'documentNumber',
+                    'igv', 'subtotal', 'amountIgv', 'total', 'pricesWithIgv'
+                ];
 
-            const dataFields = [
-                'noteId', 'userRecorderName', 'observation', 'estado',
-                'createdAt', 'updatedAt', 'supplierName', 'supplierDocument',
-                'condition', 'currency', 'documentType', 'documentNumber',
-                'igv', 'subtotal', 'amountIgv', 'total', 'pricesWithIgv'
-            ];
-
-            dataFields.forEach(fieldId => {
-                document.getElementById(fieldId).textContent = '';
-            });
-
-            destroyDataTable(dtPurchaseDocumentShow);
-            clearTable('tbl_purchase_document_show');
-            dtPurchaseDocumentShow = loadDataTableSimple(dtPurchaseDocumentShow, 'tbl_purchase_document_show');
-        });
-    }
-
-    function openMdlShowPurchaseDocument(purchase_document_id) {
-
-        getPurchaseDocument(purchase_document_id);
-
-    }
-
-    async function getPurchaseDocument(purchase_document_id) {
-        try {
-            toastr.clear();
-            mostrarAnimacion1();
-            const token = document.querySelector('input[name="_token"]').value;
-            const urlGetPurchaseDocument = @json(route('tenant.compras.documento_compra.show', ['id' => 'ID']));
-            const url = urlGetPurchaseDocument.replace('ID', purchase_document_id);
-
-            const response = await fetch(url, {
-                method: 'GET',
-                headers: {
-                    'X-CSRF-TOKEN': token
-                }
-            });
-
-            const res = await response.json();
-
-            if (res.success) {
-                paintPurchaseDocument(res.purchase_document);
+                dataFields.forEach(fieldId => {
+                    document.getElementById(fieldId).textContent = '';
+                });
 
                 destroyDataTable(dtPurchaseDocumentShow);
                 clearTable('tbl_purchase_document_show');
-                paintPurchaseDocumentDetail(res.detail);
                 dtPurchaseDocumentShow = loadDataTableSimple(dtPurchaseDocumentShow, 'tbl_purchase_document_show');
-
-                $('#mdlShowPurchaseDocument').modal('show');
-                toastr.success('MOSTRANDO DOCUMENTO DE COMPRA');
-            } else {
-                toastr.error(res.message, 'ERROR EN EL SERVIDOR');
-            }
-
-        } catch (error) {
-            toastr.error(error, 'ERROR EN LA PETICIÓN VER DOCUMENTO DE COMPRA');
-        } finally {
-            ocultarAnimacion1();
+            });
         }
-    }
 
-    function paintPurchaseDocument(purchase_document) {
-        document.getElementById('noteId').textContent = purchase_document.id;
-        document.getElementById('userRecorderName').textContent = purchase_document.user_recorder_name;
-        document.getElementById('observation').textContent = purchase_document.observation;
-        document.getElementById('estado').textContent = purchase_document.estado;
-        document.getElementById('createdAt').textContent = purchase_document.created_at;
-        document.getElementById('updatedAt').textContent = purchase_document.updated_at;
+        function openMdlShowPurchaseDocument(purchase_document_id) {
 
-        document.getElementById('supplierName').textContent = purchase_document.supplier_name;
-        document.getElementById('supplierDocument').textContent =
-            `${purchase_document.supplier_type_document_abbreviation} ${purchase_document.supplier_document_number}`;
-        document.getElementById('condition').textContent = purchase_document.condition;
-        document.getElementById('currency').textContent = purchase_document.currency;
-        document.getElementById('documentType').textContent = purchase_document.document_type;
-        document.getElementById('documentNumber').textContent =
-            `${purchase_document.serie}-${purchase_document.correlative}`;
-        document.getElementById('igv').textContent = `${parseFloat(purchase_document.igv).toFixed(2)}%`;
-        document.getElementById('subtotal').textContent = parseFloat(purchase_document.subtotal).toFixed(2);
-        document.getElementById('amountIgv').textContent = parseFloat(purchase_document.amount_igv).toFixed(2);
-        document.getElementById('total').textContent = parseFloat(purchase_document.total).toFixed(2);
-        document.getElementById('pricesWithIgv').textContent =
-            purchase_document.prices_with_igv === 1 ? "Sí" : "No";
-    }
+            getPurchaseDocument(purchase_document_id);
+
+        }
+
+        async function getPurchaseDocument(purchase_document_id) {
+            try {
+                toastr.clear();
+                mostrarAnimacion1();
+                const token = document.querySelector('input[name="_token"]').value;
+                const urlGetPurchaseDocument = @json(route('tenant.compras.documento_compra.show', ['id' => 'ID']));
+                const url = urlGetPurchaseDocument.replace('ID', purchase_document_id);
+
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'X-CSRF-TOKEN': token
+                    }
+                });
+
+                const res = await response.json();
+
+                if (res.success) {
+                    paintPurchaseDocument(res.purchase_document);
+
+                    destroyDataTable(dtPurchaseDocumentShow);
+                    clearTable('tbl_purchase_document_show');
+                    paintPurchaseDocumentDetail(res.detail);
+                    dtPurchaseDocumentShow = loadDataTableSimple(dtPurchaseDocumentShow, 'tbl_purchase_document_show');
+
+                    $('#mdlShowPurchaseDocument').modal('show');
+                    toastr.success('MOSTRANDO DOCUMENTO DE COMPRA');
+                } else {
+                    toastr.error(res.message, 'ERROR EN EL SERVIDOR');
+                }
+
+            } catch (error) {
+                toastr.error(error, 'ERROR EN LA PETICIÓN VER DOCUMENTO DE COMPRA');
+            } finally {
+                ocultarAnimacion1();
+            }
+        }
+
+        function paintPurchaseDocument(purchase_document) {
+            document.getElementById('noteId').textContent = purchase_document.id;
+            document.getElementById('userRecorderName').textContent = purchase_document.user_recorder_name;
+            document.getElementById('observation').textContent = purchase_document.observation;
+            document.getElementById('estado').textContent = purchase_document.estado;
+            document.getElementById('createdAt').textContent = purchase_document.created_at;
+            document.getElementById('updatedAt').textContent = purchase_document.updated_at;
+
+            document.getElementById('supplierName').textContent = purchase_document.supplier_name;
+            document.getElementById('supplierDocument').textContent =
+                `${purchase_document.supplier_type_document_abbreviation} ${purchase_document.supplier_document_number}`;
+            document.getElementById('condition').textContent = purchase_document.condition;
+            document.getElementById('currency').textContent = purchase_document.currency;
+            document.getElementById('documentType').textContent = purchase_document.document_type;
+            document.getElementById('documentNumber').textContent =
+                `${purchase_document.serie}-${purchase_document.correlative}`;
+            document.getElementById('igv').textContent = `${parseFloat(purchase_document.igv).toFixed(2)}%`;
+            document.getElementById('subtotal').textContent = parseFloat(purchase_document.subtotal).toFixed(2);
+            document.getElementById('amountIgv').textContent = parseFloat(purchase_document.amount_igv).toFixed(2);
+            document.getElementById('total').textContent = parseFloat(purchase_document.total).toFixed(2);
+            document.getElementById('pricesWithIgv').textContent =
+                purchase_document.prices_with_igv === 1 ? "Sí" : "No";
+        }
 
 
-    function paintPurchaseDocumentDetail(details) {
+        function paintPurchaseDocumentDetail(details) {
 
-        const tbody = document.querySelector("#tbl_purchase_document_show tbody");
+            const tbody = document.querySelector("#tbl_purchase_document_show tbody");
 
-        details.forEach(detail => {
-            const row = document.createElement("tr");
+            details.forEach(detail => {
+                const row = document.createElement("tr");
 
-            row.innerHTML = `
+                row.innerHTML = `
                 <td>${detail.product_name}</td>
                 <td>${detail.category_name}</td>
                 <td>${detail.brand_name}</td>
@@ -200,8 +200,9 @@
                 <td>${parseFloat(detail.subtotal).toFixed(2)}</td>
             `;
 
-            tbody.appendChild(row);
-        });
+                tbody.appendChild(row);
+            });
 
-    }
-</script>
+        }
+    </script>
+@endpush
