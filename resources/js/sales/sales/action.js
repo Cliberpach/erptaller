@@ -1,7 +1,9 @@
 import Swal from "sweetalert2";
 import { routes } from "./routes";
-import { amounts, app, dtProducts, lstPays, lstSale } from "./states";
-import { paintLstPays, paintTableAmounts, paintTableSaleDetail } from "./ui";
+import { amounts, app, debounceTimer, dtProducts, lstPays, lstSale, setDebounceTimer } from "./states";
+import { paintLstPays, paintProductAmount, paintTableAmounts, paintTableSaleDetail } from "./ui";
+import { validateStock } from "./fetch";
+import { actionChangeClient } from "../../utils/action";
 
 export function actionAmountPay(e) {
     const indexPay = e.target.getAttribute('data-index');
@@ -27,103 +29,69 @@ export function actionAddPay() {
 }
 
 export function actionCantProduct(e) {
-    if (e.target.classList.contains('inputCantProduct')) {
 
-        clearTimeout(debounceTimer);
+    clearTimeout(debounceTimer);
 
+    mostrarAnimacion1();
+    toastr.clear();
+
+    e.target.blur();
+    const product_id = e.target.getAttribute('data-id');
+    let cant = e.target.value;
+
+    //========= VALIDANDO CANTIDAD =======
+    //========= NO PERMITIR 0 ; COLOCAR 1 POR DEFECTO ======
+    if (isNaN(parseFloat(cant))) {
+        e.target.focus();
+        ocultarAnimacion1();
+        return;
+    }
+
+    if (!isNaN(parseFloat(cant)) && cant <= 0) {
+        cant = 1;
+        e.target.value = cant;
+    }
+
+    e.target.focus();
+    ocultarAnimacion1();
+
+    const _debounceTimer = setTimeout(async () => {
         mostrarAnimacion1();
-        toastr.clear();
+        const product = {
+            product_id,
+            cant
+        };
+        let finalQuantity = cant;
 
-        e.target.blur();
-        const product_id = e.target.getAttribute('data-id');
-        let cant = e.target.value;
+        const resValidateStock = await validateStock(product);
 
-        //========= VALIDANDO CANTIDAD =======
-        //========= NO PERMITIR 0 ; COLOCAR 1 POR DEFECTO ======
-        if (isNaN(parseFloat(cant))) {
-            e.target.focus();
-            ocultarAnimacion1();
-            return;
+        if (resValidateStock.success) {
+            toastr.success(resValidateStock.message, 'OPERACIÓN COMPLETADA');
+        } else {
+            toastr.error(resValidateStock.message, 'ERROR EN EL SERVIDOR');
+            e.target.value = resValidateStock.stock;
+            finalQuantity = resValidateStock.stock;
         }
 
-        if (!isNaN(parseFloat(cant)) && cant <= 0) {
-            cant = 1;
-            e.target.value = cant;
-        }
+        const indexProduct = lstSale.findIndex((p) => {
+            return p.id == product_id
+        });
+        lstSale[indexProduct].cant = finalQuantity;
+        calculatePrices(lstSale);
+        paintTableAmounts();
+
+        //========= ACTUALIZANDO IMPORTE EN SALE TABLE DETAIL =======
+        paintProductAmount(lstSale[indexProduct]);
+
+        lstPays[0].amount = parseFloat(amounts.total.toFixed(2));
+        paintLstPays(lstPays);
 
         e.target.focus();
         ocultarAnimacion1();
+    }, 1200);
 
-        debounceTimer = setTimeout(async () => {
-            mostrarAnimacion1();
-            const product = {
-                product_id,
-                cant
-            };
-            const resValidateStock = await validateStock(product);
+    setDebounceTimer(_debounceTimer);
 
-            if (resValidateStock.success) {
-
-                //========= ESTABLECIENDO NUEVA CANTIDAD EN EL DETALLE DE LA VENTA ======
-                const indexProduct = lstSale.findIndex((p) => {
-                    return p.id == product_id
-                });
-
-                lstSale[indexProduct].cant = cant;
-                calculatePrices(lstSale);
-                paintTableAmounts();
-
-                //========= ACTUALIZANDO IMPORTE EN SALE TABLE DETAIL =======
-                const inputAmountProduct = document.querySelector(
-                    `.amount_product_${product_id}`);
-                const amount_product = parseFloat(lstSale[indexProduct].sale_price) *
-                    parseFloat(lstSale[indexProduct].cant);
-                const amount_formatted = amount_product.toLocaleString('es-PE', {
-                    style: 'currency',
-                    currency: 'PEN',
-                    minimumFractionDigits: 2
-                });
-                inputAmountProduct.value = amount_formatted;
-
-                lstPays[0].amount = parseFloat(amounts.total.toFixed(2));
-                paintLstPays(lstPays);
-
-                toastr.success(resValidateStock.message, 'OPERACIÓN COMPLETADA');
-            } else {
-
-                toastr.error(resValidateStock.message, 'ERROR EN EL SERVIDOR');
-
-                //======== COLOCANDO STOCK EN EL INPUT DE CANTIDAD =======
-                e.target.value = resValidateStock.stock;
-
-                const indexProduct = lstSale.findIndex((p) => {
-                    return p.id == product_id
-                });
-                lstSale[indexProduct].cant = resValidateStock.stock;
-                calculatePrices(lstSale);
-                paintTableAmounts();
-
-                //========= ACTUALIZANDO IMPORTE EN SALE TABLE DETAIL =======
-                const inputAmountProduct = document.querySelector(
-                    `.amount_product_${product_id}`);
-                const amount_product = parseFloat(lstSale[indexProduct].sale_price) *
-                    parseFloat(lstSale[indexProduct].cant);
-                const amount_formatted = amount_product.toLocaleString('es-PE', {
-                    style: 'currency',
-                    currency: 'PEN',
-                    minimumFractionDigits: 2
-                });
-                inputAmountProduct.value = amount_formatted;
-
-                lstPays[0].amount = parseFloat(amounts.total.toFixed(2));
-                paintLstPays(lstPays);
-            }
-
-            e.target.focus();
-            ocultarAnimacion1();
-        }, 1200);
-
-    }
 }
 
 export function actionStore(e) {
@@ -237,7 +205,6 @@ function validationLstPays() {
     return validation;
 }
 
-
 function storeSale(formStore) {
     clearValidationErrors();
 
@@ -321,7 +288,6 @@ function storeSale(formStore) {
     });
 }
 
-
 export function actionDeletePay(e) {
     const btn = e.target.closest('.btn_delete_pay');
     const indexPay = btn.dataset.index;
@@ -377,7 +343,6 @@ const calculatePrices = (lstItems) => {
     amounts.monto_igv = monto_igv;
     amounts.total = total;
 }
-
 
 export async function actionAddProduct(e) {
     const product_id = e.target.getAttribute('data-id');
@@ -470,31 +435,6 @@ function hidePayRow() {
     rowPay.classList.add('hide');
 }
 
-export async function actionChangeClient(value) {
-
-    if (!value) return;
-
-    mostrarAnimacion1();
-    try {
-
-        const res = await axios.get(route('tenant.utils.searchVehicle', {
-            q: '',
-            customer_id: value
-        }));
-
-        if (res.data.success) {
-            toastr.info(res.data.message, 'OPERACIÓN COMPLETADA');
-            setVehiclesClient(res.data.data);
-        }
-
-    } catch (error) {
-        toastr.error(error, 'ERROR AL CARGAR VEHÍCULOS DEL CLIENTE');
-        return;
-    } finally {
-        ocultarAnimacion1();
-    }
-}
-
 export async function actionChangeVehicle(value) {
     document.querySelector('#plate').value = '';
     const vehicleInfo = document.querySelector('#vehicle_info');
@@ -531,20 +471,6 @@ export async function actionChangeVehicle(value) {
     }
 }
 
-function setVehiclesClient(vehicles) {
-    window.vehicleSelect.clear();
-    window.vehicleSelect.clearOptions();
-
-    vehicles.forEach(v => {
-        window.vehicleSelect.addOption({
-            id: v.id,
-            text: v.text,
-            subtext: v.subtext
-        });
-    });
-}
-
-
 function setCustomerOfVehicle(customer) {
     window.clientSelect.clear();
     window.clientSelect.clearOptions();
@@ -570,36 +496,6 @@ export function actionChangeMethodPay(e) {
     const value = e.target.value;
 
     lstPays[index].method_pay = value;
-}
-
-async function validateStock(product) {
-    try {
-
-        const token = document.querySelector('input[name="_token"]').value;
-        const urlValidateStock = new URL(routes.validateStock);
-
-        Object.keys(product).forEach(key => {
-            urlValidateStock.searchParams.append(key, product[key]);
-        });
-
-        const response = await fetch(urlValidateStock, {
-            method: 'GET',
-            headers: {
-                'X-CSRF-TOKEN': token
-            },
-        });
-
-        const res = await response.json();
-
-        return res;
-
-    } catch (error) {
-        toastr.error(error, 'ERROR EN LA PETICIÓN VALIDAR STOCK');
-        return {
-            success: false,
-            message: error
-        };
-    }
 }
 
 const addProductToCar = (product, indexProductExists, cant) => {

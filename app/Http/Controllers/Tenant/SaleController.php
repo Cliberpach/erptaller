@@ -24,6 +24,8 @@ use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\File;
 use Throwable;
 
+use function Symfony\Component\Translation\t;
+
 class SaleController extends Controller
 {
     protected SaleManager $s_sale;
@@ -176,13 +178,12 @@ class SaleController extends Controller
     {
         try {
 
-            $product    =   DB::select(
-                'select
+            $product    =   DB::select('SELECT
                             wp.*
-                            from warehouse_products as wp
-                            where
+                            FROM warehouse_products AS wp
+                            WHERE
                             wp.product_id = ?
-                            and wp.warehouse_id = "1"',
+                            AND wp.warehouse_id = "1"',
                 [$request->get('product_id')]
             );
 
@@ -202,7 +203,7 @@ class SaleController extends Controller
             }
 
             return response()->json(['success' => true, 'message' => "CANTIDAD VÁLIDA"]);
-        } catch (\Throwable $th) {
+        } catch (Throwable $th) {
             return response()->json(['success' => false, 'message' => $th->getMessage(), 'stock' => 0]);
         }
     }

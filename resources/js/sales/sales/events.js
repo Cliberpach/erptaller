@@ -1,4 +1,5 @@
-import { actionAddPay, actionAddProduct, actionAmountPay, actionCantProduct, actionChangeClient, actionChangeMethodPay, actionChangeVehicle, actionDeletePay, actionDeleteProduct, actionPaymentCondition, actionRemoveProduct, actionStore } from "./action";
+import { actionChangeClient } from "../../utils/action";
+import { actionAddPay, actionAddProduct, actionAmountPay, actionCantProduct, actionChangeMethodPay, actionChangeVehicle, actionDeletePay, actionDeleteProduct, actionPaymentCondition, actionRemoveProduct, actionStore } from "./action";
 import { app } from "./states";
 
 export function events() {
@@ -68,7 +69,9 @@ function eventsChange() {
 
 function eventsInput() {
     document.addEventListener('input', async (e) => {
-        actionCantProduct(e);
+        if (e.target.classList.contains('inputCantProduct')) {
+            actionCantProduct(e);
+        }
     })
 
     document.querySelector('#form-store').addEventListener('submit', (e) => {

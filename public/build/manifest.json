@@ -97,7 +97,7 @@
     "src": "resources/js/notifications/main.js"
   },
   "resources/js/sales/sales/main.js": {
-    "file": "assets/main-e1db94b8.js",
+    "file": "assets/main-40fe1a4d.js",
     "imports": [
       "_index-dd82ac63.js",
       "_sweetalert2.esm.all-f89f7467.js"

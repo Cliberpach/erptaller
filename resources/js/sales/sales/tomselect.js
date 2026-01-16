@@ -1,4 +1,5 @@
-import { app } from "./states";
+import { routesUtil } from "../../utils/routes";
+import { app, lastCustomerQuery, lastVehicleQuery, setLastCustomerQuery, setLastVehicleQuery } from "./states";
 
 export function loadTomSelect() {
 
@@ -15,12 +16,12 @@ export function loadTomSelect() {
         create: false,
         preload: false,
         onType: (str) => {
-            lastCustomerQuery = str;
+            setLastCustomerQuery(str);
         },
         load: async (query, callback) => {
             if (query.length < 3) return callback();
             try {
-                const url = `{{ route('tenant.utils.searchCustomer') }}?q=${encodeURIComponent(query)}`;
+                const url = routesUtil.searchCustomer(query, null);
                 const response = await fetch(url);
                 if (!response.ok) throw new Error('Error al buscar clientes');
                 const data = await response.json();
@@ -64,7 +65,7 @@ export function loadTomSelect() {
         create: false,
         preload: false,
         onType: (str) => {
-            lastVehicleQuery = str;
+            setLastVehicleQuery(str);
         },
         load: async (query, callback) => {
             if (!query.length) return callback();

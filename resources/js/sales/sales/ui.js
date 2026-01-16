@@ -99,3 +99,15 @@ export const paintTableAmounts = () => {
     });
 
 }
+
+export function paintProductAmount(product) {
+    console.log('PRODUCT',product)
+    const inputAmountProduct = document.querySelector(`.amount_product_${product.id}`);
+    const amount_product = parseFloat(product.sale_price) * parseFloat(product.cant);
+    const amount_formatted = amount_product.toLocaleString('es-PE', {
+        style: 'currency',
+        currency: 'PEN',
+        minimumFractionDigits: 2
+    });
+    inputAmountProduct.value = amount_formatted;
+}
