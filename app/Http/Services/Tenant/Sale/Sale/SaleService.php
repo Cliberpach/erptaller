@@ -47,17 +47,15 @@ class SaleService
         //======= OBTENIENDO MONTOS GLOBALES =======
         $amounts                =       $this->s_calculations->calculateAmounts($validated_data->lstSale, $validated_data->igv_percentage);
 
-        $lstPays                =       json_decode($data['lstPays']);
-        $validated_pays         =       $this->s_validations->validationLstPays($lstPays, $amounts);
+        $validated_data         =       $this->s_validations->validationLstPays($validated_data, $amounts);
 
         //========= OBTENIENDO CORRELATIVO Y SERIE =========
-        $data_correlative       =       $this->s_correlative->getCorrelative($validated_data->type_sale_id);
-
+        $validated_data->data_correlative   =   $this->s_correlative->getCorrelative($validated_data->type_sale_id);
         //====== LEGENDA ========
-        $legend                 =       NumberToLettersController::numberToLetters($amounts->total);
+        $validated_data->legend             =   NumberToLettersController::numberToLetters($amounts->total);
 
         //======= GUARDAR MAESTRO VENTA =======
-        $dto                    =       $this->s_dto->getDtoStore($validated_data, $amounts, $legend, $validated_pays, $data_correlative);
+        $dto                    =       $this->s_dto->getDtoStore($validated_data, $amounts);
         $sale                   =       $this->s_repository->insertSale($dto);
 
         //========= REGISTRAR DETALLE TYPE PRODUCTOS =======
@@ -74,7 +72,7 @@ class SaleService
         }
 
         $this->s_kardex->storeFromSale($sale);
-
+       
         return $sale;
     }
 

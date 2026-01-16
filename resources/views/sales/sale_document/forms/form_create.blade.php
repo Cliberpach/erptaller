@@ -119,19 +119,18 @@
                             <p class="igv-amount"></p>
                         </div>
                     </div>
-                    <div class="row mb-3">
-                        <div class="table-responsive">
-                            @include('sales.sale_document.tables.tbl_pay')
-                        </div>
-                    </div>
-                    <div class="row mb-3">
+                    <div class="row mb-3 row-pay">
                         <div class="col-12">
-                            <button class="btn btn-primary btnAddPay">
+                            <div class="table-responsive">
+                                @include('sales.sale_document.tables.tbl_pay')
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <button class="btn btn-primary btnAddPay" type="button">
                                 <i class="fas fa-plus"></i> Agregar pago
                             </button>
                         </div>
                     </div>
-
                     <div class="row mt-3">
                         <div class="col-12">
                             <button type="submit" form="form-store"

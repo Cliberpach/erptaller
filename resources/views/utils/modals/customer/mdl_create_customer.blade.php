@@ -45,7 +45,7 @@
         documentSearchCustomer: null
     };
 
-    function iniciarSelect2() {
+    function loadSelectsMdlCustomer() {
         $('.select2_form_customer').select2({
             theme: "bootstrap-5",
             width: $(this).data('width') ? $(this).data('width') : $(this).hasClass('w-100') ? '100%' : 'style',
@@ -55,7 +55,7 @@
     }
 
     function eventsMdlCreateCustomer() {
-        iniciarSelect2();
+        loadSelectsMdlCustomer();
         setDefaultData();
 
         document.querySelector('#formStoreCustomer').addEventListener('submit', (e) => {

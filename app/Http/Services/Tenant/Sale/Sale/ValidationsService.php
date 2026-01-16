@@ -2,10 +2,10 @@
 
 namespace App\Http\Services\Tenant\Sale\Sale;
 
+use App\Http\Services\Tenant\Cash\PettyCashBook\PettyCashBookService;
 use App\Models\Company;
 use App\Models\Landlord\Customer;
 use App\Models\Landlord\GeneralTable\GeneralTableDetail;
-use App\Models\Product;
 use App\Models\Tenant\Sale\PaymentCondition\PaymentCondition;
 use App\Models\User;
 use Exception;
@@ -49,53 +49,31 @@ class ValidationsService
             throw new Exception("EL USUARIO REGISTRADOR NO EXISTE EN LA BD!!!");
         }
 
-        //======= VALIDANDO USUARIO ACTUAL DEBE ESTAR EN UNA CAJA APERTURADA =======
-        $user_in_petty_cash =   DB::select(
-            'SELECT
-                                pc.name as petty_cash_name,
-                                pcb.petty_cash_id,
-                                pcb.id as petty_cash_book_id,
-                                pcb.status
-                                from petty_cash_books as pcb
-                                inner join petty_cashes as pc on pc.id = pcb.petty_cash_id
-                                where
-                                pcb.user_id = ?
-                                and pcb.status = "ABIERTO"',
-            [$user_recorder->id]
-        );
+        $cash_service   =   new PettyCashBookService();
+        $petty_cash     =   $cash_service->getCashBookUser($user_recorder->id);
 
-        if (count($user_in_petty_cash) === 0) {
+        if (!$petty_cash) {
             throw new Exception("EL USUARIO NO SE ENCUENTRA EN UNA CAJA APERTURADA!!!");
         }
 
         //======= VALIDACION TIPO DE VENTA Y CLIENTE =========
         $type_sale      =   GeneralTableDetail::findOrFail($data['type_sale']);
         $type_sale_name =   null;
-        $customer_id    =   $data['customer_id'];
 
-        $customer       =   DB::connection('landlord')->select('select
-                            c.id,
-                            c.document_number,
-                            c.name,
-                            c.phone,
-                            c.type_document_abbreviation,
-                            c.type_document_code as type_document_code
-                            from customers as c
-                            where c.id = ?', [$customer_id]);
+        $customer       =   Customer::findOrFail($data['customer_id']);
 
         //======== RUC Y BOLETA ======
-        if ($customer[0]->type_document_abbreviation === 'RUC' && $type_sale->id == '3') {
+        if ($customer->type_document_abbreviation === 'RUC' && $type_sale->id == '3') {
             throw new Exception("NO SE PERMITEN BOLETAS DE VENTA CON RUC!!!");
         }
 
         //======== DNI Y FACTURA ======
-        if ($customer[0]->type_document_abbreviation === 'DNI' && $type_sale->id == '1') {
+        if ($customer->type_document_abbreviation === 'DNI' && $type_sale->id == '1') {
             throw new Exception("NO SE PERMITEN FACTURAS DE VENTA CON DNI!!!");
         }
 
 
         $type_sale_name =   $type_sale->name;
-
 
         //======= VALIDANDO DETALLE DE LA VENTA =======
         $lstSale    =   json_decode($data['lstSale']);
@@ -115,10 +93,14 @@ class ValidationsService
         $nro_days               =   (int) $payment_condition->nro_days;
         $expiration_date        =   $registration_date->copy()->addDays($nro_days);
 
+
+        $lst_pays               =   json_decode($data['lstPays']);
+
+
         return (object)[
-            'customer'          =>  $customer[0],
+            'customer'          =>  $customer,
             'user_recorder'     =>  $user_recorder,
-            'petty_cash'        =>  $user_in_petty_cash[0],
+            'petty_cash'        =>  $petty_cash,
             'type_sale_id'      =>  $type_sale->id,
             'type_sale_code'    =>  $type_sale->symbol,
             'type_sale_name'    =>  $type_sale_name,
@@ -131,20 +113,32 @@ class ValidationsService
             'payment_condition' =>  $payment_condition,
 
             'vehicle_id'        =>  $data['vehicle_id'],
-            'plate'             =>  $data['plate']
+            'plate'             =>  $data['plate'],
+            'lst_pays'          =>  $lst_pays
         ];
     }
 
-    public static function validationLstPays(array $lstPays, object $amounts):array
+    public static function validationLstPays(object $data, object $amounts): object
     {
+        $lst_pays               =   $data->lst_pays;
+        $payment_condition_id   =   $data->payment_condition->id;
 
-        $methodPays =   array_column($lstPays, 'method_pay');
+        $methodPays             =   array_column($lst_pays, 'method_pay');
 
-        if (count($lstPays) === 0) {
+        if ($payment_condition_id !== 1) {
+            $lst_pays  =   [
+                (object)['method_pay' => 1, 'amount' => 0],
+                (object)['method_pay' => 1, 'amount' => 0]
+            ];
+            $data->lst_pays =   $lst_pays;
+            return $data;
+        }
+
+        if (count($lst_pays) === 0) {
             throw new Exception("El listado de pagos está vacío!!!");
         }
 
-        if (count($lstPays) > 2) {
+        if (count($lst_pays) > 2) {
             throw new Exception("Solo se aceptan 2 pagos como máximo!!!");
         }
 
@@ -154,7 +148,7 @@ class ValidationsService
 
         $totalAmount    =   0;
         $indexPay       =   0;
-        foreach ($lstPays as $pay) {
+        foreach ($lst_pays as $pay) {
             $indexPay++;
             $existsPaymentMethod = DB::table('payment_methods')->where('id', $pay->method_pay)->exists();
             if (!$existsPaymentMethod) {
@@ -171,12 +165,12 @@ class ValidationsService
             throw new Exception("La suma de los pagos no coincide con el total.");
         }
 
-        $lstPays[]  =   (object)['method_pay' => null, 'amount' => null];
-
-        return $lstPays;
+        $lst_pays[]  =   (object)['method_pay' => null, 'amount' => null];
+        $data->lst_pays =   $lst_pays;
+        return $data;
     }
 
-       public static function validationStoreFromOrder($data): array
+    public static function validationStoreFromOrder($data): array
     {
         //======= VALIDACION TIPO DE VENTA Y CLIENTE =========
         $type_sale      =   $data['invoice_type'];

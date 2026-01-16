@@ -4,10 +4,6 @@
     Ventas
 @endsection
 
-@section('css')
-    <link rel="stylesheet" href="{{ asset('assets/css/styles.css') }}">
-@endsection
-
 @section('content')
     @include('utils.modals.vehicles.mdl_create_vehicle')
 
@@ -25,6 +21,28 @@
     </x-card>
     @include('utils.modals.customer.mdl_create_customer')
 @endsection
+
+<style>
+    /* Estado base: VISIBLE */
+    .row-pay {
+        overflow: hidden;
+        max-height: 1000px;
+        /* suficiente para el contenido */
+        opacity: 1;
+        transform: translateY(0);
+        transition:
+            max-height 0.5s ease,
+            opacity 0.4s ease,
+            transform 0.4s ease;
+    }
+
+    /* Estado oculto */
+    .row-pay.hide {
+        max-height: 0;
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+</style>
 
 @section('js')
     <script>
@@ -51,24 +69,12 @@
             iniciarSelect2();
             loadTomSelect();
             events();
-
         });
 
         function events() {
 
             eventsMdlVehicle();
             eventsMdlCreateCustomer();
-
-            //========== SELECT2 BÚSQUEDA CLIENTE ======
-            $('.select2_customer').on('select2:open', function() {
-                const searchInput = $('.select2-search__field');
-
-                searchInput.on('input', function() {
-                    const searchTerm = $(this).val();
-                    console.log('buscado', searchTerm);
-                    customerParameters.documentSearchCustomer = $(this).val();
-                });
-            });
 
             $('#tbl_products').DataTable().on('search.dt', function(e, settings) {
 
@@ -212,12 +218,7 @@
             })
 
             document.querySelector('#form-store').addEventListener('submit', (e) => {
-                e.preventDefault();
-                toastr.clear();
-                const validation = validateSale();
-                if (validation) {
-                    storeSale(e.target);
-                }
+                actionStore(e);
             })
 
             document.addEventListener('click', async (e) => {
@@ -314,7 +315,9 @@
                 }
             })
 
-            document.querySelector('#payment_condition_id').addEventListener('change', setExpirationDate);
+            document.querySelector('#payment_condition_id').addEventListener('change', function(e) {
+                actionPaymentCondition(e.target.value);
+            });
 
             window.clientSelect.on('change', function(value) {
                 actionChangeClient(value);
@@ -323,6 +326,7 @@
             window.vehicleSelect.on('change', function(value) {
                 actionChangeVehicle(value);
             });
+
 
         }
 
@@ -373,7 +377,7 @@
                                         <input data-index="${index}" value="${pay.amount}" type="text" class="form-control amount_pay inputDecimalPositivo">
                                     </td>
                                     <td>
-                                        <button class="btn btn-danger btn-sm btn_delete_pay" data-index="${index}">
+                                        <button class="btn btn-danger btn-sm btn_delete_pay" type="button" data-index="${index}">
                                             <i class="fas fa-trash-alt"></i>
                                         </button>
                                     </td>
@@ -512,13 +516,6 @@
                 allowClear: true
             });
 
-            $('.select2_customer').select2({
-                theme: "bootstrap-5",
-                width: $(this).data('width') ? $(this).data('width') : $(this).hasClass('w-100') ? '100%' : 'style',
-                placeholder: $(this).data('placeholder'),
-                allowClear: true
-            });
-
             $('.select2_pay').select2({
                 theme: "bootstrap-5",
                 width: $(this).data('width') ? $(this).data('width') : $(this).hasClass('w-100') ? '100%' : 'style',
@@ -625,7 +622,7 @@
         function validateSale() {
 
             let validation = true;
-
+            const conditionId = document.querySelector('#payment_condition_id').value;
 
             //======== VALIDANDO DETALLE DE VENTA =========
             if (lstSale.length === 0) {
@@ -641,10 +638,6 @@
                 validation = false;
             }
 
-            // if (type_sale !== '80' && type_sale !== '3' && type_sale !== '1') {
-            //     toastr.error('EL TIPO DE COMPROBANTE NO EXISTE!!!');
-            //     validation = false;
-            // }
 
             //===== VALIDANDO CLIENTE =========
             const customer_id = document.querySelector('#customer_id');
@@ -653,18 +646,28 @@
                 validation = false;
             }
 
-            //======== VALIDANDO PAGOS ========
-            if (lstPays.length === 0) {
-                toastr.error('DEBE AGREGAR UN PAGO!!!');
-                validation = false;
+            if (conditionId == 1) {
+                validation = validationLstPays();
             }
 
+            return validation;
+        }
+
+        function validationLstPays() {
+            let validation = true;
             const lstMethodPays = [];
             let paysRepeat = false;
             let payNoNumber = false;
             let payCero = false;
             let methodPayNull = false;
             let totalPay = 0;
+
+            //======== VALIDANDO PAGOS ========
+            if (lstPays.length === 0) {
+                toastr.error('DEBE AGREGAR UN PAGO!!!');
+                validation = false;
+            }
+
             for (const pay of lstPays) {
 
                 if (!pay.method_pay) {
@@ -679,7 +682,6 @@
 
                 if (isNaN(parseFloat(pay.amount))) {
                     payNoNumber = true;
-                    console.log(pay.amount);
                 }
 
                 if (parseFloat(pay.amount) === 0) {
@@ -716,8 +718,6 @@
                 validation = false;
                 return validation;
             }
-
-
             return validation;
         }
 
@@ -1038,6 +1038,41 @@
                 window.clientSelect.on('change', actionChangeClient);
 
             }
+        }
+
+        function actionStore(e) {
+            e.preventDefault();
+            toastr.clear();
+            const validation = validateSale();
+            if (validation) {
+                storeSale(e.target);
+            }
+        }
+
+        function actionPaymentCondition(paymentConditionId) {
+            setExpirationDate();
+            if (paymentConditionId != 1) {
+                hidePayRow();
+            } else {
+                showPayRow();
+            }
+
+        }
+
+        function showPayRow() {
+            const rowPay = document.querySelector('.row-pay');
+            const btnAddPay = document.querySelector('.btnAddPay');
+            rowPay.classList.remove('hide');
+        }
+
+        function hidePayRow() {
+            const rowPay = document.querySelector('.row-pay');
+            const btnAddPay = document.querySelector('.btnAddPay');
+            rowPay.classList.add('hide');
+        }
+
+        function togglePayRow() {
+            rowPay.classList.toggle('hide');
         }
     </script>
 @endsection

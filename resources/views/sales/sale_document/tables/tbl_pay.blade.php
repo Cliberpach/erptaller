@@ -22,7 +22,7 @@
                     data-index="0">
             </td>
             <td>
-                <button class="btn btn-danger btn-sm btn_delete_pay" data-index="0">
+                <button class="btn btn-danger btn-sm btn_delete_pay" type="button" data-index="0">
                     <i class="fas fa-trash"></i>
                 </button>
             </td>

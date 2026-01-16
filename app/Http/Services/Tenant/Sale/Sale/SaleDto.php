@@ -27,11 +27,11 @@ class SaleDto
     public function getDtoStore(
         object $validated_data,
         object $amounts,
-        $legend,
-        array $validated_pays,
-        object $data_correlative
     ): array {
         $dto = [];
+        $validated_pays     =   $validated_data->lst_pays;
+        $legend             =   $validated_data->legend;
+        $data_correlative   =   $validated_data->data_correlative;
 
         //======= CLIENTE =======
         $dto['customer_id']                = $validated_data->customer->id;
@@ -47,7 +47,7 @@ class SaleDto
 
         //====== CAJA / MOVIMIENTO ======
         $dto['petty_cash_id']               = $validated_data->petty_cash->petty_cash_id;
-        $dto['petty_cash_name']             = $validated_data->petty_cash->petty_cash_name;
+        $dto['petty_cash_name']             = $validated_data->petty_cash->name;
         $dto['petty_cash_book_id']          = $validated_data->petty_cash->petty_cash_book_id;
 
         //======== TIPO DE VENTA ======
@@ -63,11 +63,11 @@ class SaleDto
         $dto['legend']                      = $legend;
 
         //======= PAGOS =====
-        $dto['method_pay_id_1']             = $validated_pays[0]->method_pay ?? null;
-        $dto['amount_pay_1']                = $validated_pays[0]->amount ?? 0;
+        $dto['method_pay_id_1']             = $validated_pays[0]->method_pay;
+        $dto['amount_pay_1']                = $validated_pays[0]->amount;
 
-        $dto['method_pay_id_2']             = $validated_pays[1]->method_pay ?? null;
-        $dto['amount_pay_2']                = $validated_pays[1]->amount ?? 0;
+        $dto['method_pay_id_2']             = $validated_pays[1]->method_pay;
+        $dto['amount_pay_2']                = $validated_pays[1]->amount;
 
         //======== SERIE Y CORRELATIVO =======
         $dto['correlative']                 = $data_correlative->correlative;
@@ -84,6 +84,8 @@ class SaleDto
         //=============== VEHÍCULO =========
         $dto['vehicle_id']                  = $validated_data->vehicle_id;
         $dto['plate']                       = $validated_data->plate;
+
+        $dto['payment_status']              = $validated_data->payment_condition->name === 'CONTADO'?'PAGADO':'PENDIENTE';
 
         return $dto;
     }

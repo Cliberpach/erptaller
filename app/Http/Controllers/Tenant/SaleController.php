@@ -226,7 +226,6 @@ array:10 [ // app\Http\Controllers\Tenant\SaleController.php:202
 */
     public function store(SaleStoreRequest $request)
     {
-
         DB::beginTransaction();
         try {
             $data   =   $request->toArray();
