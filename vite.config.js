@@ -15,6 +15,7 @@ export default defineConfig({
                 'resources/js/libs/lightgalery.js',
 
                 'resources/js/notifications/main.js',
+                'resources/js/sales/sales/main.js',
             ],
             refresh: [
                 ...refreshPaths,

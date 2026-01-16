@@ -42,8 +42,8 @@ class SaleDto
         $dto['customer_phone']             = $validated_data->customer->phone;
 
         //======= USUARIO REGISTRADOR =======
-        $dto['user_recorder_id']            = $validated_data->user_recorder->id;
-        $dto['user_recorder_name']          = $validated_data->user_recorder->name;
+        $dto['user_recorder_id']            = Auth::user()->id;
+        $dto['user_recorder_name']          = Auth::user()->name;
 
         //====== CAJA / MOVIMIENTO ======
         $dto['petty_cash_id']               = $validated_data->petty_cash->petty_cash_id;

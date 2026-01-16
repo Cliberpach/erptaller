@@ -2,6 +2,12 @@
   "__commonjsHelpers-725317a4.js": {
     "file": "assets/_commonjsHelpers-725317a4.js"
   },
+  "_index-dd82ac63.js": {
+    "file": "assets/index-dd82ac63.js"
+  },
+  "_sweetalert2.esm.all-f89f7467.js": {
+    "file": "assets/sweetalert2.esm.all-f89f7467.js"
+  },
   "node_modules/lightgallery/fonts/lg.svg": {
     "file": "assets/lg-f2fe1c00.svg",
     "src": "node_modules/lightgallery/fonts/lg.svg"
@@ -35,9 +41,10 @@
     "css": [
       "assets/app-d4213a05.css"
     ],
-    "file": "assets/app-fecd9b00.js",
+    "file": "assets/app-6e9c3758.js",
     "imports": [
-      "__commonjsHelpers-725317a4.js"
+      "__commonjsHelpers-725317a4.js",
+      "_sweetalert2.esm.all-f89f7467.js"
     ],
     "isEntry": true,
     "src": "resources/js/app.js"
@@ -82,8 +89,20 @@
     "src": "resources/js/libs/lightgalery.js"
   },
   "resources/js/notifications/main.js": {
-    "file": "assets/main-40dbea3e.js",
+    "file": "assets/main-a870c3d2.js",
+    "imports": [
+      "_index-dd82ac63.js"
+    ],
     "isEntry": true,
     "src": "resources/js/notifications/main.js"
+  },
+  "resources/js/sales/sales/main.js": {
+    "file": "assets/main-e1db94b8.js",
+    "imports": [
+      "_index-dd82ac63.js",
+      "_sweetalert2.esm.all-f89f7467.js"
+    ],
+    "isEntry": true,
+    "src": "resources/js/sales/sales/main.js"
   }
 }

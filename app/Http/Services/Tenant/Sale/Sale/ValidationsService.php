@@ -9,6 +9,7 @@ use App\Models\Landlord\GeneralTable\GeneralTableDetail;
 use App\Models\Tenant\Sale\PaymentCondition\PaymentCondition;
 use App\Models\User;
 use Exception;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class ValidationsService
@@ -43,7 +44,7 @@ class ValidationsService
     public static function validationStore($data): object
     {
         //====== VALIDANDO USUARIO REGISTRADOR DEBE EXISTIR ======
-        $user_recorder  =   User::findOrFail($data['user_recorder_id']);
+        $user_recorder  =   Auth::user();
 
         if (!$user_recorder) {
             throw new Exception("EL USUARIO REGISTRADOR NO EXISTE EN LA BD!!!");
@@ -99,7 +100,6 @@ class ValidationsService
 
         return (object)[
             'customer'          =>  $customer,
-            'user_recorder'     =>  $user_recorder,
             'petty_cash'        =>  $petty_cash,
             'type_sale_id'      =>  $type_sale->id,
             'type_sale_code'    =>  $type_sale->symbol,

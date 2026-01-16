@@ -9,7 +9,7 @@
     <tbody class="body-table">
         <tr>
             <td>
-                <select onchange="changeMethodPay(this)" name="" id=""
+                <select name="" id=""
                     class="form-control method_pay select2_pay" data-index="0" data-placeholder="Seleccionar">
                     @foreach ($payment_methods as $payment_method)
                         <option @if ($payment_method->description === 'EFECTIVO') selected @endif value="{{ $payment_method->id }}">

@@ -119,7 +119,7 @@
                             <p class="igv-amount"></p>
                         </div>
                     </div>
-                    <div class="row mb-3 row-pay">
+                    <div class="row mb-3 row-fade">
                         <div class="col-12">
                             <div class="table-responsive">
                                 @include('sales.sale_document.tables.tbl_pay')
