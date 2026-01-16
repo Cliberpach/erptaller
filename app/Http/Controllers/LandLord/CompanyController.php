@@ -13,6 +13,13 @@ use App\Models\ModuleGrandChild;
 use App\Models\Plan;
 use App\Models\Tenant;
 use App\Models\Tenant\Maintenance\Collaborator\Collaborator;
+use App\Models\Tenant\Maintenance\Company\Company as TenantCompany;
+use App\Models\Tenant\Maintenance\Company\CompanyInvoice as TenantCompanyInvoice;
+use App\Models\Tenant\Maintenance\Company\DocumentSerialization;
+use App\Models\Tenant\Maintenance\Company\Module as CompanyModule;
+use App\Models\Tenant\Maintenance\Company\ModuleChild as CompanyModuleChild;
+use App\Models\Tenant\Maintenance\Company\ModuleGrandChild as CompanyModuleGrandChild;
+use App\Models\Tenant\Maintenance\Company\Plan as CompanyPlan;
 use App\Models\Tenant\User;
 use Carbon\Carbon;
 use Exception;
@@ -164,6 +171,7 @@ class CompanyController extends Controller
                 "name" => $request->input('razon_social'),
                 "domain" => $domain . "." . parse_url(config("app.url"), PHP_URL_HOST),
             ]);
+
             $tenantDirectory = "{$domain}_{$tenant->id}";
 
             $company                                =   new Company();
@@ -194,19 +202,20 @@ class CompanyController extends Controller
             $child_array        = $request->child_id;
             $grandchild_array   = $request->grandchild_id;
 
-            $this->modules          = Module::whereIn('id', $module_array)->get();
-            $this->children         = ModuleChild::whereIn('id', $child_array)->get();
-            $this->grand_children   = ModuleGrandChild::whereIn('id', $grandchild_array)->get();
-            $this->plan             = Plan::findOrFail($company->plan);
+            $this->modules          =   Module::whereIn('id', $module_array)->get();
+            $this->children         =   ModuleChild::whereIn('id', $child_array)->get();
+            $this->grand_children   =   ModuleGrandChild::whereIn('id', $grandchild_array)->get();
+            $this->plan             =   Plan::findOrFail($company->plan);
 
-            DB::commit();
+            DB::connection('landlord')->commit();
 
             $request->merge([
                 'tenant_id'     =>  $tenant->id,
                 'tenant_name'   =>  $tenant->name,
-                'files_route'   =>  "{$domain}_{$tenant->id}"
+                'files_route'   =>  "{$domain}_{$tenant->id}",
             ]);
 
+            $tenant->makeCurrent();
             $this->insertDataTenant($tenant->database, $request);
 
             //======= CREAR CARPETA DE ARCHIVOS PARA EL TENANT  EN PUBLIC/STORAGE/ ====
@@ -214,11 +223,18 @@ class CompanyController extends Controller
                 Storage::disk('public')->makeDirectory($tenantDirectory);
             }
 
+            Tenant::forgetCurrent();
 
             Session::flash('message_success', 'EMPRESA REGISTRADA CON ÉXITO');
             return response()->json(['success' => true, 'message' => 'EMPRESA REGISTRADA CON ÉXITO']);
         } catch (Throwable $th) {
-            DB::rollback();
+
+            DB::connection('landlord')->rollback();
+
+            if (isset($tenantDatabase)) {
+                DB::connection('landlord')->statement("DROP DATABASE IF EXISTS `{$tenantDatabase}`");
+            }
+
             Session::flash('message_error', $th->getMessage());
             return response()->json([
                 'success' => false,
@@ -231,19 +247,9 @@ class CompanyController extends Controller
 
     private function insertDataTenant($database, $request)
     {
-        $serializable_document  =   GeneralTableDetail::where('symbol', 'NV')->where('parameter', 'NV')->first();
         $files_route            =   $request->get('files_route');
 
-        config([
-            'database.default' => $database
-        ]);
-
-        DB::purge('tenant');
-        DB::reconnect('tenant');
-
-        DB::setDefaultConnection('tenant');
-
-        $company                                =   new Company();
+        $company                                =   new TenantCompany();
         $company->ruc                           =   $request->get("ruc");
         $company->domain                        =   $request->get('domain');
         $company->tenant_id                     =   $request->get('tenant_id');
@@ -268,7 +274,7 @@ class CompanyController extends Controller
         $company->save();
 
         //========= DATOS DE FACTURACIÓN COMPANY INVOICE =========
-        DB::table('company_invoices')->insert([
+        TenantCompanyInvoice::create([
             'company_id'           => $company->id,
             'plan'                 => $company->plan,
             'environment'          => 'DEMO',
@@ -284,10 +290,9 @@ class CompanyController extends Controller
             'secondary_user'       => 'MODDATOS',
             'secondary_password'   => 'MODDATOS',
             'api_user_gre'         => 'test-85e5b0ae-255c-4891-a595-0b98c65c9854',
-            'api_password_gre'    => 'test-Hty/M6QshYvPgItX2P0+Kw==',
-            'created_at'           => now(),
-            'updated_at'           => now(),
+            'api_password_gre'     => 'test-Hty/M6QshYvPgItX2P0+Kw==',
         ]);
+
 
         //========= CREANDO USUARIO PARA EL TENANT ========
         $collaborator                               =   new Collaborator();
@@ -315,21 +320,20 @@ class CompanyController extends Controller
         $role = Role::where('name', 'admin')->first();
         $user->assignRole($role);
 
-        DB::table("document_serializations")->insert([
-            [
-                'company_id' => $company->id,
-                'document_type_id' => $serializable_document->id,
-                'serie' => $serializable_document->parameter . '01',
-                'number_limit' => 8,
-                'destiny' => 'NOTA DE VENTA',
-                'default' => 'NO',
-                'final_number' => 0,
-                'description'   =>  $serializable_document->name
-            ],
+        DocumentSerialization::create([
+            'company_id'        => $company->id,
+            'document_type_id'  => 67,
+            'serie'             => 'NV01',
+            'number_limit'      => 8,
+            'destiny'           => 'NOTA DE VENTA',
+            'default'           => 'NO',
+            'final_number'      => 0,
+            'description'       => 'NOTA DE VENTA',
         ]);
 
+
         foreach ($this->modules as $module) {
-            Module::create([
+            CompanyModule::create([
                 'id' => $module->id,
                 'description' => $module->description,
                 'order' => $module->order,
@@ -338,7 +342,7 @@ class CompanyController extends Controller
         }
 
         foreach ($this->children as $children) {
-            ModuleChild::create([
+            CompanyModuleChild::create([
                 'id' => $children->id,
                 'module_id' => $children->module_id,
                 'description' => $children->description,
@@ -348,7 +352,7 @@ class CompanyController extends Controller
         }
 
         foreach ($this->grand_children as $grand_children) {
-            ModuleGrandChild::create([
+            CompanyModuleGrandChild::create([
                 'id' => $grand_children->id,
                 'module_child_id' => $grand_children->module_child_id,
                 'description' => $grand_children->description,
@@ -357,7 +361,7 @@ class CompanyController extends Controller
             ]);
         }
 
-        Plan::create([
+        CompanyPlan::create([
             'id' => $this->plan->id,
             'description' => $this->plan->description,
             'number_fields' => $this->plan->number_fields,

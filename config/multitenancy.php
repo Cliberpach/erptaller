@@ -66,6 +66,8 @@ return [
      */
     'landlord_database_connection_name' => 'landlord',
 
+    'switch_tenant_database_connection' => true,
+
     /*
      * This key will be used to bind the current tenant in the container.
      */

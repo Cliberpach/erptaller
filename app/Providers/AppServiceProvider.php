@@ -32,6 +32,10 @@ class AppServiceProvider extends ServiceProvider
         $databaseConnection = $isLandlord ? 'landlord' : 'tenant';
         config(['database.default' => $databaseConnection]);
 
+        if (!$isLandlord && Tenant::current()) {
+            app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+        }
+
         // 🔐 Tenant ID (solo para cache / lógica)
         $tenantId = $isLandlord
             ? 'landlord'
