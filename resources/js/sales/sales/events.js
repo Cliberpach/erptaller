@@ -52,7 +52,6 @@ function eventsChange() {
 
     })
 
-
     document.querySelector('#payment_condition_id').addEventListener('change', function (e) {
         actionPaymentCondition(e.target.value);
     });

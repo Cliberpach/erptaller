@@ -259,9 +259,7 @@ function storeSale(formStore) {
 
                     toastr.success(res.message, 'OPERACIÓN COMPLETADA');
 
-                    const url_open_pdf =
-                        "{{ route('tenant.ventas.comprobante_venta.pdf_voucher', ['id' => '__id__']) }}"
-                            .replace('__id__', res.data.sale_id);
+                    const url_open_pdf = routes.pdf( res.data.sale_id,0);
                     window.open(url_open_pdf, 'Comprobante SISCOM',
                         'location=1, status=1, scrollbars=1,width=900, height=600');
 
