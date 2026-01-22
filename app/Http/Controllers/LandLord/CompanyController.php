@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\CompanyStoreRequest;
 use App\Models\Company;
 use App\Models\Landlord\Company as LandlordCompany;
-use App\Models\Landlord\GeneralTable\GeneralTableDetail;
 use App\Models\Module;
 use App\Models\ModuleChild;
 use App\Models\ModuleGrandChild;
