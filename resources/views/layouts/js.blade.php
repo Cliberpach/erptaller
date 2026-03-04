@@ -59,7 +59,6 @@
         audioEnabled = true;
     }
 
-
     window.onload = function() {
         hideLoader()
     };

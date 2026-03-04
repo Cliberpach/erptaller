@@ -201,7 +201,6 @@ Route::get('/test-socket', function () {
 });
 
 
-
 Route::group(["prefix" => "utils"], function () {
     Route::get('cash-available-search', [PettyCashController::class, 'searchCashAvailable'])->name('tenant.utils.searchCashAvailable');
     Route::get('service-search', [ServiceController::class, 'searchService'])->name('tenant.utils.searchService');

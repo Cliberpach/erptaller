@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\Notifications\NotificationController;
 use App\Http\Controllers\Tenant\Queries\QNotificationController;
 use App\Http\Controllers\Tenant\Queries\QVehicleController;
 use Illuminate\Support\Facades\Route;

@@ -57,7 +57,6 @@ class SaleService
         //======= GUARDAR MAESTRO VENTA =======
         $dto                    =       $this->s_dto->getDtoStore($validated_data, $amounts);
         $sale                   =       $this->s_repository->insertSale($dto);
-
         //========= REGISTRAR DETALLE TYPE PRODUCTOS =======
         if ($validated_data->type === 'PRODUCTOS') {
             $this->s_detail->storeDetail($sale, $validated_data);
@@ -72,7 +71,7 @@ class SaleService
         }
 
         $this->s_kardex->storeFromSale($sale);
-       
+
         return $sale;
     }
 
