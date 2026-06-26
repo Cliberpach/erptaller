@@ -90,7 +90,7 @@ class InvoiceController extends Controller
             $invoice = new Invoice();
                 
             //====== CONSTRUIR CLIENTE =========
-            $customer = DB::connection('landlord')->select('
+            $customer = DB::select('
                         SELECT 
                             c.address,
                             c.email,

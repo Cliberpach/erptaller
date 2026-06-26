@@ -317,8 +317,7 @@ array:3 [ // app\Http\Controllers\Tenant\Reports\ReportFieldController.php:182
         }
 
         //========== OBTENIENDO DATA ======
-        $customer   =   DB::connection('landlord')
-                        ->table('customers')
+        $customer   =   DB::table('customers')
                         ->where('id', $reservation->customer_id)
                         ->first();
 

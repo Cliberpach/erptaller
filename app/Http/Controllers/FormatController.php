@@ -40,8 +40,7 @@ class FormatController extends Controller
 
     public static function getFormatInitialCustomer(int $customer_id): array
     {
-        $customer   =   DB::connection('landlord')
-            ->table('customers as c')
+        $customer   =   DB::table('customers as c')
             ->select(
                 'c.id',
                 DB::raw('CONCAT(c.type_document_abbreviation,":",c.document_number,"-",c.name) as full_name'),

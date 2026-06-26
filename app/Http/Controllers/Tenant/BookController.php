@@ -509,7 +509,7 @@ array:5 [ // app\Http\Controllers\Tenant\BookController.php:432
                 throw new Exception("EL DNI DEBE SER NUMÉRICO!!!");
             }
 
-            $customer   =   DB::connection('landlord')->select(
+            $customer   =   DB::select(
                 'SELECT * FROM customers WHERE document_number = ?',
                 [$document_number]
             );

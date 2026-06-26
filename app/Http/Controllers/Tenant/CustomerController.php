@@ -289,7 +289,7 @@ array:10 [ // app\Http\Controllers\Tenant\CustomerController.php:173
 
 
             //======= COMPROBAR QUE NO EXISTA EL DOCUMENTO EN LA TABLA CLIENTES =======
-            $exists_nro_document   =   DB::connection('landlord')->select(
+            $exists_nro_document   =   DB::select(
                 'select
                                         c.id,
                                         c.name

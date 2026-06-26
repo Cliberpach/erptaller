@@ -73,7 +73,7 @@ class ValidationsService
         $type_sale_name =   null;
         $customer_id    =   $data['customer_id'];
 
-        $customer       =   DB::connection('landlord')->select('select
+        $customer       =   DB::select('select
                             c.id,
                             c.document_number,
                             c.name,
