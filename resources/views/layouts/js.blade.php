@@ -384,5 +384,41 @@
     }
 </script>
 
+{{-- ===== UX: menú 3-puntos de TABLAS escapa del card y elige dirección sola =====
+     Acotado a los menús de acción dentro de DataTables (no toca header/selector de sede/otros dropdowns). --}}
+<script>
+    (function () {
+        // Reactiva Popper (display:'dynamic' anula el data-bs-display="static" del markup legacy)
+        // y lo posiciona con strategy:'fixed' → escapa del overflow del card/.table-responsive.
+        // El modifier 'flip' (default de Popper) abre hacia arriba si la fila está cerca del fondo.
+        function fixTableDropdowns(scope) {
+            if (!scope || !(window.bootstrap && window.bootstrap.Dropdown)) return;
+            scope.querySelectorAll('[data-bs-toggle="dropdown"]').forEach(function (el) {
+                window.bootstrap.Dropdown.getOrCreateInstance(el, {
+                    display: 'dynamic',
+                    boundary: 'viewport',
+                    popperConfig: function (defaultConfig) {
+                        return Object.assign({}, defaultConfig, { strategy: 'fixed' });
+                    }
+                });
+            });
+        }
+
+        // Solo los menús dentro de DataTables (e.target = la <table> redibujada). Cubre actuales y futuros.
+        if (window.jQuery) {
+            window.jQuery(document).on('draw.dt', function (e) { fixTableDropdowns(e.target); });
+        }
+
+        // Con strategy:'fixed' un menú abierto "flota" si se scrollea → cerramos los de tabla al scrollear.
+        window.addEventListener('scroll', function () {
+            if (!(window.bootstrap && window.bootstrap.Dropdown)) return;
+            document.querySelectorAll('table [data-bs-toggle="dropdown"][aria-expanded="true"]').forEach(function (el) {
+                var inst = window.bootstrap.Dropdown.getInstance(el);
+                if (inst) inst.hide();
+            });
+        }, true);
+    })();
+</script>
+
 @yield('js')
 @stack('js-script')
