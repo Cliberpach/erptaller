@@ -115,3 +115,44 @@ Flujo de alta de tenant:
 El salto a Spatie v4 en este proyecto es **de bajo riesgo en cuanto a personalización**: **no hay clases propias que implementen los contratos modificados**. El trabajo real se concentra en **reconciliar `config/multitenancy.php`** con la config v4 y **revalidar el modelo `Tenant` y el provisioning** (`tenants:artisan`, cambios de conexión en caliente). Esfuerzo global estimado: **bajo-medio**, dominado por la verificación de config y el provisioning, no por reescritura de lógica.
 
 *Informe de solo lectura. No se modificó ningún archivo del proyecto salvo la creación de este documento. Las afirmaciones sobre nombres/firmas exactos de clases en v4 (Actions, comando `tenants:artisan`) deben contrastarse con el upgrade guide oficial de Spatie v4 al ejecutar el salto.*
+
+---
+
+## ⚠️ RUNBOOK — Migrar BDs de tenants (leer antes de cada deploy)
+
+**Regla de oro: toda migración de tenant va con `--database=tenant`. Sin esa bandera, migra la BD CENTRAL.**
+
+### Por qué
+`database.default` = `landlord` (BD central `erptaller_central`). El comando `migrate`, si no recibe `--database`, usa la conexión **default**. `tenants:artisan` hace "current" al tenant (reapunta solo la conexión `tenant`) pero **no cambia el default**. Resultado de correr `tenants:artisan "migrate ..."` SIN `--database=tenant`:
+- Crea el esquema de tenant **en la central** (`erptaller_central`) en vez de en la BD del tenant.
+- Registra las filas en `erptaller_central.migrations`, así que **`migrate:status` reporta "Ran" aunque el tenant real quedó intacto** (falso positivo).
+
+### Forma CORRECTA (usar el wrapper)
+```bash
+php artisan tenants:migrate                # todos los tenants
+php artisan tenants:migrate --tenant=1     # un tenant
+php artisan tenants:migrate --seed         # con seeders
+php artisan tenants:migrate --pretend      # ver SQL sin ejecutar
+```
+El wrapper [app/Console/Commands/TenantsMigrate.php](app/Console/Commands/TenantsMigrate.php) fija siempre `--database=tenant --path=database/migrations/tenant --force`.
+
+Equivalente manual (si no se usa el wrapper):
+```bash
+php artisan tenants:artisan "migrate --database=tenant --path=database/migrations/tenant --force"
+```
+
+### NUNCA hacer
+```bash
+php artisan tenants:artisan "migrate --path=database/migrations/tenant"   # ❌ sin --database=tenant → contamina la central
+php artisan migrate                                                        # ❌ corre solo migraciones del default (landlord)
+```
+
+### Verificación post-migración (no confiar solo en migrate:status)
+Tras migrar, confirmar el efecto en la **BD del tenant** (no en la central):
+```bash
+php artisan tenants:artisan "migrate:status --database=tenant --path=database/migrations/tenant"
+```
+y/o revisar que la columna/tabla nueva exista en la BD del tenant (`tenancy_*`), no en `erptaller_central`.
+
+### Provisioning (referencia)
+El alta de tenants nuevos ([app/Models/Tenant.php](app/Models/Tenant.php)) ya usa el comando correcto con `--database=tenant`. Crear tenants en producción es seguro; el riesgo es solo aplicar migraciones a tenants **existentes** olvidando la bandera.
