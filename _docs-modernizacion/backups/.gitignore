@@ -1,0 +1,2 @@
+# Backups de BD (persisten en disco, NO se versionan: contienen hashes/datos)
+*.sql

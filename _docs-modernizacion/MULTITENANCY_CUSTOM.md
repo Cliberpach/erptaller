@@ -156,3 +156,12 @@ y/o revisar que la columna/tabla nueva exista en la BD del tenant (`tenancy_*`),
 
 ### Provisioning (referencia)
 El alta de tenants nuevos ([app/Models/Tenant.php](app/Models/Tenant.php)) ya usa el comando correcto con `--database=tenant`. Crear tenants en producción es seguro; el riesgo es solo aplicar migraciones a tenants **existentes** olvidando la bandera.
+
+### Registro de limpieza ejecutada (2026-06-26)
+Se ejecutó la limpieza de la contaminación causada por correr `tenants:artisan "migrate"` sin `--database=tenant` (creó el esquema de tenant en la central):
+- **Dropeadas 71 tablas** de path tenant en `erptaller_central` (todas vacías, 0 datos). Excluida `brandsv` (landlord legítima).
+- **Borradas 75 filas** de `erptaller_central.migrations` (path tenant).
+- Central: **99 → 28 tablas**, **99 → 24 filas** migrations (solo landlord legítimas).
+- Tenant `tenancy_demo_erptaller_test` intacto (87 migraciones, esquema sano).
+- Verificaciones previas: dump completo `_docs-modernizacion/backups/erptaller_central_backup_2026-06-26.sql`, ubigeos confirmados de tenant (no central), 0 FKs huérfanas.
+- Backup NO versionado (`.gitignore` en backups/, contiene hashes) — persiste en disco.
