@@ -314,6 +314,16 @@ class CompanyController extends Controller
             'status'       => 'ACTIVO',
         ]);
 
+        //========= ALMACÉN PRINCIPAL DE LA SEDE PRINCIPAL (Multi-Sede Etapa 3a) ========
+        // Queda como id=1 (no hay otro almacén antes; WarehouseSeeder fue removido)
+        // → el warehouse_id=1 hardcodeado del flujo de stock sigue funcionando sin regresión.
+        \App\Models\Tenant\Warehouse::create([
+            'sede_id'      => $sede->id,
+            'descripcion'  => 'ALMACÉN PRINCIPAL',
+            'es_principal' => true,
+            'estado'       => 'ACTIVO',
+        ]);
+
         //========= 3 USUARIOS POR DEFECTO DEL TENANT (admin / ventas / tecnico) ========
         // Se usa App\Models\User (modelo de auth) para que el model_type del rol quede alineado.
         // Los 3 quedan asignados a la sede principal con es_default = true.

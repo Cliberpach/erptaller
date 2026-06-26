@@ -54,7 +54,8 @@ class DatabaseSeeder extends Seeder
         $this->call(PositionSeeder::class);
         $this->call(ConfigurationSeeder::class);
         $this->call(PaymentMethodSeeder::class);
-        $this->call(WarehouseSeeder::class);
+        // WarehouseSeeder removido (Multi-Sede 3a): el almacén principal se crea en el
+        // provisioning ligado a la sede principal (queda id=1). Sedes nuevas → SedeController.
         $this->call(TenantBrandSeeder::class);
         $this->call(CategorySeeder::class);
         $this->call(PettyCashSeeder::class);

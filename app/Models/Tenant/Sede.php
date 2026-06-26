@@ -41,6 +41,14 @@ class Sede extends Model
     }
 
     /**
+     * Almacenes de la sede (Multi-Sede Etapa 3a).
+     */
+    public function warehouses()
+    {
+        return $this->hasMany(Warehouse::class, 'sede_id');
+    }
+
+    /**
      * Scope: la sede principal (matriz).
      */
     public function scopePrincipal($query)

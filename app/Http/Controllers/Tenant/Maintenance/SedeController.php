@@ -71,6 +71,14 @@ class SedeController extends Controller
             $sede->status       = 'ACTIVO';
             $sede->save();
 
+            // Multi-Sede Etapa 3a: al crear una sede se siembra su almacén principal.
+            \App\Models\Tenant\Warehouse::create([
+                'sede_id'      => $sede->id,
+                'descripcion'  => 'ALMACÉN PRINCIPAL',
+                'es_principal' => true,
+                'estado'       => 'ACTIVO',
+            ]);
+
             DB::commit();
             return response()->json(['success' => true, 'message' => 'SEDE REGISTRADA']);
         } catch (Throwable $th) {
