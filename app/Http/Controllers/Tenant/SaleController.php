@@ -182,14 +182,16 @@ class SaleController extends Controller
     {
         try {
 
+            // Multi-sede 3b: valida contra el stock del almacén principal de la sede activa
+            // (no deja vender más de lo que hay EN ESA SEDE).
             $product    =   DB::select(
                 'select
                             wp.*
                             from warehouse_products as wp
                             where
                             wp.product_id = ?
-                            and wp.warehouse_id = "1"',
-                [$request->get('product_id')]
+                            and wp.warehouse_id = ?',
+                [$request->get('product_id'), $this->almacenPrincipalSedeActivaId()]
             );
 
             if (count($product) === 0) {

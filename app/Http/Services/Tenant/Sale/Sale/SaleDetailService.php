@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\DB;
 
 class SaleDetailService
 {
+    use \App\Http\Concerns\HasSedeActiva;
 
     private WarehouseProductManager $s_warehouse_product;
     private KardexManager $s_kardex;
@@ -26,10 +27,15 @@ class SaleDetailService
 
     public function storeDetail(Sale $sale, object $validated_data)
     {
+        // Multi-sede 3b: la venta descuenta SIEMPRE del almacén principal de la sede activa.
+        // Se resuelve una sola vez (única fuente de verdad). Todo corre dentro de la
+        // transacción de SaleController@store → si esto lanza, rollback total.
+        $warehouseId = $this->almacenPrincipalSedeActivaId();
+
         foreach ($validated_data->lstSale as $product) {
 
             //========= VALIDANDO PRODUCTO ========
-            $product_exists =   $this->s_warehouse_product->getProductStock(1, $product->id);
+            $product_exists =   $this->s_warehouse_product->getProductStock($warehouseId, $product->id);
 
             if (!$product_exists) {
                 throw new Exception("EL PRODUCTO NO EXISTE EN EL ALMACÉN!!!");
@@ -43,7 +49,7 @@ class SaleDetailService
             //======= GRABAR DETALLE DE VENTA =======
             $detail                     =   new SaleDetail();
             $detail->sale_document_id   =   $sale->id;
-            $detail->warehouse_id       =   1;
+            $detail->warehouse_id       =   $warehouseId;
             $detail->product_id         =   $product->id;
             $detail->product_name       =   $product_exists->product_name;
             $detail->brand_id           =   $product_exists->brand_id;
@@ -70,7 +76,7 @@ class SaleDetailService
             $detail->save();
 
             //======= RESTAR STOCK ======
-            $this->s_warehouse_product->decreaseStock(1, $product->id, $product->cant);
+            $this->s_warehouse_product->decreaseStock($warehouseId, $product->id, $product->cant);
 
             //====== GUARDANDO KARDEX DEL DETALLE ======
             $this->s_kardex->store($sale, $detail, 'OUT', 'SALE');
