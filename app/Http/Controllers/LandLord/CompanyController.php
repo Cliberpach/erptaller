@@ -234,12 +234,7 @@ class CompanyController extends Controller
         $serializable_document  =   GeneralTableDetail::where('symbol', 'NV')->where('parameter', 'NV')->first();
         $files_route            =   $request->get('files_route');
 
-        config([
-            'database.default' => $database
-        ]);
-
-        DB::purge('tenant');
-        DB::reconnect('tenant');
+        Tenant::where('database', $database)->firstOrFail()->makeCurrent();
 
         DB::setDefaultConnection('tenant');
 
