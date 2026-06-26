@@ -50,8 +50,11 @@ Route::get('/', function () {
 Route::get('user/tenant', [UserController::class, 'index'])->name('tenant.users.index');
 Route::post('user/create', [UserController::class, 'store'])->name('tenant.users.create');
 
-Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified'])->group(function () {
+Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified', 'sede.activa'])->group(function () {
     Route::get('/dashboard', [ModuleController::class, 'home'])->name('tenant.home');
+
+    // Multi-sede: cambiar la sede activa (Etapa 2)
+    Route::get('sede/cambiar/{id}', [\App\Http\Controllers\Tenant\Maintenance\SedeController::class, 'cambiar'])->name('tenant.sede.cambiar');
 
 
 

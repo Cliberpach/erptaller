@@ -2,17 +2,35 @@
 
 namespace App\Http\Controllers\Tenant\Maintenance;
 
+use App\Http\Concerns\HasSedeActiva;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Tenant\Maintenance\Sede\SedeStoreRequest;
 use App\Http\Requests\Tenant\Maintenance\Sede\SedeUpdateRequest;
 use App\Models\Tenant\Sede;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Session;
 use Yajra\DataTables\Facades\DataTables;
 use Throwable;
 
 class SedeController extends Controller
 {
+    use HasSedeActiva;
+
+    /**
+     * Cambia la sede activa del usuario (selector del header).
+     */
+    public function cambiar($id)
+    {
+        if ($this->cambiarSede($id)) {
+            Session::flash('message_success', 'SEDE ACTIVA CAMBIADA');
+        } else {
+            Session::flash('message_error', 'NO TIENE ACCESO A ESA SEDE');
+        }
+
+        return redirect()->back();
+    }
+
     public function index()
     {
         return view('maintenance.sedes.index');
