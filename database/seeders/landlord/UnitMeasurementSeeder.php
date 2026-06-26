@@ -17,6 +17,7 @@ class UnitMeasurementSeeder extends Seeder
         $tabla_general_unidades_medida->name            =   'UNIDADES DE MEDIDA';
         $tabla_general_unidades_medida->description     =   'UNIDADES DE MEDIDA';
         $tabla_general_unidades_medida->symbol          =   'UDM';
+        $tabla_general_unidades_medida->parameter       =   'UDM';
         $tabla_general_unidades_medida->save();
 
         $unidades_medida = [
