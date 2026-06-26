@@ -3,6 +3,7 @@
 namespace App\Http\Services\Landlord\WorkShop\Models;
 
 use App\Models\Landlord\ModelV;
+use App\Support\Central;
 use Illuminate\Support\Facades\DB;
 
 class ModelRepository
@@ -19,8 +20,8 @@ class ModelRepository
 
     public function findModel(string $model, string $brand)
     {
-        return DB::table('erptaller.models as m')
-            ->join('erptaller.brandsv as b', 'b.id', 'm.brand_id')
+        return DB::table(Central::table('models').' as m')
+            ->join(Central::table('brandsv').' as b', 'b.id', 'm.brand_id')
             ->where('m.description', $model)
             ->where('b.description', $brand)
             ->where('m.status', 'ACTIVE')

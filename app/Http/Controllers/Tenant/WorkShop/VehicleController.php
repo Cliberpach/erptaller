@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Tenant\WorkShop;
 
 use App\Exports\Tenant\Inventory\Brand\BrandFormatExport;
+use App\Support\Central;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\UtilController;
@@ -42,10 +43,10 @@ class VehicleController extends Controller
     {
         $vehicles = DB::table('vehicles as v')
             ->join(DB::raw('customers as cu'), 'cu.id', '=', 'v.customer_id')
-            ->join(DB::raw('erptaller.brandsv as b'), 'b.id', '=', 'v.brand_id')
-            ->join(DB::raw('erptaller.models as m'), 'm.id', '=', 'v.model_id')
-            ->leftJoin(DB::raw('erptaller.years as y'), 'y.id', '=', 'v.year_id')
-            ->join(DB::raw('erptaller.colors as c'), 'c.id', '=', 'v.color_id')
+            ->join(DB::raw(Central::table('brandsv').' as b'), 'b.id', '=', 'v.brand_id')
+            ->join(DB::raw(Central::table('models').' as m'), 'm.id', '=', 'v.model_id')
+            ->leftJoin(DB::raw(Central::table('years').' as y'), 'y.id', '=', 'v.year_id')
+            ->join(DB::raw(Central::table('colors').' as c'), 'c.id', '=', 'v.color_id')
             ->select(
                 'v.id',
                 DB::raw('CONCAT(cu.type_document_abbreviation,":",cu.document_number,"-",cu.name) as customer_name'),
@@ -254,8 +255,8 @@ array:8 [ // app\Http\Controllers\Tenant\WorkShop\VehicleController.php:159
             $customer_id    = $request->get('customer_id', null);
 
             $vehicles = Vehicle::from('vehicles as v')
-                ->join('erptaller.models as m', 'm.id', 'v.model_id')
-                ->join('erptaller.brandsv as b', 'b.id', 'v.brand_id');
+                ->join(Central::table('models').' as m', 'm.id', 'v.model_id')
+                ->join(Central::table('brandsv').' as b', 'b.id', 'v.brand_id');
 
             if ($query) {
                 $vehicles->where('v.plate', 'LIKE', "%{$query}%");

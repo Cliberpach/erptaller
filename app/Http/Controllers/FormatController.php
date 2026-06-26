@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Landlord\Company;
 use App\Models\Tenant\WorkShop\Vehicle;
+use App\Support\Central;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
@@ -15,8 +16,8 @@ class FormatController extends Controller
     public static function getFormatInitialVehicle(?int $vehicle_id): array
     {
         $vehicle    =   Vehicle::from('vehicles as v')
-            ->join('erptaller.models as m', 'm.id', 'v.model_id')
-            ->join('erptaller.brandsv as b', 'b.id', 'v.brand_id')
+            ->join(Central::table('models').' as m', 'm.id', 'v.model_id')
+            ->join(Central::table('brandsv').' as b', 'b.id', 'v.brand_id')
             ->where('v.id', $vehicle_id)
             ->select(
                 'v.id',
