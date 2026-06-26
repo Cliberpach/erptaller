@@ -8,9 +8,19 @@ use App\Http\Controllers\Tenant\NoteIncomeController;
 use App\Http\Controllers\Tenant\NoteReleaseController;
 use App\Http\Controllers\Tenant\ProductController;
 use App\Http\Controllers\Tenant\ValuedKardexController;
+use App\Http\Controllers\Tenant\WarehouseController;
 use Illuminate\Support\Facades\Route;
 
 Route::group(["prefix" => "inventarios", 'middleware' => 'validar.plan:inventario'], function () {
+
+    Route::group(["prefix" => "almacenes"], function () {
+        Route::get('index', [WarehouseController::class, 'index'])->name('tenant.inventarios.almacenes.index');
+        Route::get('getWarehouses', [WarehouseController::class, 'getWarehouses'])->name('tenant.inventarios.almacenes.getWarehouses');
+        Route::post('store', [WarehouseController::class, 'store'])->name('tenant.inventarios.almacenes.store');
+        Route::get('edit/{id}', [WarehouseController::class, 'edit'])->name('tenant.inventarios.almacenes.edit');
+        Route::put('update/{id}', [WarehouseController::class, 'update'])->name('tenant.inventarios.almacenes.update');
+        Route::put('toggle-status/{id}', [WarehouseController::class, 'toggleStatus'])->name('tenant.inventarios.almacenes.toggleStatus');
+    });
 
     Route::group(["prefix" => "categorias"], function () {
         Route::get('index', [CategoryController::class, 'index'])->name('tenant.inventarios.productos.categoria');

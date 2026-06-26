@@ -219,6 +219,14 @@ class ModuleSeeder extends Seeder
         ]);
 
         ModuleChild::create([
+            'module_id'  => $inventory->id,
+            'description' => 'Almacenes',
+            'route_name' => 'inventarios.almacenes.index',
+            'order'      => '2',
+            'show'       => 'tenant',
+        ]);
+
+        ModuleChild::create([
             'module_id' => $inventory->id,
             'description' => 'Kardex',
             'route_name' => 'inventory.kardex.index',
