@@ -20,6 +20,10 @@ Route::group(["prefix" => "mantenimiento"], function () {
         Route::post('store', [SedeController::class, 'store'])->name('tenant.mantenimientos.sedes.store');
         Route::put('update/{id}', [SedeController::class, 'update'])->name('tenant.mantenimientos.sedes.update');
         Route::put('toggle-status/{id}', [SedeController::class, 'toggleStatus'])->name('tenant.mantenimientos.sedes.toggleStatus');
+
+        // Multi-Sede Etapa 5 (Capa B): series por sede
+        Route::get('{sede}/series', [SedeController::class, 'getSeries'])->name('tenant.mantenimientos.sedes.getSeries');
+        Route::put('series/{serie}', [SedeController::class, 'updateSerie'])->name('tenant.mantenimientos.sedes.updateSerie');
     });
 
     Route::group(["prefix" => "cuentas"], function () {

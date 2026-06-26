@@ -7,6 +7,7 @@
 @section('content')
     @include('maintenance.sedes.modals.modal_create_sede')
     @include('maintenance.sedes.modals.modal_edit_sede')
+    @include('maintenance.sedes.modals.modal_series_sede')
 
     <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
@@ -123,6 +124,11 @@
                                 <li>
                                     <a class="dropdown-item" href="javascript:void(0);" onclick="openMdlEditSede(${data.id})">
                                         <i class="fa-solid fa-pen-to-square"></i> Editar
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="javascript:void(0);" onclick="openMdlSeries(${data.id})">
+                                        <i class="fa-solid fa-hashtag"></i> Series
                                     </a>
                                 </li>
                                 ${toggleItem}

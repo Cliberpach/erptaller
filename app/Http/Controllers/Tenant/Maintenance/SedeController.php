@@ -6,6 +6,8 @@ use App\Http\Concerns\HasSedeActiva;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Tenant\Maintenance\Sede\SedeStoreRequest;
 use App\Http\Requests\Tenant\Maintenance\Sede\SedeUpdateRequest;
+use App\Http\Requests\Tenant\Maintenance\Sede\SerieUpdateRequest;
+use App\Models\Tenant\DocumentSerialization;
 use App\Models\Tenant\Sede;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -136,5 +138,70 @@ class SedeController extends Controller
             DB::rollBack();
             return response()->json(['success' => false, 'message' => $th->getMessage()]);
         }
+    }
+
+    /**
+     * Multi-Sede Etapa 5 (Capa B): series de UNA sede (para el modal "Series").
+     * Blindaje: solo sedes disponibles del usuario.
+     */
+    public function getSeries($sedeId)
+    {
+        if (! $this->puedeAccederSede($sedeId)) {
+            return response()->json(['success' => false, 'message' => 'No tiene acceso a esa sede.'], 403);
+        }
+
+        $sede = Sede::find($sedeId);
+        if (! $sede) {
+            return response()->json(['success' => false, 'message' => 'La sede no existe.'], 404);
+        }
+
+        $series = DB::table('document_serializations')
+            ->where('sede_id', $sedeId)
+            ->orderBy('id')
+            ->get(['id', 'serie', 'description as tipo', 'start_number', 'current_number']);
+
+        return response()->json([
+            'success'    => true,
+            'sede_nombre' => $sede->nombre,
+            'series'     => $series,
+        ]);
+    }
+
+    /**
+     * Edita serie + start_number de UNA serie. NO toca current_number (correlativo, lo maneja
+     * la emisión en Capa C) ni sede_id/document_type_id. Blindaje por sede.
+     */
+    public function updateSerie(SerieUpdateRequest $request, $id)
+    {
+        DB::beginTransaction();
+        try {
+            $serie = DocumentSerialization::find($id);
+
+            if (! $serie) {
+                return response()->json(['success' => false, 'message' => 'La serie no existe.'], 404);
+            }
+            if (! $this->puedeAccederSede($serie->sede_id)) {
+                return response()->json(['success' => false, 'message' => 'No tiene acceso a esa serie.'], 403);
+            }
+
+            $serie->serie        = mb_strtoupper($request->get('serie'), 'UTF-8');
+            $serie->start_number = (int) $request->get('start_number');
+            $serie->save();
+
+            DB::commit();
+            return response()->json(['success' => true, 'message' => 'SERIE ACTUALIZADA']);
+        } catch (Throwable $th) {
+            DB::rollBack();
+            return response()->json(['success' => false, 'message' => $th->getMessage()]);
+        }
+    }
+
+    /**
+     * Seguridad: la sede debe pertenecer a una sede disponible del usuario.
+     * Reusa HasSedeActiva (admin → todas; usuario normal → sus sede_user). No duplica lógica.
+     */
+    private function puedeAccederSede($sedeId): bool
+    {
+        return $this->sedesDisponibles()->contains('id', (int) $sedeId);
     }
 }
