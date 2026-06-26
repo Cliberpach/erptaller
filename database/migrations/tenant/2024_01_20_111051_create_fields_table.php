@@ -18,8 +18,8 @@ return new class extends Migration
             $table->string('location')->nullable();
             $table->enum('status', ['LIBRE', 'RESERVADO', 'ALQUILADO'])->default('LIBRE');
             $table->boolean('isDeleted')->default(false);
-            $table->unsignedDecimal('day_price', 16, 6);
-            $table->unsignedDecimal('night_price', 16, 6);
+            $table->decimal('day_price', 16, 6);
+            $table->decimal('night_price', 16, 6);
             $table->timestamps();
 
             $table->foreign('type_field_id')->references('id')->on('type_fields');

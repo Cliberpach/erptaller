@@ -16,7 +16,7 @@ return new class extends Migration
 
             $table->string('name', 160);
             $table->string('description', 300)->nullable();
-            $table->unsignedDecimal('price',16,6);
+            $table->decimal('price',16,6);
 
             $table->enum('status', ['ACTIVE', 'INACTIVE'])->default('ACTIVE');
 

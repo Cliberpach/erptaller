@@ -27,10 +27,10 @@ return new class extends Migration
             $table->unsignedBigInteger('payment_method_id');
             $table->foreign('payment_method_id')->references('id')->on('payment_methods');
 
-            $table->unsignedDecimal('cash', 15, 6)->nullable()->default(0.00);
-            $table->unsignedDecimal('amount', 16, 6)->nullable()->default(0.00);
-            $table->unsignedDecimal('balance', 16, 6)->nullable();
-            $table->unsignedDecimal('total', 16, 6)->nullable();
+            $table->decimal('cash', 15, 6)->nullable()->default(0.00);
+            $table->decimal('amount', 16, 6)->nullable()->default(0.00);
+            $table->decimal('balance', 16, 6)->nullable();
+            $table->decimal('total', 16, 6)->nullable();
 
             $table->timestamps();
         });

@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('account_number');
             $table->string('iban');
             $table->string('currency');
-            $table->unsignedDecimal('itf', 15,2);
+            $table->decimal('itf', 15,2);
             $table->timestamps();
         });
     }
