@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\View;
 use App\Models\Module;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Schema;
 use Spatie\Multitenancy\Models\Tenant;
 
 class AppServiceProvider extends ServiceProvider
@@ -31,6 +32,14 @@ class AppServiceProvider extends ServiceProvider
         // 🔌 Cambiar conexión por defecto (TU enfoque)
         $databaseConnection = $isLandlord ? 'landlord' : 'tenant';
         config(['database.default' => $databaseConnection]);
+
+        // Guard: en BD fresca (antes de migrar) las tablas de menú no existen.
+        if (! Schema::hasTable('modules')) {
+            View::share('base', $base . '.');
+            View::share('modules', collect());
+            View::share('lst_search_modules', []);
+            return;
+        }
 
         // 🔐 Tenant ID (solo para cache / lógica)
         $tenantId = $isLandlord
