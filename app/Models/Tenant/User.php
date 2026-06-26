@@ -72,4 +72,22 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    /**
+     * Sedes asignadas al usuario (M:N), con marca de sede por defecto.
+     */
+    public function sedes()
+    {
+        return $this->belongsToMany(Sede::class, 'sede_user')
+            ->withPivot('es_default')
+            ->withTimestamps();
+    }
+
+    /**
+     * Sede por defecto del usuario (pivot es_default = true).
+     */
+    public function sedeDefault()
+    {
+        return $this->sedes()->wherePivot('es_default', true)->first();
+    }
 }

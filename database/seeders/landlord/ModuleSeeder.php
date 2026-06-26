@@ -378,6 +378,14 @@ class ModuleSeeder extends Seeder
             'order'         => '2'
         ]);
 
+        ModuleChild::create([
+            'module_id'  => $maintenance->id,
+            'description'=> 'Sedes',
+            'route_name' => 'mantenimientos.sedes.index',
+            'order'      => '2',
+            'show'       => 'tenant',
+        ]);
+
         //========== CONSULTAS ===========
         $consultas = Module::create([
             'description'   =>  'Consultas',

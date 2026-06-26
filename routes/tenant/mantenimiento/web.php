@@ -7,11 +7,20 @@ use App\Http\Controllers\Tenant\Maintenance\BankAccountController;
 use App\Http\Controllers\Tenant\Maintenance\CollaboratorController;
 use App\Http\Controllers\Tenant\Maintenance\ConfigurationController;
 use App\Http\Controllers\Tenant\Maintenance\PositionController;
+use App\Http\Controllers\Tenant\Maintenance\SedeController;
 use App\Http\Controllers\Tenant\Maintenance\UserController;
 use App\Http\Controllers\Tenant\PlanController;
 use App\Http\Controllers\Tenant\RoleController;
 
 Route::group(["prefix" => "mantenimiento"], function () {
+
+    Route::group(["prefix" => "sedes"], function () {
+        Route::get('index', [SedeController::class, 'index'])->name('tenant.mantenimientos.sedes.index');
+        Route::get('getSedes', [SedeController::class, 'getSedes'])->name('tenant.mantenimientos.sedes.getSedes');
+        Route::post('store', [SedeController::class, 'store'])->name('tenant.mantenimientos.sedes.store');
+        Route::put('update/{id}', [SedeController::class, 'update'])->name('tenant.mantenimientos.sedes.update');
+        Route::put('toggle-status/{id}', [SedeController::class, 'toggleStatus'])->name('tenant.mantenimientos.sedes.toggleStatus');
+    });
 
     Route::group(["prefix" => "cuentas"], function () {
         Route::get('index', [BankAccountController::class, 'index'])->name('tenant.mantenimientos.cuentas.index');

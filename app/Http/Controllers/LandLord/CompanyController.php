@@ -328,6 +328,18 @@ class CompanyController extends Controller
         $role = Role::where('name', 'admin')->first();
         $user->assignRole($role);
 
+        //========= SEDE PRINCIPAL DEL TENANT (Fase 3 - Multi-Sede) ========
+        $sede = \App\Models\Tenant\Sede::create([
+            'numero'       => 1,
+            'nombre'       => 'SEDE PRINCIPAL',
+            'codigo'       => 'S001',
+            'es_principal' => true,
+            'direccion'    => $request->get('direccion_fiscal'),
+            'ubigeo'       => $request->get('ubigeo'),
+            'status'       => 'ACTIVO',
+        ]);
+        $user->sedes()->attach($sede->id, ['es_default' => true]);
+
         DB::table("document_serializations")->insert([
             [
                 'company_id' => $company->id,
