@@ -22,6 +22,7 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 use Spatie\Permission\Models\Role;
 use Throwable;
@@ -63,7 +64,7 @@ class CompanyController extends Controller
                 'e.ruc',
                 'e.business_name',
                 'e.created_at',
-                't.id',
+                't.id as tenant_id',
                 't.domain',
                 'p.description as plan_name',
                 'e.email',
@@ -90,7 +91,7 @@ class CompanyController extends Controller
         return view('company.create', compact('all_modules', 'plans'));
     }
 
-    public function edit($id): View
+    public function edit($id): View|RedirectResponse
     {
 
         $all_modules    =   Module::with('children.grandchildren')->get();
@@ -100,7 +101,14 @@ class CompanyController extends Controller
                             t.database
                             from tenants as t
                             inner join companies as c on c.tenant_id = t.id
-                            where c.id = ?', [$id])[0];
+                            where c.id = ?', [$id]);
+
+        if (empty($tenant_data)) {
+            return redirect()->route('landlord.mantenimientos.empresa')
+                ->with('message_error', 'La empresa solicitada no existe.');
+        }
+
+        $tenant_data = $tenant_data[0];
 
         $tenant_modules =   DB::table("$tenant_data->database.modules as m")
             ->select('m.id')
@@ -117,7 +125,12 @@ class CompanyController extends Controller
         $user   =   DB::table("$tenant_data->database.users as u")
             ->select('u.*')
             ->where('u.id', 1)
-            ->get()[0];
+            ->first();
+
+        if (! $user) {
+            return redirect()->route('landlord.mantenimientos.empresa')
+                ->with('message_error', 'El usuario administrador del tenant no existe.');
+        }
 
         $company        =   DB::table("companies as c")
             ->join('tenants as t', 't.id', '=', 'c.tenant_id')
@@ -132,7 +145,12 @@ class CompanyController extends Controller
                 'c.plan'
             )
             ->where('c.id', $id)
-            ->get()[0];
+            ->first();
+
+        if (! $company) {
+            return redirect()->route('landlord.mantenimientos.empresa')
+                ->with('message_error', 'La empresa solicitada no existe.');
+        }
 
         $plans = Plan::select(
             'id',
