@@ -55,4 +55,24 @@ class User extends Authenticatable
     protected $appends = [
         'profile_photo_url',
     ];
+
+    /**
+     * Sedes asignadas al usuario (M:N), con marca de sede por defecto.
+     * Multi-sede: en contexto tenant esta relación lee la BD del tenant
+     * (App\Models\User usa la conexión default = 'tenant' en ese contexto).
+     */
+    public function sedes()
+    {
+        return $this->belongsToMany(\App\Models\Tenant\Sede::class, 'sede_user')
+            ->withPivot('es_default')
+            ->withTimestamps();
+    }
+
+    /**
+     * Sede por defecto del usuario (pivot es_default = true).
+     */
+    public function sedeDefault()
+    {
+        return $this->sedes()->wherePivot('es_default', true)->first();
+    }
 }
