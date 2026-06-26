@@ -264,7 +264,7 @@ class DashboardMarketService
                                 CONCAT(c.type_document_abbreviation,":",c.document_number,"-",c.name) as cliente_nombre,
                                 round(SUM(cc.balance),2) as cliente_saldo
                                 FROM customer_accounts as cc
-                                INNER JOIN erptaller.customers as c on c.id = cc.customer_id
+                                INNER JOIN customers as c on c.id = cc.customer_id
                                 WHERE
                                 cc.status <> "ANULADO"
                                 GROUP BY c.type_document_abbreviation,c.document_number,c.name');

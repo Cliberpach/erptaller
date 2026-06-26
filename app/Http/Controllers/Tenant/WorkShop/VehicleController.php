@@ -41,7 +41,7 @@ class VehicleController extends Controller
     public function getVehiculos(Request $request)
     {
         $vehicles = DB::table('vehicles as v')
-            ->join(DB::raw('erptaller.customers as cu'), 'cu.id', '=', 'v.customer_id')
+            ->join(DB::raw('customers as cu'), 'cu.id', '=', 'v.customer_id')
             ->join(DB::raw('erptaller.brandsv as b'), 'b.id', '=', 'v.brand_id')
             ->join(DB::raw('erptaller.models as m'), 'm.id', '=', 'v.model_id')
             ->leftJoin(DB::raw('erptaller.years as y'), 'y.id', '=', 'v.year_id')

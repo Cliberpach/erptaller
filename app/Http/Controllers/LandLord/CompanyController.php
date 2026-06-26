@@ -354,6 +354,20 @@ class CompanyController extends Controller
             $user->sedes()->attach($sede->id, ['es_default' => true]);
         }
 
+        //========= CLIENTE VARIOS POR DEFECTO (per-tenant, customers ahora vive en el tenant) ========
+        \App\Models\Landlord\Customer::firstOrCreate(
+            ['es_varios' => true],
+            [
+                'name'                       => 'CLIENTE VARIOS',
+                'document_number'            => '99999999',
+                'type_identity_document_id'  => 1,
+                'type_document_code'         => '01',
+                'type_document_name'         => 'DOCUMENTO NACIONAL DE IDENTIDAD',
+                'type_document_abbreviation' => 'DNI',
+                'status'                     => 'ACTIVO',
+            ]
+        );
+
         DB::table("document_serializations")->insert([
             [
                 'company_id' => $company->id,

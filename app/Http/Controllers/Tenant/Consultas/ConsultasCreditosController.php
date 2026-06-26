@@ -332,7 +332,7 @@ class ConsultasCreditosController extends Controller
         $tipoAbrev = $tipo === 'boleta' ? 'DNI' : 'RUC';
         $isBoleta  = $tipo === 'boleta';
     
-        $query = DB::connection('landlord')->table('customers');
+        $query = DB::table('customers');
     
         // Buscar por documento según tipo
         if ($isBoleta) {
@@ -356,7 +356,7 @@ class ConsultasCreditosController extends Controller
         $nombreInput = request('nombre_razon_social');
         $telefono    = request('telefono') ?? null;
     
-        $id = DB::connection('landlord')->table('customers')->insertGetId([
+        $id = DB::table('customers')->insertGetId([
             'document_number'             => $numero,
             'ruc_number'                  => $isBoleta ? null : $numero,
             'name'                        => $nombreInput,
@@ -380,7 +380,7 @@ class ConsultasCreditosController extends Controller
             'updated_at'                 => now(),
         ]);
     
-        return DB::connection('landlord')->table('customers')->where('id', $id)->first();
+        return DB::table('customers')->where('id', $id)->first();
     }
     
 }

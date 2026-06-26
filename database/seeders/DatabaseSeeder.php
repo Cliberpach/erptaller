@@ -80,7 +80,8 @@ class DatabaseSeeder extends Seeder
         $this->call(PlanSeeder::class);
         $this->call(RoleSeeder::class);
         $this->call(UserSeeder::class);
-        $this->call(CustomerSeeder::class);
+        // CustomerSeeder removido: customers se movió al TENANT; el "CLIENTE VARIOS"
+        // se siembra per-tenant en el provisioning (insertDataTenant).
         $this->call(YearSeeder::class);
         $this->call(LandlordBrandSeeder::class);
         $this->call(BrandSeeder::class);

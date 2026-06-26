@@ -45,7 +45,7 @@ class CustomerController extends Controller
     {
         $customer_id    =   $request->get('customer_id');
 
-        $items          =   Customer::from('erptaller.customers as c')
+        $items          =   Customer::from('customers as c')
             ->where('status', 'ACTIVO')
             ->select(
                 'c.*'
@@ -360,7 +360,7 @@ array:10 [ // app\Http\Controllers\Tenant\CustomerController.php:173
             $query = trim($request->get('q', ''));
             $vehicle_id = $request->get('vehicle_id', null);
 
-            $customers = DB::table('erptaller.customers as c');
+            $customers = DB::table('customers as c');
 
             if ($query) {
                 $customers->whereRaw("CONCAT(type_document_abbreviation, ':', document_number, ' - ', name) LIKE ?", ["%{$query}%"])

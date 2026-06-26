@@ -42,7 +42,7 @@ class AppointmentUpdateRequest extends FormRequest
 
             'customer_id' => [
                 'required',
-                Rule::exists('landlord.customers', 'id')->where('status', 'ACTIVO'),
+                Rule::exists('customers', 'id')->where('status', 'ACTIVO'),
             ],
 
             'vehicle_id' => [

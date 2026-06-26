@@ -18,10 +18,10 @@ class VehicleUpdateRequest extends FormRequest
     {
         return [
 
-            // CLIENTE: obligatorio, debe existir en landlord.customers con status ACTIVE
+            // CLIENTE: obligatorio, debe existir en customers con status ACTIVE
             'client_id' => [
                 'required',
-                Rule::exists('landlord.customers', 'id')->where(function ($q) {
+                Rule::exists('customers', 'id')->where(function ($q) {
                     $q->where('status', 'ACTIVO');
                 }),
             ],

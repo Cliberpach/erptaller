@@ -54,7 +54,7 @@ class CustomerStoreRequest extends FormRequest
                         $fail('El número de documento no debe exceder los 20 caracteres para los demás tipos de documento.');
                     }
                 },
-                Rule::unique('landlord.customers', 'document_number')
+                Rule::unique('customers', 'document_number')
                     ->where('status', 'ACTIVO'),
             ],
             'name'    => ['required', 'string', 'max:160'],

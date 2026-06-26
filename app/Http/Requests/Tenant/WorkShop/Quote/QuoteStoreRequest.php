@@ -19,7 +19,7 @@ class QuoteStoreRequest extends FormRequest
         return [
             'client_id' => [
                 'required',
-                Rule::exists('landlord.customers', 'id')->where('status', 'ACTIVO'),
+                Rule::exists('customers', 'id')->where('status', 'ACTIVO'),
             ],
 
             'vehicle_id' => [

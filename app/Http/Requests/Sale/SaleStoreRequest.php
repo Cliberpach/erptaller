@@ -25,7 +25,7 @@ class SaleStoreRequest extends FormRequest
 
             'customer_id' => [
                 'required',
-                Rule::exists('landlord.customers', 'id')
+                Rule::exists('customers', 'id')
                     ->where('status', 'ACTIVO'),
             ],
 

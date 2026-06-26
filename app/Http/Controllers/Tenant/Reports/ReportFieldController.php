@@ -74,7 +74,7 @@ class ReportFieldController extends Controller
 
         $customer_ids   = $fields->pluck('customer_id');
 
-        $customers  =   DB::connection('landlord')->table('customers as c')
+        $customers  =   DB::table('customers as c')
                         ->whereIn('c.id', $customer_ids)
                         ->get();
 
@@ -165,7 +165,7 @@ class ReportFieldController extends Controller
             throw new Exception("NO EXISTE LA RESERVA EN LA BD!!!");
         }
 
-        $customer   =   DB::connection('landlord')->table('customers as c')
+        $customer   =   DB::table('customers as c')
                         ->where('c.id', $reservation[0]->customer_id)
                         ->get();
 

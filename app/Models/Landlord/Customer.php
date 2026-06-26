@@ -10,7 +10,9 @@ class Customer extends Model
 {
     use HasFactory;
     
-    protected $connection   = 'landlord';
+    // customers se movió a la BD del TENANT (clientes privados por empresa).
+    // Nota: el modelo sigue en namespace Landlord por compatibilidad; renombrar a Tenant\Customer es follow-up.
+    protected $connection   = 'tenant';
     protected $table        = 'customers';
 
     protected $guarded = [''];
