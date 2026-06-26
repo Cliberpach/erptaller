@@ -182,26 +182,6 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::get("/logout", [ModuleController::class, 'logout'])->name('module.logout');
 });
 
-use App\Events\AlertCreated;
-use App\Events\TestSocketEvent;
-use App\Models\Tenant\Alerts\Alert;
-use Illuminate\Support\Facades\Auth;
-
-Route::get('/test-broadcast', function () {
-    $user = Auth::user();
-    event(new AlertCreated(Alert::findOrFail(2), $user));
-
-    return 'Evento enviado';
-});
-
-Route::get('/test-socket', function () {
-
-    event(new TestSocketEvent());
-    return 'OK';
-});
-
-
-
 Route::group(["prefix" => "utils"], function () {
     Route::get('cash-available-search', [PettyCashController::class, 'searchCashAvailable'])->name('tenant.utils.searchCashAvailable');
     Route::get('service-search', [ServiceController::class, 'searchService'])->name('tenant.utils.searchService');
