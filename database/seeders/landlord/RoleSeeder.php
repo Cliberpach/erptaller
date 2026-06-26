@@ -13,11 +13,12 @@ class RoleSeeder extends Seeder
      */
     public function run(): void
     {
-        $role = Role::create(['name' => 'admin']);
-        $role2 = Role::create(['name' => 'TECNICO']);
+        $admin   = Role::firstOrCreate(['name' => 'admin']);
+        $ventas  = Role::firstOrCreate(['name' => 'ventas']);
+        $tecnico = Role::firstOrCreate(['name' => 'tecnico']);
 
-        $permissions = Permission::all();
-        $role->syncPermissions($permissions);
-        $role2->syncPermissions($permissions);
+        // admin = todos los permisos. ventas/tecnico quedan sin permisos por ahora
+        // (el detalle se define en una etapa aparte; aquí solo deben EXISTIR).
+        $admin->syncPermissions(Permission::all());
     }
 }

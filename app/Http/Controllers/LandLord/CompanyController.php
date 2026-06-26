@@ -13,7 +13,8 @@ use App\Models\ModuleGrandChild;
 use App\Models\Plan;
 use App\Models\Tenant;
 use App\Models\Tenant\Maintenance\Collaborator\Collaborator;
-use App\Models\Tenant\User;
+use App\Models\Tenant\Maintenance\Position;
+use App\Models\User;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Facades\DB;
@@ -302,32 +303,6 @@ class CompanyController extends Controller
             'updated_at'           => now(),
         ]);
 
-        //========= CREANDO USUARIO PARA EL TENANT ========
-        $collaborator                               =   new Collaborator();
-        $collaborator->full_name                    =   'LUIS DANIEL ALVA LUJAN';
-        $collaborator->document_type_id             =   1;
-        $collaborator->document_number              =   77412431;
-        $collaborator->address                      =   'AV HUSARES 123';
-        $collaborator->phone                        =   '989392912';
-        $collaborator->work_days                    =   30;
-        $collaborator->rest_days                    =   20;
-        $collaborator->monthly_salary               =   12000;
-        $collaborator->daily_salary                 =   400;
-        $collaborator->position_id                  =   1;
-        $collaborator->document_type_abbreviation   =   'DNI';
-        $collaborator->save();
-
-        $user                       =   new User();
-        $user->name                 =   'ADMIN';
-        $user->email                =   $request->get("correo");
-        $user->password             =   Hash::make($request->get("password"));
-        $user->password_visible     =   $request->get("password");
-        $user->collaborator_id      =   $collaborator->id;
-        $user->save();
-
-        $role = Role::where('name', 'admin')->first();
-        $user->assignRole($role);
-
         //========= SEDE PRINCIPAL DEL TENANT (Fase 3 - Multi-Sede) ========
         $sede = \App\Models\Tenant\Sede::create([
             'numero'       => 1,
@@ -338,7 +313,46 @@ class CompanyController extends Controller
             'ubigeo'       => $request->get('ubigeo'),
             'status'       => 'ACTIVO',
         ]);
-        $user->sedes()->attach($sede->id, ['es_default' => true]);
+
+        //========= 3 USUARIOS POR DEFECTO DEL TENANT (admin / ventas / tecnico) ========
+        // Se usa App\Models\User (modelo de auth) para que el model_type del rol quede alineado.
+        // Los 3 quedan asignados a la sede principal con es_default = true.
+        $usuarios = [
+            ['name' => 'ADMIN',   'email' => $request->get('correo'),   'password' => $request->get('password'), 'doc' => '99999999', 'cargo' => 'ADMINISTRADOR', 'rol' => 'admin',   'full_name' => 'ADMINISTRADOR'],
+            ['name' => 'VENTAS',  'email' => 'ventas@tallersuite.com',  'password' => '123456789',               'doc' => '88888888', 'cargo' => 'VENTAS',        'rol' => 'ventas',  'full_name' => 'VENDEDOR'],
+            ['name' => 'TECNICO', 'email' => 'tecnico@tallersuite.com', 'password' => '123456789',               'doc' => '77777777', 'cargo' => 'TECNICO',       'rol' => 'tecnico', 'full_name' => 'TECNICO'],
+        ];
+
+        foreach ($usuarios as $u) {
+            $position = Position::firstOrCreate(['name' => $u['cargo']]);
+
+            $collaborator                               =   new Collaborator();
+            $collaborator->full_name                    =   $u['full_name'];
+            $collaborator->document_type_id             =   1;
+            $collaborator->document_number              =   $u['doc'];
+            $collaborator->address                      =   $request->get('direccion_fiscal');
+            $collaborator->phone                        =   '999999999';
+            $collaborator->work_days                    =   30;
+            $collaborator->rest_days                    =   0;
+            $collaborator->monthly_salary               =   1500;
+            $collaborator->daily_salary                 =   50;
+            $collaborator->position_id                  =   $position->id;
+            $collaborator->document_type_abbreviation   =   'DNI';
+            $collaborator->save();
+
+            $user                       =   new User();
+            $user->name                 =   $u['name'];
+            $user->email                =   $u['email'];
+            $user->password             =   Hash::make($u['password']);
+            $user->password_visible     =   $u['password'];
+            $user->collaborator_id      =   $collaborator->id;
+            $user->save();
+
+            $role = Role::firstOrCreate(['name' => $u['rol']]);
+            $user->assignRole($role);
+
+            $user->sedes()->attach($sede->id, ['es_default' => true]);
+        }
 
         DB::table("document_serializations")->insert([
             [
