@@ -250,7 +250,6 @@ class CompanyController extends Controller
 
     private function insertDataTenant($database, $request)
     {
-        $serializable_document  =   GeneralTableDetail::where('symbol', 'NV')->where('parameter', 'NV')->first();
         $files_route            =   $request->get('files_route');
 
         Tenant::where('database', $database)->firstOrFail()->makeCurrent();
@@ -324,6 +323,11 @@ class CompanyController extends Controller
             'estado'       => 'ACTIVO',
         ]);
 
+        //========= SERIES DE LA SEDE PRINCIPAL (Multi-Sede Etapa 5) ========
+        // Antes este sembrado estaba comentado → ningún tenant recibía series. Ahora la sede
+        // principal recibe sus series (sufijo 001) vía el helper único (mismo que SedeController).
+        (new \App\Http\Services\Tenant\Maintenance\SerieService())->generarSeriesSede($sede);
+
         //========= 3 USUARIOS POR DEFECTO DEL TENANT (admin / ventas / tecnico) ========
         // Se usa App\Models\User (modelo de auth) para que el model_type del rol quede alineado.
         // Los 3 quedan asignados a la sede principal con es_default = true.
@@ -378,18 +382,8 @@ class CompanyController extends Controller
             ]
         );
 
-        DB::table("document_serializations")->insert([
-            [
-                'company_id' => $company->id,
-                'document_type_id' => $serializable_document->id,
-                'serie' => $serializable_document->parameter . '01',
-                'number_limit' => 8,
-                'destiny' => 'NOTA DE VENTA',
-                'default' => 'NO',
-                'final_number' => 0,
-                'description'   =>  $serializable_document->name
-            ],
-        ]);
+        // Multi-Sede Etapa 5: las series ya se generan (las 7, por sede) en generarSeriesSede()
+        // arriba. Se eliminó el insert legado de una sola serie NV01 colgada de company_id.
 
         foreach ($this->modules as $module) {
             Module::create([

@@ -79,6 +79,9 @@ class SedeController extends Controller
                 'estado'       => 'ACTIVO',
             ]);
 
+            // Multi-Sede Etapa 5: la sede recibe sus series automáticamente (sufijo = numero).
+            (new \App\Http\Services\Tenant\Maintenance\SerieService())->generarSeriesSede($sede);
+
             DB::commit();
             return response()->json(['success' => true, 'message' => 'SEDE REGISTRADA']);
         } catch (Throwable $th) {
