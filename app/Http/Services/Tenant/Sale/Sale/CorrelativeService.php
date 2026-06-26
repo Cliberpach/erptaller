@@ -2,6 +2,7 @@
 
 namespace App\Http\Services\Tenant\Sale\Sale;
 
+use App\Http\Concerns\HasSedeActiva;
 use App\Models\Company;
 use App\Models\Product;
 use App\Models\Tenant\DocumentSerialization;
@@ -10,6 +11,9 @@ use Illuminate\Support\Facades\DB;
 
 class CorrelativeService
 {
+    // Resuelve la sede activa (Auth/Session globales del request), mismo patrón que
+    // DashboardMarketService (Capa 1). Las series cuelgan de la sede, no de la empresa.
+    use HasSedeActiva;
 
     public function __construct() {}
 
@@ -19,32 +23,39 @@ class CorrelativeService
   +"serie": "NV01"
 }
 */
-    public static function getCorrelative($type_sale):object
+    /**
+     * Multi-Sede Capa C: correlativo ATÓMICO por (sede activa, tipo de documento).
+     *
+     * Reemplaza el COUNT(*)+1 (no atómico, reutilizaba número al anular) y el company_id=1.
+     * Debe correr DENTRO de la transacción del documento (la venta la abre en
+     * SaleController@store:238; la factura de OT en WorkOrderController:178) — el
+     * lockForUpdate (SELECT ... FOR UPDATE) solo serializa dentro de transacción.
+     *
+     * current_number es MONOTÓNICO: solo sube. Anular un documento NO llama a este método,
+     * así que current_number queda intacto → un número anulado NUNCA se reutiliza.
+     */
+    public function getCorrelative($document_type_id): object
     {
-        $correlative        =   null;
-        $serie              =   null;
+        $sedeId = $this->sedeActivaId();
 
-        //======= CONTABILIZANDO SI HAY DOCUMENTOS DE VENTA EMITIDOS PARA EL TYPE SALE ======
-        $sales_documents    =   DB::select('SELECT
-                                count(*) as cant
-                                from sales_documents as sd
-                                where sd.type_sale_id = ?', [$type_sale])[0];
+        // Lock pesimista de la fila (sede, tipo) hasta el commit del documento.
+        $ds = DB::table('document_serializations')
+            ->where('sede_id', $sedeId)
+            ->where('document_type_id', $document_type_id)
+            ->lockForUpdate()
+            ->first();
 
-        $document_serialization =   DocumentSerialization::where('company_id',1)->where('document_type_id',$type_sale)->first();
-       
-        //==== SI LA CANT ES 0 =====
-        if ($sales_documents->cant === 0) {
-
-            //====== INICIAR DESDE EL STARTING NUMBER =======
-            $correlative        =   $document_serialization->start_number;
-            $serie              =   $document_serialization->serie;
-        } else {
-            //======= EN CASO YA EXISTAN DOCUMENTOS DE VENTA DEL TYPE SALE ======
-            $correlative        =   $sales_documents->cant  +   1;
-            $serie              =   $document_serialization->serie;
+        if (! $ds) {
+            throw new Exception('La sede activa no tiene serie configurada para este tipo de documento.');
         }
 
+        // Próximo número: nunca decrementa; respeta start_number si se reconfiguró.
+        $next = max((int) $ds->current_number + 1, (int) $ds->start_number);
 
-        return (object)['correlative' => $correlative, 'serie' => $serie];
+        DB::table('document_serializations')
+            ->where('id', $ds->id)
+            ->update(['current_number' => $next]);
+
+        return (object) ['correlative' => $next, 'serie' => $ds->serie];
     }
 }
