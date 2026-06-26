@@ -82,6 +82,10 @@ Route::group(["prefix" => "mantenimiento"], function () {
 
     Route::group(["prefix" => "rol"], function () {
         Route::get('rol', [RoleController::class, 'index'])->name('tenant.mantenimientos.rol');
+        Route::get('getRoles', [RoleController::class, 'getRoles'])->name('tenant.mantenimientos.roles.getRoles');
+        Route::post('store', [RoleController::class, 'store'])->name('tenant.mantenimientos.roles.store');
+        Route::get('permisos/{id}', [RoleController::class, 'permisos'])->name('tenant.mantenimientos.roles.permisos');
+        Route::post('sync-permisos/{id}', [RoleController::class, 'syncPermisos'])->name('tenant.mantenimientos.roles.syncPermisos');
     });
 
     Route::get('horario-de-atencion', [BookController::class, 'schedule'])->name('tenant.mantenimientos.horario');

@@ -8,33 +8,59 @@ use Spatie\Permission\Models\Permission;
 class PermissionSeeder extends Seeder
 {
     /**
-     * Run the database seeds.
+     * Set de permisos modulo.accion (agrupable por prefijo en la UI).
+     * Idempotente (firstOrCreate). Reemplaza el set legacy (estaba dormido, sin uso).
      */
     public function run(): void
     {
-        Permission::create(['name' => 'usuarios.listar']);
-        Permission::create(['name' => 'usuarios.editar']);
-        Permission::create(['name' => 'usuarios.editarMiUsuario']);
-        Permission::create(['name' => 'usuarios.eliminar']);
-        Permission::create(['name' => 'almacen']);
-        Permission::create(['name' => 'kardex_producto']);
-        Permission::create(['name' => 'marcas']);
-        Permission::create(['name' => 'notas_ingreso']);
-        Permission::create(['name' => 'tipos_cliente']);
-        Permission::create(['name' => 'documentos_compra']);
-        Permission::create(['name' => 'cuentas_proveedor']);
-        Permission::create(['name' => 'empresas']);
-        Permission::create(['name' => 'usuarios.crear']);
-        Permission::create(['name' => 'usuarios.ver']);
-        Permission::create(['name' => 'usuarios.verMiUsuario']);
-        Permission::create(['name' => 'roles']);
-        Permission::create(['name' => 'categorias']);
-        Permission::create(['name' => 'consulta_lote_productos']);
-        Permission::create(['name' => 'productos']);
-        Permission::create(['name' => 'notas_salida']);
-        Permission::create(['name' => 'ordenes_compra']);
-        Permission::create(['name' => 'proveedores']);
-        Permission::create(['name' => 'colaboradores']);
-        Permission::create(['name' => 'personas']);
+        $permisos = [
+            // DASHBOARD
+            'dashboard.ver',
+
+            // CAJAS
+            'cajas.ver', 'cajas.abrir_cerrar', 'cajas.egresos',
+
+            // TALLER - Órdenes de trabajo
+            'taller.ot.ver', 'taller.ot.crear', 'taller.ot.editar', 'taller.ot.anular',
+            'taller.ot.facturar', 'taller.ot.ver_precios',
+            // TALLER - Cotizaciones
+            'taller.cotizaciones.ver', 'taller.cotizaciones.crear', 'taller.cotizaciones.editar',
+            // TALLER - Maestros
+            'taller.servicios.gestionar', 'taller.vehiculos.gestionar',
+            'taller.citas.gestionar', 'taller.maestros.gestionar',
+
+            // VENTAS
+            'ventas.ver', 'ventas.crear', 'ventas.anular', 'ventas.enviar_sunat', 'ventas.ver_precios',
+            'ventas.clientes.gestionar',
+
+            // RESERVAS / CAMPOS
+            'reservas.ver', 'reservas.crear', 'reservas.editar', 'reservas.anular',
+
+            // INVENTARIO
+            'inventario.productos.gestionar', 'inventario.kardex.ver',
+            'inventario.notas.gestionar', 'inventario.ver_costos',
+
+            // COMPRAS
+            'compras.ver', 'compras.crear',
+
+            // CUENTAS
+            'cuentas.cxc.ver', 'cuentas.cxc.cobrar', 'cuentas.cxp.ver', 'cuentas.cxp.pagar',
+
+            // REPORTES
+            'reportes.ventas', 'reportes.contable', 'reportes.inventario',
+
+            // CONSULTAS
+            'consultas.ver',
+
+            // MANTENIMIENTO
+            'mantenimiento.usuarios.gestionar', 'mantenimiento.roles.gestionar',
+            'mantenimiento.sedes.gestionar', 'mantenimiento.cargos.gestionar',
+            'mantenimiento.colaboradores.gestionar', 'mantenimiento.empresa.gestionar',
+            'mantenimiento.configuracion.gestionar',
+        ];
+
+        foreach ($permisos as $name) {
+            Permission::firstOrCreate(['name' => $name]);
+        }
     }
 }
