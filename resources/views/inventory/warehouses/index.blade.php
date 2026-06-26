@@ -10,7 +10,7 @@
 
     <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
-            <h4 class="card-title mb-md-0 mb-2">ALMACENES <small class="text-muted">(sede activa)</small></h4>
+            <h4 class="card-title mb-md-0 mb-2">ALMACENES <small class="text-muted">(todas mis sedes)</small></h4>
             <div class="d-flex flex-wrap gap-2">
                 <a onclick="openMdlNuevoAlmacen()" class="btn btn-primary text-white">
                     <i class="fas fa-plus-circle"></i> Nuevo almacén

@@ -17,6 +17,7 @@ class WarehouseStoreRequest extends FormRequest
     {
         return [
             'descripcion' => ['required', 'string', 'max:120'],
+            'sede_id'     => ['required', 'integer'],
         ];
     }
 
@@ -25,6 +26,7 @@ class WarehouseStoreRequest extends FormRequest
         return [
             'descripcion.required' => 'El nombre del almacén es obligatorio.',
             'descripcion.max'      => 'El nombre no puede tener más de 120 caracteres.',
+            'sede_id.required'     => 'Debe seleccionar una sede.',
         ];
     }
 

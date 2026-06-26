@@ -18,16 +18,20 @@ class WarehouseController extends Controller
 
     public function index()
     {
-        return view('inventory.warehouses.index');
+        // Sedes para el selector del modal (admin: todas; normal: las suyas) + la activa para pre-seleccionar.
+        return view('inventory.warehouses.index', [
+            'sedes'        => $this->sedesDisponibles(),
+            'sedeActivaId' => $this->sedeActivaId(),
+        ]);
     }
 
     public function getWarehouses(Request $request)
     {
-        // Solo los almacenes de la SEDE ACTIVA (la sede activa ya está limitada a las sedes
-        // permitidas del usuario por HasSedeActiva — Etapa 2).
+        // Almacenes de TODAS las sedes disponibles del usuario (admin: todas; normal: las de sede_user).
+        // Respeta el blindaje: nunca muestra sedes ajenas.
         $warehouses = DB::table('warehouses as w')
             ->leftJoin('sedes as s', 's.id', '=', 'w.sede_id')
-            ->where('w.sede_id', $this->sedeActivaId())
+            ->whereIn('w.sede_id', $this->sedesDisponibles()->pluck('id'))
             ->select(
                 'w.id',
                 'w.descripcion',
@@ -42,12 +46,20 @@ class WarehouseController extends Controller
 
     public function store(WarehouseStoreRequest $request)
     {
+        $sedeId = (int) $request->get('sede_id');
+
+        // BLINDAJE: la sede elegida en el dropdown DEBE ser del usuario (un request manipulado
+        // podría mandar otro sede_id). No se confía en el cliente.
+        if (! $this->puedeAccederSede($sedeId)) {
+            return response()->json(['success' => false, 'message' => 'No tiene acceso a esa sede.'], 403);
+        }
+
         DB::beginTransaction();
         try {
             $warehouse               = new Warehouse();
             $warehouse->descripcion  = mb_strtoupper($request->get('descripcion'), 'UTF-8');
-            $warehouse->sede_id      = $this->sedeActivaId();  // SIEMPRE la sede activa, NUNCA del request
-            $warehouse->es_principal = false;                  // los creados a mano nunca son principal
+            $warehouse->sede_id      = $sedeId;  // validado contra sedesDisponibles()
+            $warehouse->es_principal = false;    // los creados a mano nunca son principal
             $warehouse->estado       = 'ACTIVO';
             $warehouse->save();
 
