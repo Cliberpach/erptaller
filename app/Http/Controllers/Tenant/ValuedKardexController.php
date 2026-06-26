@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Tenant;
 
+use App\Http\Concerns\HasSedeActiva;
 use App\Http\Controllers\Controller;
 use App\Models\Company;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -12,6 +13,8 @@ use Yajra\DataTables\Facades\DataTables;
 
 class ValuedKardexController extends Controller
 {
+    use HasSedeActiva;
+
     public function index(){
         return view('inventory.valued_kardex.index');
     }
@@ -24,7 +27,7 @@ class ValuedKardexController extends Controller
 
     }
 
-    public static function queryValuedKardex($request){
+    public function queryValuedKardex($request){
 
         $valued_kardex  =    DB::table('products as p')
                             ->join('categories as c','c.id','p.category_id')
@@ -41,7 +44,7 @@ class ValuedKardexController extends Controller
                                 'p.purchase_price',
                                 DB::raw('ROUND(wp.stock * p.sale_price, 2) AS value')
                             )
-                            ->where('wp.warehouse_id','1')
+                            ->where('wp.warehouse_id', $this->almacenPrincipalSedeActivaId())
                             ->where('p.status','!=','ANULADO')
                             ->orderByDesc('p.created_at');
 

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Tenant;
 
 use App\Exports\Tenant\InventoryExport;
+use App\Http\Concerns\HasSedeActiva;
 use App\Http\Controllers\Controller;
 use App\Models\Company;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -14,6 +15,8 @@ use Yajra\DataTables\Facades\DataTables;
 
 class InventoryController extends Controller
 {
+    use HasSedeActiva;
+
     public function index()
     {
         $products   =   DB::select('SELECT
@@ -32,7 +35,7 @@ class InventoryController extends Controller
 
     }
 
-    public static function queryInventory(Request $request){
+    public function queryInventory(Request $request){
 
         $inventory  =    DB::table('products as p')
                         ->join('categories as c','c.id','p.category_id')
@@ -48,7 +51,7 @@ class InventoryController extends Controller
                             'p.sale_price',
                             'p.purchase_price'
                         )
-                        ->where('wp.warehouse_id','1')
+                        ->where('wp.warehouse_id', $this->almacenPrincipalSedeActivaId())
                         ->where('p.status','!=','ANULADO')
                         ->orderByDesc('p.created_at');
 

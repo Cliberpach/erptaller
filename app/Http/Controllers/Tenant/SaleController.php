@@ -26,6 +26,8 @@ use Throwable;
 
 class SaleController extends Controller
 {
+    use \App\Http\Concerns\HasSedeActiva;
+
     protected SaleManager $s_sale;
 
     public function __construct()
@@ -134,10 +136,14 @@ class SaleController extends Controller
         $category_id   =   $request->get('category_id');
         $brand_id      =   $request->get('brand_id');
 
+        // Stock del almacén principal de la sede activa (multi-sede 3b). Solo LECTURA: el picker
+        // de la venta muestra el stock de ESTE almacén; el descuento real se hace en Capa 2.
+        $warehouseId = $this->almacenPrincipalSedeActivaId();
+
         $products = DB::table('products as p')
-            ->leftJoin('warehouse_products as wp', function ($join) {
+            ->leftJoin('warehouse_products as wp', function ($join) use ($warehouseId) {
                 $join->on('wp.product_id', '=', 'p.id')
-                    ->where('wp.warehouse_id', '=', 1); // Filtrar por almacen_id = 1
+                    ->where('wp.warehouse_id', '=', $warehouseId);
             })
             ->join('brands as b', 'b.id', '=', 'p.brand_id')
             ->join('categories as c', 'c.id', '=', 'p.category_id')

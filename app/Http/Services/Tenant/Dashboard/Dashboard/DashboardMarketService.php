@@ -2,6 +2,7 @@
 
 namespace App\Http\Services\Tenant\Dashboard\Dashboard;
 
+use App\Http\Concerns\HasSedeActiva;
 use App\Models\Company;
 use App\Models\Herramientas\Empresa;
 use Carbon\Carbon;
@@ -10,6 +11,10 @@ use Illuminate\Support\Facades\DB;
 
 class DashboardMarketService
 {
+    // Reusa la única fuente de verdad de la sede activa. getStockValorizado() es interno
+    // (lo invoca getData()), por eso el id se resuelve acá con el trait y no vía el controller.
+    use HasSedeActiva;
+
     private array $data =   [];
 
     /**
@@ -348,7 +353,7 @@ class DashboardMarketService
                 'ap.stock'
             )
             ->where('p.status', 'ACTIVO')
-            ->where('ap.warehouse_id', 1)
+            ->where('ap.warehouse_id', $this->almacenPrincipalSedeActivaId())
             ->whereColumn('ap.stock', '<', 'p.stock_min');
 
 
@@ -777,8 +782,8 @@ class DashboardMarketService
                         IFNULL(SUM(ap.stock * p.purchase_price),0) as stock_valorizado
                         FROM warehouse_products as ap
                         JOIN products as p on p.id = ap.product_id
-                        WHERE ap.warehouse_id = 1
-                        AND p.status = "ACTIVO"');
+                        WHERE ap.warehouse_id = ?
+                        AND p.status = "ACTIVO"', [$this->almacenPrincipalSedeActivaId()]);
         return round($consulta[0]->stock_valorizado, 2);
     }
 

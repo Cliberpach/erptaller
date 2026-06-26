@@ -3,6 +3,7 @@
 namespace App\Http\Concerns;
 
 use App\Models\Tenant\Sede;
+use App\Models\Tenant\Warehouse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 
@@ -80,6 +81,30 @@ trait HasSedeActiva
         }
 
         return $this->sedesDisponibles()->firstWhere('id', $id);
+    }
+
+    /**
+     * Id del almacén PRINCIPAL de la sede activa.
+     *
+     * Única fuente de verdad para los flujos de stock (lectura y movimiento):
+     * en lugar del antiguo warehouse_id=1 hardcodeado, el stock se lee/mueve sobre
+     * el almacén principal de la sede activa del usuario.
+     *
+     * Cada sede nace con su almacén principal (es_principal=true). Si por algún motivo
+     * faltara, se corta con un error CLARO en vez de devolver null/0 y operar sobre el
+     * almacén equivocado (lo que corrompería inventario).
+     */
+    public function almacenPrincipalSedeActivaId(): int
+    {
+        $warehouse = Warehouse::where('sede_id', $this->sedeActivaId())
+            ->where('es_principal', true)
+            ->first();
+
+        if (! $warehouse) {
+            throw new \RuntimeException('La sede activa no tiene almacén principal configurado.');
+        }
+
+        return $warehouse->id;
     }
 
     /**
