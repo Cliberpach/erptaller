@@ -118,10 +118,28 @@ Las series cuelgan de la **sede activa** (no del almacén). Opciones:
 
 ---
 
-## A verificar antes de implementar
-1. **`type_sale_id` == `document_type_id`**: confirmar que el `type_sale_id` del sale es el id de `general_table_details` (= `document_type_id` de la serie). El `getCorrelative` matchea por ese id.
-2. **Call sites rotos** (ConsultasCreditos/ReportField): ¿features vivas o muertas? Repuntar o limpiar.
-3. **`company_id`**: al pasar a `sede_id`, deprecar el filtro `company_id=1` (ya no se usa). La columna queda (Capa A) hasta limpieza final.
+## Verificaciones (cerradas — pre-implementación)
+
+### 1. `type_sale_id` == `document_type_id` → ✅ COINCIDEN
+Cadena confirmada:
+- [ValidationsService:72](app/Http/Services/Tenant/Sale/Sale/ValidationsService.php#L72) `$type_sale = GeneralTableDetail::findOrFail($data['type_sale'])` → :122 `'type_sale_id' => $type_sale->id`. Es decir **`type_sale_id` = `GeneralTableDetail.id`**.
+- Capa A ([SerieService](app/Http/Services/Tenant/Maintenance/SerieService.php)) sembró `document_type_id = $tipo->id` (el mismo `GeneralTableDetail.id`).
+- `getCorrelative` matchea `where('document_type_id', $type_sale)` → **busca por el id correcto**. El diseño atómico `getCorrelative(sede, document_type_id)` es válido.
+- ⚠️ Sub-hallazgo: [ValidationsService:87,92](app/Http/Services/Tenant/Sale/Sale/ValidationsService.php#L87) comparan `$type_sale->id == '3'`/`'1'` (códigos SUNAT), pero los ids reales son 65/66/67 → esa validación RUC/DNI está rota en el esquema actual (id ≠ código). **Tangencial a Capa C**, fichado aparte.
+
+### 2. Call sites rotos → VIVOS (ruteados) pero ROTOS → hay que ARREGLARLOS
+- `SaleController::getCorrelative` **no existe** (sin método propio, sin trait, sin `__callStatic`; `Controller` base tampoco lo tiene). Llamarlo lanza *Call to undefined method*.
+- **Ambos tienen ruta** (no son código muerto):
+  - `ConsultasCreditosController::generarDocumento` → `POST consultas/creditos/generar-documento` ([web.php:80](routes/web.php#L80)).
+  - `ReportFieldController::generateDocumentStore` → `POST reporte-campo/generarDocumento/store` ([web.php:146](routes/web.php#L146)).
+- → Están **wired/alcanzables desde la UI** pero **crashean** al llegar a la línea del correlativo. Probablemente referencias quedadas de un viejo `SaleController::getCorrelative` que se movió a `CorrelativeService`.
+- **Acción Capa C:** **REPUNTAR** ambos a la nueva firma `getCorrelative(sede_id, document_type_id)`. ⚠️ Además **corregir el argumento**: ConsultasCreditos pasa `'3'`/`'1'` (código SUNAT) y ReportField pasa `document_invoice` — deben pasar el **`GeneralTableDetail.id`** (no el código), o el match fallaría igual.
+
+### 3. Filtro `company_id=1` en series → 1 SOLO lugar
+- Único filtro de **lookup** de serie por company: [CorrelativeService:33](app/Http/Services/Tenant/Sale/Sale/CorrelativeService.php#L33) `DocumentSerialization::where('company_id',1)->where('document_type_id',$type)`. → se reemplaza por `where('sede_id', $sede)->where('document_type_id',$type)`.
+- No hay otros lookups de serie por `company_id`. (Nota: `CompanyController::storeNumeration` **setea** `company_id=1` al crear una serie — escritura legada, ya superada por `generarSeriesSede`; no es un filtro de emisión. Limpiar junto con la deprecación de `company_id`.)
+
+**Diseño cerrado.** Próxima acción: implementar Capa C **por la venta** (con OK), luego repuntar los 2 call sites, luego NC/ND/guía cuando se implementen.
 
 ---
 
