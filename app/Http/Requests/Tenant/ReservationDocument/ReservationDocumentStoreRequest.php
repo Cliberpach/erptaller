@@ -5,7 +5,7 @@ namespace App\Http\Requests\Tenant\ReservationDocument;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Validation\ValidationException;
-use Illuminate\Validation\Rule;
+use App\Models\Landlord\GeneralTable\GeneralTableDetail;
 
 class ReservationDocumentStoreRequest extends FormRequest
 {
@@ -26,22 +26,32 @@ class ReservationDocumentStoreRequest extends FormRequest
     {
         return [
 
+            // Multi-sede Capa C: validar contra general_table_details (misma fuente que SaleService;
+            // document_types está vacía). Solo boleta('03')/factura('01') desde reserva. El id se
+            // resuelve vivo por symbol SUNAT (no se hardcodea código->id).
             'document_invoice' => [
-                'required', 
-                Rule::exists('document_types', 'id')->whereIn('id', [1, 3]),
+                'required',
+                function ($attribute, $value, $fail) {
+                    $valido = GeneralTableDetail::where('id', $value)
+                        ->where('general_table_id', 4)
+                        ->whereIn('symbol', ['01', '03'])
+                        ->exists();
+                    if (! $valido) {
+                        $fail('SOLO SE ACEPTAN BOLETAS O FACTURAS.');
+                    }
+                },
             ],
 
             'document_number' => [
                 'required',
                 'numeric',
                 function ($attribute, $value, $fail) {
-                    $documentInvoice = $this->input('document_invoice');
-                    
-                    if ($documentInvoice == 1 && strlen($value) != 11) {
+                    $symbol = optional(GeneralTableDetail::find($this->input('document_invoice')))->symbol;
+
+                    if ($symbol === '01' && strlen($value) != 11) {
                         return $fail('El número de documento debe tener 11 dígitos para facturas.');
                     }
-                    
-                    if ($documentInvoice == 3 && strlen($value) != 8) {
+                    if ($symbol === '03' && strlen($value) != 8) {
                         return $fail('El número de documento debe tener 8 dígitos para boletas.');
                     }
                 },

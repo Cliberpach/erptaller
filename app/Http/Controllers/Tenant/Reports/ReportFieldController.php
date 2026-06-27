@@ -12,7 +12,6 @@ use App\Http\Services\Tenant\Sale\Sale\CorrelativeService;
 use App\Models\Landlord\GeneralTable\GeneralTableDetail;
 use App\Models\Booking;
 use App\Models\Company;
-use App\Models\DocumentType;
 use App\Models\Field;
 use App\Models\Landlord\Customer;
 use App\Models\Tenant\ReservationDocument;
