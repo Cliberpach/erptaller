@@ -8,6 +8,8 @@ use App\Http\Controllers\Tenant\NumberToLettersController;
 use App\Http\Controllers\Tenant\QRController;
 use App\Http\Controllers\Tenant\SaleController;
 use App\Http\Requests\Tenant\ReservationDocument\ReservationDocumentStoreRequest;
+use App\Http\Services\Tenant\Sale\Sale\CorrelativeService;
+use App\Models\Landlord\GeneralTable\GeneralTableDetail;
 use App\Models\Booking;
 use App\Models\Company;
 use App\Models\DocumentType;
@@ -207,7 +209,9 @@ array:3 [ // app\Http\Controllers\Tenant\Reports\ReportFieldController.php:182
 
             $validated_data         =   ReportFieldController::validationGenerateDocument($request);
       
-            $data_correlative       =   SaleController::getCorrelative($request->get('document_invoice'));
+            // Multi-sede Capa C: document_invoice YA es el document_type_id (sale de
+            // document_serializations en el select). getCorrelative atómico por sede activa.
+            $data_correlative       =   (new CorrelativeService())->getCorrelative($request->get('document_invoice'));
 
 
             //====== GRABANDO =======
@@ -325,7 +329,9 @@ array:3 [ // app\Http\Controllers\Tenant\Reports\ReportFieldController.php:182
             throw new Exception("EL CLIENTE NO EXISTE EN LA BD!!!");
         }
 
-        $document_type  =   DocumentType::where('id', $request->get('document_invoice'))->first();
+        // El tipo se resuelve contra general_table_details (misma fuente que SaleService);
+        // la tabla document_types está vacía/sin uso. document_invoice es el GeneralTableDetail.id.
+        $document_type  =   GeneralTableDetail::find($request->get('document_invoice'));
 
         if(!$document_type){
             throw new Exception("NO EXISTE EL TIPO DE DOCUMENTO EN LA BD!!");

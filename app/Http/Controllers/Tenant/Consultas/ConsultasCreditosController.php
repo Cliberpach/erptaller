@@ -6,7 +6,9 @@ use App\Exports\CreditosExport;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Tenant\NumberToLettersController;
 use App\Http\Controllers\Tenant\SaleController;
+use App\Http\Services\Tenant\Sale\Sale\CorrelativeService;
 use App\Models\Company;
+use App\Models\Landlord\GeneralTable\GeneralTableDetail;
 use App\Models\PettyCashBook;
 use App\Models\Tenant\Credit;
 use App\Models\Tenant\Sale;
@@ -199,10 +201,15 @@ class ConsultasCreditosController extends Controller
             $legend = NumberToLettersController::numberToLetters($total);
 
             // Obtener serie y correlativo
-            $type_sale_code = ($tipo_comprobante === 'boleta') ? '3' : '1';
-            $type_sale_name = ($tipo_comprobante === 'boleta') ? 'BOLETA DE VENTA ELECTRÓNICA' : 'FACTURA ELECTRÓNICA';
+            // Multi-sede Capa C: resolver el tipo contra general_table_details (la MISMA fuente
+            // que usa SaleService; document_types está vacía). El symbol es el código SUNAT
+            // estable; el id se busca vivo (no se hardcodea código->id, que rompería demo/prod).
+            $sunat_symbol = ($tipo_comprobante === 'boleta') ? '03' : '01';
+            $tipo_doc     = GeneralTableDetail::where('general_table_id', 4)
+                                ->where('symbol', $sunat_symbol)
+                                ->firstOrFail();
 
-            $data_correlative = SaleController::getCorrelative($type_sale_code);
+            $data_correlative = (new CorrelativeService())->getCorrelative($tipo_doc->id);
             if (!$data_correlative) {
                 throw new \Exception("No se pudo obtener el correlativo para la venta.");
             }
@@ -220,8 +227,9 @@ class ConsultasCreditosController extends Controller
             $sale->petty_cash_id = 1;
             $sale->petty_cash_name = 'CAJA PRINCIPAL';
             $sale->petty_cash_book_id = 1;
-            $sale->type_sale_code = $type_sale_code;
-            $sale->type_sale_name = $type_sale_name;
+            $sale->type_sale_id   = $tipo_doc->id;
+            $sale->type_sale_code = $tipo_doc->symbol;
+            $sale->type_sale_name = $tipo_doc->name;
             $sale->igv_percentage = $igv;
             $sale->subtotal = round($subtotal, 2);
             $sale->igv_amount = round($igv_amount, 2);
