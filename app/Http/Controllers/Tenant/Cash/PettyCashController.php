@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers\Tenant\Cash;
 
+use App\Http\Concerns\HasSedeActiva;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Tenant\Cash\Cash\CashStoreRequest;
 use App\Http\Requests\Tenant\Cash\Cash\CashUpdateRequest;
 use App\Http\Services\Tenant\Cash\PettyCash\CashManager;
+use App\Models\Tenant\Cash\PettyCash as PettyCashSede;
 use App\Models\Company;
 use App\Models\ExitMoney;
 use App\Models\ExitMoneyDetail;
@@ -21,6 +23,8 @@ use Throwable;
 
 class PettyCashController extends Controller
 {
+    use HasSedeActiva;
+
     private CashManager $s_cash;
 
     public function __construct()
@@ -30,44 +34,79 @@ class PettyCashController extends Controller
 
     public function index()
     {
-        $cashList = DB::select('select * from petty_cashes');
+        // Sedes para el selector + usuarios por sede para el multi-select del combo (vía JS).
+        $sedes = $this->sedesDisponibles();
 
-        return view('cash.petty-cash.index', compact('cashList'));
+        $usuariosPorSede = [];
+        foreach ($sedes as $s) {
+            $usuariosPorSede[$s->id] = DB::table('sede_user as su')
+                ->join('users as u', 'u.id', '=', 'su.user_id')
+                ->where('su.sede_id', $s->id)
+                ->select('u.id', 'u.name')
+                ->orderBy('u.name')
+                ->get();
+        }
+
+        return view('cash.petty-cash.index', [
+            'sedes'           => $sedes,
+            'sedeActivaId'    => $this->sedeActivaId(),
+            'usuariosPorSede' => $usuariosPorSede,
+        ]);
     }
 
 
     public function getListCash(Request $request)
     {
+        // Cajas de las sedes disponibles del usuario (admin: todas; vendedor: las suyas). Blindaje.
         $cashes = DB::connection('tenant')
             ->table('petty_cashes as c')
+            ->leftJoin('sedes as s', 's.id', '=', 'c.sede_id')
+            ->whereIn('c.sede_id', $this->sedesDisponibles()->pluck('id'))
+            ->where('c.status', '<>', 'ANULADO')
             ->select(
                 'c.id',
                 'c.name',
+                'c.status',
+                'c.sede_id',
+                's.nombre as sede_nombre',
                 'c.created_at',
-                'c.status'
-            )
-            ->where('c.status', '<>', 'ANULADO');
+                DB::raw('(select count(*) from caja_vendedor cv where cv.petty_cash_id = c.id) as combo_count')
+            );
 
-        return DataTables::of($cashes)->toJson();
+        return DataTables::of($cashes)->make(true);
     }
 
     public function getCash(int $id)
     {
-        try {
+        $cash = PettyCashSede::with('vendedores:id')->find($id);
 
-            $cash  =   $this->s_cash->getCash($id);
-
-            return response()->json(['success' => true, 'message' => 'CAJA OBTENIDA', 'data' => $cash]);
-        } catch (Throwable $th) {
-            return response()->json(['success' => false, 'message' => $th->getMessage()]);
+        if (! $cash) {
+            return response()->json(['success' => false, 'message' => 'La caja no existe.'], 404);
         }
+        if (! $this->puedeAccederSede($cash->sede_id)) {
+            return response()->json(['success' => false, 'message' => 'No tiene acceso a esa caja.'], 403);
+        }
+
+        return response()->json(['success' => true, 'data' => [
+            'id'          => $cash->id,
+            'name'        => $cash->name,
+            'sede_id'     => $cash->sede_id,
+            'vendedores'  => $cash->vendedores->pluck('id'),
+        ]]);
     }
 
     public function store(CashStoreRequest $request)
     {
+        $sedeId = (int) $request->get('sede_id');
+
+        // BLINDAJE: la sede del request debe ser del usuario (no se confía en el cliente).
+        if (! $this->puedeAccederSede($sedeId)) {
+            return response()->json(['success' => false, 'message' => 'No tiene acceso a esa sede.'], 403);
+        }
+
         DB::beginTransaction();
         try {
-            $cash   =   $this->s_cash->store($request->toArray());
+            $this->s_cash->store($request->toArray());
 
             DB::commit();
             return response()->json(['success' => true, 'message' => 'CAJA REGISTRADA CON ÉXITO']);
@@ -81,7 +120,17 @@ class PettyCashController extends Controller
     {
         DB::beginTransaction();
         try {
-            $cash   =   $this->s_cash->update($request->toArray(), $id);
+            $cash = PettyCashSede::find($id);
+
+            if (! $cash) {
+                return response()->json(['success' => false, 'message' => 'La caja no existe.'], 404);
+            }
+            if (! $this->puedeAccederSede($cash->sede_id)) {
+                return response()->json(['success' => false, 'message' => 'No tiene acceso a esa caja.'], 403);
+            }
+
+            // sede_id es INMUTABLE (el service solo actualiza nombre + combo).
+            $this->s_cash->update($request->toArray(), $id);
 
             DB::commit();
             return response()->json(['success' => true, 'message' => 'CAJA ACTUALIZADA CON ÉXITO']);
@@ -95,16 +144,39 @@ class PettyCashController extends Controller
     {
         DB::beginTransaction();
         try {
+            $cash = PettyCashSede::find($id);
 
-            $cash  =   $this->s_cash->destroy($id);
+            if (! $cash) {
+                return response()->json(['success' => false, 'message' => 'La caja no existe.'], 404);
+            }
+            if (! $this->puedeAccederSede($cash->sede_id)) {
+                return response()->json(['success' => false, 'message' => 'No tiene acceso a esa caja.'], 403);
+            }
+
+            // GUARD (dinero): no anular una caja con apertura abierta. Hay que cerrarla primero.
+            $abierta = $cash->status === 'ABIERTO'
+                || DB::table('petty_cash_books')->where('petty_cash_id', $id)->where('status', 'ABIERTO')->exists();
+            if ($abierta) {
+                return response()->json(['success' => false, 'message' => 'No se puede anular una caja con apertura abierta. Ciérrela primero.']);
+            }
+
+            $this->s_cash->destroy($id);
 
             DB::commit();
-
-            return response()->json(['success' => true, 'message' => 'CAJA ELIMINADA CON ÉXITO']);
+            return response()->json(['success' => true, 'message' => 'CAJA ANULADA CON ÉXITO']);
         } catch (Throwable $th) {
             DB::rollBack();
             return response()->json(['success' => false, 'message' => $th->getMessage()]);
         }
+    }
+
+    /**
+     * Seguridad: la caja debe pertenecer a una sede disponible del usuario.
+     * Reusa HasSedeActiva (admin → todas; vendedor → sus sede_user). No duplica lógica.
+     */
+    private function puedeAccederSede($sedeId): bool
+    {
+        return $this->sedesDisponibles()->contains('id', (int) $sedeId);
     }
 
     public function charging()

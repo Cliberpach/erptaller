@@ -5,42 +5,44 @@ namespace App\Http\Requests\Tenant\Cash\Cash;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Validation\Rule;
 
 class CashStoreRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
         return true;
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
-     */
     public function rules(): array
     {
+        $sedeId = $this->input('sede_id');
+
         return [
-            'name' => 'required|string|max:255|unique:petty_cashes,name',
+            // name único POR SEDE (no global): "CAJA PRINCIPAL" puede repetirse entre sedes.
+            'name' => [
+                'required', 'string', 'max:255',
+                Rule::unique('petty_cashes', 'name')->where(
+                    fn ($q) => $q->where('sede_id', $sedeId)->where('status', '<>', 'ANULADO')
+                ),
+            ],
+            'sede_id' => ['required', Rule::exists('sedes', 'id')->where('status', 'ACTIVO')],
+
+            // combo: cada vendedor debe pertenecer a ESA sede (sede_user). Opcional (puede nacer vacío).
+            'vendedores'   => ['array'],
+            'vendedores.*' => [Rule::exists('sede_user', 'user_id')->where('sede_id', $sedeId)],
         ];
     }
 
-    /**
-     * Custom validation messages.
-     *
-     * @return array<string, string>
-     */
     public function messages(): array
     {
         return [
-            'name.required' => 'El campo nombre es obligatorio.',
-            'name.string' => 'El campo nombre debe ser una cadena de texto.',
-            'name.unique' => 'El nombre ya existe',
-            'name.max' => 'El nombre no debe exceder los 255 caracteres.',
-
+            'name.required'    => 'El campo nombre es obligatorio.',
+            'name.unique'      => 'Ya existe una caja con ese nombre en esta sede.',
+            'name.max'         => 'El nombre no debe exceder los 255 caracteres.',
+            'sede_id.required' => 'Debe seleccionar una sede.',
+            'sede_id.exists'   => 'La sede seleccionada no es válida.',
+            'vendedores.*.exists' => 'Un vendedor del combo no pertenece a la sede de la caja.',
         ];
     }
 

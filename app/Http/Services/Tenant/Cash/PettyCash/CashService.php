@@ -19,19 +19,23 @@ class CashService
     {
         $dto    =   $this->s_dto->getDtoStore($data);
         $cash   =   $this->s_repository->insertCash($dto);
+        // Combo de vendedores (M:N). Nace vacío si no se envía.
+        $cash->vendedores()->sync($data['vendedores'] ?? []);
         return $cash;
     }
 
     public function update(array $data, int $id): PettyCash
     {
-        $dto    =   $this->s_dto->getDtoStore($data);
+        // Solo nombre (sede INMUTABLE: la caja no migra de sede).
+        $dto    =   $this->s_dto->getDtoUpdate($data);
         $cash   =   $this->s_repository->updateCash($dto, $id);
+        $cash->vendedores()->sync($data['vendedores'] ?? []);
         return $cash;
     }
 
     public function getCash(int $id): PettyCash
     {
-        return $this->s_repository->findCash($id);
+        return $this->s_repository->findCash($id)->load('sede', 'vendedores');
     }
 
     public function destroy(int $id): PettyCash

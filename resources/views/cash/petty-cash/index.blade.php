@@ -1,235 +1,227 @@
 @extends('layouts.template')
 
 @section('title')
-    Caja
+    CAJAS
 @endsection
-
-@section('css')
-    <link rel="stylesheet" href="{{ asset('assets/css/styles.css') }}">
-    <style>
-        .my-swal {
-            z-index: 3000 !important;
-        }
-    </style>
-@endsection
-
 
 @section('content')
-    @include('cash.petty-cash.modals.mdl_create_cash')
-    @include('cash.petty-cash.modals.mdl_edit_cash')
-    <div class="card overflow-hidden">
-        <div class="card-header d-flex align-items-center justify-content-between">
-            <h6 class="card-title mb-0">LISTA DE CAJAS</h6>
-            <div class="input-group-append">
-                <a onclick="openMdlCreateCash()" class="btn btn-primary text-white">
-                    <i class="fas fa-plus-circle"></i> NUEVO
-                </a>
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
+            <h4 class="card-title mb-md-0 mb-2">CAJAS <small class="text-muted">(por sede)</small></h4>
+            <a onclick="openMdlNuevaCaja()" class="btn btn-primary text-white">
+                <i class="fas fa-plus-circle"></i> Nueva caja
+            </a>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover table-striped" id="table_cajas">
+                    <thead>
+                        <tr>
+                            <th>NOMBRE</th>
+                            <th>SEDE</th>
+                            <th>VENDEDORES</th>
+                            <th>ESTADO</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
             </div>
         </div>
-        <div class="card-body p-0 pb-2">
-            @include('cash.petty-cash.tables.tbl_cash_list')
+    </div>
+
+    {{-- ===== MODAL NUEVA CAJA ===== --}}
+    <div class="modal fade" id="mdlCreateCaja" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5"><i class="fa-solid fa-cash-register"></i> Registrar Caja</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold required_field">Sede</label>
+                        <select id="c_sede" class="form-select" style="background-color:#FFF9C4;">
+                            @foreach ($sedes as $s)
+                                <option value="{{ $s->id }}" {{ (int)$s->id === (int)$sedeActivaId ? 'selected' : '' }}>{{ $s->nombre }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold required_field">Nombre</label>
+                        <input id="c_name" type="text" class="form-control" style="background-color:#FFF9C4;" placeholder="ej. CAJA PRINCIPAL">
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label fw-bold">Combo de vendedores</label>
+                        <div id="c_vendedores" class="border rounded p-2" style="max-height:180px; overflow-y:auto;"></div>
+                    </div>
+                    <div id="c_warn_combo" class="alert alert-warning py-2 mb-0" style="display:none;">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                        Esta caja no tiene vendedores asignados; nadie podrá aperturarla.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-primary" onclick="guardarCaja()"><i class="fa-solid fa-floppy-disk"></i> Registrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- ===== MODAL EDITAR CAJA ===== --}}
+    <div class="modal fade" id="mdlEditCaja" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5"><i class="fa-solid fa-pen-to-square"></i> Editar Caja</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="e_id">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Sede</label>
+                        <div><span class="badge bg-info" id="e_sede_nombre"></span> <small class="text-muted">(no se puede cambiar)</small></div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold required_field">Nombre</label>
+                        <input id="e_name" type="text" class="form-control" style="background-color:#FFF9C4;">
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label fw-bold">Combo de vendedores</label>
+                        <div id="e_vendedores" class="border rounded p-2" style="max-height:180px; overflow-y:auto;"></div>
+                    </div>
+                    <div id="e_warn_combo" class="alert alert-warning py-2 mb-0" style="display:none;">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                        Esta caja no tiene vendedores asignados; nadie podrá aperturarla.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-primary" onclick="actualizarCaja()"><i class="fa-solid fa-floppy-disk"></i> Actualizar</button>
+                </div>
+            </div>
         </div>
     </div>
 @endsection
 
-@section('js')
-    <script>
-        let dtCash = null;
+<style>.swal2-container { z-index: 9999999; }</style>
 
-        document.addEventListener('DOMContentLoaded', () => {
-            iniciarDtCash();
-            events();
-        })
+<script>
+    const usuariosPorSede = @json($usuariosPorSede);
+    const sedesNombre = @json($sedes->pluck('nombre', 'id'));
+    let dtCajas = null;
 
-        function events() {
-            eventsMdlCreateCash();
-            eventsMdlEditCash();
+    document.addEventListener('DOMContentLoaded', () => {
+        dtCajas = new DataTable('#table_cajas', {
+            serverSide: true, processing: true,
+            ajax: { url: '{{ route('tenant.cajas.getListCash') }}', type: 'GET' },
+            order: [[0, 'asc']],
+            columns: [
+                { data: 'name', name: 'name' },
+                { data: 'sede_nombre', name: 'sede_nombre', orderable: false, render: d => `<span class="badge bg-info">${d ?? '-'}</span>` },
+                { data: 'combo_count', name: 'combo_count', orderable: false, searchable: false,
+                  render: d => Number(d) > 0 ? `<span class="badge bg-success">${d} vendedor(es)</span>` : '<span class="badge bg-warning text-dark">sin combo</span>' },
+                { data: 'status', name: 'status', orderable: false, searchable: false,
+                  render: d => d === 'ABIERTO' ? '<span class="badge bg-primary">ABIERTA</span>' : '<span class="badge bg-secondary">CERRADA</span>' },
+                { data: null, orderable: false, searchable: false, name: 'actions', render: (data, t, row) => `
+                    <div class="btn-group dropstart">
+                      <button type="button" class="dropdown-toggle btn btn-primary" data-bs-toggle="dropdown"><i class="fa-solid fa-grip"></i></button>
+                      <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="javascript:void(0)" onclick="openMdlEditCaja(${row.id})"><i class="fa-solid fa-pen-to-square"></i> Editar</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item text-danger" href="javascript:void(0)" onclick="anularCaja(${row.id}, '${(row.name||'').replace(/'/g,'')}')"><i class="fa-solid fa-ban"></i> Anular</a></li>
+                      </ul>
+                    </div>` }
+            ],
+            language: { emptyTable: "No hay cajas en sus sedes", zeroRecords: "Sin resultados", processing: "Procesando...",
+                info: "Mostrando _START_ a _END_ de _TOTAL_", search: "Buscar:", lengthMenu: "Mostrar _MENU_", paginate: { next: "Siguiente", previous: "Anterior" } }
+        });
+    });
+
+    function renderVendedores(containerId, warnId, sedeId, selected = []) {
+        const users = usuariosPorSede[sedeId] || [];
+        const cont = document.getElementById(containerId);
+        if (!users.length) { cont.innerHTML = '<div class="text-muted small">No hay usuarios en esta sede.</div>'; }
+        else {
+            cont.innerHTML = users.map(u => `
+                <div class="form-check">
+                    <input class="form-check-input vchk" type="checkbox" value="${u.id}" id="${containerId}_${u.id}" ${selected.map(Number).includes(Number(u.id))?'checked':''} onchange="toggleWarn('${containerId}','${warnId}')">
+                    <label class="form-check-label" for="${containerId}_${u.id}">${u.name}</label>
+                </div>`).join('');
         }
+        toggleWarn(containerId, warnId);
+    }
+    function getVendedores(containerId) {
+        return [...document.querySelectorAll(`#${containerId} .vchk:checked`)].map(c => Number(c.value));
+    }
+    function toggleWarn(containerId, warnId) {
+        document.getElementById(warnId).style.display = getVendedores(containerId).length === 0 ? 'block' : 'none';
+    }
 
-        function iniciarDtCash() {
-            dtCash = new DataTable('#dt-cash', {
-                "processing": true,
-                "ajax": '{{ route('tenant.cajas.getListCash') }}',
-                "order": [
-                    [0, "desc"]
-                ],
-                "columns": [{
-                        data: 'id',
-                        "visible": false,
-                        "searchable": false
-                    },
-                    {
-                        data: 'name',
-                        name: 'c.name',
-                        searchable: true,
-                        orderable: true,
-                    },
-                    {
-                        data: 'created_at',
-                        name: 'c.created_at',
-                        searchable: true,
-                        orderable: true,
-                        type: 'string'
-                    },
-                    {
-                        data: 'status',
-                        name: 'c.status',
-                        searchable: true,
-                        orderable: true,
-                        render: function(status) {
+    function openMdlNuevaCaja() {
+        document.getElementById('c_name').value = '';
+        const sedeSel = document.getElementById('c_sede');
+        renderVendedores('c_vendedores', 'c_warn_combo', sedeSel.value, []);
+        sedeSel.onchange = () => renderVendedores('c_vendedores', 'c_warn_combo', sedeSel.value, []);
+        new bootstrap.Modal('#mdlCreateCaja').show();
+    }
 
-                            let badgeClass = '';
+    async function guardarCaja() {
+        toastr.clear();
+        const body = { name: document.getElementById('c_name').value.trim(), sede_id: document.getElementById('c_sede').value, vendedores: getVendedores('c_vendedores') };
+        const token = document.querySelector('input[name="_token"]').value;
+        try {
+            const r = await fetch('{{ route('tenant.cajas.store') }}', { method: 'POST', headers: { 'X-CSRF-TOKEN': token, 'Content-Type': 'application/json', 'Accept': 'application/json' }, body: JSON.stringify(body) });
+            const res = await r.json();
+            if (r.status === 422) { toastr.warning(Object.values(res.errors).flat().join(' '), 'VALIDACIÓN'); return; }
+            if (res.success) { dtCajas.draw(); bootstrap.Modal.getInstance('#mdlCreateCaja').hide(); toastr.success(res.message, 'OPERACIÓN COMPLETADA'); }
+            else toastr.error(res.message, 'ERROR');
+        } catch (e) { toastr.error(e, 'ERROR'); }
+    }
 
-                            switch (status) {
-                                case 'ANULADO':
-                                    badgeClass = 'bg-dark';
-                                    break;
+    async function openMdlEditCaja(id) {
+        toastr.clear();
+        try {
+            const r = await fetch('{{ route('tenant.cajas.getCash', ['id' => ':id']) }}'.replace(':id', id));
+            const res = await r.json();
+            if (!res.success) { toastr.error(res.message, 'ERROR'); return; }
+            const c = res.data;
+            document.getElementById('e_id').value = c.id;
+            document.getElementById('e_sede_nombre').textContent = sedesNombre[c.sede_id] ?? '-';
+            document.getElementById('e_name').value = c.name;
+            renderVendedores('e_vendedores', 'e_warn_combo', c.sede_id, c.vendedores);
+            new bootstrap.Modal('#mdlEditCaja').show();
+        } catch (e) { toastr.error(e, 'ERROR'); }
+    }
 
-                                case 'CERRADO':
-                                    badgeClass = 'bg-danger';
-                                    break;
+    async function actualizarCaja() {
+        toastr.clear();
+        const id = document.getElementById('e_id').value;
+        const body = { name: document.getElementById('e_name').value.trim(), vendedores: getVendedores('e_vendedores') };
+        const token = document.querySelector('input[name="_token"]').value;
+        try {
+            const r = await fetch('{{ route('tenant.cajas.update', ['id' => ':id']) }}'.replace(':id', id), { method: 'PUT', headers: { 'X-CSRF-TOKEN': token, 'Content-Type': 'application/json', 'Accept': 'application/json' }, body: JSON.stringify(body) });
+            const res = await r.json();
+            if (r.status === 422) { toastr.warning(Object.values(res.errors).flat().join(' '), 'VALIDACIÓN'); return; }
+            if (res.success) { dtCajas.draw(); bootstrap.Modal.getInstance('#mdlEditCaja').hide(); toastr.success(res.message, 'OPERACIÓN COMPLETADA'); }
+            else toastr.error(res.message, 'ERROR');
+        } catch (e) { toastr.error(e, 'ERROR'); }
+    }
 
-                                case 'ABIERTO':
-                                    badgeClass = 'bg-success';
-                                    break;
-                            }
-
-                            return `<span class="badge ${badgeClass}">${status}</span>`;
-                        }
-                    },
-                    {
-                        searchable: false,
-                        orderable: false,
-                        data: null,
-                        className: "text-end",
-                        render: function(data) {
-                            return `
-                            <div class="btn-group">
-                                <button
-                                    class="btn btn-warning btn-sm modificarDetalle"
-                                    onclick="openMdlEditCash(${data.id})"
-                                    type="button"
-                                    title="Modificar">
-                                    <i class="fa fa-edit"></i>
-                                </button>
-                                <a
-                                    class="btn btn-danger btn-sm"
-                                    href="#"
-                                    onclick="eliminar(${data.id})"
-                                    title="Eliminar">
-                                    <i class="fa fa-trash"></i>
-                                </a>
-                            </div>
-                        `;
-                        }
-                    }
-                ],
-                language: {
-                    decimal: "",
-                    emptyTable: "No hay datos disponibles en la tabla",
-                    info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
-                    infoEmpty: "Mostrando 0 a 0 de 0 registros",
-                    infoFiltered: "(filtrado de _MAX_ registros totales)",
-                    infoPostFix: "",
-                    thousands: ",",
-                    lengthMenu: "Mostrar _MENU_ registros",
-                    loadingRecords: "Cargando...",
-                    processing: "Procesando...",
-                    search: "Buscar:",
-                    zeroRecords: "No se encontraron registros coincidentes",
-                    paginate: {
-                        first: "Primero",
-                        last: "Último",
-                        next: "Siguiente",
-                        previous: "Anterior"
-                    },
-                    aria: {
-                        sortAscending: ": activar para ordenar columna ascendente",
-                        sortDescending: ": activar para ordenar columna descendente"
-                    },
-                    select: {
-                        rows: {
-                            _: "%d filas seleccionadas",
-                            0: "Haz clic en una fila para seleccionarla",
-                            1: "1 fila seleccionada"
-                        }
-                    }
-                }
-            });
-
-        }
-
-        function eliminar(id) {
-            const fila = getRowById(dtCash, id);
-            const name = fila.name;
-            const messageHtml = `
-                <div class="text-center" style="font-size: 15px;">
-                    <p class="mb-2">
-                        <i class="fas fa-tag text-primary me-2"></i>
-                        <strong>Nombre:</strong> ${name}
-                    </p>
-                </div>
-            `;
-
-            const swalWithBootstrapButtons = Swal.mixin({
-                customClass: {
-                    confirmButton: 'btn btn-success me-2',
-                    cancelButton: 'btn btn-danger',
-                    actions: 'd-flex justify-content-center gap-2 mt-3'
-                },
-                buttonsStyling: false // Necesario para que Bootstrap controle el estilo
-            });
-
-            swalWithBootstrapButtons.fire({
-                title: '¿Desea eliminar la caja?',
-                html: messageHtml,
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonText: 'Sí, eliminar',
-                cancelButtonText: 'No, cancelar',
-                focusCancel: true,
-                reverseButtons: true
-            }).then(async (result) => {
-                if (result.isConfirmed) {
-                    Swal.fire({
-                        title: 'Eliminando caja...',
-                        html: `
-                            <div style="display:flex; align-items:center; justify-content:center; flex-direction:column;">
-                                <i class="fa fa-spinner fa-spin fa-3x text-primary mb-3"></i>
-                                <p style="margin:0; font-weight:600;">Por favor, espere un momento</p>
-                            </div>
-                        `,
-                        allowOutsideClick: false,
-                        showConfirmButton: false
-                    });
-
-                    try {
-                        const res = await axios.delete(route('tenant.cajas.destroy', id));
-                        if (res.data.success) {
-                            toastr.success(res.data.message, 'OPERACIÓN COMPLETADA');
-                            dtCash.ajax.reload();
-                        } else {
-                            toastr.error(res.data.message, 'ERROR EN EL SERVIDOR');
-                        }
-                    } catch (error) {
-                        toastr.error(error, 'ERROR EN LA PETICIÓN ELIMINAR CAJA');
-                    } finally {
-                        Swal.close();
-                    }
-
-                } else if (result.dismiss === Swal.DismissReason.cancel) {
-                    swalWithBootstrapButtons.fire({
-                        title: 'Cancelado',
-                        text: 'La solicitud ha sido cancelada.',
-                        icon: 'error',
-                        confirmButtonText: 'Entendido',
-                        customClass: {
-                            confirmButton: 'btn btn-secondary'
-                        },
-                        buttonsStyling: false
-                    });
-                }
-            });
-        }
-    </script>
-@endsection
+    function anularCaja(id, name) {
+        toastr.clear();
+        Swal.mixin({ customClass: { confirmButton: "btn btn-danger", cancelButton: "btn btn-secondary" }, buttonsStyling: false }).fire({
+            title: '¿ANULAR LA CAJA?', text: `Caja: ${name}`, icon: 'warning', showCancelButton: true,
+            confirmButtonText: 'Sí, anular', cancelButtonText: 'Cancelar', reverseButtons: true
+        }).then(async (result) => {
+            if (!result.isConfirmed) return;
+            const token = document.querySelector('input[name="_token"]').value;
+            try {
+                const r = await fetch('{{ route('tenant.cajas.destroy', ['id' => ':id']) }}'.replace(':id', id), { method: 'DELETE', headers: { 'X-CSRF-TOKEN': token, 'Accept': 'application/json' } });
+                const res = await r.json();
+                if (res.success) { dtCajas.draw(); toastr.success(res.message, 'OPERACIÓN COMPLETADA'); }
+                else toastr.warning(res.message, 'NO PERMITIDO');
+            } catch (e) { toastr.error(e, 'ERROR'); }
+        });
+    }
+</script>
