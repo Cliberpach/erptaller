@@ -58,7 +58,8 @@ class DatabaseSeeder extends Seeder
         // provisioning ligado a la sede principal (queda id=1). Sedes nuevas → SedeController.
         $this->call(TenantBrandSeeder::class);
         $this->call(CategorySeeder::class);
-        $this->call(PettyCashSeeder::class);
+        // Multi-Sede Etapa 4: la caja se crea POR SEDE en el provisioning (CajaService),
+        // ya no global aquí. (PettyCashSeeder removido, igual que WarehouseSeeder/series.)
         $this->call(ShiftSeeder::class);
         $this->call(PermissionSeeder::class);
         $this->call(RoleSeeder::class);

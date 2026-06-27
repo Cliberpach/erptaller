@@ -328,6 +328,11 @@ class CompanyController extends Controller
         // principal recibe sus series (sufijo 001) vía el helper único (mismo que SedeController).
         (new \App\Http\Services\Tenant\Maintenance\SerieService())->generarSeriesSede($sede);
 
+        //========= CAJA DE LA SEDE PRINCIPAL (Multi-Sede Etapa 4) ========
+        // Paralelo al almacén/series. Combo de vendedores vacío (se llena en el CRUD).
+        // Reemplaza la "CAJA PRINCIPAL" global que sembraba PettyCashSeeder (ya removido).
+        (new \App\Http\Services\Tenant\Cash\CajaService())->crearCajaSede($sede);
+
         //========= 3 USUARIOS POR DEFECTO DEL TENANT (admin / ventas / tecnico) ========
         // Se usa App\Models\User (modelo de auth) para que el model_type del rol quede alineado.
         // Los 3 quedan asignados a la sede principal con es_default = true.

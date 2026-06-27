@@ -13,7 +13,9 @@ class PettyCash extends Model
     protected $table = 'petty_cashes';
 
     protected $fillable = [
+        'sede_id',
         'name',
+        'type',
         'status',
 
         'creator_user_id',
@@ -28,6 +30,18 @@ class PettyCash extends Model
     public function pettyCashBooks()
     {
         return $this->hasMany(PettyCashBook::class, 'petty_cash_id');
+    }
+
+    // Multi-Sede Etapa 4: la caja cuelga de una sede.
+    public function sede()
+    {
+        return $this->belongsTo(\App\Models\Tenant\Sede::class, 'sede_id');
+    }
+
+    // Combo de vendedores (M:N) que pueden abrir/vender sobre la caja.
+    public function vendedores()
+    {
+        return $this->belongsToMany(\App\Models\User::class, 'caja_vendedor', 'petty_cash_id', 'user_id');
     }
 
     protected static function boot()

@@ -49,6 +49,14 @@ class Sede extends Model
     }
 
     /**
+     * Cajas de la sede (Multi-Sede Etapa 4).
+     */
+    public function cajas()
+    {
+        return $this->hasMany(\App\Models\Tenant\Cash\PettyCash::class, 'sede_id');
+    }
+
+    /**
      * Scope: la sede principal (matriz).
      */
     public function scopePrincipal($query)
