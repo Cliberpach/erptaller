@@ -358,22 +358,6 @@ class ModuleSeeder extends Seeder
 
         ModuleChild::create([
             'module_id' => $maintenance->id,
-            'description' => 'Usuarios',
-            'route_name' => 'mantenimientos.usuario.index',
-            'order' => '2',
-            'show' => 'tenant'
-        ]);
-
-        ModuleChild::create([
-            'module_id' => $maintenance->id,
-            'description' => 'Roles',
-            'route_name' => 'mantenimientos.rol',
-            'order' => '2',
-            'show' => 'tenant'
-        ]);
-
-        ModuleChild::create([
-            'module_id' => $maintenance->id,
             'description' => 'Horario de atención',
             'route_name' => 'mantenimientos.horario',
             'order' => '2'
@@ -390,6 +374,35 @@ class ModuleSeeder extends Seeder
             'module_id'  => $maintenance->id,
             'description'=> 'Sedes',
             'route_name' => 'mantenimientos.sedes.index',
+            'order'      => '2',
+            'show'       => 'tenant',
+        ]);
+
+        //========== SEGURIDAD ===========
+        // Multi-Sede: Roles y Usuarios se mueven aquí desde Mantenimiento. show='tenant'
+        // (módulo + hijos son tenant-only; al provisionar la BD del tenant los copia con
+        // show por defecto 'tenant'). Posición: justo después de Mantenimiento (por id).
+        $seguridad = Module::create([
+            'description' => 'Seguridad',
+            'order'       => '1',
+            'show'        => 'tenant',
+            // Aún sin SVG propio: el archivo no existe → el menú usa el ícono fallback.
+            // Soltá public/assets/menu-icons/security.svg para darle ícono propio.
+            'icon'        => 'security.svg',
+        ]);
+
+        ModuleChild::create([
+            'module_id'  => $seguridad->id,
+            'description' => 'Usuarios',
+            'route_name' => 'mantenimientos.usuario.index',
+            'order'      => '2',
+            'show'       => 'tenant',
+        ]);
+
+        ModuleChild::create([
+            'module_id'  => $seguridad->id,
+            'description' => 'Roles',
+            'route_name' => 'mantenimientos.rol',
             'order'      => '2',
             'show'       => 'tenant',
         ]);
