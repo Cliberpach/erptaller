@@ -14,7 +14,7 @@ use App\Http\Controllers\Tenant\RoleController;
 
 Route::group(["prefix" => "mantenimiento"], function () {
 
-    Route::group(["prefix" => "sedes"], function () {
+    Route::group(["prefix" => "sedes", 'middleware' => 'can:mantenimiento.sedes.gestionar'], function () {
         Route::get('index', [SedeController::class, 'index'])->name('tenant.mantenimientos.sedes.index');
         Route::get('getSedes', [SedeController::class, 'getSedes'])->name('tenant.mantenimientos.sedes.getSedes');
         Route::post('store', [SedeController::class, 'store'])->name('tenant.mantenimientos.sedes.store');
@@ -26,7 +26,7 @@ Route::group(["prefix" => "mantenimiento"], function () {
         Route::put('series/{serie}', [SedeController::class, 'updateSerie'])->name('tenant.mantenimientos.sedes.updateSerie');
     });
 
-    Route::group(["prefix" => "cuentas"], function () {
+    Route::group(["prefix" => "cuentas", 'middleware' => 'can:mantenimiento.cuentas_bancarias.gestionar'], function () {
         Route::get('index', [BankAccountController::class, 'index'])->name('tenant.mantenimientos.cuentas.index');
         Route::get('getCuentas', [BankAccountController::class, 'getBankAccounts'])->name('tenant.mantenimiento.cuentas.getBankAccounts');
         Route::post('store', [BankAccountController::class, 'store'])->name('tenant.mantenimiento.cuentas.store');
@@ -34,7 +34,7 @@ Route::group(["prefix" => "mantenimiento"], function () {
         Route::delete('/destroy/{id}', [BankAccountController::class, 'destroy'])->name('tenant.mantenimiento.cuentas.destroy');
     });
 
-    Route::group(["prefix" => "empresa"], function () {
+    Route::group(["prefix" => "empresa", 'middleware' => 'can:mantenimiento.empresa.gestionar'], function () {
         Route::get('empresa', [CompanyController::class, 'index'])->name('tenant.mantenimientos.empresa');
         Route::get('empresa/registrar', [CompanyController::class, 'create'])->name('tenant.mantenimientos.empresas.create');
         Route::get('empresa/editar/{id}', [CompanyController::class, 'edit'])->name('tenant.mantenimientos.empresa.edit');
@@ -45,7 +45,7 @@ Route::group(["prefix" => "mantenimiento"], function () {
         Route::get('getListNumeration', [CompanyController::class, 'getListNumeration'])->name('tenant.mantenimientos.empresas.getListNumeration');
     });
 
-    Route::group(["prefix" => "cargos"], function () {
+    Route::group(["prefix" => "cargos", 'middleware' => 'can:mantenimiento.cargos.gestionar'], function () {
         Route::get('index', [PositionController::class, 'index'])->name('tenant.mantenimientos.cargos.index');
         Route::get('getPositions', [PositionController::class, 'getPositions'])->name('tenant.mantenimientos.cargos.getPositions');
         Route::post('store', [PositionController::class, 'store'])->name('tenant.mantenimientos.cargos.store');
@@ -53,7 +53,7 @@ Route::group(["prefix" => "mantenimiento"], function () {
         Route::delete('destroy/{id}', [PositionController::class, 'destroy'])->name('tenant.mantenimientos.cargos.destroy');
     });
 
-    Route::group(["prefix" => "colaborador"], function () {
+    Route::group(["prefix" => "colaborador", 'middleware' => 'can:mantenimiento.colaboradores.gestionar'], function () {
         Route::get('index', [CollaboratorController::class, 'index'])->name('tenant.mantenimientos.colaboradores.index');
         Route::get('getColaboradores', [CollaboratorController::class, 'getCollaborators'])->name('tenant.mantenimientos.colaboradores.getColaboradores');
         Route::get('edit/{id}', [CollaboratorController::class, 'edit'])->name('tenant.mantenimientos.colaboradores.edit');
@@ -64,11 +64,11 @@ Route::group(["prefix" => "mantenimiento"], function () {
         Route::get('search-document', [CollaboratorController::class, 'searchDocument'])->name('tenant.mantenimientos.colaboradores.searchDocument');
     });
 
-    Route::group(["prefix" => "plan"], function () {
+    Route::group(["prefix" => "plan", 'middleware' => 'can:mantenimiento.empresa.gestionar'], function () {
         Route::get('plan', [PlanController::class, 'index'])->name('tenant.mantenimientos.plan');
     });
 
-    Route::group(["prefix" => "usuario"], function () {
+    Route::group(["prefix" => "usuario", 'middleware' => 'can:mantenimiento.usuarios.gestionar'], function () {
         Route::get('index', [UserController::class, 'index'])->name('tenant.mantenimientos.usuario.index');
         Route::get('create', [UserController::class, 'create'])->name('tenant.mantenimientos.usuario.create');
         Route::get('getAll', [UserController::class, 'getAll'])->name('tenant.mantenimientos.usuario.getAll');
@@ -78,13 +78,13 @@ Route::group(["prefix" => "mantenimiento"], function () {
         Route::put('update/{id}', [UserController::class, 'update'])->name('tenant.mantenimientos.usuario.update');
     });
 
-    Route::group(["prefix" => "configuracion"], function () {
+    Route::group(["prefix" => "configuracion", 'middleware' => 'can:mantenimiento.configuracion.gestionar'], function () {
         //========== CONFIGURACION =========
         Route::get('configuracion', [ConfigurationController::class, 'index'])->name('tenant.mantenimientos.configuracion');
         Route::post('configuracion/store', [ConfigurationController::class, 'store'])->name('tenant.mantenimientos.configuracion.store');
     });
 
-    Route::group(["prefix" => "rol"], function () {
+    Route::group(["prefix" => "rol", 'middleware' => 'can:mantenimiento.roles.gestionar'], function () {
         Route::get('rol', [RoleController::class, 'index'])->name('tenant.mantenimientos.rol');
         Route::get('getRoles', [RoleController::class, 'getRoles'])->name('tenant.mantenimientos.roles.getRoles');
         Route::post('store', [RoleController::class, 'store'])->name('tenant.mantenimientos.roles.store');
@@ -92,6 +92,6 @@ Route::group(["prefix" => "mantenimiento"], function () {
         Route::post('sync-permisos/{id}', [RoleController::class, 'syncPermisos'])->name('tenant.mantenimientos.roles.syncPermisos');
     });
 
-    Route::get('horario-de-atencion', [BookController::class, 'schedule'])->name('tenant.mantenimientos.horario');
-    Route::post('horario-de-atencion/guardar', [BookController::class, 'saveSchedule'])->name('tenant.mantenimientos.horario.store');
+    Route::get('horario-de-atencion', [BookController::class, 'schedule'])->name('tenant.mantenimientos.horario')->middleware('can:mantenimiento.horario.gestionar');
+    Route::post('horario-de-atencion/guardar', [BookController::class, 'saveSchedule'])->name('tenant.mantenimientos.horario.store')->middleware('can:mantenimiento.horario.gestionar');
 });
