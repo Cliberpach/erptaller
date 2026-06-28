@@ -33,7 +33,8 @@ class CashRepository
 
     public function searchCashAvailable($data)
     {
-        $search = $data['search'] ?? null;
+        $search  = $data['search'] ?? null;
+        $sede_id = $data['sede_id'] ?? null;
 
         $query = PettyCash::from('petty_cashes as pc')
             ->leftJoin('petty_cash_books as pcb', function ($join) {
@@ -42,6 +43,10 @@ class CashRepository
             })
             ->where('pc.status','<>','ANULADO')
             ->whereNull('pcb.id')
+            // Cajas Capa C: solo cajas de la sede activa.
+            ->when($sede_id, function ($q) use ($sede_id) {
+                $q->where('pc.sede_id', $sede_id);
+            })
             ->when($search, function ($q) use ($search) {
                 $q->where('pc.name', 'like', "%{$search}%");
             })

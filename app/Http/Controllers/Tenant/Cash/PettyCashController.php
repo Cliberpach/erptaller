@@ -210,7 +210,10 @@ class PettyCashController extends Controller
     {
         try {
 
-            $cashes =   $this->s_cash->searchCashAvailable($request->toArray());
+            // Cajas LIBRES solo de la SEDE ACTIVA (Cajas Capa C). Blindaje: el sede_id
+            // lo fija el backend, no el cliente.
+            $data = array_merge($request->toArray(), ['sede_id' => $this->sedeActivaId()]);
+            $cashes =   $this->s_cash->searchCashAvailable($data);
 
             return response()->json([
                 'success' => true,

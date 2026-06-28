@@ -2,6 +2,7 @@
 
 namespace App\Http\Concerns;
 
+use App\Http\Services\Tenant\Cash\PettyCashBook\PettyCashBookRepository;
 use App\Models\Tenant\Sede;
 use App\Models\Tenant\Warehouse;
 use Illuminate\Support\Facades\Auth;
@@ -118,8 +119,27 @@ trait HasSedeActiva
             return false;
         }
 
+        // CANDADO 3 (Cajas Capa C): con caja abierta queda anclado a su sede. Solo afecta
+        // a quien TIENE book abierto; admin/usuario sin caja -> false -> cambia normal.
+        if ($this->tieneCajaAbierta()) {
+            return false;
+        }
+
         Session::put(self::SESSION_KEY, (int) $sedeId);
 
         return true;
+    }
+
+    /**
+     * ¿El usuario actual tiene una caja (petty_cash_book) ABIERTA? (global, sin filtro de sede).
+     * Base de los candados 2 y 3 de Cajas Capa C.
+     */
+    protected function tieneCajaAbierta(): bool
+    {
+        if (! Auth::check()) {
+            return false;
+        }
+
+        return (bool) (new PettyCashBookRepository())->getCashBookUser(Auth::id());
     }
 }

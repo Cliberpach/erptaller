@@ -253,30 +253,42 @@
         @isset($sedeActiva)
             <div class="vr my-3"></div>
             @if (($sedesDisponibles ?? collect())->count() > 1)
-                <div class="dropdown ms-sm-3 ms-lg-2 ms-2 text-end">
-                    <a href="#" class="d-flex align-items-center py-2" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="fi fi-rr-marker me-2 fs-5 text-primary"></i>
+                @if (!empty($cajaAbierta))
+                    {{-- CANDADO 3 (Cajas Capa C): con caja abierta, selector deshabilitado --}}
+                    <div class="ms-sm-3 ms-lg-2 ms-2 d-flex align-items-center opacity-50" style="cursor:not-allowed;"
+                        title="Cerrá tu caja para cambiar de sede">
+                        <i class="fi fi-rr-lock me-2 fs-5 text-secondary"></i>
                         <div class="d-none d-lg-inline-block text-start">
-                            <small class="text-body d-block lh-sm">Sede activa</small>
+                            <small class="text-body d-block lh-sm">Sede activa (bloqueada)</small>
                             <span class="fw-bold text-dark">{{ $sedeActiva->nombre }}</span>
                         </div>
-                        <i class="fi fi-rr-angle-down ms-2 text-3xs"></i>
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu-end mt-1">
-                        <li><h6 class="dropdown-header">CAMBIAR DE SEDE</h6></li>
-                        @foreach ($sedesDisponibles as $s)
-                            <li>
-                                <a class="dropdown-item d-flex align-items-center justify-content-between gap-3 {{ $s->id === $sedeActiva->id ? 'active' : '' }}"
-                                    href="{{ route('tenant.sede.cambiar', $s->id) }}">
-                                    <span><i class="fi fi-rr-marker me-2"></i>{{ $s->nombre }}</span>
-                                    @if ($s->id === $sedeActiva->id)
-                                        <i class="fi fi-rr-check text-success"></i>
-                                    @endif
-                                </a>
-                            </li>
-                        @endforeach
-                    </ul>
-                </div>
+                    </div>
+                @else
+                    <div class="dropdown ms-sm-3 ms-lg-2 ms-2 text-end">
+                        <a href="#" class="d-flex align-items-center py-2" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fi fi-rr-marker me-2 fs-5 text-primary"></i>
+                            <div class="d-none d-lg-inline-block text-start">
+                                <small class="text-body d-block lh-sm">Sede activa</small>
+                                <span class="fw-bold text-dark">{{ $sedeActiva->nombre }}</span>
+                            </div>
+                            <i class="fi fi-rr-angle-down ms-2 text-3xs"></i>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end mt-1">
+                            <li><h6 class="dropdown-header">CAMBIAR DE SEDE</h6></li>
+                            @foreach ($sedesDisponibles as $s)
+                                <li>
+                                    <a class="dropdown-item d-flex align-items-center justify-content-between gap-3 {{ $s->id === $sedeActiva->id ? 'active' : '' }}"
+                                        href="{{ route('tenant.sede.cambiar', $s->id) }}">
+                                        <span><i class="fi fi-rr-marker me-2"></i>{{ $s->nombre }}</span>
+                                        @if ($s->id === $sedeActiva->id)
+                                            <i class="fi fi-rr-check text-success"></i>
+                                        @endif
+                                    </a>
+                                </li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
             @else
                 <div class="ms-sm-3 ms-lg-2 ms-2 d-flex align-items-center">
                     <i class="fi fi-rr-marker me-2 fs-5 text-primary"></i>

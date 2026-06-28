@@ -27,6 +27,7 @@ class SetSedeActiva
 
         View::share('sedeActiva', $this->sedeActiva());
         View::share('sedesDisponibles', $this->sedesDisponibles());
+        View::share('cajaAbierta', $this->tieneCajaAbierta());   // CANDADO 3 (UI selector)
 
         return $next($request);
     }

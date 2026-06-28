@@ -26,6 +26,8 @@ class SedeController extends Controller
     {
         if ($this->cambiarSede($id)) {
             Session::flash('message_success', 'SEDE ACTIVA CAMBIADA');
+        } elseif ($this->tieneCajaAbierta()) {
+            Session::flash('message_error', 'Cerrá tu caja para cambiar de sede.');
         } else {
             Session::flash('message_error', 'NO TIENE ACCESO A ESA SEDE');
         }

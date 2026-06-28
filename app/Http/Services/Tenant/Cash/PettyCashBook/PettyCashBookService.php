@@ -34,6 +34,14 @@ class PettyCashBookService
         $dto    =   $this->s_dto->getDtoStore($data);
         $petty_cash_book   =   $this->s_repository->insertPettyCashBook($dto);
         $this->s_cash->setStatus($dto['petty_cash_id'], 'ABIERTO');
+
+        // CANDADO 3 (Cajas Capa C): ancla la sede activa a la sede de la caja abierta
+        // ('sede_activa_id' = HasSedeActiva::SESSION_KEY).
+        $caja = \App\Models\Tenant\Cash\PettyCash::find($dto['petty_cash_id']);
+        if ($caja && $caja->sede_id) {
+            \Illuminate\Support\Facades\Session::put('sede_activa_id', (int) $caja->sede_id);
+        }
+
         return $petty_cash_book;
     }
 
