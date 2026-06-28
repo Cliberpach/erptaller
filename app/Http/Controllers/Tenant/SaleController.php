@@ -69,6 +69,7 @@ class SaleController extends Controller
                 'sd.id',
                 'sd.registration_date as fecha_registro',
                 'sd.customer_name',
+                'sd.plate',
                 'sd.user_recorder_name as vendedor',
                 'sd.serie',
                 'sd.correlative',

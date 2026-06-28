@@ -4,6 +4,7 @@
             <th data-priority="1">#</th>
             <th data-priority="2">Fecha</th>
             <th>Cliente</th>
+            <th>Placa</th>
             <th>Vendedor</th>
             <th>Doc</th>
             <th>Monto</th>

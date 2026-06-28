@@ -207,6 +207,10 @@
                         name: 'customer_name'
                     },
                     {
+                        data: 'plate',
+                        name: 'plate'
+                    },
+                    {
                         data: 'vendedor',
                         name: 'vendedor',
                         searchable: false
