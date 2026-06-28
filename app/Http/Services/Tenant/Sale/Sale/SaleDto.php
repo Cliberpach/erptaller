@@ -81,6 +81,11 @@ class SaleDto
         $dto['payment_condition_name']      = $validated_data->payment_condition->name;
         $dto['payment_condition_days']      = $validated_data->payment_condition->nro_days;
 
+        //======= ESTADO DE PAGO =====
+        // Lo define la CONDICIÓN, no el método: CONTADO -> PAGADO; CRÉDITO -> PENDIENTE
+        // (el crédito pasa a PAGADO al cobrarse en Cuentas por Cobrar). Espejo de PurchaseDto.
+        $dto['payment_status']              = $validated_data->payment_condition->name === 'CONTADO' ? 'PAGADO' : 'PENDIENTE';
+
         //=============== VEHÍCULO =========
         $dto['vehicle_id']                  = $validated_data->vehicle_id;
         $dto['plate']                       = $validated_data->plate;
