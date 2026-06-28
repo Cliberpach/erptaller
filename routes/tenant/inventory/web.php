@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::group(["prefix" => "inventarios", 'middleware' => 'validar.plan:inventario'], function () {
 
-    Route::group(["prefix" => "almacenes"], function () {
+    Route::group(["prefix" => "almacenes", 'middleware' => 'can:inventario.almacenes.gestionar'], function () {
         Route::get('index', [WarehouseController::class, 'index'])->name('tenant.inventarios.almacenes.index');
         Route::get('getWarehouses', [WarehouseController::class, 'getWarehouses'])->name('tenant.inventarios.almacenes.getWarehouses');
         Route::post('store', [WarehouseController::class, 'store'])->name('tenant.inventarios.almacenes.store');
@@ -22,7 +22,7 @@ Route::group(["prefix" => "inventarios", 'middleware' => 'validar.plan:inventari
         Route::put('toggle-status/{id}', [WarehouseController::class, 'toggleStatus'])->name('tenant.inventarios.almacenes.toggleStatus');
     });
 
-    Route::group(["prefix" => "categorias"], function () {
+    Route::group(["prefix" => "categorias", 'middleware' => 'can:inventario.productos.gestionar'], function () {
         Route::get('index', [CategoryController::class, 'index'])->name('tenant.inventarios.productos.categoria');
         Route::get('get-all', [CategoryController::class, 'getAll'])->name('tenant.inventarios.productos.categoria.get-all');
         Route::post('store', [CategoryController::class, 'store'])->name('tenant.inventarios.productos.categoria.store');
@@ -32,7 +32,7 @@ Route::group(["prefix" => "inventarios", 'middleware' => 'validar.plan:inventari
         Route::post('import-categories-excel', [CategoryController::class, 'importCategoriesExcel'])->name('tenant.inventarios.productos.categoria.import-categories-excel');
     });
 
-    Route::group(["prefix" => "marcas"], function () {
+    Route::group(["prefix" => "marcas", 'middleware' => 'can:inventario.productos.gestionar'], function () {
         Route::get('index', [BrandController::class, 'index'])->name('tenant.inventarios.productos.marca');
         Route::get('get-all', [BrandController::class, 'getAll'])->name('tenant.inventarios.productos.marca.get-all');
         Route::post('store', [BrandController::class, 'store'])->name('tenant.inventarios.productos.marca.store');
@@ -42,7 +42,7 @@ Route::group(["prefix" => "inventarios", 'middleware' => 'validar.plan:inventari
         Route::post('import-marcas-excel', [BrandController::class, 'importExcel'])->name('tenant.inventarios.productos.marca.import-excel');
     });
 
-    Route::group(["prefix" => "productos"], function () {
+    Route::group(["prefix" => "productos", 'middleware' => 'can:inventario.productos.gestionar'], function () {
         Route::get('index', [ProductController::class, 'index'])->name('tenant.inventarios.productos.producto');
         Route::get('get-all', [ProductController::class, 'getAll'])->name('tenant.inventarios.productos.producto.get-all');
         Route::post('store', [ProductController::class, 'store'])->name('tenant.inventarios.productos.store');
@@ -53,7 +53,7 @@ Route::group(["prefix" => "inventarios", 'middleware' => 'validar.plan:inventari
         Route::post('export-producto-excel', [ProductController::class, 'exportExcel'])->name('tenant.inventarios.productos.producto.export-excel');
     });
 
-    Route::group(["prefix" => "inventario"], function () {
+    Route::group(["prefix" => "inventario", 'middleware' => 'can:inventario.ver'], function () {
         Route::get('servicio', [InventoryController::class, 'service'])->name('tenant.inventarios.servicio');
         Route::get('movimiento', [InventoryController::class, 'movement'])->name('tenant.inventarios.movimiento');
         Route::get('devolucion-proveedor', [InventoryController::class, 'supplierReturn'])->name('tenant.inventarios.devolucion_proveedor');
@@ -63,7 +63,7 @@ Route::group(["prefix" => "inventarios", 'middleware' => 'validar.plan:inventari
         Route::get('inventario/pdf', [InventoryController::class, 'pdf'])->name('tenant.inventarios.inventario.pdf');
     });
 
-    Route::group(["prefix" => "kardex"], function () {
+    Route::group(["prefix" => "kardex", 'middleware' => 'can:inventario.kardex.ver'], function () {
         //============ KARDEX ============
         Route::get('kardex', [KardexController::class, 'index'])->name('tenant.inventory.kardex.index');
         Route::get('getKardex', [KardexController::class, 'getKardex'])->name('tenant.inventory.kardex.getKardex');
@@ -72,14 +72,14 @@ Route::group(["prefix" => "inventarios", 'middleware' => 'validar.plan:inventari
     });
 
 
-    Route::group(["prefix" => "kardex_valor"], function () {
+    Route::group(["prefix" => "kardex_valor", 'middleware' => 'can:inventario.ver_costos'], function () {
         Route::get('kardex-valor/index', [ValuedKardexController::class, 'index'])->name('tenant.inventarios.kardex_valorizado');
         Route::get('kardex-valor/getValuedKardex', [ValuedKardexController::class, 'getValuedKardex'])->name('tenant.inventarios.kardex_valorizado.getValuedKardex');
         Route::get('kardex-valor/pdf', [ValuedKardexController::class, 'pdf'])->name('tenant.inventarios.kardex_valorizado.pdf');
     });
 
 
-    Route::group(["prefix" => "nota_ingreso"], function () {
+    Route::group(["prefix" => "nota_ingreso", 'middleware' => 'can:inventario.notas.gestionar'], function () {
         //============ NOTA INGRESO ========
         Route::get('index', [NoteIncomeController::class, 'index'])->name('tenant.inventarios.nota_ingreso');
         Route::get('getNoteIncome', [NoteIncomeController::class, 'getNoteIncome'])->name('tenant.inventarios.nota_ingreso.getNoteIncome');
@@ -88,7 +88,7 @@ Route::group(["prefix" => "inventarios", 'middleware' => 'validar.plan:inventari
         Route::get('getProducts', [NoteIncomeController::class, 'getProducts'])->name('tenant.inventarios.nota_ingreso.getProducts');
         Route::get('show/{id}', [NoteIncomeController::class, 'show'])->name('tenant.inventarios.nota_ingreso.show');
     });
-    Route::group(["prefix" => "nota_salida"], function () {
+    Route::group(["prefix" => "nota_salida", 'middleware' => 'can:inventario.notas.gestionar'], function () {
         //============ NOTA SALIDA ========
         Route::get('index', [NoteReleaseController::class, 'index'])->name('tenant.inventarios.nota_salida');
         Route::get('create', [NoteReleaseController::class, 'create'])->name('tenant.inventarios.nota_salida.create');
