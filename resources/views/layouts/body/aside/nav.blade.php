@@ -102,7 +102,18 @@
         </ul>
     </li> --}}
 
+    {{-- Permisos P2: cada nodo se muestra solo si el usuario tiene su permiso (@can).
+         Admin pasa todo (Gate::before). NULL = sin permiso → fail-closed (solo admin).
+         Módulo/contenedor se ocultan si no hay ningún hijo visible (no quedan vacíos). --}}
+    @php $esAdmin = auth()->user()?->hasRole('admin'); @endphp
     @foreach ($modules as $module)
+        @php
+            $modPerms = $module->children->flatMap(fn ($c) =>
+                $c->grandchildren->isNotEmpty() ? $c->grandchildren->pluck('permission') : collect([$c->permission])
+            )->filter()->unique()->values()->all();
+            $verModulo = $esAdmin || (count($modPerms) && auth()->user()?->canAny($modPerms));
+        @endphp
+        @if ($verModulo)
         <li class="menu-item menu-arrow">
             <a class="menu-link" href="javascript:void(0);" role="button">
                 {{-- --}}
@@ -120,31 +131,44 @@
 
                 @foreach ($module->children as $child)
                     @if ($child->grandchildren->isNotEmpty())
+                        @php
+                            $gPerms  = $child->grandchildren->pluck('permission')->filter()->unique()->values()->all();
+                            $verCont = $esAdmin || (count($gPerms) && auth()->user()?->canAny($gPerms));
+                        @endphp
+                        @if ($verCont)
                         <li class="menu-item menu-arrow">
                             <a class="menu-link" href="javascript:void(0);">
                                 <span class="menu-label">{{ $child->description }}</span>
                             </a>
                             <ul class="menu-inner">
                                 @foreach ($child->grandchildren as $grandchild)
+                                    @php $verG = $grandchild->permission ? auth()->user()?->can($grandchild->permission) : $esAdmin; @endphp
+                                    @if ($verG)
                                     <li class="menu-item">
                                         <a class="menu-link menu-click"
                                             href="{{ route($base . $grandchild->route_name) }}">
                                             <span class="menu-label">{{ $grandchild->description }}</span>
                                         </a>
                                     </li>
+                                    @endif
                                 @endforeach
                             </ul>
                         </li>
+                        @endif
                     @else
+                        @php $verChild = $child->permission ? auth()->user()?->can($child->permission) : $esAdmin; @endphp
+                        @if ($verChild)
                         <li class="menu-item">
                             <a class="menu-link menu-click" href="{{ route($base . $child->route_name) }}">
                                 <span class="menu-label">{{ $child->description }}</span>
                             </a>
                         </li>
+                        @endif
                     @endif
                 @endforeach
             </ul>
         </li>
+        @endif
     @endforeach
 
 
