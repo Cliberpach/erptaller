@@ -75,4 +75,10 @@ class Sale extends Model
         'vehicle_id',
         'plate',
     ];
+
+    // PASO 4 - Pago en la venta (Capa A): N líneas de pago (método+cuenta+monto+operación).
+    public function payments()
+    {
+        return $this->hasMany(\App\Models\Tenant\Sale\SaleDocumentPayment::class, 'sale_document_id');
+    }
 }
