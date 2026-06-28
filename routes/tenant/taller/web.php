@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::group(["prefix" => "taller"], function () {
 
-    Route::group(["prefix" => "ordenes_trabajo"], function () {
+    Route::group(["prefix" => "ordenes_trabajo", 'middleware' => 'can:taller.ot.ver'], function () {
 
         Route::get('index', [WorkOrderController::class, 'index'])->name('tenant.taller.ordenes_trabajo.index');
         Route::get('create', [WorkOrderController::class, 'create'])->name('tenant.taller.ordenes_trabajo.create');
@@ -31,7 +31,7 @@ Route::group(["prefix" => "taller"], function () {
         Route::post('alert/store', [WorkOrderController::class, 'alertStore'])->name('tenant.taller.ordenes_trabajo.alertStore');
     });
 
-    Route::group(["prefix" => "cotizaciones"], function () {
+    Route::group(["prefix" => "cotizaciones", 'middleware' => 'can:taller.cotizaciones.ver'], function () {
 
         Route::get('index', [QuoteController::class, 'index'])->name('tenant.taller.cotizaciones.index');
         Route::get('create', [QuoteController::class, 'create'])->name('tenant.taller.cotizaciones.create');
@@ -45,7 +45,7 @@ Route::group(["prefix" => "taller"], function () {
         Route::get('convert-order/{id}', [QuoteController::class, 'convertOrderCreate'])->name('tenant.taller.cotizaciones.convertOrderCreate');
     });
 
-    Route::group(["prefix" => "servicios"], function () {
+    Route::group(["prefix" => "servicios", 'middleware' => 'can:taller.servicios.gestionar'], function () {
 
         Route::get('index', [ServiceController::class, 'index'])->name('tenant.taller.servicios.index');
         Route::get('getServices', [ServiceController::class, 'getServices'])->name('tenant.taller.servicios.getServices');
@@ -55,7 +55,7 @@ Route::group(["prefix" => "taller"], function () {
         Route::delete('destroy/{id}', [ServiceController::class, 'destroy'])->name('tenant.taller.servicios.destroy');
     });
 
-    Route::group(["prefix" => "vehiculos"], function () {
+    Route::group(["prefix" => "vehiculos", 'middleware' => 'can:taller.vehiculos.gestionar'], function () {
 
         Route::get('index', [VehicleController::class, 'index'])->name('tenant.taller.vehiculos.index');
         Route::get('getVehiculos', [VehicleController::class, 'getVehiculos'])->name('tenant.taller.vehiculos.getVehiculos');
@@ -66,7 +66,7 @@ Route::group(["prefix" => "taller"], function () {
         Route::delete('destroy/{id}', [VehicleController::class, 'destroy'])->name('tenant.taller.vehiculos.destroy');
     });
 
-    Route::group(["prefix" => "colores"], function () {
+    Route::group(["prefix" => "colores", 'middleware' => 'can:taller.maestros.gestionar'], function () {
 
         Route::get('index', [ColorController::class, 'index'])->name('tenant.taller.colores.index');
         Route::get('getColores', [ColorController::class, 'getColores'])->name('tenant.taller.colores.getColores');
@@ -76,7 +76,7 @@ Route::group(["prefix" => "taller"], function () {
         Route::put('update/{id}', [ColorController::class, 'update'])->name('tenant.taller.colores.update');
     });
 
-    Route::group(["prefix" => "marcas"], function () {
+    Route::group(["prefix" => "marcas", 'middleware' => 'can:taller.maestros.gestionar'], function () {
 
         Route::get('index', [BrandController::class, 'index'])->name('tenant.taller.marcas.index');
         Route::get('getMarcas', [BrandController::class, 'getMarcas'])->name('tenant.taller.marcas.getMarcas');
@@ -86,7 +86,7 @@ Route::group(["prefix" => "taller"], function () {
         Route::put('update/{id}', [BrandController::class, 'update'])->name('tenant.taller.marcas.update');
     });
 
-    Route::group(["prefix" => "modelos"], function () {
+    Route::group(["prefix" => "modelos", 'middleware' => 'can:taller.maestros.gestionar'], function () {
 
         Route::get('index', [ModelController::class, 'index'])->name('tenant.taller.modelos.index');
         Route::get('getModelos', [ModelController::class, 'getModelos'])->name('tenant.taller.modelos.getModelos');
@@ -96,7 +96,7 @@ Route::group(["prefix" => "taller"], function () {
         Route::put('update/{id}', [ModelController::class, 'update'])->name('tenant.taller.modelos.update');
     });
 
-    Route::group(["prefix" => "years"], function () {
+    Route::group(["prefix" => "years", 'middleware' => 'can:taller.maestros.gestionar'], function () {
 
         Route::get('index', [YearController::class, 'index'])->name('tenant.taller.years.index');
         Route::get('getYears', [YearController::class, 'getYears'])->name('tenant.taller.years.getYears');
@@ -106,7 +106,7 @@ Route::group(["prefix" => "taller"], function () {
         Route::put('update/{id}', [YearController::class, 'update'])->name('tenant.taller.years.update');
     });
 
-    Route::group(["prefix" => "citas"], function () {
+    Route::group(["prefix" => "citas", 'middleware' => 'can:taller.citas.gestionar'], function () {
 
         Route::get('index', [AppointmentController::class, 'index'])->name('tenant.taller.citas.index');
         Route::get('getEvents', [AppointmentController::class, 'getEvents'])->name('tenant.taller.citas.getEvents');
