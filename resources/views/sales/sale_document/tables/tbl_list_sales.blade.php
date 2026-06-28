@@ -4,10 +4,12 @@
             <th data-priority="1">#</th>
             <th data-priority="2">Fecha</th>
             <th>Cliente</th>
+            <th>Vendedor</th>
             <th>Doc</th>
             <th>Monto</th>
             <th>Sunat</th>
             <th>Pago</th>
+            <th>Método</th>
             <th style="text-align: center;">Descargas</th>
             <th>Acción</th>
         </tr>

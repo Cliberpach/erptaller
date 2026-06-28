@@ -62,15 +62,21 @@ class SaleController extends Controller
         $esAdmin = auth()->user()->hasRole('admin');
 
         $sales    =   DB::table('sales_documents as sd')
+            // Método de pago: la venta guarda hasta 2 (method_pay_id_1/_2). Se muestran ambos.
+            ->leftJoin('payment_methods as pm1', 'pm1.id', '=', 'sd.method_pay_id_1')
+            ->leftJoin('payment_methods as pm2', 'pm2.id', '=', 'sd.method_pay_id_2')
             ->select(
                 'sd.id',
                 'sd.registration_date as fecha_registro',
                 'sd.customer_name',
+                'sd.user_recorder_name as vendedor',
                 'sd.serie',
                 'sd.correlative',
                 DB::raw("CONCAT(sd.serie, '-', sd.correlative) AS doc"),
                 'sd.type_sale_name',
                 DB::raw("FORMAT(sd.total, 2) AS total"),
+                // CONCAT_WS ignora NULL: 'EFECTIVO' o 'EFECTIVO, YAPE' si hay 2.
+                DB::raw("CONCAT_WS(', ', pm1.description, pm2.description) AS metodo_pago"),
                 'sd.sunat_status',
                 'sd.type_sale_code',
                 'sd.ruta_xml',

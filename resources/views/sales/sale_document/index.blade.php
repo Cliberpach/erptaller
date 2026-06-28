@@ -207,6 +207,11 @@
                         name: 'customer_name'
                     },
                     {
+                        data: 'vendedor',
+                        name: 'vendedor',
+                        searchable: false
+                    },
+                    {
                         data: 'doc',
                         name: 'doc'
                     },
@@ -255,6 +260,12 @@
                             return `<span class="badge bg-${badge_class}">${data.payment_status}</span>`;
                         },
                         name: 'actions',
+                        orderable: false,
+                        searchable: false
+                    },
+                    {
+                        data: 'metodo_pago',
+                        name: 'metodo_pago',
                         orderable: false,
                         searchable: false
                     },
