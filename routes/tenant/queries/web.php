@@ -5,7 +5,9 @@ use App\Http\Controllers\Tenant\Queries\QNotificationController;
 use App\Http\Controllers\Tenant\Queries\QVehicleController;
 use Illuminate\Support\Facades\Route;
 
-Route::group(["prefix" => "consultas"], function () {
+// Permisos P3: Consultas (vehículos + alertas) → can:consultas.ver. AJAX (getList/getAll)
+// dentro de los grupos → heredan. (Los créditos viven en web.php, se protegen ahí.)
+Route::group(["prefix" => "consultas", 'middleware' => 'can:consultas.ver'], function () {
     Route::group(["prefix" => "vehiculos"], function () {
 
         Route::get('index', [QVehicleController::class, 'index'])->name('tenant.consultas.vehiculos.index');
