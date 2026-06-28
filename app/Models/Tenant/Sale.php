@@ -69,6 +69,10 @@ class Sale extends Model
         'registration_date',
         'payment_condition_id',
         'payment_condition_name',
-        'payment_condition_days'
+        'payment_condition_days',
+
+        'payment_status',
+        'vehicle_id',
+        'plate',
     ];
 }
