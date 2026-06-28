@@ -115,7 +115,7 @@
 
                     if (response.status === 422) {
                         if ('errors' in res) {
-                            pintarErroresValidacion(res.errors, 'edit_error')
+                            paintValidationErrors(res.errors, 'edit_error')
                         }
                         Swal.close();
                         return;
