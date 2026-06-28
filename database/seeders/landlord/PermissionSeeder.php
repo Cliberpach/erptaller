@@ -31,7 +31,10 @@ class PermissionSeeder extends Seeder
 
             // VENTAS
             'ventas.ver', 'ventas.crear', 'ventas.anular', 'ventas.enviar_sunat', 'ventas.ver_precios',
-            'ventas.clientes.gestionar', 'ventas.config.gestionar',
+            'ventas.clientes.gestionar',
+            // DEPRECADO: Métodos/Condiciones Pago se movieron a Mantenimiento
+            // (mantenimiento.config_pago.gestionar). Ya no protege ninguna ruta/nodo.
+            'ventas.config.gestionar',
 
             // RESERVAS / CAMPOS
             'reservas.ver', 'reservas.crear', 'reservas.editar', 'reservas.anular',
@@ -58,6 +61,7 @@ class PermissionSeeder extends Seeder
             'mantenimiento.colaboradores.gestionar', 'mantenimiento.empresa.gestionar',
             'mantenimiento.configuracion.gestionar',
             'mantenimiento.cuentas_bancarias.gestionar', 'mantenimiento.horario.gestionar',
+            'mantenimiento.config_pago.gestionar',
         ];
 
         foreach ($permisos as $name) {

@@ -39,7 +39,9 @@ Route::group(["prefix" => "ventas"], function () {
         Route::get('getAll', [CustomerController::class, 'getAll'])->name('tenant.ventas.cliente.getAll');
     });
 
-    Route::group(["prefix" => "metodos_pago", 'middleware' => 'can:ventas.config.gestionar'], function () {
+    // Métodos/Condiciones Pago: movidos a Mantenimiento (permiso mantenimiento.config_pago).
+    // Quedan físicamente aquí (route names tenant.ventas.*) pero el candado es de mantenimiento.
+    Route::group(["prefix" => "metodos_pago", 'middleware' => 'can:mantenimiento.config_pago.gestionar'], function () {
         //======= MÉTODOS DE PAGO =======
         Route::get('metodo_pago/index', [PaymentMethodController::class, 'index'])->name('tenant.ventas.metodo_pago');
         Route::post('metodo_pago/store', [PaymentMethodController::class, 'store'])->name('tenant.ventas.metodo_pago.store');
@@ -49,7 +51,7 @@ Route::group(["prefix" => "ventas"], function () {
         Route::post('assign-accounts/store', [PaymentMethodController::class, 'assignAccountsStore'])->name('tenant.ventas.metodo_pago.assignAccountsStore');
     });
 
-    Route::group(["prefix" => "condiciones_pago", 'middleware' => 'can:ventas.config.gestionar'], function () {
+    Route::group(["prefix" => "condiciones_pago", 'middleware' => 'can:mantenimiento.config_pago.gestionar'], function () {
         //======= MÉTODOS DE PAGO =======
         Route::get('metodo_pago/index', [PaymentConditionController::class, 'index'])->name('tenant.ventas.condiciones_pago.index');
         Route::get('create', [PaymentConditionController::class, 'create'])->name('tenant.ventas.condiciones_pago.create');

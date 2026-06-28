@@ -25,7 +25,7 @@ class RoleSeeder extends Seeder
             'dashboard.ver',
             'cajas.ver', 'cajas.abrir_cerrar', 'cajas.egresos',
             'ventas.ver', 'ventas.crear', 'ventas.anular', 'ventas.enviar_sunat',
-            'ventas.ver_precios', 'ventas.clientes.gestionar', 'ventas.config.gestionar',
+            'ventas.ver_precios', 'ventas.clientes.gestionar',
             'cuentas.cxc.ver', 'cuentas.cxc.cobrar',
             'taller.cotizaciones.ver', 'taller.cotizaciones.crear', 'taller.cotizaciones.editar',
             'taller.ot.ver', 'taller.ot.facturar',

@@ -149,19 +149,7 @@ class ModuleSeeder extends Seeder
             'order' => '2'
         ]);
 
-        ModuleChild::create([
-            'module_id'     => $sale->id,
-            'description'   => 'Métodos Pago',
-            'route_name'    => 'ventas.metodo_pago',
-            'order'         => '2'
-        ]);
-
-        ModuleChild::create([
-            'module_id'     => $sale->id,
-            'description'   => 'Condiciones Pago',
-            'route_name'    => 'ventas.condiciones_pago.index',
-            'order'         => '2'
-        ]);
+        // Métodos Pago + Condiciones Pago se movieron a Mantenimiento (ver $maintenance).
 
         /*============ CUENTAS ==========*/
         $accounts = Module::create([
@@ -370,6 +358,21 @@ class ModuleSeeder extends Seeder
             'order'         => '2'
         ]);
 
+        // Movidos desde Ventas: ahora son config de pago de mantenimiento.
+        ModuleChild::create([
+            'module_id'     => $maintenance->id,
+            'description'   => 'Métodos Pago',
+            'route_name'    => 'ventas.metodo_pago',
+            'order'         => '2'
+        ]);
+
+        ModuleChild::create([
+            'module_id'     => $maintenance->id,
+            'description'   => 'Condiciones Pago',
+            'route_name'    => 'ventas.condiciones_pago.index',
+            'order'         => '2'
+        ]);
+
         ModuleChild::create([
             'module_id'  => $maintenance->id,
             'description'=> 'Sedes',
@@ -455,8 +458,9 @@ class ModuleSeeder extends Seeder
             'taller.citas.index'                  => 'taller.citas.gestionar',
             'ventas.comprobante_venta'            => 'ventas.ver',
             'ventas.cliente'                      => 'ventas.clientes.gestionar',
-            'ventas.metodo_pago'                  => 'ventas.config.gestionar',
-            'ventas.condiciones_pago.index'       => 'ventas.config.gestionar',
+            // Movidos a Mantenimiento: ahora gestionados con el permiso de mantenimiento.
+            'ventas.metodo_pago'                  => 'mantenimiento.config_pago.gestionar',
+            'ventas.condiciones_pago.index'       => 'mantenimiento.config_pago.gestionar',
             'cuentas.cliente.index'               => 'cuentas.cxc.ver',
             'cuentas.proveedor.index'             => 'cuentas.cxp.ver',
             'inventarios.productos.categoria'     => 'inventario.productos.gestionar',
