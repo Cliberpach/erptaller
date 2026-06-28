@@ -3,7 +3,6 @@
 use App\Http\Controllers\LandLord\ApiController;
 use App\Http\Controllers\Notifications\NotificationController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Tenant\UserController;
 use App\Http\Controllers\Tenant\BookController;
 use App\Http\Controllers\Tenant\Cash\PettyCashController;
 use App\Http\Controllers\Tenant\FieldController;
@@ -46,9 +45,6 @@ Route::get('/', function () {
 //         return view('dashboard');
 //     })->name('dashboard');
 // });
-
-Route::get('user/tenant', [UserController::class, 'index'])->name('tenant.users.index');
-Route::post('user/create', [UserController::class, 'store'])->name('tenant.users.create');
 
 Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified', 'sede.activa'])->group(function () {
     Route::get('/dashboard', [ModuleController::class, 'home'])->name('tenant.home');
