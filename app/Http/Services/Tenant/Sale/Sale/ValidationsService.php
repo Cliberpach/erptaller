@@ -50,6 +50,10 @@ class ValidationsService
         }
 
         //======= VALIDANDO USUARIO ACTUAL DEBE ESTAR EN UNA CAJA APERTURADA =======
+        // Cajas Capa C (cobro): la venta cae en la caja que ESTE vendedor (recorder) abrió
+        // en su sede activa. Determinístico por Candado 2 (un vendedor = una sola caja abierta).
+        $sede_activa_id     =   session('sede_activa_id');
+
         $user_in_petty_cash =   DB::select(
             'SELECT
                                 pc.name as petty_cash_name,
@@ -60,12 +64,13 @@ class ValidationsService
                                 inner join petty_cashes as pc on pc.id = pcb.petty_cash_id
                                 where
                                 pcb.user_id = ?
-                                and pcb.status = "ABIERTO"',
-            [$user_recorder->id]
+                                and pcb.status = "ABIERTO"
+                                and pc.sede_id = ?',
+            [$user_recorder->id, $sede_activa_id]
         );
 
         if (count($user_in_petty_cash) === 0) {
-            throw new Exception("EL USUARIO NO SE ENCUENTRA EN UNA CAJA APERTURADA!!!");
+            throw new Exception("No tenés una caja aperturada en esta sede.");
         }
 
         //======= VALIDACION TIPO DE VENTA Y CLIENTE =========

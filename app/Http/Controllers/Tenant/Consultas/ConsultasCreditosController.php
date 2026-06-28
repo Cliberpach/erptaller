@@ -214,6 +214,19 @@ class ConsultasCreditosController extends Controller
                 throw new \Exception("No se pudo obtener el correlativo para la venta.");
             }
 
+            // Cajas Capa C (cobro): la caja que ESTE vendedor abrió en su sede activa
+            // (mismo criterio que la venta normal). Determinístico por Candado 2.
+            $apertura = DB::selectOne(
+                'SELECT pc.name as petty_cash_name, pcb.petty_cash_id, pcb.id as petty_cash_book_id
+                 from petty_cash_books as pcb
+                 inner join petty_cashes as pc on pc.id = pcb.petty_cash_id
+                 where pcb.user_id = ? and pcb.status = "ABIERTO" and pc.sede_id = ?',
+                [auth()->id(), session('sede_activa_id')]
+            );
+            if (!$apertura) {
+                throw new \Exception("No tenés una caja aperturada en esta sede.");
+            }
+
             // Crear la venta
             $sale = new Sale();
             $sale->customer_id = $customer->id;
@@ -224,9 +237,9 @@ class ConsultasCreditosController extends Controller
             $sale->customer_phone = $customer->phone;
             $sale->user_recorder_id = auth()->id();
             $sale->user_recorder_name = auth()->user()->name;
-            $sale->petty_cash_id = 1;
-            $sale->petty_cash_name = 'CAJA PRINCIPAL';
-            $sale->petty_cash_book_id = 1;
+            $sale->petty_cash_id = $apertura->petty_cash_id;
+            $sale->petty_cash_name = $apertura->petty_cash_name;
+            $sale->petty_cash_book_id = $apertura->petty_cash_book_id;
             $sale->type_sale_id   = $tipo_doc->id;
             $sale->type_sale_code = $tipo_doc->symbol;
             $sale->type_sale_name = $tipo_doc->name;
