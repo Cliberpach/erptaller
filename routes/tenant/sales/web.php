@@ -9,13 +9,15 @@ use Illuminate\Support\Facades\Route;
 
 Route::group(["prefix" => "ventas"], function () {
 
-    Route::group(["prefix" => "ventas"], function () {
+    // Permisos P3: piso del módulo ventas = can:ventas.ver; las acciones sensibles suman
+    // su propio can: a nivel de ruta (doble capa: requiere ver + la acción).
+    Route::group(["prefix" => "ventas", 'middleware' => 'can:ventas.ver'], function () {
         Route::get('index', [SaleController::class, 'index'])->name('tenant.ventas.comprobante_venta')->middleware('validar.plan:ventas');
         Route::get('create', [SaleController::class, 'create'])->name('tenant.ventas.comprobante_venta.create')->middleware('validar.plan:ventas');
         Route::get('getProductos', [SaleController::class, 'getProductos'])->name('tenant.ventas.comprobante_venta.getProductos')->middleware('validar.plan:ventas');
         Route::get('validateStock', [SaleController::class, 'validateStock'])->name('tenant.ventas.comprobante_venta.validateStock')->middleware('validar.plan:ventas');
-        Route::post('store', [SaleController::class, 'store'])->name('tenant.ventas.comprobante_venta.store')->middleware('validar.plan:ventas');
-        Route::post('send_sunat', [SaleController::class, 'send_sunat'])->name('tenant.ventas.comprobante_venta.send_sunat')->middleware('validar.plan:ventas');
+        Route::post('store', [SaleController::class, 'store'])->name('tenant.ventas.comprobante_venta.store')->middleware(['validar.plan:ventas', 'can:ventas.crear']);
+        Route::post('send_sunat', [SaleController::class, 'send_sunat'])->name('tenant.ventas.comprobante_venta.send_sunat')->middleware(['validar.plan:ventas', 'can:ventas.enviar_sunat']);
         Route::get('getSales', [SaleController::class, 'getSales'])->name('tenant.ventas.comprobante_venta.getSales')->middleware('validar.plan:ventas');
         Route::get('pdf_voucher/{id}/{size?}', [SaleController::class, 'pdf_voucher'])->name('tenant.ventas.comprobante_venta.pdf_voucher')->middleware('validar.plan:ventas');
         Route::get('downloadXml/{id}', [SaleController::class, 'downloadXml'])->name('tenant.ventas.comprobante_venta.downloadXml')->middleware('validar.plan:ventas');
@@ -25,7 +27,7 @@ Route::group(["prefix" => "ventas"], function () {
         Route::get('cotizacion', [SaleController::class, 'quotation'])->name('tenant.ventas.cotizacion');
     });
 
-    Route::group(["prefix" => "clientes"], function () {
+    Route::group(["prefix" => "clientes", 'middleware' => 'can:ventas.clientes.gestionar'], function () {
         Route::get('index', [CustomerController::class, 'index'])->name('tenant.ventas.cliente');
         Route::get('create', [CustomerController::class, 'create'])->name('tenant.ventas.cliente.create');
         Route::post('store', [CustomerController::class, 'store'])->name('tenant.ventas.cliente.store');
@@ -37,7 +39,7 @@ Route::group(["prefix" => "ventas"], function () {
         Route::get('getAll', [CustomerController::class, 'getAll'])->name('tenant.ventas.cliente.getAll');
     });
 
-    Route::group(["prefix" => "metodos_pago"], function () {
+    Route::group(["prefix" => "metodos_pago", 'middleware' => 'can:ventas.config.gestionar'], function () {
         //======= MÉTODOS DE PAGO =======
         Route::get('metodo_pago/index', [PaymentMethodController::class, 'index'])->name('tenant.ventas.metodo_pago');
         Route::post('metodo_pago/store', [PaymentMethodController::class, 'store'])->name('tenant.ventas.metodo_pago.store');
@@ -47,7 +49,7 @@ Route::group(["prefix" => "ventas"], function () {
         Route::post('assign-accounts/store', [PaymentMethodController::class, 'assignAccountsStore'])->name('tenant.ventas.metodo_pago.assignAccountsStore');
     });
 
-    Route::group(["prefix" => "condiciones_pago"], function () {
+    Route::group(["prefix" => "condiciones_pago", 'middleware' => 'can:ventas.config.gestionar'], function () {
         //======= MÉTODOS DE PAGO =======
         Route::get('metodo_pago/index', [PaymentConditionController::class, 'index'])->name('tenant.ventas.condiciones_pago.index');
         Route::get('create', [PaymentConditionController::class, 'create'])->name('tenant.ventas.condiciones_pago.create');
