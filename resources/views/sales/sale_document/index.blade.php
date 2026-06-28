@@ -47,7 +47,7 @@
                     <label class="form-label fw-bold">
                         <i class="fas fa-calendar-alt text-success mr-1"></i> Fecha inicio:
                     </label>
-                    <input type="date" class="form-control" id="start_date" name="start_date">
+                    <input type="date" class="form-control" id="start_date" name="start_date" value="{{ $fecha_inicio }}">
                 </div>
 
                 <!-- Fecha Fin -->
@@ -55,7 +55,7 @@
                     <label class="form-label fw-bold">
                         <i class="fas fa-calendar-check text-danger mr-1"></i> Fecha fin:
                     </label>
-                    <input type="date" class="form-control" id="end_date" name="end_date">
+                    <input type="date" class="form-control" id="end_date" name="end_date" value="{{ $fecha_fin }}">
                 </div>
 
                 <!-- Estado -->
@@ -73,6 +73,21 @@
                         <option value="ANULADO PARCIAL">Anulado Parcial</option>
                     </select>
                 </div>
+
+                @if ($esAdmin)
+                    <!-- Vendedor (solo admin) -->
+                    <div class="col-lg-2 col-md-3 col-sm-12 col-xs-12 mb-2">
+                        <label class="form-label fw-bold">
+                            <i class="fas fa-user-tie text-secondary mr-1"></i> Vendedor:
+                        </label>
+                        <select class="form-control" id="seller_id" name="seller_id">
+                            <option value="">Todos</option>
+                            @foreach ($vendedores as $vendedor)
+                                <option value="{{ $vendedor->id }}">{{ $vendedor->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                @endif
 
                 <div class="col-lg-2 col-md-3 col-sm-12 col-xs-12 mb-2 text-end">
                     <button type="button" id="btn-filter" class="btn btn-primary btn-block" onclick="filterData();">
@@ -169,6 +184,9 @@
                         d.start_date = $('#start_date').val();
                         d.end_date = $('#end_date').val();
                         d.status = $('#status').val();
+                        // Filtro Vendedor solo existe para admin; no-admin no lo envía
+                        // (y el backend lo ignora de todos modos: su query es fijo a su user).
+                        d.seller_id = $('#seller_id').val() || '';
                     }
                 },
                 order: [

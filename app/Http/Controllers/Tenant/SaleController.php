@@ -37,8 +37,18 @@ class SaleController extends Controller
 
     public function index()
     {
+        $esAdmin = auth()->user()->hasRole('admin');
 
-        return view('sales.sale_document.index');
+        return view('sales.sale_document.index', [
+            // Fechas por defecto = mes en curso (sobre registration_date).
+            'fecha_inicio' => now()->startOfMonth()->toDateString(),
+            'fecha_fin'    => now()->toDateString(),
+            'esAdmin'      => $esAdmin,
+            // Filtro Vendedor: solo admin. Lista = usuarios con rol ventas.
+            'vendedores'   => $esAdmin
+                ? \App\Models\User::role('ventas')->orderBy('name')->get(['id', 'name'])
+                : collect(),
+        ]);
     }
 
     public function getSales(Request $request)
@@ -47,11 +57,14 @@ class SaleController extends Controller
         $start_date     =   $request->get('start_date');
         $end_date       =   $request->get('end_date');
         $status         =   $request->get('status');
+        $seller_id      =   $request->get('seller_id');
+
+        $esAdmin = auth()->user()->hasRole('admin');
 
         $sales    =   DB::table('sales_documents as sd')
             ->select(
                 'sd.id',
-                'sd.created_at as fecha_registro',
+                'sd.registration_date as fecha_registro',
                 'sd.customer_name',
                 'sd.serie',
                 'sd.correlative',
@@ -66,14 +79,27 @@ class SaleController extends Controller
             )
             ->where('sd.sunat_status', '!=', 'ANULADO');
 
+        // VISIBILIDAD POR ROL (backend, blindado):
+        // - admin: ve TODAS las ventas (de todas las sedes, todos los vendedores).
+        // - no-admin: SOLO las que él registró. where fijo a auth()->id(); ignora cualquier
+        //   seller_id manipulado en el request.
+        if ($esAdmin) {
+            // Filtro Vendedor (solo admin): si eligió uno, acota; si no, todas.
+            if ($seller_id) {
+                $sales->where('sd.user_recorder_id', $seller_id);
+            }
+        } else {
+            $sales->where('sd.user_recorder_id', auth()->id());
+        }
+
         if ($customer_id) {
             $sales->where('sd.customer_id', $customer_id);
         }
         if ($start_date) {
-            $sales->whereDate('sd.created_date', '>=', $start_date);
+            $sales->whereDate('sd.registration_date', '>=', $start_date);
         }
         if ($end_date) {
-            $sales->whereDate('sd.created_date', '<=', $end_date);
+            $sales->whereDate('sd.registration_date', '<=', $end_date);
         }
         if ($status) {
             $sales->where('sd.sunat_status', $status);
