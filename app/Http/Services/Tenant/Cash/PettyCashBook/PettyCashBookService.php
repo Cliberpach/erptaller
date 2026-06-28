@@ -63,7 +63,7 @@ class PettyCashBookService
         $company = Company::first();
 
         //========= OBTENER DOCUMENTOS DE VENTA ======
-        $sale_documents     =   Sale::where('petty_cash_book_id', $id)->get();
+        $sale_documents     =   Sale::where('petty_cash_book_id', $id)->with('payments')->get();
 
         $customer_pays      =   CustomerAccountDetail::from('customer_accounts_details as cad')
             ->join('customer_accounts as ca', 'ca.id', 'cad.customer_account_id')
@@ -162,24 +162,32 @@ class PettyCashBookService
 
     public function getReportSales($payment_methods, int $id)
     {
-        $sales  =   Sale::where('petty_cash_book_id', $id)->where('status', '<>', 'ANULADO')->get();
-        $report_sales   =   [];
+        // PASO 4 (Capa C): montos por método desde sales_document_payments (join a la venta
+        // por petty_cash_book_id). GROUP BY método suma TODAS las líneas, incl. N del mismo
+        // método (2 Yapes -> suma las dos). Reemplaza la lectura de amount_pay_1/2.
+        $pagos = DB::table('sales_document_payments as sdp')
+            ->join('sales_documents as sd', 'sd.id', '=', 'sdp.sale_document_id')
+            ->where('sd.petty_cash_book_id', $id)
+            ->where('sd.status', '<>', 'ANULADO')
+            ->groupBy('sdp.payment_method_id')
+            ->select('sdp.payment_method_id', DB::raw('SUM(sdp.amount) as amount'))
+            ->get()
+            ->pluck('amount', 'payment_method_id'); // [method_id => monto]
+
+        $report_sales = [];
         foreach ($payment_methods as $payment_method) {
-            $item   =   [];
-
-            $amount_1   =   $sales->where('method_pay_id_1', $payment_method->id)->sum('amount_pay_1');
-            $amount_2   =   $sales->where('method_pay_id_2', $payment_method->id)->sum('amount_pay_2');
-
-            $item       =   [
-                'payment_method_id' =>  $payment_method->id,
+            $report_sales[] = [
+                'payment_method_id'   => $payment_method->id,
                 'payment_method_name' => $payment_method->description,
-                'amount'            =>  $amount_1 + $amount_2
+                'amount'              => (float) ($pagos[$payment_method->id] ?? 0),
             ];
-
-            $report_sales[] =   $item;
         }
 
-        $total  =   $sales->sum('amount_pay_1') + $sales->sum('amount_pay_2');
+        $total = (float) DB::table('sales_document_payments as sdp')
+            ->join('sales_documents as sd', 'sd.id', '=', 'sdp.sale_document_id')
+            ->where('sd.petty_cash_book_id', $id)
+            ->where('sd.status', '<>', 'ANULADO')
+            ->sum('sdp.amount');
 
         return ['total' => $total, 'report' => $report_sales];
     }

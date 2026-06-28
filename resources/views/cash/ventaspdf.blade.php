@@ -272,17 +272,14 @@
                         <td>{{ number_format($sale->total, 2) }}</td>
         
                         @foreach ($payment_methods as $payment_method)
+                            {{-- PASO 4 (Capa C): monto del método desde payments (suma N líneas). --}}
+                            @php
+                                $monto_metodo = $sale->payments->where('payment_method_id', $payment_method->id)->sum('amount');
+                                $totals[$payment_method->id] += $monto_metodo;
+                            @endphp
                             <td>
-                                @if ($sale->method_pay_id_1 == $payment_method->id)
-                                    {{ number_format($sale->amount_pay_1, 2) }}
-                                    @php
-                                        $totals[$payment_method->id] += $sale->amount_pay_1;
-                                    @endphp
-                                @elseif ($sale->method_pay_id_2 == $payment_method->id)
-                                    {{ number_format($sale->amount_pay_2, 2) }}
-                                    @php
-                                        $totals[$payment_method->id] += $sale->amount_pay_2;
-                                    @endphp
+                                @if ($monto_metodo > 0)
+                                    {{ number_format($monto_metodo, 2) }}
                                 @endif
                             </td>
                         @endforeach

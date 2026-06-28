@@ -227,14 +227,9 @@
                         <td style="text-align: right;">{{ number_format($sale->total, 2) }}</td>
 
                         @foreach ($payment_methods as $payment_method)
+                            {{-- PASO 4 (Capa C): monto del método en esta venta desde payments (suma N líneas). --}}
                             <td style="text-align: right;">
-                                @if ($sale->method_pay_id_1 == $payment_method->id)
-                                    {{ number_format($sale->amount_pay_1, 2) }}
-                                @elseif ($sale->method_pay_id_2 == $payment_method->id)
-                                    {{ number_format($sale->amount_pay_2, 2) }}
-                                @else
-                                    0.00
-                                @endif
+                                {{ number_format($sale->payments->where('payment_method_id', $payment_method->id)->sum('amount'), 2) }}
                             </td>
                         @endforeach
                     </tr>
