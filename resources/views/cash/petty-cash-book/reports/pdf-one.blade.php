@@ -206,7 +206,7 @@
         </table>
 
 
-        <h5 style="font-size:9px;">VENTAS DEL DÍA</h5>
+        <h5 style="font-size:9px;">VENTAS AL CONTADO (cobradas)</h5>
 
         <table class="table-info">
             <thead>
@@ -246,6 +246,33 @@
                     @endforeach
                 </tr>
             </tfoot>
+        </table>
+
+        {{-- PASO: ventas a crédito del turno. INFORMATIVO: no suman al cuadre (su dinero
+             llega vía Cobranzas de CxC). Partición null-safe: todo lo no-CONTADO. --}}
+        <h5 style="font-size:9px;">VENTAS AL CRÉDITO (informativo, no suma al cuadre)</h5>
+
+        <table class="table-info">
+            <thead>
+                <tr>
+                    <th>N°</th>
+                    <th>CLIENTE</th>
+                    <th>CONDICIÓN</th>
+                    <th>TOTAL</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse ($consolidated['report_credit_sales'] as $credito)
+                    <tr>
+                        <td>{{ $credito->serie . '-' . $credito->correlative }}</td>
+                        <td>{{ $credito->customer_name }}</td>
+                        <td>{{ $credito->payment_condition_name ?: 'CRÉDITO' }}</td>
+                        <td style="text-align: right;">{{ number_format($credito->total, 2, '.', ',') }}</td>
+                    </tr>
+                @empty
+                    <tr><td colspan="4" style="text-align:center;">Sin ventas al crédito en el turno.</td></tr>
+                @endforelse
+            </tbody>
         </table>
 
         <h5 style="font-size:9px;">EGRESOS</h5>

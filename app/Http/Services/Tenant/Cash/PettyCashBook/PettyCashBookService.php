@@ -63,7 +63,11 @@ class PettyCashBookService
         $company = Company::first();
 
         //========= OBTENER DOCUMENTOS DE VENTA ======
-        $sale_documents     =   Sale::where('petty_cash_book_id', $id)->with('payments')->get();
+        // Reporte de caja: la tabla de ventas cobradas muestra solo CONTADO (cuadra con
+        // report_sales). El crédito va en su tabla informativa (consolidated.report_credit_sales).
+        $sale_documents     =   Sale::where('petty_cash_book_id', $id)
+            ->where('payment_condition_name', 'CONTADO')
+            ->with('payments')->get();
 
         $customer_pays      =   CustomerAccountDetail::from('customer_accounts_details as cad')
             ->join('customer_accounts as ca', 'ca.id', 'cad.customer_account_id')
@@ -148,13 +152,16 @@ class PettyCashBookService
         $report_sales               =   $this->getReportSales($payment_methods, $id);
         $report_expenses            =   $this->getReportExpenses($payment_methods, $id);
         $report_customer_accounts   =   $this->getReportCustomerAccounts($payment_methods, $id);
+        $report_credit_sales        =   $this->getReportCreditSales($id); // informativo, NO suma
         $petty_cash_book            =   $this->s_repository->getPettyCashBookInfo($id);
+        // Cuadre: solo ventas CONTADO + cobranzas - egresos + saldo inicial. El crédito NO suma.
         $amount_close               =   $report_customer_accounts['total'] + $report_sales['total'] - $report_expenses['total'] + $petty_cash_book->initial_amount;
 
         return [
             'report_sales'              =>  $report_sales,
             'report_expenses'           =>  $report_expenses,
             'report_customer_accounts'  =>  $report_customer_accounts,
+            'report_credit_sales'       =>  $report_credit_sales,
             'petty_cash_book'           =>  $petty_cash_book,
             'amount_close'              =>  $amount_close
         ];
@@ -165,10 +172,15 @@ class PettyCashBookService
         // PASO 4 (Capa C): montos por método desde sales_document_payments (join a la venta
         // por petty_cash_book_id). GROUP BY método suma TODAS las líneas, incl. N del mismo
         // método (2 Yapes -> suma las dos). Reemplaza la lectura de amount_pay_1/2.
+        // Reporte de caja: solo VENTAS AL CONTADO suman al cuadre (lo realmente cobrado).
+        // Las ventas a CRÉDITO entran como informativo aparte (su dinero llega vía Cobranzas
+        // de CxC, que ya tiene su sección -> evita doble conteo). Filtro por CONDICIÓN
+        // (payment_condition_name), no por estado (un crédito cobrado pasa a PAGADO).
         $pagos = DB::table('sales_document_payments as sdp')
             ->join('sales_documents as sd', 'sd.id', '=', 'sdp.sale_document_id')
             ->where('sd.petty_cash_book_id', $id)
             ->where('sd.status', '<>', 'ANULADO')
+            ->where('sd.payment_condition_name', 'CONTADO')
             ->groupBy('sdp.payment_method_id')
             ->select('sdp.payment_method_id', DB::raw('SUM(sdp.amount) as amount'))
             ->get()
@@ -187,9 +199,26 @@ class PettyCashBookService
             ->join('sales_documents as sd', 'sd.id', '=', 'sdp.sale_document_id')
             ->where('sd.petty_cash_book_id', $id)
             ->where('sd.status', '<>', 'ANULADO')
+            ->where('sd.payment_condition_name', 'CONTADO')
             ->sum('sdp.amount');
 
         return ['total' => $total, 'report' => $report_sales];
+    }
+
+    /**
+     * Reporte de caja: ventas a CRÉDITO del turno (informativo, NO suman al cuadre).
+     * Partición null-safe: todo lo que NO es CONTADO (incl. NULL/'') cae acá -> ninguna
+     * venta del turno queda en limbo.
+     */
+    public function getReportCreditSales(int $id)
+    {
+        return DB::table('sales_documents as sd')
+            ->where('sd.petty_cash_book_id', $id)
+            ->where('sd.status', '<>', 'ANULADO')
+            ->whereRaw("NOT (sd.payment_condition_name <=> 'CONTADO')")
+            ->select('sd.id', 'sd.serie', 'sd.correlative', 'sd.customer_name', 'sd.total', 'sd.payment_condition_name')
+            ->orderBy('sd.id')
+            ->get();
     }
 
     public function getReportExpenses($payment_methods, int $id)
