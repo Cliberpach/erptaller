@@ -142,27 +142,27 @@ class ValidationsService
 
     public static function validationLstPays(array $lstPays, object $amounts):array
     {
-
-        $methodPays =   array_column($lstPays, 'method_pay');
-
+        // PASO 4 (Capa B): N líneas de pago. Cada una = método + cuenta (si electrónico)
+        // + monto + n° operación. Se permite mismo método con cuentas distintas (Yape a
+        // Juan + Yape a María); se prohíbe repetir la COMBINACIÓN método+cuenta.
         if (count($lstPays) === 0) {
             throw new Exception("El listado de pagos está vacío!!!");
         }
 
-        if (count($lstPays) > 2) {
-            throw new Exception("Solo se aceptan 2 pagos como máximo!!!");
-        }
-
-        if (count($methodPays) !== count(array_unique($methodPays))) {
-            throw new Exception("Los métodos de pago no pueden repetirse");
+        if (count($lstPays) > 10) {
+            throw new Exception("Máximo 10 líneas de pago.");
         }
 
         $totalAmount    =   0;
+        $combos         =   [];   // método+cuenta ya usados (anti-duplicado)
         $indexPay       =   0;
         foreach ($lstPays as $pay) {
             $indexPay++;
-            $existsPaymentMethod = DB::table('payment_methods')->where('id', $pay->method_pay)->exists();
-            if (!$existsPaymentMethod) {
+            $methodId       =   $pay->method_pay;
+            $bankAccountId  =   $pay->bank_account_id ?? null;
+
+            $metodo = DB::table('payment_methods')->where('id', $methodId)->first();
+            if (!$metodo) {
                 throw new Exception("NO EXISTE EL " . $indexPay . '° MÉTODO DE PAGO EN LA BD!!!');
             }
 
@@ -170,13 +170,39 @@ class ValidationsService
                 throw new Exception("Los montos deben ser valores enteros,decimales mayores a 0");
             }
             $totalAmount += (float) $pay->amount;
+
+            // ¿El método maneja cuentas? (tiene filas en el pivote)
+            $tieneCuentas = DB::table('payment_method_accounts')->where('payment_method_id', $methodId)->exists();
+
+            if ($bankAccountId) {
+                // BLINDAJE: la cuenta debe pertenecer a ESE método (pivote). No se confía en el cliente.
+                $perteneceAlMetodo = DB::table('payment_method_accounts')
+                    ->where('payment_method_id', $methodId)
+                    ->where('bank_account_id', $bankAccountId)
+                    ->exists();
+                if (!$perteneceAlMetodo) {
+                    throw new Exception("La cuenta seleccionada no pertenece al método de pago.");
+                }
+            } else {
+                // Sin cuenta: solo válido si el método NO maneja cuentas (efectivo).
+                if ($tieneCuentas) {
+                    throw new Exception("Debe seleccionar una cuenta para el método " . $metodo->description . ".");
+                }
+            }
+
+            // No repetir la combinación método+cuenta (cubre 2 efectivos = mismo método+NULL).
+            $key = $methodId . '-' . ($bankAccountId ?? 'NULL');
+            if (in_array($key, $combos)) {
+                throw new Exception("No se puede repetir el mismo método con la misma cuenta.");
+            }
+            $combos[] = $key;
         }
 
         if (round($totalAmount, 2) !== round((float) $amounts->total, 2)) {
             throw new Exception("La suma de los pagos no coincide con el total.");
         }
 
-        $lstPays[]  =   (object)['method_pay' => null, 'amount' => null];
+        $lstPays[]  =   (object)['method_pay' => null, 'amount' => null, 'bank_account_id' => null, 'operation_number' => null];
 
         return $lstPays;
     }

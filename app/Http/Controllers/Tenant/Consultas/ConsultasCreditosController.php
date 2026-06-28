@@ -254,6 +254,15 @@ class ConsultasCreditosController extends Controller
             $sale->serie = $data_correlative->serie;
             $sale->save();
 
+            // PASO 4: 1 línea de pago efectivo (venta de crédito generada)
+            \App\Models\Tenant\Sale\SaleDocumentPayment::create([
+                'sale_document_id'  => $sale->id,
+                'payment_method_id' => 1, // EFECTIVO
+                'bank_account_id'   => null,
+                'amount'            => $sale->total,
+                'operation_number'  => null,
+            ]);
+
             // Inicializar caja abierta
             $cajaAbierta = PettyCashBook::where('status', 'open')->first();
             if ($cajaAbierta && is_null($cajaAbierta->closing_amount)) {

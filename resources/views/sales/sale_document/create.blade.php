@@ -35,10 +35,14 @@
             monto_igv: 0,
             total: 0
         };
+        // PASO 4 (Capa B): cada línea = método + cuenta (si electrónico) + monto + n° operación.
         const lstPays = [{
             method_pay: 1,
-            amount: 0
+            amount: 0,
+            bank_account_id: null,
+            operation_number: null
         }];
+        const MAX_PAYS = 10; // tope sano de líneas de pago
 
         let customerParameters = {
             documentSearchCustomer: null
@@ -103,6 +107,19 @@
                     lstPays[indexPay].amount = amount_pay;
                 }
 
+                // PASO 4 (Capa B): cuenta elegida por línea
+                if (e.target.classList.contains('account_pay')) {
+                    const indexPay = e.target.getAttribute('data-index');
+                    lstPays[indexPay].bank_account_id = e.target.value || null;
+                }
+            })
+
+            // PASO 4 (Capa B): n° operación por línea
+            document.addEventListener('input', (e) => {
+                if (e.target.classList.contains('operation_pay')) {
+                    const indexPay = e.target.getAttribute('data-index');
+                    lstPays[indexPay].operation_number = e.target.value || null;
+                }
             })
 
             document.querySelector('.btnAddPay').addEventListener('click', (e) => {
@@ -331,20 +348,54 @@
             const method_pay = selecMethodPay.value;
 
             lstPays[indexPay].method_pay = method_pay;
+            // Al cambiar el método se resetea cuenta/operación; el combo se recarga.
+            lstPays[indexPay].bank_account_id = null;
+            lstPays[indexPay].operation_number = null;
+            refreshAccountCombo(indexPay, method_pay, null, null);
+        }
+
+        // PASO 4 (Capa B): carga las cuentas del método en la línea; muestra/oculta cuenta + n° op.
+        async function refreshAccountCombo(index, methodId, selectedId, opValue) {
+            const accSel = document.querySelector(`.account_pay[data-index="${index}"]`);
+            const opInput = document.querySelector(`.operation_pay[data-index="${index}"]`);
+            if (!accSel || !opInput || !methodId) return;
+
+            const url = @json(route('tenant.ventas.comprobante_venta.paymentAccounts', ['method' => ':m'])).replace(':m', methodId);
+            try {
+                const res = await (await fetch(url)).json();
+                if (res.needs_account) {
+                    accSel.innerHTML = '<option value="">Seleccionar cuenta</option>' +
+                        res.data.map(c => `<option value="${c.id}" ${selectedId == c.id ? 'selected' : ''}>${c.label}</option>`).join('');
+                    accSel.style.display = '';
+                    opInput.style.display = '';
+                    opInput.value = opValue || '';
+                    lstPays[index].bank_account_id = selectedId || null;
+                    lstPays[index].operation_number = opValue || null;
+                } else {
+                    accSel.innerHTML = '<option value=""></option>';
+                    accSel.style.display = 'none';
+                    opInput.value = '';
+                    opInput.style.display = 'none';
+                    lstPays[index].bank_account_id = null;
+                    lstPays[index].operation_number = null;
+                }
+            } catch (e) { /* combo no crítico: si falla, queda sin cuenta */ }
         }
 
         function addPay() {
             toastr.clear();
-            if (lstPays.length < 2) {
+            if (lstPays.length < MAX_PAYS) {
 
                 lstPays.push({
                     method_pay: null,
-                    amount: 0
+                    amount: 0,
+                    bank_account_id: null,
+                    operation_number: null
                 });
                 paintLstPays(lstPays);
 
             } else {
-                toastr.error('MÁXIMO DE PAGOS PERMITIDOS 2!!!');
+                toastr.error('MÁXIMO DE LÍNEAS DE PAGO: ' + MAX_PAYS);
             }
 
         }
@@ -370,6 +421,14 @@
                 new_pay += `</select>
                                     </td>
                                     <td>
+                                        <select class="form-control account_pay" data-index="${index}" style="display:none;">
+                                            <option value=""></option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <input data-index="${index}" type="text" class="form-control operation_pay" placeholder="N° op." style="display:none;">
+                                    </td>
+                                    <td>
                                         <input data-index="${index}" value="${pay.amount}" type="text" class="form-control amount_pay inputDecimalPositivo">
                                     </td>
                                     <td>
@@ -388,6 +447,9 @@
                 placeholder: $(this).data('placeholder'),
                 allowClear: true
             });
+
+            // Recargar el combo de cuenta de cada línea (según su método actual).
+            lstPays.forEach((pay, index) => refreshAccountCombo(index, pay.method_pay, pay.bank_account_id, pay.operation_number));
         }
 
         function loadTomSelect() {
