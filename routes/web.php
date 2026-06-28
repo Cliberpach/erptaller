@@ -60,14 +60,16 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
     //     Route::get('egreso', [PettyCashController::class, 'exitMoney'])->name('tenant.cajas.egreso');
     // });
 
-    Route::group(["prefix" => "reservas"], function () {
+    // P3: módulo Reservas/Campos a eliminar -> can:reservas.ver (admin-only de facto, nadie más lo tiene).
+    Route::group(["prefix" => "reservas", 'middleware' => 'can:reservas.ver'], function () {
         Route::get('reserva', [BookController::class, 'book'])->middleware('verificar.caja')->name('tenant.reservas.reserva');
         Route::get('/reserva/{id}/recibo', [BookController::class, 'showPDF'])->middleware('verificar.caja')->name('tenant.reservas.recibo');
         Route::get('/reservas/pdf', [BookController::class, 'generatePDF'])->name('tenant.reservas.pdf');
         Route::get('/available-fields', [BookController::class, 'getAvailableFields'])->name('tenat.reservas.camposdisponibles');
     });
 
-    Route::group(["prefix" => "consultas"], function () {
+    // P3: consultas (créditos + reservas-query) -> can:consultas.ver (los 3 roles lo tienen).
+    Route::group(["prefix" => "consultas", 'middleware' => 'can:consultas.ver'], function () {
 
         Route::get('index', [ConsultasCreditosController::class, 'index'])->name('tenant.consultas.creditos');
         Route::get('creditos/data', [ConsultasCreditosController::class, 'data'])->name('tenant.consultas.creditos.data');
@@ -86,7 +88,8 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
 
 
 
-    Route::group(["prefix" => "campos"], function () {
+    // P3: Campos (parte de Reservas, a eliminar) -> can:reservas.ver (admin-only de facto).
+    Route::group(["prefix" => "campos", 'middleware' => 'can:reservas.ver'], function () {
         Route::post('tipo-campo', [FieldController::class, 'fieldType'])->name('tenant.campos.tipo_campo');
         Route::get('tipo-campos', [FieldController::class, 'indexFieldType'])->name('tenant.campos.index_tipo_campos');
         Route::put('tipo-campos/{id}', [FieldController::class, 'editFieldType'])->name('tenant.campos.edit_tipo_campos');
@@ -99,7 +102,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
         Route::delete('campo/{id}/anular', [FieldController::class, 'destroy'])->name('tenant.campos.delete');
     });
 
-    Route::group(["prefix" => "compras", 'middleware' => 'validar.plan:compras'], function () {
+    Route::group(["prefix" => "compras", 'middleware' => ['validar.plan:compras', 'can:compras.ver']], function () {
 
         //======= PROVEEDORES =========
         Route::get('proveedor', [SupplierController::class, 'index'])->name('tenant.compras.proveedor');
@@ -128,33 +131,33 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
     Route::group(["prefix" => "reportes"], function () {
 
         //======= REPORTE VENTAS =========
-        Route::get('reporte-venta', [ReportSaleController::class, 'index'])->name('tenant.reportes.reporte_venta');
-        Route::get('reporte-venta/getReporteVenta', [ReportSaleController::class, 'getReporteVenta'])->name('tenant.reportes.reporte_venta.getReporteVenta');
-        Route::get('reporte-venta/excel', [ReportSaleController::class, 'excel'])->name('tenant.reportes.reporte_venta.excel');
-        Route::get('reporte-venta/pdf', [ReportSaleController::class, 'pdf'])->name('tenant.reportes.reporte_venta.pdf');
+        Route::get('reporte-venta', [ReportSaleController::class, 'index'])->name('tenant.reportes.reporte_venta')->middleware('can:reportes.ventas');
+        Route::get('reporte-venta/getReporteVenta', [ReportSaleController::class, 'getReporteVenta'])->name('tenant.reportes.reporte_venta.getReporteVenta')->middleware('can:reportes.ventas');
+        Route::get('reporte-venta/excel', [ReportSaleController::class, 'excel'])->name('tenant.reportes.reporte_venta.excel')->middleware('can:reportes.ventas');
+        Route::get('reporte-venta/pdf', [ReportSaleController::class, 'pdf'])->name('tenant.reportes.reporte_venta.pdf')->middleware('can:reportes.ventas');
 
         //======== REPORTE DE CAMPOS =======
-        Route::get('reporte-campo', [ReportFieldController::class, 'index'])->name('tenant.reportes.reporte_campo');
-        Route::get('reporte-campo/getReporteCampos', [ReportFieldController::class, 'getReporteCampos'])->name('tenant.reportes.reporte_campo.getReporteCampos');
-        Route::get('reporte-campo/excel', [ReportFieldController::class, 'excel'])->name('tenant.reportes.reporte_campo.excel');
-        Route::get('reporte-campo/pdf', [ReportFieldController::class, 'pdf'])->name('tenant.reportes.reporte_campo.pdf');
-        Route::get('reporte-campo/generarDocumento/{id}', [ReportFieldController::class, 'generateDocumentCreate'])->name('tenant.reportes.reporte_campo.generarDocumento');
-        Route::post('reporte-campo/generarDocumento/store', [ReportFieldController::class, 'generateDocumentStore'])->name('tenant.reportes.reporte_campo.generateDocumentStore');
-        Route::get('reporte-campo/pdf_voucher/{id}', [ReportFieldController::class, 'pdf_voucher'])->name('tenant.reportes.reporte_campo.pdf_voucher');
+        Route::get('reporte-campo', [ReportFieldController::class, 'index'])->name('tenant.reportes.reporte_campo')->middleware('can:reservas.ver');
+        Route::get('reporte-campo/getReporteCampos', [ReportFieldController::class, 'getReporteCampos'])->name('tenant.reportes.reporte_campo.getReporteCampos')->middleware('can:reservas.ver');
+        Route::get('reporte-campo/excel', [ReportFieldController::class, 'excel'])->name('tenant.reportes.reporte_campo.excel')->middleware('can:reservas.ver');
+        Route::get('reporte-campo/pdf', [ReportFieldController::class, 'pdf'])->name('tenant.reportes.reporte_campo.pdf')->middleware('can:reservas.ver');
+        Route::get('reporte-campo/generarDocumento/{id}', [ReportFieldController::class, 'generateDocumentCreate'])->name('tenant.reportes.reporte_campo.generarDocumento')->middleware('can:reservas.ver');
+        Route::post('reporte-campo/generarDocumento/store', [ReportFieldController::class, 'generateDocumentStore'])->name('tenant.reportes.reporte_campo.generateDocumentStore')->middleware('can:reservas.ver');
+        Route::get('reporte-campo/pdf_voucher/{id}', [ReportFieldController::class, 'pdf_voucher'])->name('tenant.reportes.reporte_campo.pdf_voucher')->middleware('can:reservas.ver');
 
         //======== REPORTE CONTABLE =======
-        Route::get('reporte-contable', [ReportContableController::class, 'index'])->name('tenant.reportes.reporte_contable');
-        Route::get('reporte-contable/getReporteContable', [ReportContableController::class, 'getReporteContable'])->name('tenant.reportes.reporte_contable.getReporteContable');
-        Route::get('reporte-contable/excel', [ReportContableController::class, 'excel'])->name('tenant.reportes.reporte_contable.excel');
-        Route::get('reporte-contable/pdf', [ReportContableController::class, 'pdf'])->name('tenant.reportes.reporte_contable.pdf');
+        Route::get('reporte-contable', [ReportContableController::class, 'index'])->name('tenant.reportes.reporte_contable')->middleware('can:reportes.contable');
+        Route::get('reporte-contable/getReporteContable', [ReportContableController::class, 'getReporteContable'])->name('tenant.reportes.reporte_contable.getReporteContable')->middleware('can:reportes.contable');
+        Route::get('reporte-contable/excel', [ReportContableController::class, 'excel'])->name('tenant.reportes.reporte_contable.excel')->middleware('can:reportes.contable');
+        Route::get('reporte-contable/pdf', [ReportContableController::class, 'pdf'])->name('tenant.reportes.reporte_contable.pdf')->middleware('can:reportes.contable');
 
         //========== REPORTE COMPROBANTE RESERVAS ========
-        Route::get('comprobantes-reservas', [ReservationDocumentController::class, 'index'])->name('tenant.reportes.comprobantes_reservas');
-        Route::get('comprobantes-reservas/getReservationDocuments', [ReservationDocumentController::class, 'getReservationDocuments'])->name('tenant.reportes.comprobantes_reservas.getReservationDocuments');
-        Route::post('comprobantes-reservas/send_sunat', [ReservationDocumentController::class, 'send_sunat'])->name('tenant.reportes.comprobantes_reservas.send_sunat');
-        Route::get('comprobantes-reservas/pdf_voucher/{id}', [ReservationDocumentController::class, 'pdf_voucher'])->name('tenant.reportes.comprobantes_reservas.pdf_voucher');
-        Route::get('downloadXml/{id}', [ReservationDocumentController::class, 'downloadXml'])->name('tenant.reportes.comprobantes_reservas.downloadXml');
-        Route::get('downloadCdr/{id}', [ReservationDocumentController::class, 'downloadCdr'])->name('tenant.reportes.comprobantes_reservas.downloadCdr');
+        Route::get('comprobantes-reservas', [ReservationDocumentController::class, 'index'])->name('tenant.reportes.comprobantes_reservas')->middleware('can:reservas.ver');
+        Route::get('comprobantes-reservas/getReservationDocuments', [ReservationDocumentController::class, 'getReservationDocuments'])->name('tenant.reportes.comprobantes_reservas.getReservationDocuments')->middleware('can:reservas.ver');
+        Route::post('comprobantes-reservas/send_sunat', [ReservationDocumentController::class, 'send_sunat'])->name('tenant.reportes.comprobantes_reservas.send_sunat')->middleware('can:reservas.ver');
+        Route::get('comprobantes-reservas/pdf_voucher/{id}', [ReservationDocumentController::class, 'pdf_voucher'])->name('tenant.reportes.comprobantes_reservas.pdf_voucher')->middleware('can:reservas.ver');
+        Route::get('downloadXml/{id}', [ReservationDocumentController::class, 'downloadXml'])->name('tenant.reportes.comprobantes_reservas.downloadXml')->middleware('can:reservas.ver');
+        Route::get('downloadCdr/{id}', [ReservationDocumentController::class, 'downloadCdr'])->name('tenant.reportes.comprobantes_reservas.downloadCdr')->middleware('can:reservas.ver');
     });
 
 
@@ -181,7 +184,9 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
     Route::get("/logout", [ModuleController::class, 'logout'])->name('module.logout');
 });
 
-Route::group(["prefix" => "utils"], function () {
+// P3: utils/* = lookups AJAX (product/customer/vehicle/etc.). Solo-auth (sin permiso),
+// pero ya NO quedan fuera de autenticación: requieren sesión válida.
+Route::group(["prefix" => "utils", 'middleware' => ['auth:sanctum', config('jetstream.auth_session'), 'verified']], function () {
     Route::get('cash-available-search', [PettyCashController::class, 'searchCashAvailable'])->name('tenant.utils.searchCashAvailable');
     Route::get('service-search', [ServiceController::class, 'searchService'])->name('tenant.utils.searchService');
     Route::get('product-search', [ProductController::class, 'searchProduct'])->name('tenant.utils.searchProduct');
