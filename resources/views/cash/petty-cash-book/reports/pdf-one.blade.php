@@ -173,6 +173,10 @@
 
         <table class="table-info" style="width: 100%; border-collapse: collapse; margin-top: 10px;">
             <tr>
+                <td style="width: 50%; padding: 2px; font-weight: bold; text-align: left; border: 1px solid #ddd;">SEDE:</td>
+                <td style="width: 50%; padding: 2px; text-align: left; border: 1px solid #ddd;">{{ $sede_nombre ?? '-' }}</td>
+            </tr>
+            <tr>
                 <td style="width: 50%; padding: 2px; font-weight: bold; text-align: left; border: 1px solid #ddd;">CAJERO:</td>
                 <td style="width: 50%; padding: 2px; text-align: left; border: 1px solid #ddd;">{{ $cajero->name }}</td>
             </tr>
@@ -201,7 +205,7 @@
             <tr>
                 <td style="width: 50%; padding: 2px; font-weight: bold; text-align: left; border: 1px solid #ddd;">FECHA CIERRE:</td>
                 <td style="width: 50%; padding: 2px; text-align: left; border: 1px solid #ddd;">
-                    {{ \Carbon\Carbon::parse($petty_cash_book->close_date)->format('d/m/Y H:i') }}</td>
+                    {{ $petty_cash_book->final_date ? \Carbon\Carbon::parse($petty_cash_book->final_date)->format('d/m/Y H:i') : '-' }}</td>
             </tr>
         </table>
 

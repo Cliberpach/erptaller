@@ -54,6 +54,12 @@ class PettyCashBookService
         $cajero             =   User::findOrFail($petty_cash_book->user_id);
         $payment_methods    =   PaymentMethod::where('estado', 'ACTIVO')->get();
 
+        // SEDE del turno: la caja cuelga de una sede (petty_cashes.sede_id -> sedes.nombre).
+        $sede_nombre        =   DB::table('petty_cashes as pc')
+            ->join('sedes as s', 's.id', '=', 'pc.sede_id')
+            ->where('pc.id', $petty_cash_book->petty_cash_id)
+            ->value('s.nombre');
+
         $consolidated       =   $this->getConsolidated($id);
 
         //========= EGRESOS ===========
@@ -95,6 +101,7 @@ class PettyCashBookService
             'cash.petty-cash-book.reports.pdf-one',
             compact(
                 'petty_cash_book',
+                'sede_nombre',
                 'company',
                 'sale_documents',
                 'payment_methods',
