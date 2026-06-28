@@ -11,8 +11,7 @@ use App\Models\Tenant\Sede;
  * La llaman SedeController@store (sedes nuevas) y el provisioning (sede principal),
  * igual que crearSeriesSede / almacén principal. NO se repite la lógica.
  *
- * El combo de vendedores nace VACÍO: se llena en el CRUD (Capa B). Una caja sin combo
- * no es operable; el CRUD lo deja explícito.
+ * La caja es solo sede + nombre. Nace CERRADA; cualquier vendedor de la sede la abre.
  */
 class CajaService
 {

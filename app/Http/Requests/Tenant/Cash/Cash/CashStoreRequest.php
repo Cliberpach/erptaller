@@ -27,10 +27,6 @@ class CashStoreRequest extends FormRequest
                 ),
             ],
             'sede_id' => ['required', Rule::exists('sedes', 'id')->where('status', 'ACTIVO')],
-
-            // combo: cada vendedor debe pertenecer a ESA sede (sede_user). Opcional (puede nacer vacío).
-            'vendedores'   => ['array'],
-            'vendedores.*' => [Rule::exists('sede_user', 'user_id')->where('sede_id', $sedeId)],
         ];
     }
 
@@ -42,7 +38,6 @@ class CashStoreRequest extends FormRequest
             'name.max'         => 'El nombre no debe exceder los 255 caracteres.',
             'sede_id.required' => 'Debe seleccionar una sede.',
             'sede_id.exists'   => 'La sede seleccionada no es válida.',
-            'vendedores.*.exists' => 'Un vendedor del combo no pertenece a la sede de la caja.',
         ];
     }
 

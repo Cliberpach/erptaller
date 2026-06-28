@@ -34,7 +34,7 @@ class CashUpdateRequest extends FormRequest
     public function rules(): array
     {
         $id     = $this->route('id');
-        // sede INMUTABLE: la unicidad y el combo se validan contra la sede ACTUAL de la caja.
+        // sede INMUTABLE: la unicidad se valida contra la sede ACTUAL de la caja.
         $sedeId = optional(PettyCash::find($id))->sede_id;
 
         return [
@@ -44,8 +44,6 @@ class CashUpdateRequest extends FormRequest
                     ->where(fn ($q) => $q->where('sede_id', $sedeId)->where('status', '<>', 'ANULADO'))
                     ->ignore($id),
             ],
-            'vendedores'   => ['array'],
-            'vendedores.*' => [Rule::exists('sede_user', 'user_id')->where('sede_id', $sedeId)],
         ];
     }
 
@@ -55,7 +53,6 @@ class CashUpdateRequest extends FormRequest
             'name.required' => 'El campo nombre es obligatorio.',
             'name.unique'   => 'Ya existe una caja con ese nombre en esta sede.',
             'name.max'      => 'El nombre no debe exceder los 255 caracteres.',
-            'vendedores.*.exists' => 'Un vendedor del combo no pertenece a la sede de la caja.',
         ];
     }
 

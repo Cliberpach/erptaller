@@ -84,7 +84,7 @@ class SedeController extends Controller
             // Multi-Sede Etapa 5: la sede recibe sus series automáticamente (sufijo = numero).
             (new \App\Http\Services\Tenant\Maintenance\SerieService())->generarSeriesSede($sede);
 
-            // Multi-Sede Etapa 4: la sede recibe su caja (combo de vendedores vacío; se llena en CRUD).
+            // Multi-Sede Etapa 4: la sede recibe su caja (solo sede + nombre; sin combo).
             (new \App\Http\Services\Tenant\Cash\CajaService())->crearCajaSede($sede);
 
             DB::commit();

@@ -34,23 +34,12 @@ class PettyCashController extends Controller
 
     public function index()
     {
-        // Sedes para el selector + usuarios por sede para el multi-select del combo (vía JS).
+        // Caja = sede + nombre. Cualquier vendedor de la sede abre una caja libre de su sede.
         $sedes = $this->sedesDisponibles();
 
-        $usuariosPorSede = [];
-        foreach ($sedes as $s) {
-            $usuariosPorSede[$s->id] = DB::table('sede_user as su')
-                ->join('users as u', 'u.id', '=', 'su.user_id')
-                ->where('su.sede_id', $s->id)
-                ->select('u.id', 'u.name')
-                ->orderBy('u.name')
-                ->get();
-        }
-
         return view('cash.petty-cash.index', [
-            'sedes'           => $sedes,
-            'sedeActivaId'    => $this->sedeActivaId(),
-            'usuariosPorSede' => $usuariosPorSede,
+            'sedes'        => $sedes,
+            'sedeActivaId' => $this->sedeActivaId(),
         ]);
     }
 
@@ -69,8 +58,7 @@ class PettyCashController extends Controller
                 'c.status',
                 'c.sede_id',
                 's.nombre as sede_nombre',
-                'c.created_at',
-                DB::raw('(select count(*) from caja_vendedor cv where cv.petty_cash_id = c.id) as combo_count')
+                'c.created_at'
             );
 
         return DataTables::of($cashes)->make(true);
@@ -78,7 +66,7 @@ class PettyCashController extends Controller
 
     public function getCash(int $id)
     {
-        $cash = PettyCashSede::with('vendedores:id')->find($id);
+        $cash = PettyCashSede::find($id);
 
         if (! $cash) {
             return response()->json(['success' => false, 'message' => 'La caja no existe.'], 404);
@@ -88,10 +76,9 @@ class PettyCashController extends Controller
         }
 
         return response()->json(['success' => true, 'data' => [
-            'id'          => $cash->id,
-            'name'        => $cash->name,
-            'sede_id'     => $cash->sede_id,
-            'vendedores'  => $cash->vendedores->pluck('id'),
+            'id'      => $cash->id,
+            'name'    => $cash->name,
+            'sede_id' => $cash->sede_id,
         ]]);
     }
 
@@ -129,7 +116,7 @@ class PettyCashController extends Controller
                 return response()->json(['success' => false, 'message' => 'No tiene acceso a esa caja.'], 403);
             }
 
-            // sede_id es INMUTABLE (el service solo actualiza nombre + combo).
+            // sede_id es INMUTABLE (el service solo actualiza el nombre).
             $this->s_cash->update($request->toArray(), $id);
 
             DB::commit();

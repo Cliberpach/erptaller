@@ -329,7 +329,7 @@ class CompanyController extends Controller
         (new \App\Http\Services\Tenant\Maintenance\SerieService())->generarSeriesSede($sede);
 
         //========= CAJA DE LA SEDE PRINCIPAL (Multi-Sede Etapa 4) ========
-        // Paralelo al almacén/series. Combo de vendedores vacío (se llena en el CRUD).
+        // Paralelo al almacén/series. La caja nace solo con sede + nombre (sin combo).
         // Reemplaza la "CAJA PRINCIPAL" global que sembraba PettyCashSeeder (ya removido).
         (new \App\Http\Services\Tenant\Cash\CajaService())->crearCajaSede($sede);
 

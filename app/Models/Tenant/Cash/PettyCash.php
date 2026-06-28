@@ -38,12 +38,6 @@ class PettyCash extends Model
         return $this->belongsTo(\App\Models\Tenant\Sede::class, 'sede_id');
     }
 
-    // Combo de vendedores (M:N) que pueden abrir/vender sobre la caja.
-    public function vendedores()
-    {
-        return $this->belongsToMany(\App\Models\User::class, 'caja_vendedor', 'petty_cash_id', 'user_id');
-    }
-
     protected static function boot()
     {
         parent::boot();

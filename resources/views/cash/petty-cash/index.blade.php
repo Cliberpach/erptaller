@@ -19,7 +19,6 @@
                         <tr>
                             <th>NOMBRE</th>
                             <th>SEDE</th>
-                            <th>VENDEDORES</th>
                             <th>ESTADO</th>
                             <th></th>
                         </tr>
@@ -51,14 +50,6 @@
                         <label class="form-label fw-bold required_field">Nombre</label>
                         <input id="c_name" type="text" class="form-control" style="background-color:#FFF9C4;" placeholder="ej. CAJA PRINCIPAL">
                     </div>
-                    <div class="mb-2">
-                        <label class="form-label fw-bold">Combo de vendedores</label>
-                        <div id="c_vendedores" class="border rounded p-2" style="max-height:180px; overflow-y:auto;"></div>
-                    </div>
-                    <div id="c_warn_combo" class="alert alert-warning py-2 mb-0" style="display:none;">
-                        <i class="fa-solid fa-triangle-exclamation"></i>
-                        Esta caja no tiene vendedores asignados; nadie podrá aperturarla.
-                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
@@ -86,14 +77,6 @@
                         <label class="form-label fw-bold required_field">Nombre</label>
                         <input id="e_name" type="text" class="form-control" style="background-color:#FFF9C4;">
                     </div>
-                    <div class="mb-2">
-                        <label class="form-label fw-bold">Combo de vendedores</label>
-                        <div id="e_vendedores" class="border rounded p-2" style="max-height:180px; overflow-y:auto;"></div>
-                    </div>
-                    <div id="e_warn_combo" class="alert alert-warning py-2 mb-0" style="display:none;">
-                        <i class="fa-solid fa-triangle-exclamation"></i>
-                        Esta caja no tiene vendedores asignados; nadie podrá aperturarla.
-                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
@@ -107,7 +90,6 @@
 <style>.swal2-container { z-index: 9999999; }</style>
 
 <script>
-    const usuariosPorSede = @json($usuariosPorSede);
     const sedesNombre = @json($sedes->pluck('nombre', 'id'));
     let dtCajas = null;
 
@@ -119,8 +101,6 @@
             columns: [
                 { data: 'name', name: 'name' },
                 { data: 'sede_nombre', name: 'sede_nombre', orderable: false, render: d => `<span class="badge bg-info">${d ?? '-'}</span>` },
-                { data: 'combo_count', name: 'combo_count', orderable: false, searchable: false,
-                  render: d => Number(d) > 0 ? `<span class="badge bg-success">${d} vendedor(es)</span>` : '<span class="badge bg-warning text-dark">sin combo</span>' },
                 { data: 'status', name: 'status', orderable: false, searchable: false,
                   render: d => d === 'ABIERTO' ? '<span class="badge bg-primary">ABIERTA</span>' : '<span class="badge bg-secondary">CERRADA</span>' },
                 { data: null, orderable: false, searchable: false, name: 'actions', render: (data, t, row) => `
@@ -138,37 +118,14 @@
         });
     });
 
-    function renderVendedores(containerId, warnId, sedeId, selected = []) {
-        const users = usuariosPorSede[sedeId] || [];
-        const cont = document.getElementById(containerId);
-        if (!users.length) { cont.innerHTML = '<div class="text-muted small">No hay usuarios en esta sede.</div>'; }
-        else {
-            cont.innerHTML = users.map(u => `
-                <div class="form-check">
-                    <input class="form-check-input vchk" type="checkbox" value="${u.id}" id="${containerId}_${u.id}" ${selected.map(Number).includes(Number(u.id))?'checked':''} onchange="toggleWarn('${containerId}','${warnId}')">
-                    <label class="form-check-label" for="${containerId}_${u.id}">${u.name}</label>
-                </div>`).join('');
-        }
-        toggleWarn(containerId, warnId);
-    }
-    function getVendedores(containerId) {
-        return [...document.querySelectorAll(`#${containerId} .vchk:checked`)].map(c => Number(c.value));
-    }
-    function toggleWarn(containerId, warnId) {
-        document.getElementById(warnId).style.display = getVendedores(containerId).length === 0 ? 'block' : 'none';
-    }
-
     function openMdlNuevaCaja() {
         document.getElementById('c_name').value = '';
-        const sedeSel = document.getElementById('c_sede');
-        renderVendedores('c_vendedores', 'c_warn_combo', sedeSel.value, []);
-        sedeSel.onchange = () => renderVendedores('c_vendedores', 'c_warn_combo', sedeSel.value, []);
         new bootstrap.Modal('#mdlCreateCaja').show();
     }
 
     async function guardarCaja() {
         toastr.clear();
-        const body = { name: document.getElementById('c_name').value.trim(), sede_id: document.getElementById('c_sede').value, vendedores: getVendedores('c_vendedores') };
+        const body = { name: document.getElementById('c_name').value.trim(), sede_id: document.getElementById('c_sede').value };
         const token = document.querySelector('input[name="_token"]').value;
         try {
             const r = await fetch('{{ route('tenant.cajas.store') }}', { method: 'POST', headers: { 'X-CSRF-TOKEN': token, 'Content-Type': 'application/json', 'Accept': 'application/json' }, body: JSON.stringify(body) });
@@ -189,7 +146,6 @@
             document.getElementById('e_id').value = c.id;
             document.getElementById('e_sede_nombre').textContent = sedesNombre[c.sede_id] ?? '-';
             document.getElementById('e_name').value = c.name;
-            renderVendedores('e_vendedores', 'e_warn_combo', c.sede_id, c.vendedores);
             new bootstrap.Modal('#mdlEditCaja').show();
         } catch (e) { toastr.error(e, 'ERROR'); }
     }
@@ -197,7 +153,7 @@
     async function actualizarCaja() {
         toastr.clear();
         const id = document.getElementById('e_id').value;
-        const body = { name: document.getElementById('e_name').value.trim(), vendedores: getVendedores('e_vendedores') };
+        const body = { name: document.getElementById('e_name').value.trim() };
         const token = document.querySelector('input[name="_token"]').value;
         try {
             const r = await fetch('{{ route('tenant.cajas.update', ['id' => ':id']) }}'.replace(':id', id), { method: 'PUT', headers: { 'X-CSRF-TOKEN': token, 'Content-Type': 'application/json', 'Accept': 'application/json' }, body: JSON.stringify(body) });
