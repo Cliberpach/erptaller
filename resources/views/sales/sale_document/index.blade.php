@@ -279,17 +279,11 @@
                             const urlDownloadCdr =
                                 "{{ route('tenant.ventas.comprobante_venta.downloadCdr', ':id') }}".replace(
                                     ':id', data.id);
-                            const urlPdf =
-                                "{{ route('tenant.ventas.comprobante_venta.pdf_voucher', ':id') }}".replace(
-                                    ':id', data.id);
 
                             let descargas =
                                 `<div style="display: flex; justify-content: flex-start; gap: 10px; flex-wrap: nowrap;">`;
 
-                            descargas += `<a target="_blank" class="btn btn-danger" style="color:white; max-width: 150px; flex-shrink: 0;" href="${urlPdf}">
-                                            <i class="fa-solid fa-file-pdf"></i> PDF
-                                        </a>`;
-
+                            // PDF movido al menú de acciones (⋮). Descargas conserva XML/CDR.
                             if (data.ruta_xml) {
                                 const asset_route = @json(asset(''));
                                 descargas += `<a class="btn btn-success" style="color:white; max-width: 150px; flex-shrink: 0;" href="${urlDownloadXml}" >
@@ -316,6 +310,10 @@
                         data: null,
                         render: function(data, type, row) {
 
+                            const urlPdf =
+                                "{{ route('tenant.ventas.comprobante_venta.pdf_voucher', ':id') }}".replace(
+                                    ':id', data.id);
+
                             let acciones = `
                             <div class="dropdown float-end">
                                 <button
@@ -328,6 +326,12 @@
                                 </button>
                                 <ul class="dropdown-menu dropdown-menu-end">
                             `;
+
+                            acciones += `<li>
+                                            <a class="dropdown-item" target="_blank" href="${urlPdf}">
+                                                <i class="fa-solid fa-file-pdf text-danger"></i> PDF
+                                            </a>
+                                        </li>`;
 
                             if (data.type_sale_code === '09' || data.type_sale_code === '01') {
 
