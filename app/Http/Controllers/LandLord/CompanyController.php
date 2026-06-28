@@ -405,6 +405,7 @@ class CompanyController extends Controller
                 'module_id' => $children->module_id,
                 'description' => $children->description,
                 'route_name' => $children->route_name,
+                'permission' => $children->permission, // Permisos P1: copia el mapeo al tenant
                 'order' => $children->order,
             ]);
         }
@@ -415,6 +416,7 @@ class CompanyController extends Controller
                 'module_child_id' => $grand_children->module_child_id,
                 'description' => $grand_children->description,
                 'route_name' => $grand_children->route_name,
+                'permission' => $grand_children->permission, // Permisos P1: copia el mapeo al tenant
                 'order' => $grand_children->order,
             ]);
         }

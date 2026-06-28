@@ -434,5 +434,62 @@ class ModuleSeeder extends Seeder
             'route_name' => 'consultas.notificaciones.index',
             'order' => '2'
         ]);
+
+        // ===== Permisos P1: mapeo nodo del menú → permiso Spatie (data-driven) =====
+        // Se puebla la columna `permission` por route_name. Nodos sin entrada (ej.
+        // mantenimientos.plan landlord-only, o el contenedor "Productos" con route vacía)
+        // quedan en NULL → el menú (P2) los resuelve. El provisioning copia esta columna.
+        $mapaPermisos = [
+            'dashboard.dashboard.index'           => 'dashboard.ver',
+            'cajas.caja'                          => 'cajas.ver',
+            'movimientos_caja.apertura_cierre'    => 'cajas.abrir_cerrar',
+            'cajas.egreso'                        => 'cajas.egresos',
+            'taller.cotizaciones.index'           => 'taller.cotizaciones.ver',
+            'taller.ordenes_trabajo.index'        => 'taller.ot.ver',
+            'taller.servicios.index'              => 'taller.servicios.gestionar',
+            'taller.colores.index'                => 'taller.maestros.gestionar',
+            'taller.years.index'                  => 'taller.maestros.gestionar',
+            'taller.marcas.index'                 => 'taller.maestros.gestionar',
+            'taller.modelos.index'                => 'taller.maestros.gestionar',
+            'taller.vehiculos.index'              => 'taller.vehiculos.gestionar',
+            'taller.citas.index'                  => 'taller.citas.gestionar',
+            'ventas.comprobante_venta'            => 'ventas.ver',
+            'ventas.cliente'                      => 'ventas.clientes.gestionar',
+            'ventas.metodo_pago'                  => 'ventas.config.gestionar',
+            'ventas.condiciones_pago.index'       => 'ventas.config.gestionar',
+            'cuentas.cliente.index'               => 'cuentas.cxc.ver',
+            'cuentas.proveedor.index'             => 'cuentas.cxp.ver',
+            'inventarios.productos.categoria'     => 'inventario.productos.gestionar',
+            'inventarios.productos.marca'         => 'inventario.productos.gestionar',
+            'inventarios.productos.producto'      => 'inventario.productos.gestionar',
+            'inventarios.almacenes.index'         => 'inventario.almacenes.gestionar',
+            'inventory.kardex.index'              => 'inventario.kardex.ver',
+            'inventarios.inventario'              => 'inventario.ver',
+            'inventarios.kardex_valorizado'       => 'inventario.ver_costos',
+            'inventarios.nota_ingreso'            => 'inventario.notas.gestionar',
+            'inventarios.nota_salida'             => 'inventario.notas.gestionar',
+            'compras.proveedor'                   => 'compras.ver',
+            'compras.documento_compra.index'      => 'compras.ver',
+            'reportes.reporte_venta'              => 'reportes.ventas',
+            'reportes.reporte_contable'           => 'reportes.contable',
+            'mantenimientos.empresa'              => 'mantenimiento.empresa.gestionar',
+            'mantenimientos.cuentas.index'        => 'mantenimiento.cuentas_bancarias.gestionar',
+            // 'mantenimientos.plan'              => NULL (landlord-only, no se mapea)
+            'mantenimientos.cargos.index'         => 'mantenimiento.cargos.gestionar',
+            'mantenimientos.colaboradores.index'  => 'mantenimiento.colaboradores.gestionar',
+            'mantenimientos.horario'              => 'mantenimiento.horario.gestionar',
+            'mantenimientos.configuracion'        => 'mantenimiento.configuracion.gestionar',
+            'mantenimientos.sedes.index'          => 'mantenimiento.sedes.gestionar',
+            'mantenimientos.usuario.index'        => 'mantenimiento.usuarios.gestionar',
+            'mantenimientos.rol'                  => 'mantenimiento.roles.gestionar',
+            'consultas.creditos'                  => 'consultas.ver',
+            'consultas.vehiculos.index'           => 'consultas.ver',
+            'consultas.notificaciones.index'      => 'consultas.ver',
+        ];
+
+        foreach ($mapaPermisos as $route => $perm) {
+            ModuleChild::where('route_name', $route)->update(['permission' => $perm]);
+            ModuleGrandChild::where('route_name', $route)->update(['permission' => $perm]);
+        }
     }
 }

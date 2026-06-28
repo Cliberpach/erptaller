@@ -31,14 +31,14 @@ class PermissionSeeder extends Seeder
 
             // VENTAS
             'ventas.ver', 'ventas.crear', 'ventas.anular', 'ventas.enviar_sunat', 'ventas.ver_precios',
-            'ventas.clientes.gestionar',
+            'ventas.clientes.gestionar', 'ventas.config.gestionar',
 
             // RESERVAS / CAMPOS
             'reservas.ver', 'reservas.crear', 'reservas.editar', 'reservas.anular',
 
             // INVENTARIO
-            'inventario.productos.gestionar', 'inventario.kardex.ver',
-            'inventario.notas.gestionar', 'inventario.ver_costos',
+            'inventario.ver', 'inventario.productos.gestionar', 'inventario.kardex.ver',
+            'inventario.notas.gestionar', 'inventario.ver_costos', 'inventario.almacenes.gestionar',
 
             // COMPRAS
             'compras.ver', 'compras.crear',
@@ -57,6 +57,7 @@ class PermissionSeeder extends Seeder
             'mantenimiento.sedes.gestionar', 'mantenimiento.cargos.gestionar',
             'mantenimiento.colaboradores.gestionar', 'mantenimiento.empresa.gestionar',
             'mantenimiento.configuracion.gestionar',
+            'mantenimiento.cuentas_bancarias.gestionar', 'mantenimiento.horario.gestionar',
         ];
 
         foreach ($permisos as $name) {
