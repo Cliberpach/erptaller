@@ -305,7 +305,6 @@
                                     class="btn btn-white btn-sm btn-shadow btn-icon dropdown-toggle"
                                     type="button"
                                     data-bs-toggle="dropdown"
-                                    data-bs-display="static"
                                     aria-expanded="false">
                                     <i class="fi fi-rr-menu-dots"></i>
                                 </button>
