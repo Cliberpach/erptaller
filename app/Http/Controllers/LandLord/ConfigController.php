@@ -23,20 +23,23 @@ class ConfigController extends Controller
     public function apiPlacas(): View
     {
         return view('configuracion.api_placas', [
-            'api_placa_token' => GlobalSetting::valor('api_placa_token'),
-            'api_placa_url'   => GlobalSetting::valor('api_placa_url'),
+            'api_placa_token'  => GlobalSetting::valor('api_placa_token'),
+            'api_placa_url'    => GlobalSetting::valor('api_placa_url'),
+            'api_placa_bearer' => GlobalSetting::valor('api_placa_bearer'),
         ]);
     }
 
     public function apiPlacasUpdate(Request $request): RedirectResponse
     {
         $data = $request->validate([
-            'api_placa_token' => ['nullable', 'string', 'max:255'],
-            'api_placa_url'   => ['nullable', 'string', 'max:255'],
+            'api_placa_token'  => ['nullable', 'string', 'max:255'],
+            'api_placa_url'    => ['nullable', 'string', 'max:255'],
+            'api_placa_bearer' => ['nullable', 'string', 'max:255'],
         ]);
 
         GlobalSetting::setValor('api_placa_token', $data['api_placa_token'] ?? null);
         GlobalSetting::setValor('api_placa_url', $data['api_placa_url'] ?? null);
+        GlobalSetting::setValor('api_placa_bearer', $data['api_placa_bearer'] ?? null);
 
         return redirect()
             ->route('landlord.configuracion.api_placas')

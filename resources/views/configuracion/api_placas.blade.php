@@ -47,6 +47,14 @@
                     <small class="text-muted">Token de acceso al API (sensible).</small>
                 </div>
 
+                <div class="mb-3">
+                    <label for="api_placa_bearer" class="form-label fw-bold">Bearer (Authorization) — opcional</label>
+                    <input type="text" class="form-control" id="api_placa_bearer" name="api_placa_bearer"
+                        value="{{ old('api_placa_bearer', $api_placa_bearer) }}"
+                        placeholder="Token Bearer del header Authorization (dejar vacío si no aplica)" autocomplete="off">
+                    <small class="text-muted">Token del header Authorization (sensible). Opcional: solo si el API lo exige.</small>
+                </div>
+
                 <button type="submit" class="btn btn-primary">
                     <i class="fa-solid fa-floppy-disk"></i> Guardar
                 </button>

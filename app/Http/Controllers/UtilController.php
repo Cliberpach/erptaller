@@ -6,6 +6,7 @@ use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Landlord\Company;
 use App\Models\Landlord\GeneralTable\GeneralTableDetail;
+use App\Models\Landlord\GlobalSetting;
 use App\Models\Landlord\TypeIdentityDocument;
 use App\Models\Landlord\Year;
 use App\Models\Tenant\BillingCompany;
@@ -70,27 +71,47 @@ class UtilController extends Controller
 
     public static function apiPlaca(string $placa)
     {
+        // Declaradas antes del try -> en scope del catch para redactar el secreto.
+        $token = $base = $bearer = null;
+
         try {
+            // Config GLOBAL central (GlobalSetting fuerza conexión 'landlord').
+            $token  = GlobalSetting::valor('api_placa_token');
+            $base   = GlobalSetting::valor('api_placa_url');
+            $bearer = GlobalSetting::valor('api_placa_bearer');
 
-            $token = Company::first()->token_placa;
+            // Guard: token + url son obligatorios (el bearer NO -> el API puede validar
+            // solo con el token del path). Mensaje claro, sin exponer secretos.
+            $faltan = [];
+            if (empty($token)) $faltan[] = 'api_placa_token';
+            if (empty($base))  $faltan[] = 'api_placa_url';
+            if (! empty($faltan)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'API de Placas no configurada: falta ' . implode(', ', $faltan)
+                        . '. Configurar en panel padre → Configuración → API de Placas.',
+                ]);
+            }
 
-            $url = "https://multijc.com/api/queryplaca/" . $placa . "/" . $token;
+            // URL desde config (sin hardcodear el dominio). Base ej: https://multijc.com/api/queryplaca
+            $url = rtrim($base, '/') . '/' . $placa . '/' . $token;
 
-            $client = new \GuzzleHttp\Client(['verify' => false]);
-            $token = 'c36358c49922c564f035d4dc2ff3492fbcfd31ee561866960f75b79f7d645d7d';
-            $response = $client->get($url, [
-                'headers' => [
-                    'Content-Type' => 'application/json',
-                    'Accept' => 'application/json',
-                    'Authorization' => "Bearer {$token}"
-                ]
-            ]);
-            $estado     =   $response->getStatusCode();
-            $data       =   json_decode($response->getBody()->getContents());
+            // Header Authorization SOLO si hay bearer configurado (opcional).
+            $headers = ['Content-Type' => 'application/json', 'Accept' => 'application/json'];
+            if (! empty($bearer)) {
+                $headers['Authorization'] = "Bearer {$bearer}";
+            }
+
+            $client   = new \GuzzleHttp\Client(['verify' => false]);
+            $response = $client->get($url, ['headers' => $headers]);
+            $data     = json_decode($response->getBody()->getContents());
 
             return response()->json(['success' => true, 'data' => $data, 'origin' => 'API']);
         } catch (Throwable $th) {
-            return response()->json(['success' => false, 'message' => $th->getMessage(), 'line' => $th->getLine(), 'file' => $th->getFile()]);
+            // El token va en el PATH -> la excepción de Guzzle incluye la URL con el token.
+            // Redactar token/bearer (secreto GLOBAL) y NO devolver file/line al browser.
+            $msg = str_replace(array_filter([$token, $bearer]), '***', $th->getMessage());
+            return response()->json(['success' => false, 'message' => $msg]);
         }
     }
 
