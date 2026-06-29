@@ -53,6 +53,9 @@ Route::group(["prefix" => "taller"], function () {
         Route::get('getService/{id}', [ServiceController::class, 'getService'])->name('tenant.taller.servicios.getService');
         Route::put('update/{id}', [ServiceController::class, 'update'])->name('tenant.taller.servicios.update');
         Route::delete('destroy/{id}', [ServiceController::class, 'destroy'])->name('tenant.taller.servicios.destroy');
+
+        // Importador de servicios (Parte A): descarga de plantilla. Hereda can:taller.servicios.gestionar.
+        Route::get('get-format-excel', [ServiceController::class, 'getFormatExcel'])->name('tenant.taller.servicios.get-format-excel');
     });
 
     Route::group(["prefix" => "vehiculos", 'middleware' => 'can:taller.vehiculos.gestionar'], function () {

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Tenant\WorkShop;
 
+use App\Exports\Tenant\WorkShop\Servicio\ServicioExport;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Tenant\WorkShop\Service\ServiceStoreRequest;
 use App\Http\Requests\Tenant\WorkShop\Service\ServiceUpdateRequest;
@@ -9,6 +10,7 @@ use App\Http\Services\Tenant\WorkShop\Services\ServiceManager;
 use App\Models\Landlord\Year;
 use App\Models\Tenant\WorkShop\Service;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 use Yajra\DataTables\DataTables;
 use Illuminate\Support\Facades\DB;
 use Throwable;
@@ -20,6 +22,15 @@ class ServiceController extends Controller
     public function __construct()
     {
         $this->s_service  =   new ServiceManager();
+    }
+
+    /**
+     * Importador de servicios (Parte A): descarga la plantilla Excel
+     * (NOMBRE / PRECIO / DESCRIPCIÓN + instrucciones). Espejo del de productos.
+     */
+    public function getFormatExcel()
+    {
+        return Excel::download(new ServicioExport(), 'formato_import_servicios.xlsx');
     }
 
     public function index()
