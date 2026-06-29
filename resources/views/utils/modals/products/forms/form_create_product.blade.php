@@ -26,6 +26,10 @@
                 </div>
                 <p class="msgError sale_price_mdlproduct_error"></p>
             </div>
+            {{-- Costo (precio compra): SOLO admin (inventario.ver_costos -> admin por
+                 Gate::before). Para ventas/otros se renderiza un hidden con el MISMO
+                 id/name (la JS de reset/submit no cambia) y valor 1 (cumple min:1). --}}
+            @can('inventario.ver_costos')
             <div class="col-lg-6 col-md-6 mb-3">
                 <label for="purchase_price_mdlproduct" class="form-label required_field">Precio compra</label>
                 <div class="input-group">
@@ -36,6 +40,9 @@
                 </div>
                 <p class="msgError purchase_price_mdlproduct_error"></p>
             </div>
+            @else
+                <input type="hidden" id="purchase_price_mdlproduct" name="purchase_price_mdlproduct" value="1">
+            @endcan
             <div class="col-lg-6 col-md-6 colStock mb-3">
                 <label for="stock_mdlproduct" class="form-label required_field">Stock</label>
                 <input value="0" name="stock_mdlproduct" type="number" class="form-control stock" min="0"
