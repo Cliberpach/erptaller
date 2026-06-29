@@ -40,6 +40,9 @@ class SaleAnnulmentService
         if ($sale->status === 'ANULADO') {
             throw new Exception('La venta ya está anulada.');
         }
+        if (! is_null($sale->converted_to_id)) {
+            throw new Exception('No se puede anular: el documento ya fue convertido a fiscal.');
+        }
         if (! in_array($sale->type_sale_code, self::INTERNOS, true)) {
             throw new Exception('Solo se anula documento interno (Ticket / Nota de Venta). Boleta/Factura requieren baja SUNAT (próximamente).');
         }

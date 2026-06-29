@@ -8,6 +8,50 @@
 @endsection
 
 @section('content')
+    {{-- Modal Convertir documento interno -> Boleta/Factura (solo formaliza). --}}
+    <div class="modal fade" id="mdlConvertir" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5">Convertir <span id="conv_doc"></span> a comprobante fiscal</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="conv_ticket_id">
+                    <div class="row">
+                        <div class="col-lg-4 col-md-4 col-sm-12 mb-3">
+                            <label class="form-label fw-bold required_field">Comprobante</label>
+                            <select class="form-control" id="conv_type_sale"></select>
+                        </div>
+                        <div class="col-lg-8 col-md-8 col-sm-12 mb-3">
+                            <label class="form-label fw-bold required_field">Cliente</label>
+                            <select class="form-control" id="conv_customer"></select>
+                            <small id="conv_ruc_hint" class="text-danger" style="display:none;">La factura exige cliente con RUC.</small>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead class="table-light">
+                                <tr><th>Producto</th><th>Marca</th><th class="text-end">Cant.</th><th class="text-end">P.Venta</th><th class="text-end">Importe</th></tr>
+                            </thead>
+                            <tbody id="conv_productos"></tbody>
+                            <tfoot>
+                                <tr><th colspan="4" class="text-end">TOTAL S/</th><th class="text-end" id="conv_total"></th></tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                    <p class="text-muted small mb-0">No descuenta stock ni vuelve a cobrar: solo formaliza fiscalmente.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-primary" id="btnConfirmConvertir">
+                        <i class="fa-solid fa-right-left"></i> Convertir
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="card overflow-hidden">
         <div class="card-header">
 
@@ -246,6 +290,10 @@
                             if (data.status === 'ANULADO') {
                                 return `<span class="badge bg-danger">ANULADO</span>`;
                             }
+                            // Documento interno convertido a fiscal -> trazabilidad.
+                            if (data.converted_to_id) {
+                                return `<span class="badge bg-info text-dark">Convertido &rarr; ${data.converted_to_doc ?? ''}</span>`;
+                            }
 
                             let badge_class = '';
 
@@ -346,10 +394,11 @@
                             // Documento INTERNO (NV legacy + TICKET '50') -> Convertir + Anular.
                             // Boleta(03)/Factura(01) -> Generar Guía + Anular (fiscal, no Convertir).
                             // Los onclick llaman a accionProximamente() (toast). NO hay rutas/backend todavía.
-                            if (['NV', '50'].includes(data.type_sale_code)) {
-                                // Convertir: aún placeholder (lógica en su propio paso).
+                            // Documento interno YA convertido -> sin Convertir ni Anular (solo trazabilidad).
+                            if (['NV', '50'].includes(data.type_sale_code) && !data.converted_to_id) {
+                                // Convertir: abre el modal (crea boleta/factura, no mueve stock/caja).
                                 acciones += `<li>
-                                                <a class="dropdown-item" href="javascript:void(0);" onclick="accionProximamente('Convertir')">
+                                                <a class="dropdown-item" href="javascript:void(0);" onclick="openConvertir(${data.id})">
                                                     <i class="fa-solid fa-right-left text-info"></i> Convertir
                                                 </a>
                                             </li>`;
@@ -497,6 +546,95 @@
                     toastr.error(error, 'ERROR EN LA PETICIÓN ANULAR');
                 }
             });
+        }
+
+        // ===== CONVERTIR documento interno -> Boleta/Factura =====
+        let convCustomerSelect = null;
+
+        async function openConvertir(id) {
+            const url = @json(route('tenant.ventas.comprobante_venta.convertData', ['id' => ':id'])).replace(':id', id);
+            try {
+                const res = await (await fetch(url)).json();
+                if (!res.success) { toastr.error(res.message || 'No se pudo cargar'); return; }
+
+                document.getElementById('conv_ticket_id').value = id;
+                document.getElementById('conv_doc').textContent = res.doc;
+                document.getElementById('conv_total').textContent = res.total;
+
+                // Tipos fiscales (Boleta/Factura)
+                const sel = document.getElementById('conv_type_sale');
+                sel.innerHTML = res.tipos.map(t => `<option value="${t.id}" data-param="${t.parameter}">${t.name}</option>`).join('');
+                sel.onchange = toggleRucHint;
+
+                // Productos del ticket (solo lectura)
+                document.getElementById('conv_productos').innerHTML = res.productos.map(p => `
+                    <tr><td>${p.product_name}</td><td>${p.brand_name ?? ''}</td>
+                        <td class="text-end">${(+p.quantity)}</td>
+                        <td class="text-end">${(+p.price_sale).toFixed(2)}</td>
+                        <td class="text-end">${(+p.amount).toFixed(2)}</td></tr>`).join('');
+
+                // Cliente: TomSelect con búsqueda (reusa searchCustomer), sembrado con el del ticket.
+                if (convCustomerSelect) { convCustomerSelect.destroy(); }
+                const el = document.getElementById('conv_customer');
+                el.innerHTML = `<option value="${res.customer.id}">${res.customer.full_name}</option>`;
+                convCustomerSelect = new TomSelect(el, {
+                    valueField: 'id', labelField: 'full_name', searchField: ['full_name'],
+                    options: [res.customer], items: [String(res.customer.id)],
+                    create: false, preload: false, maxOptions: 20,
+                    load: async (q, cb) => {
+                        if (q.length < 3) return cb();
+                        try {
+                            const u = `{{ route('tenant.utils.searchCustomer') }}?q=${encodeURIComponent(q)}`;
+                            const r = await (await fetch(u)).json();
+                            cb(r.data ?? []);
+                        } catch (e) { cb(); }
+                    },
+                    render: { option: (i, e) => `<div>${e(i.full_name)}</div>`, item: (i, e) => `<div>${e(i.full_name)}</div>` }
+                });
+
+                toggleRucHint();
+                $('#mdlConvertir').modal('show');
+            } catch (e) {
+                toastr.error('Error cargando datos de conversión');
+            }
+        }
+
+        function toggleRucHint() {
+            const opt = document.getElementById('conv_type_sale').selectedOptions[0];
+            const esFactura = opt && opt.dataset.param === 'F';
+            document.getElementById('conv_ruc_hint').style.display = esFactura ? 'block' : 'none';
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('btnConfirmConvertir').addEventListener('click', confirmarConvertir);
+        });
+
+        async function confirmarConvertir() {
+            const id = document.getElementById('conv_ticket_id').value;
+            const type_sale = document.getElementById('conv_type_sale').value;
+            const customer_id = convCustomerSelect ? convCustomerSelect.getValue() : '';
+            if (!customer_id) { toastr.error('Seleccione un cliente'); return; }
+
+            Swal.fire({ title: 'Convirtiendo...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+            try {
+                const token = document.querySelector('input[name="_token"]').value;
+                const url = @json(route('tenant.ventas.comprobante_venta.convertir', ['id' => ':id'])).replace(':id', id);
+                const fd = new FormData();
+                fd.append('type_sale', type_sale);
+                fd.append('customer_id', customer_id);
+                const res = await (await fetch(url, { method: 'POST', headers: { 'X-CSRF-TOKEN': token }, body: fd })).json();
+                Swal.close();
+                if (res.success) {
+                    $('#mdlConvertir').modal('hide');
+                    dtSales.ajax.reload(null, false);
+                    toastr.success(res.message, 'OPERACIÓN COMPLETADA');
+                } else {
+                    toastr.error(res.message, 'NO SE PUDO CONVERTIR');
+                }
+            } catch (e) {
+                Swal.close();
+                toastr.error('Error en la petición convertir');
+            }
         }
 
         function sendSunat(sale_document_id) {

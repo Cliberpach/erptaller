@@ -81,4 +81,16 @@ class Sale extends Model
     {
         return $this->hasMany(\App\Models\Tenant\Sale\SaleDocumentPayment::class, 'sale_document_id');
     }
+
+    // Conversión interno -> fiscal: este documento (ticket/NV) fue convertido a...
+    public function convertedTo()
+    {
+        return $this->belongsTo(self::class, 'converted_to_id');
+    }
+
+    // ...y este fiscal (boleta/factura) proviene de este documento interno.
+    public function convertedFrom()
+    {
+        return $this->belongsTo(self::class, 'converted_from_id');
+    }
 }

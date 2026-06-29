@@ -258,8 +258,14 @@
                 $cond_credito = in_array(strtoupper($sale_document->payment_condition_name), ['CREDITO', 'CRÉDITO']);
                 $monto_pagado = $sale_document->payments->sum('amount');
                 $monto_pendiente = $sale_document->total - $monto_pagado;
+                // Convertido de un interno: el cobro real vive en el ticket de origen.
+                $origen_conv = $sale_document->converted_from_id ? $sale_document->convertedFrom : null;
             @endphp
-            @if ($cond_credito)
+            @if ($origen_conv)
+                <p class="p-0 m-0 text-uppercase text-cuerpo"><b>FORMA DE PAGO:</b></p>
+                <p class="p-0 m-0 text-uppercase text-cuerpo">CANCELADO CON COMPROBANTE INTERNO {{ $origen_conv->serie }}-{{ $origen_conv->correlative }}</p>
+                <br>
+            @elseif ($cond_credito)
                 <p class="p-0 m-0 text-uppercase text-cuerpo"><b>CONDICIÓN: CRÉDITO</b></p>
                 @if ($sale_document->expiration_date)
                     <p class="p-0 m-0 text-uppercase text-cuerpo">VENCE: {{ \Carbon\Carbon::parse($sale_document->expiration_date)->format('d/m/Y') }}</p>

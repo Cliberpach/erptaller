@@ -7,6 +7,7 @@ use App\Http\Controllers\FormatController;
 use App\Http\Controllers\UtilController;
 use App\Http\Requests\Sale\SaleStoreRequest;
 use App\Http\Services\Tenant\Sale\Sale\SaleAnnulmentService;
+use App\Http\Services\Tenant\Sale\Sale\SaleConversionService;
 use App\Http\Services\Tenant\Sale\Sale\SaleManager;
 use App\Models\Company;
 use App\Models\CompanyInvoice;
@@ -86,6 +87,9 @@ class SaleController extends Controller
                 'sd.status',
                 'sd.type_sale_code',
                 'sd.payment_condition_name',
+                'sd.converted_to_id',
+                DB::raw("(SELECT CONCAT(f.serie, '-', f.correlative)
+                          FROM sales_documents f WHERE f.id = sd.converted_to_id) AS converted_to_doc"),
                 'sd.ruta_xml',
                 'sd.ruta_cdr',
                 'sd.payment_status'
@@ -317,13 +321,66 @@ array:10 [ // app\Http\Controllers\Tenant\SaleController.php:202
         }
     }
 
+    /**
+     * Datos para el modal Convertir: tipos fiscales (Boleta/Factura), cliente actual
+     * del ticket y sus productos (solo lectura). No muta nada.
+     */
+    public function getConvertData($id)
+    {
+        $ticket = Sale::findOrFail($id);
+
+        $tipos = UtilController::getInvoiceTypes()
+            ->whereIn('symbol', ['01', '03'])
+            ->map(fn($t) => ['id' => $t->id, 'name' => $t->name, 'symbol' => $t->symbol, 'parameter' => $t->parameter])
+            ->values();
+
+        $productos = DB::table('sales_documents_details')
+            ->where('sale_document_id', $id)
+            ->select('product_name', 'brand_name', 'quantity', 'price_sale', 'amount')
+            ->get();
+
+        return response()->json([
+            'success'   => true,
+            'doc'       => $ticket->serie . '-' . $ticket->correlative,
+            'total'     => number_format($ticket->total, 2),
+            'tipos'     => $tipos,
+            'customer'  => [
+                'id'        => $ticket->customer_id,
+                'full_name' => $ticket->customer_type_document . ': ' . $ticket->customer_document_number . ' - ' . $ticket->customer_name,
+            ],
+            'productos' => $productos,
+        ]);
+    }
+
+    /**
+     * Convertir documento interno (Ticket/NV) a fiscal (Boleta/Factura). Solo formaliza:
+     * no mueve stock ni caja. Permiso can:ventas.crear (en la ruta).
+     */
+    public function convertir(Request $request, $id)
+    {
+        try {
+            $fiscal = (new SaleConversionService())->convertir((int) $id, [
+                'type_sale'   => $request->input('type_sale'),
+                'customer_id' => $request->input('customer_id'),
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'CONVERTIDO A ' . $fiscal->type_sale_name . ' ' . $fiscal->serie . '-' . $fiscal->correlative,
+            ]);
+        } catch (Throwable $th) {
+            return response()->json(['success' => false, 'message' => $th->getMessage()]);
+        }
+    }
+
     public function pdf_voucher($sale_id, $size = 0)
     {
         try {
 
             $company                =   Company::find(1);
-            // Eager-load de los pagos (Paso 4) para el bloque FORMA DE PAGO del PDF (sin N+1).
-            $sale_document          =   Sale::with(['payments.paymentMethod', 'payments.bankAccount'])
+            // Eager-load de los pagos (Paso 4) + origen de conversión para el bloque
+            // FORMA DE PAGO del PDF (sin N+1).
+            $sale_document          =   Sale::with(['payments.paymentMethod', 'payments.bankAccount', 'convertedFrom'])
                                             ->findOrFail($sale_id);
             $sale_products          =   SaleDetail::where('sale_document_id',$sale_id)->get();
             $sale_services          =   SaleService::where('sale_document_id',$sale_id)->get();

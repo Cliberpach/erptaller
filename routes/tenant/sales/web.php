@@ -23,6 +23,8 @@ Route::group(["prefix" => "ventas"], function () {
         Route::get('downloadXml/{id}', [SaleController::class, 'downloadXml'])->name('tenant.ventas.comprobante_venta.downloadXml')->middleware('validar.plan:ventas');
         Route::get('downloadCdr/{id}', [SaleController::class, 'downloadCdr'])->name('tenant.ventas.comprobante_venta.downloadCdr')->middleware('validar.plan:ventas');
         Route::post('{id}/anular', [SaleController::class, 'anular'])->name('tenant.ventas.comprobante_venta.anular')->middleware(['validar.plan:ventas', 'can:ventas.anular']);
+        Route::get('{id}/convert-data', [SaleController::class, 'getConvertData'])->name('tenant.ventas.comprobante_venta.convertData')->middleware('validar.plan:ventas');
+        Route::post('{id}/convertir', [SaleController::class, 'convertir'])->name('tenant.ventas.comprobante_venta.convertir')->middleware(['validar.plan:ventas', 'can:ventas.crear']);
 
         Route::get('comprobante-electronico', [SaleController::class, 'electronicReceipt'])->name('tenant.ventas.comprobante_electronico');
         Route::get('cotizacion', [SaleController::class, 'quotation'])->name('tenant.ventas.cotizacion');
