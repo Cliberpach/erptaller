@@ -334,6 +334,35 @@
                                             </li>`;
                             }
 
+                            // ===== Acciones por tipo de documento (SOLO UI, sin lógica aún) =====
+                            // NV -> Convertir + Anular ; Boleta(03)/Factura(01) -> Generar Guía + Anular.
+                            // Los onclick llaman a accionProximamente() (toast). NO hay rutas/backend todavía.
+                            if (data.type_sale_code === 'NV') {
+                                acciones += `<li>
+                                                <a class="dropdown-item" href="javascript:void(0);" onclick="accionProximamente('Convertir')">
+                                                    <i class="fa-solid fa-right-left text-info"></i> Convertir
+                                                </a>
+                                            </li>`;
+                                acciones += `<li>
+                                                <a class="dropdown-item text-danger" href="javascript:void(0);" onclick="accionProximamente('Anular')">
+                                                    <i class="fa-solid fa-ban"></i> Anular
+                                                </a>
+                                            </li>`;
+                            }
+
+                            if (data.type_sale_code === '03' || data.type_sale_code === '01') {
+                                acciones += `<li>
+                                                <a class="dropdown-item" href="javascript:void(0);" onclick="accionProximamente('Generar Guía')">
+                                                    <i class="fa-solid fa-truck text-secondary"></i> Generar Guía
+                                                </a>
+                                            </li>`;
+                                acciones += `<li>
+                                                <a class="dropdown-item text-danger" href="javascript:void(0);" onclick="accionProximamente('Anular')">
+                                                    <i class="fa-solid fa-ban"></i> Anular
+                                                </a>
+                                            </li>`;
+                            }
+
                             if (data.type_sale_code === '09' || data.type_sale_code === '01') {
 
                                 if (data.sunat_status === 'PENDIENTE' || data.sunat_status ===
@@ -386,6 +415,13 @@
         function goToSaleCreate() {
             const route = @json(route('tenant.ventas.comprobante_venta.create'));
             window.location.href = route;
+        }
+
+        // Placeholder: las acciones Convertir/Anular/Generar Guía aún no tienen lógica.
+        // Solo avisan "Próximamente" (no navegan, no llaman backend). Cada una se
+        // implementará por separado en su propio paso.
+        function accionProximamente(nombre) {
+            toastr.info(nombre + ': próximamente', 'EN CONSTRUCCIÓN');
         }
 
         function sendSunat(sale_document_id) {
