@@ -12,8 +12,8 @@
                         <div class="col-md-4 col-12 mb-3">
                             <label for="document_number" class="form-label">Tipo de documento</label>
                             <select name="identity_document" id="identity_document" class="form-control text-center">
-                                <option value="DNI">DNI</option>
-                                <option value="RUC">RUC</option> 
+                                <option value="1">DNI</option>
+                                <option value="3">RUC</option>
                             </select>
                         </div>
                         <div class="col-md-8 col-12 mb-3">

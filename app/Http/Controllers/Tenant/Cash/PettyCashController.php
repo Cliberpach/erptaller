@@ -13,6 +13,7 @@ use App\Models\ExitMoney;
 use App\Models\ExitMoneyDetail;
 use Illuminate\Http\Request;
 use App\Models\PettyCash;
+use App\Models\Landlord\TypeIdentityDocument;
 use App\Models\PettyCashBook;
 use App\Models\ProofPayment;
 use App\Models\Supplier;
@@ -187,11 +188,19 @@ class PettyCashController extends Controller
 
     public function supplierStore(Request $request)
     {
+        // Espejo de SupplierController::store (compras): una sola forma de crear proveedores.
+        // El form manda el id del tipo (1=DNI, 3=RUC). Resuelve el tipo y puebla los 4
+        // campos de documento (la FK type_identity_document_id es NOT NULL).
+        $type = TypeIdentityDocument::findOrFail($request->identity_document);
+
         $supplier = new Supplier();
-        $supplier->identity_document = $request->identity_document;
-        $supplier->document_number = $request->document_number;
-        $supplier->name = $request->name;
-        $supplier->address = $request->address;
+        $supplier->type_identity_document_id    = $type->id;
+        $supplier->type_document_name           = $type->name;
+        $supplier->type_document_abbreviation   = $type->abbreviation;
+        $supplier->type_document_code           = $type->code;
+        $supplier->document_number              = $request->document_number;
+        $supplier->name                         = $request->name;
+        $supplier->address                      = $request->address;
         $supplier->save();
 
         return back()->with('datos', 'Proveedor registrado');
