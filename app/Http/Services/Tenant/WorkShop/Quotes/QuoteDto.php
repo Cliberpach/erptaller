@@ -10,6 +10,7 @@ use App\Models\Product;
 use App\Models\Tenant\Warehouse;
 use App\Models\Tenant\WorkShop\Quote\Quote;
 use App\Models\Tenant\WorkShop\Service;
+use App\Support\Placa;
 use DateTime;
 
 class QuoteDto
@@ -29,7 +30,7 @@ class QuoteDto
         $dto['customer_document_number']            =   $customer->document_number;
         $dto['customer_name']                       =   mb_strtoupper(trim($customer->name));
 
-        $dto['plate']       =   mb_strtoupper(trim($data['plate']));
+        $dto['plate']       =   Placa::normalizarStorage($data['plate']);
         $dto['vehicle_id']  =   $data['vehicle_id'];
 
         $days_validity      =   0;

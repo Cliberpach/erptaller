@@ -3,13 +3,20 @@
 namespace App\Http\Services\Tenant\WorkShop\Vehicles;
 
 use App\Models\Tenant\WorkShop\Vehicle;
+use App\Support\Placa;
 
 class VehicleRepository
 {
 
     public function findPlate(string $placa): ?Vehicle
     {
-        return Vehicle::where('plate', $placa)->where('status', 'ACTIVO')->first();
+        // Match TOLERANTE: normaliza ambos lados (clave sin guion/espacios) para encontrar
+        // la placa aunque se haya tecleado en otro formato. No migra datos.
+        $clave = Placa::claveComparacion($placa);
+
+        return Vehicle::whereRaw("REPLACE(REPLACE(UPPER(plate), '-', ''), ' ', '') = ?", [$clave])
+            ->where('status', 'ACTIVO')
+            ->first();
     }
 
     public function insertVehicle(array $dto): Vehicle

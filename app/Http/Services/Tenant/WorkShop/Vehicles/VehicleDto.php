@@ -3,6 +3,7 @@
 namespace App\Http\Services\Tenant\WorkShop\Vehicles;
 
 use App\Models\Landlord\ModelV;
+use App\Support\Placa;
 
 class VehicleDto
 {
@@ -11,7 +12,7 @@ class VehicleDto
     {
         $dto                =   [];
         $dto['customer_id'] =   $data['client_id'];
-        $dto['plate']       =   mb_strtoupper(str_replace(' ', '', trim($data['plate'])));
+        $dto['plate']       =   Placa::normalizarStorage($data['plate']);
         $dto['model_id']    =   $data['model_id'];
         $dto['year_id']     =   $data['year_id'];
         $dto['observation'] =   isset($data['observation']) && trim($data['observation']) !== ''? trim($data['observation']): null;
