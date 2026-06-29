@@ -19,16 +19,17 @@ class PurchaseDto
         $dto    =   [];
 
         $supplier           =   Supplier::findOrFail($data['proveedor']);
-        $warehouse          =   Warehouse::findOrFail(1);
         $montos             =   $this->calcularMontos($data['lst_purchase'], $data['igv_chk'] ?? null, $data['igv_value']);
 
-        $dto['warehouse_id']                        =   $warehouse->id;
-        $dto['warehouse_name']                      =   $warehouse->descripcion;
+        // El almacén NO va en la cabecera (purchase_documents no tiene esas columnas);
+        // pertenece al detalle, donde stock/kardex lo leen. Se resuelve en getDtoDetail.
         $dto['delivery_date']                       =   $data['fecha_entrega'];
         $dto['supplier_id']                         =   $supplier->id;
         $dto['supplier_name']                       =   $supplier->name;
         $dto['supplier_type_document_abbreviation'] =   $supplier->type_document_abbreviation;
         $dto['supplier_document_number']            =   $supplier->document_number;
+        $dto['user_recorder_id']                    =   $data['user_recorder_id'];
+        $dto['user_recorder_name']                  =   $data['user_recorder_name'];
         $dto['currency']                            =   $data['moneda'];
         $dto['document_type']                       =   $data['tipo_doc'];
         $dto['serie']                               =   $data['serie'];
@@ -47,6 +48,7 @@ class PurchaseDto
         $nro_days               =   (int) $payment_condition->nro_days;
         $expiration_date        =   $registration_date->copy()->addDays($nro_days);
 
+        $dto['condition']               =   $payment_condition->name;   // CONTADO / CREDITO
         $dto['registration_date']       =   $registration_date;
         $dto['payment_condition_id']    =   $payment_condition->id;
         $dto['payment_condition_name']  =   $payment_condition->name;
@@ -60,6 +62,9 @@ class PurchaseDto
     public function getDtoDetail(array $lst_items, PurchaseDocument $purchase): array
     {
         $dto_detail =   [];
+        // El almacén se resuelve acá (no se lee de $purchase, que ya no lo trae):
+        // el detalle es la fuente de verdad del almacén para stock y kardex.
+        $warehouse  =   Warehouse::findOrFail(1);
         foreach ($lst_items as  $item) {
             $_item  =   [];
 
@@ -74,8 +79,8 @@ class PurchaseDto
             $_item['product_name']          =   $product->name;
             $_item['brand_name']            =   $brand->name;
             $_item['category_name']         =   $category->name;
-            $_item['warehouse_id']          =   $purchase->warehouse_id;
-            $_item['warehouse_name']        =   $purchase->warehouse_name;
+            $_item['warehouse_id']          =   $warehouse->id;
+            $_item['warehouse_name']        =   $warehouse->descripcion;
             $_item['quantity']              =   $item->quantity;
             $_item['purchase_price']        =   $item->purchase_price;
             $_item['subtotal']              =   $item->quantity * $item->purchase_price;
