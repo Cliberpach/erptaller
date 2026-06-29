@@ -19,7 +19,9 @@
 
                         @foreach ($modules as $module)
                             @foreach ($module->children as $child)
-                                @if (!$child->grandchildren->isNotEmpty())
+                                {{-- Solo hijos hoja CON ruta funcional. Los "próximamente"
+                                     (route_name NULL) se omiten del buscador (no rompen route()). --}}
+                                @if (!$child->grandchildren->isNotEmpty() && $child->route_name && Route::has($base . $child->route_name))
                                     <li>
                                         <a class="search-item" href="{{ route($base . $child->route_name) }}">
                                             <i class="fi fi-rr-file"></i> {{ $child->description }}

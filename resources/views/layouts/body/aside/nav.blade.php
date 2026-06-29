@@ -145,10 +145,18 @@
                                     @php $verG = $grandchild->permission ? auth()->user()?->can($grandchild->permission) : $esAdmin; @endphp
                                     @if ($verG)
                                     <li class="menu-item">
-                                        <a class="menu-link menu-click"
-                                            href="{{ route($base . $grandchild->route_name) }}">
-                                            <span class="menu-label">{{ $grandchild->description }}</span>
-                                        </a>
+                                        @if ($grandchild->route_name && Route::has($base . $grandchild->route_name))
+                                            <a class="menu-link menu-click"
+                                                href="{{ route($base . $grandchild->route_name) }}">
+                                                <span class="menu-label">{{ $grandchild->description }}</span>
+                                            </a>
+                                        @else
+                                            {{-- Próximamente: sin ruta funcional -> deshabilitado (sin RouteNotFound) --}}
+                                            <a class="menu-link" href="javascript:void(0);" style="opacity:.55;cursor:not-allowed;"
+                                                title="Próximamente">
+                                                <span class="menu-label">{{ $grandchild->description }} <small>(Próximamente)</small></span>
+                                            </a>
+                                        @endif
                                     </li>
                                     @endif
                                 @endforeach
