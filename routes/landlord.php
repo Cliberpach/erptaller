@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LandLord\ApiController;
 use App\Http\Controllers\LandLord\CompanyController;
+use App\Http\Controllers\LandLord\ConfigController;
 use App\Http\Controllers\LandLord\ModuleController;
 use App\Http\Controllers\LandLord\PlanController;
 
@@ -36,6 +37,12 @@ Route::middleware(['auth:web', 'verified'])->group(function () {
         Route::put('plan/update/{id}', [PlanController::class, 'update'])->name('landlord.mantenimientos.planes.update');
         Route::get('plan/delete/{id}', [PlanController::class, 'delete'])->name('landlord.mantenimientos.planes.delete');
         Route::delete('plan/destroy/{id}', [PlanController::class, 'destroy'])->name('landlord.mantenimientos.planes.destroy');
+    });
+
+    // Configuración GLOBAL de la plataforma (BD central). Extensible: más opciones acá.
+    Route::group(["prefix" => "configuracion"], function () {
+        Route::get('api-placas', [ConfigController::class, 'apiPlacas'])->name('landlord.configuracion.api_placas');
+        Route::put('api-placas', [ConfigController::class, 'apiPlacasUpdate'])->name('landlord.configuracion.api_placas.update');
     });
 });
 
