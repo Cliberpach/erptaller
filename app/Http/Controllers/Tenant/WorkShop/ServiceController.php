@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Tenant\WorkShop;
 use App\Exports\Tenant\WorkShop\Servicio\ServicioExport;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Tenant\WorkShop\Service\ServiceStoreRequest;
+use App\Http\Requests\Tenant\WorkShop\Service\ServicioImportExcelRequest;
+use App\Imports\Tenant\WorkShop\Servicio\ServicioImport;
 use App\Http\Requests\Tenant\WorkShop\Service\ServiceUpdateRequest;
 use App\Http\Services\Tenant\WorkShop\Services\ServiceManager;
 use App\Models\Landlord\Year;
@@ -31,6 +33,50 @@ class ServiceController extends Controller
     public function getFormatExcel()
     {
         return Excel::download(new ServicioExport(), 'formato_import_servicios.xlsx');
+    }
+
+    /**
+     * Importador de servicios (Parte B): clasifica y crea.
+     *  - ERROR de formato -> aborta todo, crea 0, reporta los errores.
+     *  - DUPLICADO -> omite la fila, sigue con el resto.
+     *  - VÁLIDO -> crea (ServiceManager::store, Eloquent).
+     */
+    public function importExcel(ServicioImportExcelRequest $request)
+    {
+        try {
+            $import = new ServicioImport();
+            Excel::import($import, $request->file('servicios_import_excel'));
+            $res = $import->getResultados();
+
+            // Pasada 1: si hay errores de formato -> abortar (no crea nada).
+            if (count($res->errores) > 0) {
+                return response()->json([
+                    'success'   => false,
+                    'message'   => 'IMPORTACIÓN ABORTADA: ' . count($res->errores) . ' fila(s) con errores de formato.',
+                    'resultado' => $res,
+                ]);
+            }
+
+            // Pasada 2: crear los válidos (los duplicados ya quedaron fuera).
+            DB::beginTransaction();
+            foreach ($res->validos as $servicio) {
+                $this->s_service->store([
+                    'name'        => $servicio['name'],
+                    'price'       => $servicio['price'],
+                    'description' => $servicio['description'],
+                ]);
+            }
+            DB::commit();
+
+            return response()->json([
+                'success'   => true,
+                'message'   => count($res->validos) . ' servicio(s) creado(s), ' . count($res->duplicados) . ' omitido(s) por duplicado.',
+                'resultado' => $res,
+            ]);
+        } catch (Throwable $th) {
+            DB::rollBack();
+            return response()->json(['success' => false, 'message' => $th->getMessage()]);
+        }
     }
 
     public function index()
