@@ -60,7 +60,7 @@
         loadSelectMdlVehicle();
 
         document.querySelector('#btn_search_plate').addEventListener('click', () => {
-            accionBuscarPlaca();
+            buscarPlacaMdlVehicle();
         })
 
         document.querySelector('#form_create_vehicle').addEventListener('submit', (e) => {
@@ -197,7 +197,9 @@
 
     }
 
-    async function accionBuscarPlaca() {
+    // Nombres ÚNICOS del modal (rompen la colisión con la lupa inline de quotes/edit,
+    // que conserva accionBuscarPlaca/searchPlate/setDataApi sobre #plate).
+    async function buscarPlacaMdlVehicle() {
         const placa = document.querySelector('#plate_mdlvehicle').value.trim();
 
         if (placa.length < 6 || placa.length > 8) {
@@ -205,25 +207,24 @@
             return;
         }
 
-        searchPlate(placa);
+        searchPlateMdlVehicle(placa);
     }
 
-    async function searchPlate(placa) {
+    async function searchPlateMdlVehicle(placa) {
         mostrarAnimacion1();
         try {
             toastr.clear();
             const res = await axios.get(route('tenant.utils.searchPlate', placa));
             if (res.data.success) {
-
-                if (res.data.origin == 'BD') {
-                    toastr.error('VEHICULO YA EXISTE EN BD');
-                    return;
-                }
-
-                const dataApi = res.data.data;
-                if (dataApi.mensaje == 'SUCCESS') {
-                    toastr.info(dataApi.mensaje);
-                    setDataApi(res);
+                // Forma PLANA unificada (Capa 1): mismo prefill para BD y API.
+                if (res.data.vehiculo) {
+                    prefillMdlVehicle(res.data.vehiculo);
+                    if (res.data.origin === 'BD') {
+                        // No bloquea: el vehículo ya existe, solo se cargan sus datos.
+                        toastr.info('Vehículo ya registrado — datos cargados');
+                    }
+                } else {
+                    toastr.error('Placa no encontrada en BD ni en el API');
                 }
             } else {
                 toastr.error(res.data.message, 'ERROR EN EL SERVIDOR');
@@ -237,42 +238,46 @@
         }
     }
 
-    function setDataApi(res) {
+    // Prefill ÚNICO desde vehiculo{} plano (BD y API por igual). Año queda manual
+    // (el API no lo trae). No toca los legacy data/model/color de la respuesta.
+    function prefillMdlVehicle(vehiculo) {
 
-        const dataApi = res.data.data.data;
-        const model = res.data.model;
-        const color = res.data.color;
+        // Placa en MAYÚSCULA (la Capa 1 la normaliza a lower; solo display).
+        document.querySelector('#plate_mdlvehicle').value = (vehiculo.placa ?? '').toUpperCase();
 
-        const mensaje = dataApi.mensaje;
-        if (mensaje == 'No encontrado') {
-            toastr.error(mensaje);
-            return;
+        // Marca-Modelo: select REMOTO (valueField:'id', labelField:'text') -> el id no está
+        // en su lista; hay que inyectar la opción + refreshOptions ANTES de setear el value.
+        if (vehiculo.model_id) {
+            window.modelSelect.addOption({
+                id: vehiculo.model_id,
+                text: `${vehiculo.marca ?? ''}-${vehiculo.modelo ?? ''}`
+            });
+            window.modelSelect.refreshOptions(false);
+            window.modelSelect.setValue(vehiculo.model_id);
         }
 
-        const modelItem = {
-            id: model.id,
-            text: `${dataApi.marca}-${dataApi.modelo}`
-        };
-        addModelSelect(modelItem);
-
-        if (dataApi.color) {
-            const colorItem = {
-                id: color.id,
-                description: `${dataApi.color}`
-            };
-            addColorSelect(colorItem);
+        // Color: select server-seeded (valueField:'id', labelField:'description') -> setea
+        // directo; addColorSelect inyecta+refresh por robustez.
+        if (vehiculo.color_id) {
+            addColorSelect({
+                id: vehiculo.color_id,
+                description: vehiculo.color ?? ''
+            });
         }
 
-        document.querySelector('#vin').value = dataApi.vin;
-        document.querySelector('#serie').value = dataApi.serie;
+        // Año (#year_id_mdlvehicle): NO se toca -> queda manual.
 
-    }
+        document.querySelector('#vin').value = vehiculo.vin ?? '';
+        document.querySelector('#serie').value = vehiculo.serie ?? '';
 
-    function addModelSelect(item) {
-        window.modelSelect.clear();
-        window.modelSelect.clearOptions();
-        window.modelSelect.addOption(item);
-        window.modelSelect.setValue(item.id);
+        // Aviso CASO A: SOLO los campos genuinamente ausentes (id null), no los seteados.
+        const faltan = [];
+        if (!vehiculo.model_id) faltan.push('Marca-Modelo');
+        if (!vehiculo.color_id) faltan.push('Color');
+        if (!vehiculo.year_id) faltan.push('Año');
+        if (faltan.length) {
+            toastr.info('Complete manualmente: ' + faltan.join(', '));
+        }
     }
 
     function addColorSelect(item) {
