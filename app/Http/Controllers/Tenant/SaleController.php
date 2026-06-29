@@ -297,7 +297,9 @@ array:10 [ // app\Http\Controllers\Tenant\SaleController.php:202
         try {
 
             $company                =   Company::find(1);
-            $sale_document          =   Sale::findOrFail($sale_id);
+            // Eager-load de los pagos (Paso 4) para el bloque FORMA DE PAGO del PDF (sin N+1).
+            $sale_document          =   Sale::with(['payments.paymentMethod', 'payments.bankAccount'])
+                                            ->findOrFail($sale_id);
             $sale_products          =   SaleDetail::where('sale_document_id',$sale_id)->get();
             $sale_services          =   SaleService::where('sale_document_id',$sale_id)->get();
 

@@ -249,8 +249,53 @@
                 </tfoot> 
             </table> 
             <br>
-            <p class="p-0 m-0 text-uppercase text-cuerpo">SON: <b>{{ $sale_document->legend }}</b></p> 
+            <p class="p-0 m-0 text-uppercase text-cuerpo">SON: <b>{{ $sale_document->legend }}</b></p>
             <br>
+
+            {{-- FORMA DE PAGO (Paso 4): lee de sales_document_payments (NO columnas viejas _1/_2).
+                 CONTADO -> métodos; CRÉDITO -> condición + vencimiento + pendiente. --}}
+            @php
+                $cond_credito = in_array(strtoupper($sale_document->payment_condition_name), ['CREDITO', 'CRÉDITO']);
+                $monto_pagado = $sale_document->payments->sum('amount');
+                $monto_pendiente = $sale_document->total - $monto_pagado;
+            @endphp
+            @if ($cond_credito)
+                <p class="p-0 m-0 text-uppercase text-cuerpo"><b>CONDICIÓN: CRÉDITO</b></p>
+                @if ($sale_document->expiration_date)
+                    <p class="p-0 m-0 text-uppercase text-cuerpo">VENCE: {{ \Carbon\Carbon::parse($sale_document->expiration_date)->format('d/m/Y') }}</p>
+                @endif
+                <p class="p-0 m-0 text-uppercase text-cuerpo">PENDIENTE: S/ {{ number_format($monto_pendiente, 2) }}</p>
+                <br>
+            @elseif ($sale_document->payments->count() > 0)
+                <p class="p-0 m-0 text-uppercase text-cuerpo"><b>FORMA DE PAGO:</b></p>
+                <table class="text-cuerpo" style="width:100%; border-collapse:collapse;">
+                    @foreach ($sale_document->payments as $pay)
+                        @php
+                            $metodo      = optional($pay->paymentMethod)->description ?? '';
+                            $acc         = $pay->bankAccount;
+                            // Mismo formato que el combo (UtilController::paymentAccounts):
+                            // YAPE -> celular; resto -> n° cuenta. holder - detalle.
+                            $usa_celular = strtoupper($metodo) === 'YAPE';
+                            $detalle_acc = $acc
+                                ? trim($acc->holder . ' - ' . ($usa_celular ? ($acc->phone ?? '') : ($acc->account_number ?? '')), ' -')
+                                : null;
+                        @endphp
+                        <tr>
+                            <td class="text-uppercase" style="text-align:left;">{{ $metodo }}</td>
+                            <td style="text-align:right; white-space:nowrap;">S/ {{ number_format($pay->amount, 2) }}</td>
+                        </tr>
+                        @if ($detalle_acc)
+                            <tr>
+                                <td colspan="2" style="text-align:left; padding-left:6px;">
+                                    {{ $detalle_acc }}@if ($pay->operation_number) &nbsp;&nbsp;OP: {{ $pay->operation_number }}@endif
+                                </td>
+                            </tr>
+                        @endif
+                    @endforeach
+                </table>
+                <br>
+            @endif
+
             {{-- @if ($mostrar_cuentas === "SI")
                 <table class="tbl-qr">
                     <tr>
