@@ -101,6 +101,18 @@
             <p class="serie_error msgError mb-0"></p>
         </div>
 
+        <!-- N° Motor (editable: el prefill lo llena si viene; si no, se tipea) -->
+        <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+            <label for="motor" class="form-label fw-bold">N° Motor:</label>
+            <div class="input-group">
+                <span class="input-group-text">
+                    <i class="fas fa-gears"></i>
+                </span>
+                <input type="text" class="form-control" id="motor" name="motor" placeholder="N° Motor" maxlength="50">
+            </div>
+            <p class="motor_error msgError mb-0"></p>
+        </div>
+
         <!-- Observación -->
         <div class="col-12">
             <label for="observation_mdlvehicle" class="form-label fw-bold">Observación:</label>

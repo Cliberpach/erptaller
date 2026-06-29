@@ -25,6 +25,7 @@ class Vehicle extends Model
         'observation',
         'vin',
         'serie',
+        'motor',
         'status',
         'creator_user_id',
         'editor_user_id',

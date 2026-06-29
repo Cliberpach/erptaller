@@ -22,6 +22,7 @@ class VehicleDto
 
         $dto['vin']         =   $data['vin'];
         $dto['serie']       =   $data['serie'];
+        $dto['motor']       =   $data['motor'] ?? null;
         return $dto;
     }
 }

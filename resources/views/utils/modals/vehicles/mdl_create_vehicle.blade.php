@@ -269,6 +269,7 @@
 
         document.querySelector('#vin').value = vehiculo.vin ?? '';
         document.querySelector('#serie').value = vehiculo.serie ?? '';
+        document.querySelector('#motor').value = vehiculo.motor ?? '';
 
         // Aviso CASO A: SOLO los campos genuinamente ausentes (id null), no los seteados.
         const faltan = [];

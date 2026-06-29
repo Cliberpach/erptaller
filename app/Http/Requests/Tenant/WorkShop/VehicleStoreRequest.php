@@ -84,6 +84,13 @@ class VehicleStoreRequest extends FormRequest
                 'string',
                 'max:160',
             ],
+
+            // N° MOTOR: opcional, máximo 50 caracteres
+            'motor' => [
+                'nullable',
+                'string',
+                'max:50',
+            ],
         ];
     }
 
@@ -113,6 +120,7 @@ class VehicleStoreRequest extends FormRequest
 
             'vin.max' => 'El vin no puede tener más de 160 caracteres.',
             'serie.max' => 'La serie no puede tener más de 160 caracteres.',
+            'motor.max' => 'El número de motor no puede tener más de 50 caracteres.',
 
         ];
     }
