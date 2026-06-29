@@ -20,7 +20,7 @@ class PaymentMethodSeeder extends Seeder
             'description' => 'YAPE',
         ]);
         PaymentMethod::create([
-            'description' => 'PLIN',
+            'description' => 'TRANSFERENCIA',
         ]);
         PaymentMethod::create([
             'description' => 'POS',

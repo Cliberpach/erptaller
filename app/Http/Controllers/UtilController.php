@@ -262,7 +262,7 @@ class UtilController extends Controller
     /**
      * PASO 4 (transversal): cuentas asociadas a un método (combo dependiente del cobro de
      * venta y del egreso). Lee el pivote payment_method_accounts. EFECTIVO -> 0 cuentas.
-     * Label por método: YAPE/PLIN -> titular + celular; otros -> titular + n° cuenta.
+     * Label por método: YAPE -> titular + celular; otros (TRANSFERENCIA/POS) -> titular + n° cuenta.
      */
     public function paymentAccounts(int $method)
     {
@@ -278,7 +278,7 @@ class UtilController extends Controller
             ->select('ba.id', 'ba.holder', 'ba.phone', 'ba.account_number')
             ->get();
 
-        $usaCelular = in_array(strtoupper($metodo->description), ['YAPE', 'PLIN']);
+        $usaCelular = in_array(strtoupper($metodo->description), ['YAPE']);
 
         $data = $cuentas->map(function ($c) use ($usaCelular) {
             $detalle = $usaCelular ? ($c->phone ?? '') : ($c->account_number ?? '');
