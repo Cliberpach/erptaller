@@ -61,6 +61,10 @@ class CustomerAccountDto
         $dto['observation']         =   $data['observacion'];
         $dto['total']               =   $data['cantidad'];
         $dto['payment_method_id']   =   $data['modo_pago'];
+        // Trazabilidad por cuenta: cuenta bancaria + N° operación. Efectivo manda
+        // cuenta='' -> !empty lo convierte a null (el bigint nullable no acepta '').
+        $dto['bank_account_id']     =   ! empty($data['cuenta']) ? $data['cuenta'] : null;
+        $dto['operation_number']    =   ! empty($data['nro_operacion']) ? trim($data['nro_operacion']) : null;
         $dto['cash']                =   $data['efectivo_venta'];
         $dto['amount']              =   $data['importe_venta'];
         $dto['balance']             =   $data['balance'];

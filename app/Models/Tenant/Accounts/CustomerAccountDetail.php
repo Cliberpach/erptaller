@@ -20,6 +20,8 @@ class CustomerAccountDetail extends Model
         'img_route',
         'total',
         'payment_method_id',
+        'bank_account_id',
+        'operation_number',
         'cash',
         'amount',
         'balance',
