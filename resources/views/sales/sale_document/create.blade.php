@@ -647,7 +647,11 @@
                     },
                     {
                         data: 'code_bar',
-                        name: 'code_bar'
+                        name: 'code_bar',
+                        // Columna oculta SOLO en presentación (más espacio al NOMBRE).
+                        // visible:false NO toca searchable -> el servidor sigue buscando por
+                        // code_bar: la pistola/escaneo de código de barras sigue funcionando.
+                        visible: false
                     },
                 ],
                 pageLength: 25,
