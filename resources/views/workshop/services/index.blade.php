@@ -7,10 +7,14 @@
 @section('content')
     @include('workshop.services.modals.mdl_create_service')
     @include('workshop.services.modals.mdl_edit_service')
+    @include('workshop.services.modals.mdl_import_service')
     <div class="card overflow-hidden">
         <div class="card-header d-flex align-items-center justify-content-between">
             <h6 class="card-title mb-0">LISTA DE SERVICIOS</h6>
             <div class="d-flex flex-wrap gap-2">
+                <a onclick="openMdlImportServicio()" class="btn btn-success text-white">
+                    <i class="fas fa-file-import"></i> IMPORTAR
+                </a>
                 <a onclick="openMdlCreateMarca()" class="btn btn-primary text-white">
                     <i class="fas fa-plus-circle"></i> NUEVO
                 </a>
@@ -46,6 +50,7 @@
         function events() {
             eventsMdlCreateService();
             eventsMdlEditService();
+            eventsMdlImportarServicios();
         }
 
         function iniciarDtServices() {
