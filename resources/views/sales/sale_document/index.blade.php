@@ -335,9 +335,10 @@
                             }
 
                             // ===== Acciones por tipo de documento (SOLO UI, sin lógica aún) =====
-                            // NV -> Convertir + Anular ; Boleta(03)/Factura(01) -> Generar Guía + Anular.
+                            // Documento INTERNO (NV legacy + TICKET '50') -> Convertir + Anular.
+                            // Boleta(03)/Factura(01) -> Generar Guía + Anular (fiscal, no Convertir).
                             // Los onclick llaman a accionProximamente() (toast). NO hay rutas/backend todavía.
-                            if (data.type_sale_code === 'NV') {
+                            if (['NV', '50'].includes(data.type_sale_code)) {
                                 acciones += `<li>
                                                 <a class="dropdown-item" href="javascript:void(0);" onclick="accionProximamente('Convertir')">
                                                     <i class="fa-solid fa-right-left text-info"></i> Convertir
