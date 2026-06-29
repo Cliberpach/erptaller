@@ -64,6 +64,17 @@
             <span class="phone_error msgError text-danger"></span>
         </div>
 
+        {{-- Kardex de Cuenta: saldo guardado (punto de partida del kardex). Default 0. --}}
+        <div class="col-12 mb-3">
+            <label for="saldo" class="form-label fw-bold">Saldo actual</label>
+            <div class="input-group">
+                <span class="input-group-text"><i class="fas fa-wallet"></i></span>
+                <input id="saldo" name="saldo" type="number" step="0.01" min="0" value="0" class="form-control"
+                    placeholder="0.00" aria-label="Saldo">
+            </div>
+            <span class="saldo_error msgError text-danger"></span>
+        </div>
+
         <div class="col-12 mb-3">
             <label for="bank_id" class="form-label fw-bold required_field">Banco</label>
             <div class="input-group">

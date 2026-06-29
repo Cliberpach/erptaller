@@ -56,6 +56,9 @@ class BankAccountStoreRequest extends FormRequest
                 'nullable',
                 'regex:/^\d{1,20}$/',
             ],
+
+            // Kardex de Cuenta: saldo guardado de la cuenta (punto de partida del kardex).
+            'saldo' => ['nullable', 'numeric', 'min:0'],
         ];
     }
 

@@ -59,6 +59,7 @@
         document.querySelector('#account_number_edit').value = rowEditar.account_number;
         document.querySelector('#cci_edit').value = rowEditar.cci;
         document.querySelector('#phone_edit').value = rowEditar.phone;
+        document.querySelector('#saldo_edit').value = rowEditar.saldo ?? 0;
         $('#bank_id_edit').val(rowEditar.bank_id).trigger('change');
 
         $('#mdlEditCuenta').modal('show');

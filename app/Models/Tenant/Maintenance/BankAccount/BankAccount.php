@@ -21,6 +21,7 @@ class BankAccount extends Model
         'phone',
         'holder',
         'currency',
+        'saldo',
 
         'creator_user_id',
         'editor_user_id',

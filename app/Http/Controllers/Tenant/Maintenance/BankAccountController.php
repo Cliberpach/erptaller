@@ -33,7 +33,8 @@ class BankAccountController extends Controller
                 'c.account_number', // nro_cuenta
                 'c.cci',            // cci
                 'c.phone',          // celular
-                'c.currency'        // moneda
+                'c.currency',       // moneda
+                'c.saldo'           // saldo (kardex de cuenta)
             )
             ->where('status', '<>', 'ANULADO'); // estado
 
