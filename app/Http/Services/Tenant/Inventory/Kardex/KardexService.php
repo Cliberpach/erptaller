@@ -31,6 +31,16 @@ class KardexService
         $this->s_repository->insertKardex($dto);
     }
 
+    /**
+     * Anulación de venta interna: kardex ENTRADA (devolución), espejo invertido de la
+     * SALIDA de la emisión. Mismas filas (wh/prod/qty/precios), atadas por sale_id.
+     */
+    public function storeFromSaleAnulacion(Sale $sale)
+    {
+        $dto    =   $this->s_dto->getDtoFromSaleAnulacion($sale);
+        $this->s_repository->insertKardex($dto);
+    }
+
     public function storeFromPurchase(PurchaseDocument $purchase)
     {
         $dto    =   $this->s_dto->getDtoFromPurchase($purchase);

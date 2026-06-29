@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Controllers\FormatController;
 use App\Http\Controllers\UtilController;
 use App\Http\Requests\Sale\SaleStoreRequest;
+use App\Http\Services\Tenant\Sale\Sale\SaleAnnulmentService;
 use App\Http\Services\Tenant\Sale\Sale\SaleManager;
 use App\Models\Company;
 use App\Models\CompanyInvoice;
@@ -44,6 +45,8 @@ class SaleController extends Controller
             'fecha_inicio' => now()->startOfMonth()->toDateString(),
             'fecha_fin'    => now()->toDateString(),
             'esAdmin'      => $esAdmin,
+            // Gate del ítem "Anular" en el menú ⋮ (además del candado en la ruta).
+            'puedeAnular'  => auth()->user()->can('ventas.anular'),
             // Filtro Vendedor: solo admin. Lista = usuarios con rol ventas.
             'vendedores'   => $esAdmin
                 ? \App\Models\User::role('ventas')->orderBy('name')->get(['id', 'name'])
@@ -80,12 +83,15 @@ class SaleController extends Controller
                           JOIN payment_methods pm ON pm.id = sdp.payment_method_id
                           WHERE sdp.sale_document_id = sd.id) AS metodo_pago"),
                 'sd.sunat_status',
+                'sd.status',
                 'sd.type_sale_code',
+                'sd.payment_condition_name',
                 'sd.ruta_xml',
                 'sd.ruta_cdr',
                 'sd.payment_status'
-            )
-            ->where('sd.sunat_status', '!=', 'ANULADO');
+            );
+            // Antes había un hard filter (sunat_status != ANULADO). Se quitó: los anulados
+            // ahora SE VEN en el index con badge ANULADO (estado real en sd.status).
 
         // VISIBILIDAD POR ROL (backend, blindado):
         // - admin: ve TODAS las ventas (de todas las sedes, todos los vendedores).
@@ -289,6 +295,25 @@ array:10 [ // app\Http\Controllers\Tenant\SaleController.php:202
         } catch (Throwable $th) {
             DB::rollBack();
             return response()->json(['success' => false, 'message' => $th->getMessage(), 'line' => $th->getLine(), 'file' => $th->getFile()]);
+        }
+    }
+
+    /**
+     * Anular un documento INTERNO (Ticket / NV legacy) CONTADO: revierte stock + kardex
+     * y marca status=ANULADO con auditoría. Permiso can:ventas.anular (en la ruta).
+     */
+    public function anular(Request $request, $id)
+    {
+        try {
+            $reason = $request->input('reason');
+            $sale   = (new SaleAnnulmentService())->anular((int) $id, $reason);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'VENTA ANULADA: ' . $sale->serie . '-' . $sale->correlative,
+            ]);
+        } catch (Throwable $th) {
+            return response()->json(['success' => false, 'message' => $th->getMessage()]);
         }
     }
 

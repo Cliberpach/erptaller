@@ -125,6 +125,8 @@
 @section('js')
     <script>
         let dtSales = null;
+        // Gate del ítem Anular (además del candado en la ruta can:ventas.anular).
+        const puedeAnular = @json($puedeAnular);
 
         document.addEventListener('DOMContentLoaded', () => {
             loadTomSelect();
@@ -239,6 +241,12 @@
                         data: null,
                         render: function(data, type, row) {
 
+                            // Anulada (estado real en sd.status) -> badge rojo ANULADO,
+                            // sin importar el sunat_status.
+                            if (data.status === 'ANULADO') {
+                                return `<span class="badge bg-danger">ANULADO</span>`;
+                            }
+
                             let badge_class = '';
 
                             if (data.sunat_status === 'PENDIENTE') {
@@ -339,16 +347,21 @@
                             // Boleta(03)/Factura(01) -> Generar Guía + Anular (fiscal, no Convertir).
                             // Los onclick llaman a accionProximamente() (toast). NO hay rutas/backend todavía.
                             if (['NV', '50'].includes(data.type_sale_code)) {
+                                // Convertir: aún placeholder (lógica en su propio paso).
                                 acciones += `<li>
                                                 <a class="dropdown-item" href="javascript:void(0);" onclick="accionProximamente('Convertir')">
                                                     <i class="fa-solid fa-right-left text-info"></i> Convertir
                                                 </a>
                                             </li>`;
-                                acciones += `<li>
-                                                <a class="dropdown-item text-danger" href="javascript:void(0);" onclick="accionProximamente('Anular')">
-                                                    <i class="fa-solid fa-ban"></i> Anular
-                                                </a>
-                                            </li>`;
+                                // Anular: REAL. Solo si tiene permiso + está ACTIVO + es CONTADO
+                                // (crédito interno -> próximamente; el server también lo valida).
+                                if (puedeAnular && data.status === 'ACTIVO' && data.payment_condition_name === 'CONTADO') {
+                                    acciones += `<li>
+                                                    <a class="dropdown-item text-danger" href="javascript:void(0);" onclick="anularVenta(${data.id})">
+                                                        <i class="fa-solid fa-ban"></i> Anular
+                                                    </a>
+                                                </li>`;
+                                }
                             }
 
                             if (data.type_sale_code === '03' || data.type_sale_code === '01') {
@@ -418,11 +431,72 @@
             window.location.href = route;
         }
 
-        // Placeholder: las acciones Convertir/Anular/Generar Guía aún no tienen lógica.
+        // Placeholder: las acciones Convertir/Generar Guía aún no tienen lógica.
         // Solo avisan "Próximamente" (no navegan, no llaman backend). Cada una se
         // implementará por separado en su propio paso.
         function accionProximamente(nombre) {
             toastr.info(nombre + ': próximamente', 'EN CONSTRUCCIÓN');
+        }
+
+        // Anular documento interno (Ticket / NV) CONTADO: confirma + motivo opcional ->
+        // POST -> revierte stock + marca ANULADO -> recarga la tabla.
+        function anularVenta(sale_document_id) {
+            const sale = getRowById(dtSales, sale_document_id);
+
+            Swal.fire({
+                title: '¿Anular la venta?',
+                html: `Documento: <b>${sale.serie}-${sale.correlative}</b><br>` +
+                      `<span class="text-muted">Esto devuelve el stock al almacén. No se puede deshacer.</span>`,
+                icon: 'warning',
+                input: 'text',
+                inputLabel: 'Motivo (opcional)',
+                inputPlaceholder: 'Ej. error de digitación',
+                showCancelButton: true,
+                confirmButtonText: 'Sí, anular',
+                cancelButtonText: 'No',
+                reverseButtons: true,
+                customClass: {
+                    confirmButton: 'btn btn-danger me-2',
+                    cancelButton: 'btn btn-secondary'
+                },
+                buttonsStyling: false
+            }).then(async (result) => {
+                if (!result.isConfirmed) return;
+
+                Swal.fire({
+                    title: 'Anulando...',
+                    html: `Anulando ${sale.serie}-${sale.correlative}...`,
+                    allowOutsideClick: false,
+                    didOpen: () => Swal.showLoading()
+                });
+
+                try {
+                    const token = document.querySelector('input[name="_token"]').value;
+                    let url = @json(route('tenant.ventas.comprobante_venta.anular', ['id' => ':id']));
+                    url = url.replace(':id', sale_document_id);
+
+                    const formData = new FormData();
+                    formData.append('reason', result.value || '');
+
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: { 'X-CSRF-TOKEN': token },
+                        body: formData
+                    });
+                    const res = await response.json();
+                    Swal.close();
+
+                    if (res.success) {
+                        dtSales.ajax.reload(null, false);
+                        toastr.success(res.message, 'OPERACIÓN COMPLETADA');
+                    } else {
+                        toastr.error(res.message, 'NO SE PUDO ANULAR');
+                    }
+                } catch (error) {
+                    Swal.close();
+                    toastr.error(error, 'ERROR EN LA PETICIÓN ANULAR');
+                }
+            });
         }
 
         function sendSunat(sale_document_id) {

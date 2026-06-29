@@ -93,6 +93,21 @@ class KardexDto
         return $dto;
     }
 
+    /**
+     * Kardex de ANULACIÓN de venta interna: mismas filas que getDtoFromSale (wh, prod,
+     * qty, precios, document_serie = serie-correlative, sale_id) pero type = 'ENTRADA'
+     * (la devolución es el espejo invertido de la SALIDA de la emisión).
+     */
+    public function getDtoFromSaleAnulacion(Sale $sale)
+    {
+        $dto    =   $this->getDtoFromSale($sale);
+        foreach ($dto as &$row) {
+            $row['type']    =   'ENTRADA';
+        }
+
+        return $dto;
+    }
+
     public function getDtoFromPurchase(PurchaseDocument $purchase)
     {
         $dto            =   [];
