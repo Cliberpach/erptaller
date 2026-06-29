@@ -38,6 +38,13 @@
     #mdlCreateCustomer {
         z-index: 9999;
     }
+
+    /* El modal está en z-index 9999; SweetAlert2 por defecto (~1060) queda detrás.
+       Subimos SOLO los swal de este modal (clase propia) por encima -> la
+       confirmación/loading aparecen sobre el modal. NO toca el z-index global. */
+    .swal-sobre-modal {
+        z-index: 10600 !important;
+    }
 </style>
 
 <script>
@@ -316,7 +323,8 @@
         const swalWithBootstrapButtons = Swal.mixin({
             customClass: {
                 confirmButton: "btn btn-success",
-                cancelButton: "btn btn-danger"
+                cancelButton: "btn btn-danger",
+                container: "swal-sobre-modal" // por encima del modal (z-index 9999)
             },
             buttonsStyling: false
         });
@@ -342,6 +350,7 @@
                     title: 'Cargando...',
                     html: 'Registrando nuevo cliente...',
                     allowOutsideClick: false,
+                    customClass: { container: 'swal-sobre-modal' }, // sobre el modal
                     didOpen: () => {
                         Swal.showLoading();
                     }
