@@ -27,7 +27,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                <button class="btn btn-primary" type="submit" form="formImportarServicios">
+                <button id="btnImportarServicios" class="btn btn-primary" type="submit" form="formImportarServicios" disabled>
                     <i class="fa-solid fa-upload"></i> Importar
                 </button>
             </div>
@@ -36,16 +36,44 @@
 </div>
 
 <script>
+    // Flag de defensa REAL contra doble carga: aunque el botón se deshabilite,
+    // este guard impide que una segunda invocación dispare otra petición.
+    let importarServiciosEnCurso = false;
+
     function eventsMdlImportarServicios() {
         document.querySelector('#formImportarServicios').addEventListener('submit', (e) => {
             e.preventDefault();
             importarServiciosExcel();
         });
+
+        // El botón solo se habilita cuando hay un archivo seleccionado.
+        document.querySelector('#inputImportExcelServicios').addEventListener('change', () => {
+            toggleBtnImportarServicios();
+        });
+    }
+
+    function toggleBtnImportarServicios() {
+        const input = document.querySelector('#inputImportExcelServicios');
+        const btn = document.querySelector('#btnImportarServicios');
+        btn.disabled = importarServiciosEnCurso || input.files.length === 0;
+    }
+
+    function setBtnImportarServiciosCargando(cargando) {
+        const btn = document.querySelector('#btnImportarServicios');
+        if (cargando) {
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Importando...';
+        } else {
+            btn.innerHTML = '<i class="fa-solid fa-upload"></i> Importar';
+            toggleBtnImportarServicios();
+        }
     }
 
     function openMdlImportServicio() {
         document.getElementById('reporteImportServicios').innerHTML = '';
         document.getElementById('inputImportExcelServicios').value = '';
+        importarServiciosEnCurso = false;
+        setBtnImportarServiciosCargando(false); // queda deshabilitado (sin archivo)
         $('#mdlImportServicio').modal('show');
     }
 
@@ -54,18 +82,22 @@
     }
 
     async function importarServiciosExcel() {
+        // Guard anti-doble-click: si ya hay una importación en curso, no dispara otra.
+        if (importarServiciosEnCurso) return;
+
         const input = document.querySelector('#inputImportExcelServicios');
         if (input.files.length === 0) {
             toastr.error('DEBE CARGAR UN EXCEL PARA PROCEDER CON LA IMPORTACIÓN');
             return;
         }
 
+        importarServiciosEnCurso = true;
+        setBtnImportarServiciosCargando(true);
+
         const token = document.querySelector('input[name="_token"]').value;
         const formData = new FormData(document.querySelector('#formImportarServicios'));
         formData.append('servicios_import_excel', input.files[0]);
         const url = @json(route('tenant.taller.servicios.import-excel'));
-
-        Swal.fire({ title: 'Cargando...', html: 'Importando servicios ...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
 
         try {
             const response = await fetch(url, { method: 'POST', headers: { 'X-CSRF-TOKEN': token }, body: formData });
@@ -73,22 +105,26 @@
 
             if (response.status === 422) {
                 if ('errors' in res) paintValidationErrors(res.errors, 'error');
-                Swal.close();
-                return;
+                return; // error de validación: NO se limpia el archivo
             }
 
             pintarReporteServicios(res);
 
             if (res.success) {
-                toastr.success(res.message, 'OPERACIÓN COMPLETADA');
-                dtServices.ajax.reload(null, false);
+                const n = (res.resultado && res.resultado.validos) ? res.resultado.validos.length : 0;
+                toastr.success(`Importación completada: ${n} servicio(s) creado(s).`, 'OPERACIÓN COMPLETADA');
+                input.value = '';                       // limpia el campo solo en éxito
+                dtServices.ajax.reload(null, false);    // refresca la tabla con los nuevos
             } else {
+                // Import abortado (error de formato): se muestra el reporte en rojo y
+                // NO se limpia el archivo, para que el usuario corrija y reintente.
                 toastr.warning(res.message, 'IMPORTACIÓN NO COMPLETADA');
             }
         } catch (error) {
             toastr.error(error, 'ERROR EN LA PETICIÓN IMPORTAR EXCEL');
         } finally {
-            Swal.close();
+            importarServiciosEnCurso = false;
+            setBtnImportarServiciosCargando(false); // re-habilita segun haya o no archivo
         }
     }
 
@@ -100,6 +136,13 @@
         const duplicados = r.duplicados || [];
         const validos = r.validos || [];
         let html = '';
+
+        // Encabezado-resumen siempre visible: creados (verde) · omitidos (ámbar) · errores (rojo).
+        html += `<div class="d-flex flex-wrap gap-2 mb-2">
+                    <span class="badge bg-success">✓ ${validos.length} creado(s)</span>
+                    <span class="badge bg-warning text-dark">⊘ ${duplicados.length} omitido(s)</span>
+                    <span class="badge bg-danger">✕ ${errores.length} error(es)</span>
+                 </div>`;
 
         if (errores.length > 0) {
             html += `<div class="alert alert-danger">
