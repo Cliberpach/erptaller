@@ -23,7 +23,7 @@ class PaymentMethodSeeder extends Seeder
             'description' => 'PLIN',
         ]);
         PaymentMethod::create([
-            'description' => 'BIM',
+            'description' => 'POS',
         ]);
 
     }
