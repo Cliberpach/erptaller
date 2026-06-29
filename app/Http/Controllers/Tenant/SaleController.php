@@ -137,7 +137,8 @@ class SaleController extends Controller
         $provinces      =   DB::select('select * from provinces');
 
         $company_invoice    =   CompanyInvoice::find(1);
-        $invoice_types      =   UtilController::getInvoiceTypes();
+        // Combo de venta: solo BOLETA/FACTURA/TICKET (NV/NC/ND/Guía no se crean acá).
+        $invoice_types      =   UtilController::getInvoiceTypesVenta();
         $payment_methods    =   PaymentMethod::where('estado', 'ACTIVO')->get();
         $customer_formatted =   FormatController::getFormatInitialCustomer(1);
         $payment_conditions =   UtilController::getPaymentConditions();

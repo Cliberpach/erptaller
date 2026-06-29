@@ -8,7 +8,7 @@
 
             <select class="form-control" id="type_sale" name="type_sale" required>
                 @foreach ($invoice_types as $item)
-                    <option @if ($item->name === 'NOTA DE VENTA') selected @endif value="{{ $item->id }}">
+                    <option @if ($item->name === 'TICKET') selected @endif value="{{ $item->id }}">
                         {{ $item->name }}</option>
                 @endforeach
             </select>

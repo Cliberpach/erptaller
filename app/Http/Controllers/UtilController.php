@@ -230,6 +230,20 @@ class UtilController extends Controller
         return $invoice_types;
     }
 
+    /**
+     * Tipos de comprobante OFRECIBLES en "crear venta": solo BOLETA (03), FACTURA (01)
+     * y TICKET (50, documento interno). Excluye NOTA DE VENTA / NC / ND / GUÍA (no se
+     * crean acá: NC/ND son ajustes, Guía es traslado, NV se reemplaza por TICKET).
+     * getInvoiceTypes() (los 7) queda INTACTO para la config de series.
+     */
+    public static function getInvoiceTypesVenta()
+    {
+        return GeneralTableDetail::where('general_table_id', 4)
+            ->where('status', 'ACTIVO')
+            ->whereIn('symbol', ['03', '01', '50'])
+            ->get();
+    }
+
     public function isActiveInvoiceType(int $id)
     {
         try {
