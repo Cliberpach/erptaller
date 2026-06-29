@@ -21,7 +21,47 @@
 <script>
     let rowEditarSede = null;
 
+    // Ubigeo de la sede = 3 selects encadenados (mismo mecanismo que Registrar Cliente).
+    // dropdownParent al modal de EDICIÓN (que no se abra detrás del modal).
+    function iniciarSelect2SedeEdit() {
+        $('.select2_form_sede_edit').select2({
+            theme: 'bootstrap-5',
+            width: '100%',
+            placeholder: 'Seleccionar',
+            dropdownParent: $('#mdlEditSede'),
+        });
+    }
+
+    function changeDepartmentSedeEdit(department_id) {
+        const lstProvinces = @json($provinces);
+        $('#province_edit').empty().append(new Option('Seleccionar', '', false, false));
+        $('#ubigeo_edit').empty().append(new Option('Seleccionar', '', false, false)).trigger('change');
+
+        if (department_id) {
+            department_id = String(department_id).padStart(2, '0');
+            lstProvinces
+                .filter((p) => p.department_id == department_id)
+                .forEach((p) => $('#province_edit').append(new Option(p.name, p.id, false, false)));
+        }
+        $('#province_edit').trigger('change');
+    }
+
+    function changeProvinceSedeEdit(province_id) {
+        const lstDistricts = @json($districts);
+        $('#ubigeo_edit').empty().append(new Option('Seleccionar', '', false, false));
+
+        if (province_id) {
+            province_id = String(province_id).padStart(4, '0');
+            lstDistricts
+                .filter((d) => d.province_id == province_id)
+                .forEach((d) => $('#ubigeo_edit').append(new Option(d.name, d.id, false, false)));
+        }
+        $('#ubigeo_edit').trigger('change');
+    }
+
     function eventsMdlEditSede() {
+        iniciarSelect2SedeEdit();
+
         document.querySelector('#formActualizarSede').addEventListener('submit', (e) => {
             e.preventDefault();
             actualizarSede();
@@ -29,6 +69,9 @@
 
         $('#mdlEditSede').on('hidden.bs.modal', function () {
             document.querySelector('#formActualizarSede').reset();
+            $('#province_edit').empty().append(new Option('Seleccionar', '', false, false));
+            $('#ubigeo_edit').empty().append(new Option('Seleccionar', '', false, false));
+            $('.select2_form_sede_edit').val('').trigger('change');
             clearValidationErrors('msgError_edit');
         });
     }
@@ -46,7 +89,26 @@
         document.querySelector('#codigo_edit').value    = rowEditarSede.codigo;
         document.querySelector('#direccion_edit').value = rowEditarSede.direccion ?? '';
         document.querySelector('#telefono_edit').value  = rowEditarSede.telefono ?? '';
-        document.querySelector('#ubigeo_edit').value    = rowEditarSede.ubigeo ?? '';
+
+        // Descomponer el ubigeo guardado (6 díg) y preseleccionar los 3 selects:
+        // dep = primeros 2, prov = primeros 4, distrito = los 6 (= ubigeo).
+        const ubigeo = rowEditarSede.ubigeo ?? '';
+        if (ubigeo && ubigeo.length === 6) {
+            const dep  = ubigeo.substring(0, 2);
+            const prov = ubigeo.substring(0, 4);
+            const dist = ubigeo;
+
+            $('#department_edit').val(dep).trigger('change');
+            changeDepartmentSedeEdit(dep);   // carga provincias
+            $('#province_edit').val(prov).trigger('change');
+            changeProvinceSedeEdit(prov);    // carga distritos
+            $('#ubigeo_edit').val(dist).trigger('change');
+        } else {
+            // Sin ubigeo: limpiar los 3.
+            $('#department_edit').val('').trigger('change');
+            $('#province_edit').empty().append(new Option('Seleccionar', '', false, false)).trigger('change');
+            $('#ubigeo_edit').empty().append(new Option('Seleccionar', '', false, false)).trigger('change');
+        }
 
         $('#mdlEditSede').modal('show');
     }

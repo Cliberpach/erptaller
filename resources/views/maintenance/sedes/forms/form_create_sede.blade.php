@@ -41,13 +41,33 @@
             <span class="telefono_error msgError" style="color:red;"></span>
         </div>
 
-        <div class="col-lg-6 col-md-6 col-sm-12 mb-3">
-            <label for="ubigeo" style="font-weight: bold;">Ubigeo</label>
-            <div class="input-group">
-                <span class="input-group-text"><i class="fa-solid fa-map"></i></span>
-                <input id="ubigeo" name="ubigeo" type="text" class="form-control"
-                    style="background-color:#FFF9C4;" placeholder="Ubigeo (6 dígitos)">
-            </div>
+        {{-- Ubigeo: 3 selects encadenados (mismo patrón que Registrar Cliente).
+             Solo el distrito se persiste -> name="ubigeo" (código de 6 dígitos). --}}
+        <div class="col-lg-4 col-md-4 col-sm-12 mb-3">
+            <label for="department" style="font-weight: bold;">Departamento</label>
+            <select name="department" class="form-select select2_form_sede" id="department"
+                data-placeholder="Seleccionar" onchange="changeDepartmentSede(this.value)">
+                <option value="">Seleccionar</option>
+                @foreach ($departments as $department)
+                    <option value="{{ $department->id }}">{{ $department->name }}</option>
+                @endforeach
+            </select>
+        </div>
+
+        <div class="col-lg-4 col-md-4 col-sm-12 mb-3">
+            <label for="province" style="font-weight: bold;">Provincia</label>
+            <select name="province" class="form-select select2_form_sede" id="province"
+                data-placeholder="Seleccionar" onchange="changeProvinceSede(this.value)">
+                <option value="">Seleccionar</option>
+            </select>
+        </div>
+
+        <div class="col-lg-4 col-md-4 col-sm-12 mb-3">
+            <label for="ubigeo" style="font-weight: bold;">Distrito</label>
+            <select name="ubigeo" class="form-select select2_form_sede" id="ubigeo"
+                data-placeholder="Seleccionar">
+                <option value="">Seleccionar</option>
+            </select>
             <span class="ubigeo_error msgError" style="color:red;"></span>
         </div>
     </div>

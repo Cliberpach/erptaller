@@ -7,6 +7,9 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Tenant\Maintenance\Sede\SedeStoreRequest;
 use App\Http\Requests\Tenant\Maintenance\Sede\SedeUpdateRequest;
 use App\Http\Requests\Tenant\Maintenance\Sede\SerieUpdateRequest;
+use App\Models\Department;
+use App\Models\District;
+use App\Models\Province;
 use App\Models\Tenant\DocumentSerialization;
 use App\Models\Tenant\Sede;
 use Illuminate\Http\Request;
@@ -37,7 +40,13 @@ class SedeController extends Controller
 
     public function index()
     {
-        return view('maintenance.sedes.index');
+        // Ubigeo como 3 selects encadenados (mismo mecanismo que Registrar Cliente):
+        // data precargada + cascada/filtrado en JS. Solo se persiste el distrito (ubigeo).
+        return view('maintenance.sedes.index', [
+            'departments' => Department::all(),
+            'provinces'   => Province::all(),
+            'districts'   => District::all(),
+        ]);
     }
 
     public function getSedes(Request $request)

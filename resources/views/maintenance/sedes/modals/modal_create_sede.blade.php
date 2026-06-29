@@ -19,7 +19,47 @@
 </div>
 
 <script>
+    // Ubigeo de la sede = 3 selects encadenados (mismo mecanismo que Registrar Cliente):
+    // data precargada + filtrado en JS. dropdownParent al modal de creación.
+    function iniciarSelect2Sede() {
+        $('.select2_form_sede').select2({
+            theme: 'bootstrap-5',
+            width: '100%',
+            placeholder: 'Seleccionar',
+            dropdownParent: $('#mdlCreateSede'),
+        });
+    }
+
+    function changeDepartmentSede(department_id) {
+        const lstProvinces = @json($provinces);
+        $('#province').empty().append(new Option('Seleccionar', '', false, false));
+        $('#ubigeo').empty().append(new Option('Seleccionar', '', false, false)).trigger('change');
+
+        if (department_id) {
+            department_id = String(department_id).padStart(2, '0');
+            lstProvinces
+                .filter((p) => p.department_id == department_id)
+                .forEach((p) => $('#province').append(new Option(p.name, p.id, false, false)));
+        }
+        $('#province').trigger('change');
+    }
+
+    function changeProvinceSede(province_id) {
+        const lstDistricts = @json($districts);
+        $('#ubigeo').empty().append(new Option('Seleccionar', '', false, false));
+
+        if (province_id) {
+            province_id = String(province_id).padStart(4, '0');
+            lstDistricts
+                .filter((d) => d.province_id == province_id)
+                .forEach((d) => $('#ubigeo').append(new Option(d.name, d.id, false, false)));
+        }
+        $('#ubigeo').trigger('change');
+    }
+
     function eventsMdlCreateSede() {
+        iniciarSelect2Sede();
+
         document.querySelector('#formRegistrarSede').addEventListener('submit', (e) => {
             e.preventDefault();
             registrarSede();
@@ -27,6 +67,10 @@
 
         $('#mdlCreateSede').on('hidden.bs.modal', function () {
             document.querySelector('#formRegistrarSede').reset();
+            // Reset de los selects de ubigeo (select2 no se limpia con form.reset()).
+            $('#province').empty().append(new Option('Seleccionar', '', false, false));
+            $('#ubigeo').empty().append(new Option('Seleccionar', '', false, false));
+            $('.select2_form_sede').val('').trigger('change');
             clearValidationErrors('msgError');
         });
     }
