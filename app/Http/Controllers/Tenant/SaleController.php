@@ -58,6 +58,7 @@ class SaleController extends Controller
         $end_date       =   $request->get('end_date');
         $status         =   $request->get('status');
         $seller_id      =   $request->get('seller_id');
+        $plate          =   $request->get('plate');
 
         $esAdmin = auth()->user()->hasRole('admin');
 
@@ -110,6 +111,10 @@ class SaleController extends Controller
         }
         if ($status) {
             $sales->where('sd.sunat_status', $status);
+        }
+        // Filtro Placa (taller): búsqueda parcial sobre sales_documents.plate.
+        if ($plate) {
+            $sales->where('sd.plate', 'like', '%' . $plate . '%');
         }
 
         return DataTables::of($sales)->make(true);

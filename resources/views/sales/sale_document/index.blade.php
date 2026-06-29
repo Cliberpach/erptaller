@@ -58,6 +58,15 @@
                     <input type="date" class="form-control" id="end_date" name="end_date" value="{{ $fecha_fin }}">
                 </div>
 
+                <!-- Placa -->
+                <div class="col-lg-2 col-md-3 col-sm-6 col-xs-12 mb-2">
+                    <label class="form-label fw-bold">
+                        <i class="fas fa-car text-dark mr-1"></i> Placa:
+                    </label>
+                    <input type="text" class="form-control" id="plate" name="plate" placeholder="Ej. TXT-987"
+                        onkeydown="if(event.key==='Enter'){ filterData(); }">
+                </div>
+
                 <!-- Estado -->
                 <div class="col-lg-2 col-md-3 col-sm-12 col-xs-12 mb-2">
                     <label class="form-label fw-bold">
@@ -127,7 +136,11 @@
         }
 
         function loadTomSelect() {
-            window.clientSelect = new TomSelect('#customer_id', {
+            const customerEl = document.getElementById('customer_id');
+            // Guarda anti-doble-init: si ya es TomSelect, no re-inicializar.
+            if (!customerEl || customerEl.tomselect) return;
+
+            window.clientSelect = new TomSelect(customerEl, {
                 valueField: 'id',
                 labelField: 'full_name',
                 searchField: ['full_name'],
@@ -136,22 +149,14 @@
                 maxOptions: 20,
                 create: false,
                 preload: false,
-                onType: (str) => {
-                    lastCustomerQuery = str;
-                },
                 load: async (query, callback) => {
-                    if (!query.length) return callback();
+                    if (query.length < 3) return callback();
                     try {
                         const url = `{{ route('tenant.utils.searchCustomer') }}?q=${encodeURIComponent(query)}`;
                         const response = await fetch(url);
                         if (!response.ok) throw new Error('Error al buscar clientes');
                         const data = await response.json();
-                        const results = data.data ?? [];
-                        callback(results);
-                        if (results.length === 0) {
-                            customerParams.documentSearchCustomer = lastCustomerQuery;
-                            console.log("No se encontró en BD. Guardado:", window.typedCustomer);
-                        }
+                        callback(data.data ?? []);
                     } catch (error) {
                         console.error('Error cargando clientes:', error);
                         callback();
@@ -164,7 +169,13 @@
                             <small>${escape(item.email ?? '')}</small>
                         </div>
                     `,
-                    item: (item, escape) => `<div>${escape(item.full_name)}</div>`
+                    item: (item, escape) => `<div>${escape(item.full_name)}</div>`,
+                    no_results: (data, escape) => `
+                        <div class="no-results">
+                            <i class="fas fa-search" style="margin-right:6px; color:#17a2b8;"></i>
+                            Sin resultados
+                        </div>
+                    `
                 }
             });
         }
@@ -184,6 +195,7 @@
                         d.start_date = $('#start_date').val();
                         d.end_date = $('#end_date').val();
                         d.status = $('#status').val();
+                        d.plate = $('#plate').val();
                         // Filtro Vendedor solo existe para admin; no-admin no lo envía
                         // (y el backend lo ignora de todos modos: su query es fijo a su user).
                         d.seller_id = $('#seller_id').val() || '';
@@ -277,45 +289,14 @@
                         data: null,
                         render: function(data, type, row) {
 
+                            const urlPdf =
+                                "{{ route('tenant.ventas.comprobante_venta.pdf_voucher', ':id') }}".replace(
+                                    ':id', data.id);
                             const urlDownloadXml =
                                 "{{ route('tenant.ventas.comprobante_venta.downloadXml', ':id') }}".replace(
                                     ':id', data.id);
                             const urlDownloadCdr =
                                 "{{ route('tenant.ventas.comprobante_venta.downloadCdr', ':id') }}".replace(
-                                    ':id', data.id);
-
-                            let descargas =
-                                `<div style="display: flex; justify-content: flex-start; gap: 10px; flex-wrap: nowrap;">`;
-
-                            // PDF movido al menú de acciones (⋮). Descargas conserva XML/CDR.
-                            if (data.ruta_xml) {
-                                const asset_route = @json(asset(''));
-                                descargas += `<a class="btn btn-success" style="color:white; max-width: 150px; flex-shrink: 0;" href="${urlDownloadXml}" >
-                                                <i class="fa-solid fa-file-excel"></i> XML
-                                            </a>`;
-                            }
-
-                            if (data.ruta_cdr) {
-                                const asset_route = @json(asset(''));
-                                descargas += `<a class="btn btn-primary" style="color:white; max-width: 150px; flex-shrink: 0;" href="${urlDownloadCdr}">
-                                                <i class="fa-solid fa-book"></i> CDR
-                                            </a>`;
-                            }
-
-                            descargas += `</div>`;
-
-                            return descargas;
-                        },
-                        name: 'actions',
-                        orderable: false,
-                        searchable: false
-                    },
-                    {
-                        data: null,
-                        render: function(data, type, row) {
-
-                            const urlPdf =
-                                "{{ route('tenant.ventas.comprobante_venta.pdf_voucher', ':id') }}".replace(
                                     ':id', data.id);
 
                             let acciones = `
@@ -336,6 +317,23 @@
                                                 <i class="fa-solid fa-file-pdf text-danger"></i> PDF
                                             </a>
                                         </li>`;
+
+                            // XML/CDR movidos desde la columna Descargas (solo comprobantes SUNAT).
+                            if (data.ruta_xml) {
+                                acciones += `<li>
+                                                <a class="dropdown-item" href="${urlDownloadXml}">
+                                                    <i class="fa-solid fa-file-excel text-success"></i> XML
+                                                </a>
+                                            </li>`;
+                            }
+
+                            if (data.ruta_cdr) {
+                                acciones += `<li>
+                                                <a class="dropdown-item" href="${urlDownloadCdr}">
+                                                    <i class="fa-solid fa-book text-primary"></i> CDR
+                                                </a>
+                                            </li>`;
+                            }
 
                             if (data.type_sale_code === '09' || data.type_sale_code === '01') {
 

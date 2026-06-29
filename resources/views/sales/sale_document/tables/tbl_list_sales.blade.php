@@ -11,7 +11,6 @@
             <th>Sunat</th>
             <th>Pago</th>
             <th>Método</th>
-            <th style="text-align: center;">Descargas</th>
             <th>Acción</th>
         </tr>
     </thead>
