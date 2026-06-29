@@ -121,6 +121,10 @@
 
     function openMdlNewCustomer() {
 
+        // Preseleccionar el ubigeo de la sede activa en cada apertura (default editable).
+        // Va antes del bloque RUC: si se consulta un RUC, su ubigeo lo sobrescribe luego.
+        setDefaultData();
+
         if (isNumeric(customerParams.documentSearchCustomer) && customerParams.documentSearchCustomer) {
             //====== DNI ======
             if (customerParams.documentSearchCustomer.length === 8) {
@@ -414,19 +418,30 @@
         }
     }
 
+    // Ubigeo por defecto = el de la SEDE ACTIVA (heredado, EDITABLE). Mismo mecanismo de
+    // descomposición que el editar sede (Cambio 1): substring sobre el código de 6 díg
+    // (preserva ceros a la izquierda; NO usar parseInt). $sedeActiva lo comparte el
+    // middleware SetSedeActiva con todas las vistas. Si la sede no tiene ubigeo -> vacío.
     function setDefaultData() {
-        const department_id = parseInt(@json($company_invoice->department_id));
-        const province_id = parseInt(@json($company_invoice->province_id));
-        const district_id = parseInt(@json($company_invoice->district_id));
+        const ubigeo = @json(optional($sedeActiva)->ubigeo);
 
-        if (department_id && province_id && district_id) {
-            $('#department').val(department_id).trigger('change');
-            changeDepartment(department_id);
+        if (ubigeo && String(ubigeo).length === 6) {
+            const dep  = String(ubigeo).substring(0, 2);
+            const prov = String(ubigeo).substring(0, 4);
+            const dist = String(ubigeo);
 
-            $('#province').val(province_id).trigger('change');
-            changeProvince(province_id);
+            $('#department').val(dep).trigger('change');
+            changeDepartment(dep);            // carga provincias
 
-            $('#district').val(district_id).trigger('change');
+            $('#province').val(prov).trigger('change');
+            changeProvince(prov);             // carga distritos
+
+            $('#district').val(dist).trigger('change');
+        } else {
+            // Sede sin ubigeo: dejar los 3 selects vacíos (sin romper).
+            $('#department').val(null).trigger('change');
+            $('#province').empty().trigger('change');
+            $('#district').empty().trigger('change');
         }
     }
 </script>
