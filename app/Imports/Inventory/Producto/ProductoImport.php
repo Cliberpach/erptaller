@@ -31,7 +31,7 @@ class ProductoImport implements ToCollection, WithMultipleSheets
 
             // Validar encabezados
             if ($key === 0) {
-                $headers = ["NOMBRE", "CÓDIGO BARRAS", "CÓDIGO INTERNO", "CATEGORÍA", "MARCA", "PRECIO VENTA","PRECIO COMPRA", "STOCK MÍNIMO"];
+                $headers = ["NOMBRE", "CÓDIGO BARRAS", "CÓDIGO INTERNO", "CATEGORÍA", "MARCA", "PRECIO VENTA","PRECIO COMPRA", "STOCK MÍNIMO", "STOCK INICIAL"];
 
                 foreach ($headers as $index => $header) {
                     if (strtoupper(trim($row[$index])) !== $header) {
@@ -51,6 +51,8 @@ class ProductoImport implements ToCollection, WithMultipleSheets
             $precio_venta           = $row[5];
             $precio_compra          = $row[6];
             $stock_minimo           = $row[7];
+            // STOCK INICIAL (opcional): vacío -> 0. Numérico >= 0.
+            $stock_inicial          = (isset($row[8]) && trim((string) $row[8]) !== '') ? $row[8] : 0;
             $error                  = '';
 
 
@@ -108,6 +110,12 @@ class ProductoImport implements ToCollection, WithMultipleSheets
                 $error .= " El stock mínimo debe ser un valor numérico.";
             }
 
+            // STOCK INICIAL: numérico >= 0 (vacío ya quedó en 0).
+            if (!is_numeric($stock_inicial) || (float) $stock_inicial < 0) {
+                $con_errores = true;
+                $error .= " El stock inicial debe ser un número mayor o igual a 0.";
+            }
+
             $nombresProcesados[] = $nombre;
 
             $listadoProductos[] = [
@@ -121,6 +129,7 @@ class ProductoImport implements ToCollection, WithMultipleSheets
                 'precio_venta'          => $precio_venta,
                 'precio_compra'         => $precio_compra,
                 'stock_minimo'          => $stock_minimo,
+                'stock_inicial'         => $stock_inicial,
                 'error'                 => $error,
             ];
 

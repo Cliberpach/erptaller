@@ -232,7 +232,9 @@ array:1 [ // app\Http\Controllers\Tenant\ProductController.php:190
                         'description'       =>  null,
                         'sale_price'        =>  $producto_excel['precio_venta'],
                         'purchase_price'    =>  $producto_excel['precio_compra'],
-                        'stock'             =>  0,
+                        // STOCK INICIAL: ProductService::store rutea stock>0 -> Nota de Ingreso
+                        // (almacén 1 + kardex). Vacío/0 -> warehouse en 0, sin kardex.
+                        'stock'             =>  $producto_excel['stock_inicial'] ?? 0,
                         'stock_min'         =>  $producto_excel['stock_minimo'],
                         'code_factory'      =>  $producto_excel['codigo_interno'],
                         'code_bar'          =>  $producto_excel['codigo_barras'],
