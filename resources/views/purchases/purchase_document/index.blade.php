@@ -47,7 +47,7 @@
                     <label class="form-label fw-bold">
                         <i class="fas fa-calendar-alt text-success mr-1"></i> Fecha inicio:
                     </label>
-                    <input type="date" class="form-control" id="start_date" name="start_date">
+                    <input type="date" class="form-control" id="start_date" name="start_date" value="{{ $fecha_inicio }}">
                 </div>
 
                 <!-- Fecha Fin -->
@@ -55,7 +55,7 @@
                     <label class="form-label fw-bold">
                         <i class="fas fa-calendar-check text-danger mr-1"></i> Fecha fin:
                     </label>
-                    <input type="date" class="form-control" id="end_date" name="end_date">
+                    <input type="date" class="form-control" id="end_date" name="end_date" value="{{ $fecha_fin }}">
                 </div>
 
                 <!-- Estado -->
@@ -64,8 +64,8 @@
                         <i class="fas fa-tasks text-info mr-1"></i> Estado:
                     </label>
                     <select class="form-control" id="status" name="status">
-                        <option value="">Todo</option>
-                        <option selected value="PENDIENTE">Pendiente</option>
+                        <option selected value="">Todo</option>
+                        <option value="PENDIENTE">Pendiente</option>
                         <option value="PAGADO">Pagado</option>
                     </select>
                 </div>

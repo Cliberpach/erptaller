@@ -27,7 +27,12 @@ class PurchaseDocumentoController extends Controller
 
     public function index()
     {
-        return view('purchases.purchase_document.index');
+        return view('purchases.purchase_document.index', [
+            // Fechas por defecto = mes en curso, filtrando por delivery_date (fecha del
+            // documento de compra, no created_at/tipeo).
+            'fecha_inicio' => now()->startOfMonth()->toDateString(),
+            'fecha_fin'    => now()->toDateString(),
+        ]);
     }
 
     public function getPurchaseDocuments(Request $request)
@@ -68,10 +73,10 @@ class PurchaseDocumentoController extends Controller
             $items->where('pd.payment_status', $status);
         }
         if ($start_date) {
-            $items->whereDate('pd.created_at', '>=', $start_date);
+            $items->whereDate('pd.delivery_date', '>=', $start_date);
         }
         if ($end_date) {
-            $items->whereDate('pd.created_at', '<=', $end_date);
+            $items->whereDate('pd.delivery_date', '<=', $end_date);
         }
 
         return $items;
