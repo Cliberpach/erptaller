@@ -15,7 +15,6 @@ Route::group(["prefix" => "ventas"], function () {
         Route::get('index', [SaleController::class, 'index'])->name('tenant.ventas.comprobante_venta')->middleware('validar.plan:ventas');
         Route::get('create', [SaleController::class, 'create'])->name('tenant.ventas.comprobante_venta.create')->middleware('validar.plan:ventas');
         Route::get('getProductos', [SaleController::class, 'getProductos'])->name('tenant.ventas.comprobante_venta.getProductos')->middleware('validar.plan:ventas');
-        Route::get('payment-accounts/{method}', [SaleController::class, 'paymentAccounts'])->name('tenant.ventas.comprobante_venta.paymentAccounts')->middleware('validar.plan:ventas');
         Route::get('validateStock', [SaleController::class, 'validateStock'])->name('tenant.ventas.comprobante_venta.validateStock')->middleware('validar.plan:ventas');
         Route::post('store', [SaleController::class, 'store'])->name('tenant.ventas.comprobante_venta.store')->middleware(['validar.plan:ventas', 'can:ventas.crear']);
         Route::post('send_sunat', [SaleController::class, 'send_sunat'])->name('tenant.ventas.comprobante_venta.send_sunat')->middleware(['validar.plan:ventas', 'can:ventas.enviar_sunat']);

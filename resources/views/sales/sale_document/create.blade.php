@@ -360,7 +360,7 @@
             const opInput = document.querySelector(`.operation_pay[data-index="${index}"]`);
             if (!accSel || !opInput || !methodId) return;
 
-            const url = @json(route('tenant.ventas.comprobante_venta.paymentAccounts', ['method' => ':m'])).replace(':m', methodId);
+            const url = @json(route('tenant.utils.paymentAccounts', ['method' => ':m'])).replace(':m', methodId);
             try {
                 const res = await (await fetch(url)).json();
                 if (res.needs_account) {

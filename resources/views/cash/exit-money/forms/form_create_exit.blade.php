@@ -88,6 +88,22 @@
                 <p class="payment_method_id_error msgError"></p>
             </div>
 
+            <!-- PASO 4: cuenta de ORIGEN (dependiente del método; oculto si efectivo) -->
+            <div class="col-md-3" id="wrap_bank_account" style="display:none;">
+                <label for="bank_account_id" class="form-label">CUENTA DE ORIGEN</label>
+                <select name="bank_account_id" id="bank_account_id" class="form-control">
+                    <option value="">Seleccionar cuenta</option>
+                </select>
+                <p class="bank_account_id_error msgError"></p>
+            </div>
+
+            <!-- PASO 4: n° operación (opcional; oculto si efectivo) -->
+            <div class="col-md-3" id="wrap_operation_number" style="display:none;">
+                <label for="operation_number" class="form-label">N° OPERACIÓN</label>
+                <input type="text" name="operation_number" id="operation_number" class="form-control" placeholder="N° op.">
+                <p class="operation_number_error msgError"></p>
+            </div>
+
         </div>
 
         <!-- Botón para agregar detalles -->

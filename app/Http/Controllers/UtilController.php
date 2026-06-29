@@ -258,4 +258,33 @@ class UtilController extends Controller
         $data   =   GeneralTableDetail::where('general_table_id', 5)->get();
         return $data;
     }
+
+    /**
+     * PASO 4 (transversal): cuentas asociadas a un método (combo dependiente del cobro de
+     * venta y del egreso). Lee el pivote payment_method_accounts. EFECTIVO -> 0 cuentas.
+     * Label por método: YAPE/PLIN -> titular + celular; otros -> titular + n° cuenta.
+     */
+    public function paymentAccounts(int $method)
+    {
+        $metodo = DB::table('payment_methods')->where('id', $method)->first();
+        if (! $metodo) {
+            return response()->json(['needs_account' => false, 'data' => []]);
+        }
+
+        $cuentas = DB::table('bank_accounts as ba')
+            ->join('payment_method_accounts as pma', 'pma.bank_account_id', '=', 'ba.id')
+            ->where('pma.payment_method_id', $method)
+            ->where('ba.status', 'ACTIVO')
+            ->select('ba.id', 'ba.holder', 'ba.phone', 'ba.account_number')
+            ->get();
+
+        $usaCelular = in_array(strtoupper($metodo->description), ['YAPE', 'PLIN']);
+
+        $data = $cuentas->map(function ($c) use ($usaCelular) {
+            $detalle = $usaCelular ? ($c->phone ?? '') : ($c->account_number ?? '');
+            return ['id' => $c->id, 'label' => trim($c->holder . ' - ' . $detalle, ' -')];
+        })->values();
+
+        return response()->json(['needs_account' => $data->isNotEmpty(), 'data' => $data]);
+    }
 }

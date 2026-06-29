@@ -187,6 +187,8 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
 // P3: utils/* = lookups AJAX (product/customer/vehicle/etc.). Solo-auth (sin permiso),
 // pero ya NO quedan fuera de autenticación: requieren sesión válida.
 Route::group(["prefix" => "utils", 'middleware' => ['auth:sanctum', config('jetstream.auth_session'), 'verified']], function () {
+    // PASO 4 (transversal): combo de cuentas por método — lo usan el cobro de venta y el egreso.
+    Route::get('payment-accounts/{method}', [UtilController::class, 'paymentAccounts'])->name('tenant.utils.paymentAccounts');
     Route::get('cash-available-search', [PettyCashController::class, 'searchCashAvailable'])->name('tenant.utils.searchCashAvailable');
     Route::get('service-search', [ServiceController::class, 'searchService'])->name('tenant.utils.searchService');
     Route::get('product-search', [ProductController::class, 'searchProduct'])->name('tenant.utils.searchProduct');

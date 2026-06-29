@@ -60,7 +60,14 @@
         <p><strong>Fecha de emisión:</strong> {{ $exit_money->date }}</p>
         <p><strong>Razón del egreso:</strong> {{ $exit_money->reason }}</p>
         <p><strong>Proveedor:</strong> {{ $exit_money->supplier->name }}</p>
-        <p><strong>Tipo de pago:</strong> {{ $exit_money->payment_type }}</p>
+        {{-- PASO 4: método real (reemplaza payment_type deprecada) + cuenta origen + n° op --}}
+        <p><strong>Método de pago:</strong> {{ optional($exit_money->paymentMethod)->description ?? '-' }}</p>
+        @if ($exit_money->bank_account_id)
+            <p><strong>Cuenta de origen:</strong> {{ optional($exit_money->bankAccount)->holder }} - {{ optional($exit_money->bankAccount)->account_number }}</p>
+            @if ($exit_money->operation_number)
+                <p><strong>N° operación:</strong> {{ $exit_money->operation_number }}</p>
+            @endif
+        @endif
     </div>
 
     <h3>Detalles del Egreso</h3>

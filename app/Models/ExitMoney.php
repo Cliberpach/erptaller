@@ -14,13 +14,14 @@ class ExitMoney extends Model
         'proof_payment_id',
         'supplier_id',
         'user_id',
-        'payment_method_name',
         'number',
         'date',
         'reason',
         'total',
         'status',
         'payment_method_id',
+        'bank_account_id',
+        'operation_number',
         'petty_cash_book_id'
     ];
 
@@ -32,5 +33,16 @@ class ExitMoney extends Model
     public function proofPayment()
     {
         return $this->belongsTo(ProofPayment::class, 'proof_payment_id');
+    }
+
+    // PASO 4: método + cuenta de origen del egreso (para PDF y reporte de caja).
+    public function paymentMethod()
+    {
+        return $this->belongsTo(\App\Models\Tenant\PaymentMethod::class, 'payment_method_id');
+    }
+
+    public function bankAccount()
+    {
+        return $this->belongsTo(\App\Models\Tenant\Maintenance\BankAccount\BankAccount::class, 'bank_account_id');
     }
 }

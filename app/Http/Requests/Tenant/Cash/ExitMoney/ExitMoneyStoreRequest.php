@@ -29,6 +29,11 @@ class ExitMoneyStoreRequest extends FormRequest
                 'required',
                 Rule::exists('payment_methods', 'id')->where('estado', 'ACTIVO'),
             ],
+
+            // PASO 4: cuenta de origen (nullable = efectivo) + n° operación (opcional).
+            // El blindaje cuenta<->método se valida en el store (espejo del cobro).
+            'bank_account_id'   => ['nullable', Rule::exists('bank_accounts', 'id')->where('status', 'ACTIVO')],
+            'operation_number'  => ['nullable', 'string', 'max:100'],
         ];
     }
 

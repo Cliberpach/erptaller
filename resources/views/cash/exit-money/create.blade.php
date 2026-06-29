@@ -60,6 +60,13 @@
                 storeExitMoney(e.target);
             })
 
+            // PASO 4: combo de cuenta de ORIGEN dependiente del método (reusa utils/payment-accounts).
+            const methodSelect = document.getElementById('payment_method_id');
+            if (methodSelect) {
+                methodSelect.addEventListener('change', () => refreshAccountCombo(methodSelect.value));
+                refreshAccountCombo(methodSelect.value); // estado inicial
+            }
+
             proofPaymentSelect.addEventListener('change', function() {
                 const selectedProofPayment = proofPaymentSelect.options[proofPaymentSelect.selectedIndex]
                     .text;
@@ -332,6 +339,32 @@
                 });
 
             }
+        }
+
+        // PASO 4: carga las cuentas del método (utils/payment-accounts); muestra/oculta cuenta + n° op.
+        async function refreshAccountCombo(methodId) {
+            const wrapAcc = document.getElementById('wrap_bank_account');
+            const wrapOp = document.getElementById('wrap_operation_number');
+            const accSel = document.getElementById('bank_account_id');
+            const opInput = document.getElementById('operation_number');
+            if (!wrapAcc || !accSel || !methodId) return;
+
+            const url = @json(route('tenant.utils.paymentAccounts', ['method' => ':m'])).replace(':m', methodId);
+            try {
+                const res = await (await fetch(url)).json();
+                if (res.needs_account) {
+                    accSel.innerHTML = '<option value="">Seleccionar cuenta</option>' +
+                        res.data.map(c => `<option value="${c.id}">${c.label}</option>`).join('');
+                    wrapAcc.style.display = '';
+                    wrapOp.style.display = '';
+                } else {
+                    accSel.innerHTML = '<option value="">Seleccionar cuenta</option>';
+                    accSel.value = '';
+                    opInput.value = '';
+                    wrapAcc.style.display = 'none';
+                    wrapOp.style.display = 'none';
+                }
+            } catch (e) { /* combo no crítico */ }
         }
     </script>
 @endsection

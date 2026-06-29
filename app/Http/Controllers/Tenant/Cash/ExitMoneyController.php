@@ -90,11 +90,28 @@ class ExitMoneyController extends Controller
 
             $payment_method =   PaymentMethod::findOrFail($request->get('payment_method_id'));
 
+            // PASO 4: cuenta de ORIGEN + blindaje cuenta<->método (espejo del cobro; no se
+            // confía en el cliente). Efectivo (método sin cuentas) -> bank_account_id NULL.
+            $bankAccountId  =   $request->get('bank_account_id') ?: null;
+            $tieneCuentas   =   DB::table('payment_method_accounts')->where('payment_method_id', $payment_method->id)->exists();
+            if ($bankAccountId) {
+                $pertenece = DB::table('payment_method_accounts')
+                    ->where('payment_method_id', $payment_method->id)
+                    ->where('bank_account_id', $bankAccountId)
+                    ->exists();
+                if (! $pertenece) {
+                    throw new Exception("La cuenta seleccionada no pertenece al método de pago.");
+                }
+            } elseif ($tieneCuentas) {
+                throw new Exception("Debe seleccionar una cuenta de origen para el método " . $payment_method->description . ".");
+            }
+
             $exit_money = new ExitMoney();
             $cajaAbierta = PettyCashBook::where('status', 'ABIERTO')->first();
             $exit_money->proof_payment_id = $request->proof_payment;
             $exit_money->payment_method_id = $payment_method->id;
-            $exit_money->payment_method_name    =   $payment_method->description;
+            $exit_money->bank_account_id = $bankAccountId;                      // NULL = efectivo
+            $exit_money->operation_number = $request->get('operation_number') ?: null;
             $exit_money->number = $request->number;
             $exit_money->date = $request->date;
             $exit_money->reason = $request->reason;
