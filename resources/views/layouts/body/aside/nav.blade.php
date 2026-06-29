@@ -159,9 +159,17 @@
                         @php $verChild = $child->permission ? auth()->user()?->can($child->permission) : $esAdmin; @endphp
                         @if ($verChild)
                         <li class="menu-item">
-                            <a class="menu-link menu-click" href="{{ route($base . $child->route_name) }}">
-                                <span class="menu-label">{{ $child->description }}</span>
-                            </a>
+                            @if ($child->route_name && Route::has($base . $child->route_name))
+                                <a class="menu-link menu-click" href="{{ route($base . $child->route_name) }}">
+                                    <span class="menu-label">{{ $child->description }}</span>
+                                </a>
+                            @else
+                                {{-- Próximamente: sin ruta funcional -> deshabilitado (sin RouteNotFound) --}}
+                                <a class="menu-link" href="javascript:void(0);" style="opacity:.55;cursor:not-allowed;"
+                                    title="Próximamente">
+                                    <span class="menu-label">{{ $child->description }} <small>(Próximamente)</small></span>
+                                </a>
+                            @endif
                         </li>
                         @endif
                     @endif

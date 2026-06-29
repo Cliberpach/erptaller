@@ -55,6 +55,9 @@ class PermissionSeeder extends Seeder
             // CONSULTAS
             'consultas.ver',
 
+            // KARDEX DE CUENTA (Paso 4)
+            'kardex.cuentas.ver',
+
             // MANTENIMIENTO
             'mantenimiento.usuarios.gestionar', 'mantenimiento.roles.gestionar',
             'mantenimiento.sedes.gestionar', 'mantenimiento.cargos.gestionar',

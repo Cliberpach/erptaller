@@ -438,6 +438,34 @@ class ModuleSeeder extends Seeder
             'order' => '2'
         ]);
 
+        //========== KARDEX (Paso 4) ===========
+        // Hoy solo "Kardex Cuentas" es funcional; los otros 4 son "próximamente"
+        // (route_name NULL -> el nav los renderiza deshabilitados, sin ruta muerta).
+        $kardex = Module::create([
+            'description' => 'Kardex',
+            'order'       => '1',
+            'icon'        => 'analytics-report-svgrepo-com.svg',
+        ]);
+
+        ModuleChild::create([
+            'module_id'  => $kardex->id,
+            'description' => 'Kardex Cuentas',
+            'route_name' => 'kardex.cuentas.index',
+            'order'      => '2',
+        ]);
+
+        foreach (['Kardex Clientes', 'Kardex Unidades', 'Kardex Productos', 'Kardex Servicios'] as $proximamente) {
+            ModuleChild::create([
+                'module_id'  => $kardex->id,
+                'description' => $proximamente,
+                'route_name' => null, // próximamente
+                'order'      => '2',
+            ]);
+        }
+
+        // Permiso compartido a los 5 hijos (roadmap visible para quien tiene acceso al Kardex).
+        ModuleChild::where('module_id', $kardex->id)->update(['permission' => 'kardex.cuentas.ver']);
+
         // ===== Permisos P1: mapeo nodo del menú → permiso Spatie (data-driven) =====
         // Se puebla la columna `permission` por route_name. Nodos sin entrada (ej.
         // mantenimientos.plan landlord-only, o el contenedor "Productos" con route vacía)

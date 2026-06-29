@@ -31,6 +31,7 @@ class RoleSeeder extends Seeder
             'taller.ot.ver', 'taller.ot.facturar',
             'consultas.ver',
             'inventario.ver', 'inventario.kardex.ver',
+            'kardex.cuentas.ver',
         ]);
 
         // TECNICO (taller: OT, vehículos, servicios). SIN taller.ot.ver_precios (no ve precios).

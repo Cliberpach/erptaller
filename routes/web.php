@@ -161,6 +161,12 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
     });
 
 
+    // KARDEX DE CUENTA (Paso 4): estado por cuenta bancaria (ingresos ventas + egresos), UNION al vuelo.
+    Route::group(["prefix" => "kardex", 'middleware' => 'can:kardex.cuentas.ver'], function () {
+        Route::get('cuentas', [\App\Http\Controllers\Tenant\Kardex\AccountKardexController::class, 'index'])->name('tenant.kardex.cuentas.index');
+        Route::get('cuentas/data', [\App\Http\Controllers\Tenant\Kardex\AccountKardexController::class, 'data'])->name('tenant.kardex.cuentas.data');
+    });
+
     Route::get('/notifications', [NotificationController::class, 'getNotifications'])->name('notifications.index');
     Route::get('/notifications/count', [NotificationController::class, 'getNotificationsCount'])->name('notifications.count');
     Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
