@@ -215,6 +215,16 @@ array:1 [ // app\Http\Controllers\Tenant\ProductController.php:190
                 return response()->json(['success' => false, 'message' => 'ERRORES EN EL EXCEL', 'resultado' => $resultado]);
             } else {
                 $lstProductos  =   $resultado->listadoProductos;
+
+                // Unidad de medida por defecto = UNIDAD (NIU, código SUNAT). Se resuelve por
+                // symbol (estable), no por id hardcodeado. Guard claro si no existe.
+                $unidadDefault = GeneralTableDetail::where('general_table_id', 5)
+                    ->where('symbol', 'NIU')
+                    ->first();
+                if (! $unidadDefault) {
+                    throw new Exception("No existe la unidad de medida UNIDAD (NIU) en el catálogo de unidades.");
+                }
+
                 foreach ($lstProductos as $producto_excel) {
 
                     $categoria      =   DB::select('select c.id
@@ -240,6 +250,7 @@ array:1 [ // app\Http\Controllers\Tenant\ProductController.php:190
                         'code_bar'          =>  $producto_excel['codigo_barras'],
                         'category_id'       =>  $categoria->id,
                         'brand_id'          =>  $marca->id,
+                        'unit_id'           =>  $unidadDefault->id, // UNIDAD (NIU) por defecto
                         'image'             =>  null
                     ];
 
