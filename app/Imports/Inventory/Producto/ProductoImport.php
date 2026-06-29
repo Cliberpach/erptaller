@@ -80,17 +80,16 @@ class ProductoImport implements ToCollection, WithMultipleSheets
                 $error          .=  " El código interno tiene más de 20 caracteres.";
             }
 
-            if (empty($categoria) || !DB::table('categories as c')
-                    ->where('c.name', $categoria)
-                    ->where('c.status', 'ACTIVE')
-                    ->exists()) {
+            // Categoría/marca obligatorias, pero NO se exige que existan: si no existen se
+            // crean (firstOrCreate normalizado) en el controller. Solo se valida no-vacío.
+            if (empty($categoria) || strlen(str_replace(' ', '', $categoria)) === 0) {
                 $con_errores = true;
-                $error .= " La categoría '$categoria' no es válida o no existe.";
+                $error .= " La categoría es obligatoria.";
             }
 
-            if (empty($marca) || !Brand::where('name', $marca)->where('status','ACTIVE')->exists()) {
+            if (empty($marca) || strlen(str_replace(' ', '', $marca)) === 0) {
                 $con_errores    =   true;
-                $error          .=  " La marca '$marca' no es válida o no existe.";
+                $error          .=  " La marca es obligatoria.";
             }
 
 

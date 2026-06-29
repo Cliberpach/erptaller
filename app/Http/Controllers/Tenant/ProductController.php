@@ -12,6 +12,8 @@ use App\Http\Requests\Tenant\Inventory\Product\ProductStoreRequest;
 use App\Http\Requests\Tenant\Inventory\Product\ProductUpdateRequest;
 use App\Http\Services\Tenant\Inventory\Product\ProductManager;
 use App\Imports\Inventory\Producto\ProductoImport;
+use App\Models\Brand;
+use App\Models\Category;
 use App\Models\Landlord\GeneralTable\GeneralTableDetail;
 use App\Models\Product;
 use App\Models\Tenant\WarehouseProduct;
@@ -200,6 +202,24 @@ array:11 [ // app\Http\Controllers\Tenant\ProductController.php:127
 array:1 [ // app\Http\Controllers\Tenant\ProductController.php:190
   "productos_import_excel" =>Illuminate\Http\UploadedFile
 */
+    /**
+     * Normaliza un nombre de catálogo (categoría/marca) para deduplicar antes de
+     * firstOrCreate: trim + mayúsculas + colapsar espacios + quitar tildes.
+     * La collation utf8mb4_unicode_ci es case-insensitive pero accent-SENSITIVE,
+     * por eso se quitan tildes en PHP ("BUJÍAS"/"bujias"/" Bujias " -> "BUJIAS").
+     */
+    private function normalizarCatalogo(string $nombre): string
+    {
+        $n = mb_strtoupper(trim($nombre), 'UTF-8');
+        $n = preg_replace('/\s+/u', ' ', $n);
+        $n = strtr($n, [
+            'Á' => 'A', 'É' => 'E', 'Í' => 'I', 'Ó' => 'O', 'Ú' => 'U',
+            'Ü' => 'U', 'Ñ' => 'N',
+        ]);
+
+        return $n;
+    }
+
     public function importExcel(ProductoImportExcelRequest $request)
     {
         DB::beginTransaction();
@@ -225,17 +245,29 @@ array:1 [ // app\Http\Controllers\Tenant\ProductController.php:190
                     throw new Exception("No existe la unidad de medida UNIDAD (NIU) en el catálogo de unidades.");
                 }
 
+                // Catálogos creados al vuelo (firstOrCreate). Se reportan para control.
+                $categoriasNuevas = [];
+                $marcasNuevas     = [];
+
                 foreach ($lstProductos as $producto_excel) {
 
-                    $categoria      =   DB::select('select c.id
-                                        from categories as c
-                                        where c.status = "ACTIVE"
-                                        and c.name = ?', [$producto_excel['categoria']])[0];
+                    // firstOrCreate por nombre NORMALIZADO (trim+upper+sin tildes) -> no duplica
+                    // por case/espacios/tildes. Si no existe, se crea (status ACTIVE).
+                    $categoria = Category::firstOrCreate(
+                        ['name' => $this->normalizarCatalogo($producto_excel['categoria'])],
+                        ['status' => 'ACTIVE']
+                    );
+                    if ($categoria->wasRecentlyCreated) {
+                        $categoriasNuevas[] = $categoria->name;
+                    }
 
-                    $marca          =   DB::select('select m.id
-                                        from brands as m
-                                        where m.status = "ACTIVE"
-                                        and m.name = ?', [$producto_excel['marca']])[0];
+                    $marca = Brand::firstOrCreate(
+                        ['name' => $this->normalizarCatalogo($producto_excel['marca'])],
+                        ['status' => 'ACTIVE']
+                    );
+                    if ($marca->wasRecentlyCreated) {
+                        $marcasNuevas[] = $marca->name;
+                    }
 
                     $data   =   [
                         'name'              =>  mb_strtoupper($producto_excel['nombre'], 'UTF-8'),
@@ -258,7 +290,28 @@ array:1 [ // app\Http\Controllers\Tenant\ProductController.php:190
                 }
                 DB::commit();
 
-                return response()->json(['success' => true, 'message' => 'EXCEL IMPORTADO CON ÉXITO', 'resultado' => $resultado]);
+                // Reporte de catálogos creados al vuelo (sin duplicados).
+                $categoriasNuevas = array_values(array_unique($categoriasNuevas));
+                $marcasNuevas     = array_values(array_unique($marcasNuevas));
+
+                $msg = 'EXCEL IMPORTADO CON ÉXITO';
+                if ($categoriasNuevas || $marcasNuevas) {
+                    $msg .= sprintf(
+                        ' (%d categoría(s) nueva(s): %s; %d marca(s) nueva(s): %s)',
+                        count($categoriasNuevas),
+                        $categoriasNuevas ? implode(', ', $categoriasNuevas) : '-',
+                        count($marcasNuevas),
+                        $marcasNuevas ? implode(', ', $marcasNuevas) : '-'
+                    );
+                }
+
+                return response()->json([
+                    'success'           => true,
+                    'message'           => $msg,
+                    'resultado'         => $resultado,
+                    'categorias_nuevas' => $categoriasNuevas,
+                    'marcas_nuevas'     => $marcasNuevas,
+                ]);
             }
         } catch (Throwable $th) {
             DB::rollBack();
