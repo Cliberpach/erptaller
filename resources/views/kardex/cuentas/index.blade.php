@@ -31,14 +31,15 @@
                     <label class="form-label fw-bold">Hasta</label>
                     <input type="date" id="end_date" class="form-control" value="{{ $fecha_fin }}">
                 </div>
-                <div class="col-lg-3 col-md-12 mb-2 d-flex align-items-end">
-                    <button class="btn btn-primary w-100" onclick="cargarKardex()"><i class="fas fa-search me-1"></i> Consultar</button>
+                <div class="col-lg-3 col-md-12 mb-2 d-flex align-items-end gap-2">
+                    <button class="btn btn-primary w-100" onclick="cargarKardex()"><i class="fas fa-filter me-1"></i> Filtrar</button>
+                    <button class="btn btn-secondary" onclick="limpiarKardex()"><i class="fas fa-eraser"></i></button>
                 </div>
             </div>
 
             {{-- Cabecera de totales --}}
             <div class="row mt-3">
-                <div class="col-md-3 mb-2"><div class="border rounded p-2 text-center"><small class="text-muted d-block">SALDO APERTURA</small><span class="fw-bold" id="k_apertura">0.00</span></div></div>
+                <div class="col-md-3 mb-2"><div class="border rounded p-2 text-center"><small class="text-muted d-block">SALDO CUENTA</small><span class="fw-bold" id="k_apertura">0.00</span></div></div>
                 <div class="col-md-3 mb-2"><div class="border rounded p-2 text-center bg-light"><small class="text-success d-block">TOTAL INGRESOS</small><span class="fw-bold text-success" id="k_ingresos">0.00</span></div></div>
                 <div class="col-md-3 mb-2"><div class="border rounded p-2 text-center bg-light"><small class="text-danger d-block">TOTAL EGRESOS</small><span class="fw-bold text-danger" id="k_egresos">0.00</span></div></div>
                 <div class="col-md-3 mb-2"><div class="border rounded p-2 text-center"><small class="text-muted d-block">SALDO FINAL</small><span class="fw-bold" id="k_saldo">0.00</span></div></div>
@@ -70,7 +71,15 @@
     <script>
         const fmt = n => Number(n || 0).toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-        document.addEventListener('DOMContentLoaded', cargarKardex);
+        // Cuenta OBLIGATORIA: al entrar no se auto-carga, se muestra el mensaje.
+        document.addEventListener('DOMContentLoaded', limpiarKardex);
+
+        function limpiarKardex() {
+            document.getElementById('bank_account_id').value = '';
+            ['k_apertura', 'k_ingresos', 'k_egresos', 'k_saldo'].forEach(id => document.getElementById(id).textContent = '0.00');
+            document.querySelector('#tbl_kardex tbody').innerHTML =
+                '<tr><td colspan="8" class="text-center text-muted">Elegí una cuenta bancaria para ver su kardex.</td></tr>';
+        }
 
         async function cargarKardex() {
             const cuenta = document.getElementById('bank_account_id').value;
@@ -78,11 +87,8 @@
             tbody.innerHTML = '';
 
             if (!cuenta) {
-                document.getElementById('k_apertura').textContent = '0.00';
-                document.getElementById('k_ingresos').textContent = '0.00';
-                document.getElementById('k_egresos').textContent = '0.00';
-                document.getElementById('k_saldo').textContent = '0.00';
-                tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">Seleccioná una cuenta.</td></tr>';
+                ['k_apertura', 'k_ingresos', 'k_egresos', 'k_saldo'].forEach(id => document.getElementById(id).textContent = '0.00');
+                tbody.innerHTML = '<tr><td colspan="8" class="text-center text-warning">Elegí una cuenta bancaria (es obligatoria).</td></tr>';
                 return;
             }
 
@@ -95,7 +101,7 @@
 
             try {
                 const res = await (await fetch(url)).json();
-                document.getElementById('k_apertura').textContent = fmt(res.apertura);
+                document.getElementById('k_apertura').textContent = fmt(res.saldo_cuenta);
                 document.getElementById('k_ingresos').textContent = fmt(res.total_ingresos);
                 document.getElementById('k_egresos').textContent = fmt(res.total_egresos);
                 document.getElementById('k_saldo').textContent = fmt(res.saldo_final);

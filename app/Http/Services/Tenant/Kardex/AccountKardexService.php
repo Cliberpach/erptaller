@@ -14,17 +14,18 @@ class AccountKardexService
 {
     public function kardex(int $bankAccountId, string $desde, string $hasta): array
     {
+        // Punto de partida = el saldo GUARDADO de la cuenta (decisión del cliente; simple,
+        // es el saldo real que la empresa carga). NO se calcula Σ de movimientos anteriores.
+        $saldoBase = (float) (DB::table('bank_accounts')->where('id', $bankAccountId)->value('saldo') ?? 0);
+
         // Movimientos del rango (entradas de venta + salidas de egreso), ordenados por fecha.
         $movimientos = collect(DB::select($this->sqlMovimientos(), [
             $bankAccountId, $desde, $hasta,   // entradas
             $bankAccountId, $desde, $hasta,   // salidas
         ]));
 
-        // Saldo de apertura del rango: todo lo anterior a `desde` (ingresos - egresos).
-        $apertura = $this->saldoApertura($bankAccountId, $desde);
-
-        // Running sum: cada fila acumula sobre la anterior (la primera, sobre la apertura).
-        $saldo    = $apertura;
+        // Running sum: la primera fila acumula sobre el saldo de la cuenta.
+        $saldo    = $saldoBase;
         $totalIn  = 0.0;
         $totalOut = 0.0;
         $movimientos = $movimientos->map(function ($m) use (&$saldo, &$totalIn, &$totalOut) {
@@ -36,7 +37,7 @@ class AccountKardexService
         });
 
         return [
-            'apertura'       => round($apertura, 2),
+            'saldo_cuenta'   => round($saldoBase, 2),
             'movimientos'    => $movimientos->values(),
             'total_ingresos' => round($totalIn, 2),
             'total_egresos'  => round($totalOut, 2),
@@ -71,24 +72,4 @@ class AccountKardexService
         ";
     }
 
-    /**
-     * Saldo de apertura del rango = Σ(entradas) − Σ(salidas) de TODO lo anterior a `desde`.
-     */
-    private function saldoApertura(int $bankAccountId, string $desde): float
-    {
-        $in = (float) DB::table('sales_document_payments as sdp')
-            ->join('sales_documents as sd', 'sd.id', '=', 'sdp.sale_document_id')
-            ->where('sdp.bank_account_id', $bankAccountId)
-            ->where('sd.status', '<>', 'ANULADO')
-            ->whereDate('sd.registration_date', '<', $desde)
-            ->sum('sdp.amount');
-
-        $out = (float) DB::table('exit_money')
-            ->where('bank_account_id', $bankAccountId)
-            ->where('status', 1)
-            ->whereDate('date', '<', $desde)
-            ->sum('total');
-
-        return $in - $out;
-    }
 }
