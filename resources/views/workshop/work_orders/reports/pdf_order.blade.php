@@ -233,6 +233,16 @@
             </tr>
 
             <tr>
+                <td class="label">KILOMETRAJE:</td>
+                <td>{{ !is_null($data_order['order']->mileage) ? number_format($data_order['order']->mileage, 0, '.', ',') . ' km' : '—' }}</td>
+            </tr>
+
+            <tr>
+                <td class="label">OBSERVACIÓN:</td>
+                <td>{{ $data_order['order']->observation ?: '—' }}</td>
+            </tr>
+
+            <tr>
                 <td class="label">USUARIO CREACIÓN:</td>
                 <td>{{ $data_order['order']->create_user_name }}</td>
             </tr>

@@ -38,6 +38,10 @@ class WorkOrderDto
         $dto['plate']       =   $vehicle->plate;
         $dto['fuel_level']  =   $data['fuel_level'];
 
+        // Datos adicionales manuales de la OT (km de tablero + observación del estado/pedido).
+        $dto['mileage']     =   isset($data['mileage']) && $data['mileage'] !== '' ? (int) $data['mileage'] : null;
+        $dto['observation'] =   isset($data['observation']) && trim($data['observation']) !== '' ? trim($data['observation']) : null;
+
         //======== AMOUNTS ======
         $dto_amounts        =   $this->calculateAmounts($data['lst_products'], $data['lst_services']);
         $dto['total']       =   $dto_amounts['total'];

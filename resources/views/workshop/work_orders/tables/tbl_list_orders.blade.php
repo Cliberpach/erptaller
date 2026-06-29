@@ -6,6 +6,7 @@
             <th class="minw-100px">Cot</th>
             <th class="minw-200px">Cliente</th>
             <th class="minw-100px">Placa</th>
+            <th class="minw-100px">Km</th>
             <th class="minw-100px">Almacén</th>
             <th class="minw-100px">Total</th>
             <th class="minw-100px">A cuenta</th>

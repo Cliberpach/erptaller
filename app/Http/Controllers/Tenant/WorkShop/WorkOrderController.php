@@ -51,6 +51,7 @@ class WorkOrderController extends Controller
                 DB::raw('CONCAT("OT-",o.id) as code'),
                 DB::raw('CONCAT(o.customer_type_document_abbreviation,":",o.customer_document_number,"-",o.customer_name) as customer_name'),
                 'o.plate',
+                'o.mileage',
                 'o.warehouse_name',
                 'o.total',
                 'o.create_user_name',

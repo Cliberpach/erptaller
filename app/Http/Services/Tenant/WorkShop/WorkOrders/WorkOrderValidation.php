@@ -42,6 +42,11 @@ class WorkOrderValidation
             throw new Exception("SOLO SE PERMITEN MÁXIMO 3 TÉCNICOS POR ORDEN DE TRABAJO");
         }
 
+        // Kilometraje (opcional): si viene, debe ser dígitos puros (entero >= 0).
+        if (isset($data['mileage']) && trim((string) $data['mileage']) !== '' && ! ctype_digit(trim((string) $data['mileage']))) {
+            throw new Exception("El kilometraje debe ser un número entero.");
+        }
+
         $data['lst_products']       =   $lst_products;
         $data['lst_services']       =   $lst_services;
         $data['lst_technicians']    =   $lst_technicians;

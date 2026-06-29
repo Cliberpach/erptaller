@@ -60,7 +60,7 @@
                         </div>
 
                         <!-- Cliente -->
-                        <div class="col-lg-6 col-md-8 col-sm-12">
+                        <div class="col-lg-5 col-md-6 col-sm-12">
                             <label class="form-label fw-bold required_field">Cliente:</label>
                             <i class="fas fa-plus btn btn-warning btn-sm" onclick="openMdlNewCustomer();"
                                 style="margin-left:4px;"></i>
@@ -72,7 +72,7 @@
                         </div>
 
                         <!-- Vehículo -->
-                        <div class="col-lg-6 col-md-8 col-sm-12">
+                        <div class="col-lg-5 col-md-6 col-sm-12">
                             <label class="form-label fw-bold">Vehículo:</label>
                             <i class="fas fa-plus btn btn-warning btn-sm" onclick="openMdlCreateVehicle();"
                                 style="margin-left:4px;"></i>
@@ -81,6 +81,22 @@
                                 <option value="">Seleccionar</option>
                             </select>
                             <p class="vehicle_id_error msgError mb-0"></p>
+                        </div>
+
+                        <!-- Kilometraje (manual, km de tablero) -->
+                        <div class="col-lg-2 col-md-12 col-sm-12">
+                            <label class="form-label fw-bold">Kilometraje:</label>
+                            <input type="number" class="form-control" id="mileage" name="mileage" min="0"
+                                placeholder="Km tablero">
+                            <p class="mileage_error msgError mb-0"></p>
+                        </div>
+
+                        <!-- Observación de la OT (estado del auto / pedido del cliente) -->
+                        <div class="col-12">
+                            <label class="form-label fw-bold">Observación (estado del auto / pedido del cliente):</label>
+                            <textarea class="form-control" id="observation" name="observation" rows="3"
+                                maxlength="1000" placeholder="Estado del vehículo, lo que pidió el cliente..."></textarea>
+                            <p class="observation_error msgError mb-0"></p>
                         </div>
 
                     </div>

@@ -193,6 +193,13 @@
                         orderable: true,
                     },
                     {
+                        data: 'mileage',
+                        name: 'o.mileage',
+                        searchable: true,
+                        orderable: true,
+                        render: (data) => (data === null || data === undefined) ? '—' : data,
+                    },
+                    {
                         data: 'warehouse_name',
                         name: 'o.warehouse_name',
                         searchable: true,
