@@ -2,6 +2,7 @@
 
 namespace App\Http\Services\Tenant\Inventory\Kardex;
 
+use App\Models\Tenant\CreditNote;
 use App\Models\Tenant\Kardex;
 use App\Models\Tenant\NoteIncome;
 use App\Models\Tenant\PurchaseDocument;
@@ -38,6 +39,16 @@ class KardexService
     public function storeFromSaleAnulacion(Sale $sale)
     {
         $dto    =   $this->s_dto->getDtoFromSaleAnulacion($sale);
+        $this->s_repository->insertKardex($dto);
+    }
+
+    /**
+     * Nota de Crédito (Capa 2): kardex ENTRADA por la cantidad ACREDITADA del detalle NC.
+     * Atado a la venta original (sale_id), identificado por document_serie de la NC.
+     */
+    public function storeFromCreditNote(CreditNote $credit_note)
+    {
+        $dto    =   $this->s_dto->getDtoFromCreditNote($credit_note);
         $this->s_repository->insertKardex($dto);
     }
 

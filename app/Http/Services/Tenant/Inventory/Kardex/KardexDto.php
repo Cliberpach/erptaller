@@ -3,6 +3,8 @@
 namespace App\Http\Services\Tenant\Inventory\Kardex;
 
 use App\Models\Product;
+use App\Models\Tenant\CreditNote;
+use App\Models\Tenant\CreditNoteDetail;
 use App\Models\Tenant\NoteIncome;
 use App\Models\Tenant\NoteIncomeDetail;
 use App\Models\Tenant\PurchaseDocument;
@@ -103,6 +105,53 @@ class KardexDto
         $dto    =   $this->getDtoFromSale($sale);
         foreach ($dto as &$row) {
             $row['type']    =   'ENTRADA';
+        }
+
+        return $dto;
+    }
+
+    /**
+     * Kardex de NOTA DE CRÉDITO (Capa 2): ENTRADA por cada línea del detalle NC (cantidad
+     * ACREDITADA, no la vendida). Espeja getDtoFromSale pero leyendo credit_notes_details.
+     * El kardex no tiene credit_note_id -> se ata a la venta original (sale_id) y se
+     * identifica por document_serie = serie-correlative de la NC.
+     */
+    public function getDtoFromCreditNote(CreditNote $credit_note)
+    {
+        $dto        =   [];
+        $lst_detail =   CreditNoteDetail::where('credit_note_id', $credit_note->id)->get();
+        $sale       =   $credit_note->sale;   // venta original (customer_id para el kardex)
+
+        foreach ($lst_detail as $item) {
+
+            $product                        =   Product::findOrFail($item->product_id);
+
+            $_item                          =   [];
+            $_item['sale_id']               =   $credit_note->sale_id;
+            $_item['type']                  =   'ENTRADA';
+            $_item['document_serie']        =   $credit_note->serie . '-' . $credit_note->correlative;
+            $_item['date']                  =   $credit_note->created_at;
+            $_item['warehouse_id']          =   $item->warehouse_id;
+            $_item['warehouse_name']        =   $item->warehouse_name;
+            $_item['product_id']            =   $item->product_id;
+            $_item['category_id']           =   $item->category_id;
+            $_item['brand_id']              =   $item->brand_id;
+            $_item['product_name']          =   $item->product_name;
+            $_item['product_unit']          =   $item->unity;
+            $_item['category_name']         =   $item->category_name;
+            $_item['brand_name']            =   $item->brand_name;
+            $_item['quantity']              =   $item->quantity;
+            $_item['sale_price']            =   $item->sale_price;
+            $_item['purchase_price']        =   $product->purchase_price;
+            $_item['amount']                =   $item->amount;
+            $_item['creator_user_id']       =   Auth::user()->id;
+            $_item['creator_user_name']     =   Auth::user()->name;
+            $_item['customer_id']           =   $sale->customer_id ?? null;
+            $_item['customer_name']         =   $credit_note->customer_name;
+            $_item['customer_type_document_abbreviation']   =   $credit_note->customer_type_document;
+            $_item['customer_document_number']              =   $credit_note->customer_document_number;
+
+            $dto[]  =   $_item;
         }
 
         return $dto;

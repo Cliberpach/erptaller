@@ -52,6 +52,8 @@
         </div>
     </div>
 
+    @include('sales.sale_document.modals.mdl_credit_note')
+
     <div class="card overflow-hidden">
         <div class="card-header">
 
@@ -420,8 +422,8 @@
                                                 </a>
                                             </li>`;
                                 acciones += `<li>
-                                                <a class="dropdown-item text-danger" href="javascript:void(0);" onclick="accionProximamente('Anular')">
-                                                    <i class="fa-solid fa-ban"></i> Anular
+                                                <a class="dropdown-item text-danger" href="javascript:void(0);" onclick="openCreditNote(${data.id})">
+                                                    <i class="fa-solid fa-file-invoice"></i> Nota de Crédito
                                                 </a>
                                             </li>`;
                             }
@@ -724,6 +726,124 @@
                     });
                 }
             });
+        }
+
+        // ===== NOTA DE CRÉDITO (Capa 1: documento + PDF) =====
+        let ncLinesData = [];
+
+        async function openCreditNote(id) {
+            try {
+                const url = @json(route('tenant.ventas.nota_credito.data', ['id' => ':id'])).replace(':id', id);
+                const res = await (await fetch(url)).json();
+                if (!res.success) { toastr.error(res.message || 'No se pudo cargar la venta'); return; }
+
+                document.getElementById('nc_sale_id').value = res.sale.id;
+                document.getElementById('nc_doc').textContent = res.sale.doc;
+                ncLinesData = res.lines;
+
+                document.getElementById('nc_lines').innerHTML = res.lines.map((l, i) => `
+                    <tr>
+                        <td><input type="checkbox" class="nc-chk" data-i="${i}"></td>
+                        <td>${l.product_name}</td>
+                        <td>${l.brand_name ?? ''}</td>
+                        <td class="text-end">${(+l.quantity).toFixed(2)}</td>
+                        <td class="text-end">
+                            <input type="number" class="form-control form-control-sm nc-qty text-end" data-i="${i}"
+                                   min="0" max="${+l.quantity}" step="0.01" value="0" disabled>
+                        </td>
+                        <td class="text-end nc-imp" data-i="${i}">0.00</td>
+                    </tr>`).join('');
+
+                recalcNc();
+                $('#mdlCreditNote').modal('show');
+            } catch (e) {
+                toastr.error('Error cargando datos de la Nota de Crédito');
+            }
+        }
+
+        function recalcNc() {
+            let total = 0;
+            document.querySelectorAll('#nc_lines tr').forEach(tr => {
+                const chk = tr.querySelector('.nc-chk');
+                const qtyEl = tr.querySelector('.nc-qty');
+                const i = chk.dataset.i;
+                const price = +ncLinesData[i].price_sale;
+                qtyEl.disabled = !chk.checked;
+                if (!chk.checked) qtyEl.value = 0;
+                const imp = (+qtyEl.value || 0) * price;
+                tr.querySelector('.nc-imp').textContent = imp.toFixed(2);
+                total += imp;
+            });
+            document.getElementById('nc_total').textContent = total.toFixed(2);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const body = document.getElementById('nc_lines');
+            if (body) {
+                body.addEventListener('input', recalcNc);
+                body.addEventListener('change', recalcNc);
+            }
+            document.getElementById('nc_btn_all')?.addEventListener('click', () => {
+                document.querySelectorAll('#nc_lines tr').forEach(tr => {
+                    const chk = tr.querySelector('.nc-chk');
+                    const qty = tr.querySelector('.nc-qty');
+                    chk.checked = true;
+                    qty.disabled = false;
+                    qty.value = ncLinesData[chk.dataset.i].quantity;
+                });
+                recalcNc();
+            });
+            document.getElementById('nc_btn_emit')?.addEventListener('click', emitCreditNote);
+        });
+
+        async function emitCreditNote() {
+            const sale_id = document.getElementById('nc_sale_id').value;
+            const motivoEl = document.getElementById('nc_cod_motivo');
+            const codMotivo = motivoEl.value;
+            const desMotivo = motivoEl.selectedOptions[0].dataset.text;
+            const observation = document.getElementById('nc_observation').value;
+
+            const lines = [];
+            document.querySelectorAll('#nc_lines tr').forEach(tr => {
+                const chk = tr.querySelector('.nc-chk');
+                if (!chk.checked) return;
+                const i = chk.dataset.i;
+                const qty = +tr.querySelector('.nc-qty').value;
+                if (qty > 0) lines.push({
+                    product_id: ncLinesData[i].product_id,
+                    warehouse_id: ncLinesData[i].warehouse_id,
+                    quantity: qty
+                });
+            });
+            if (!lines.length) { toastr.error('Seleccione al menos una línea con cantidad a acreditar'); return; }
+
+            Swal.fire({ title: 'Emitiendo Nota de Crédito...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+            try {
+                const token = document.querySelector('meta[name="csrf-token"]').content;
+                const url = @json(route('tenant.ventas.nota_credito.store'));
+                const fd = new FormData();
+                fd.append('sale_id', sale_id);
+                fd.append('codMotivo', codMotivo);
+                fd.append('desMotivo', desMotivo);
+                fd.append('observation', observation);
+                fd.append('lines', JSON.stringify(lines));
+
+                const res = await (await fetch(url, { method: 'POST', headers: { 'X-CSRF-TOKEN': token }, body: fd })).json();
+                Swal.close();
+
+                if (res.success) {
+                    $('#mdlCreditNote').modal('hide');
+                    dtSales.ajax.reload(null, false);
+                    toastr.success(res.message + ' ' + res.doc, 'OPERACIÓN COMPLETADA');
+                    const pdfUrl = @json(route('tenant.ventas.nota_credito.pdf', ['id' => ':id'])).replace(':id', res.id);
+                    window.open(pdfUrl, '_blank');
+                } else {
+                    toastr.error(res.message, 'NO SE PUDO EMITIR LA NC');
+                }
+            } catch (e) {
+                Swal.close();
+                toastr.error('Error en la petición de Nota de Crédito');
+            }
         }
 
         function filterData() {

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Tenant\CustomerController;
+use App\Http\Controllers\Tenant\Sale\CreditNoteController;
 use App\Http\Controllers\Tenant\SaleController;
 use App\Http\Controllers\Tenant\Sales\PaymentConditionController;
 use App\Http\Controllers\Tenant\Sales\PaymentMethodController;
@@ -25,6 +26,11 @@ Route::group(["prefix" => "ventas"], function () {
         Route::post('{id}/anular', [SaleController::class, 'anular'])->name('tenant.ventas.comprobante_venta.anular')->middleware(['validar.plan:ventas', 'can:ventas.anular']);
         Route::get('{id}/convert-data', [SaleController::class, 'getConvertData'])->name('tenant.ventas.comprobante_venta.convertData')->middleware('validar.plan:ventas');
         Route::post('{id}/convertir', [SaleController::class, 'convertir'])->name('tenant.ventas.comprobante_venta.convertir')->middleware(['validar.plan:ventas', 'can:ventas.crear']);
+
+        // Nota de Crédito (Capa 1: documento + PDF; sin SUNAT/stock/caja todavía).
+        Route::get('nota-credito/data/{id}', [CreditNoteController::class, 'data'])->name('tenant.ventas.nota_credito.data')->middleware('validar.plan:ventas');
+        Route::post('nota-credito/store', [CreditNoteController::class, 'store'])->name('tenant.ventas.nota_credito.store')->middleware(['validar.plan:ventas', 'can:ventas.crear']);
+        Route::get('nota-credito/pdf/{id}', [CreditNoteController::class, 'pdf'])->name('tenant.ventas.nota_credito.pdf')->middleware('validar.plan:ventas');
 
         Route::get('comprobante-electronico', [SaleController::class, 'electronicReceipt'])->name('tenant.ventas.comprobante_electronico');
         Route::get('cotizacion', [SaleController::class, 'quotation'])->name('tenant.ventas.cotizacion');
