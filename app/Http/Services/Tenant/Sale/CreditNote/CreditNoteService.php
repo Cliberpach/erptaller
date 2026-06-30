@@ -3,6 +3,7 @@
 namespace App\Http\Services\Tenant\Sale\CreditNote;
 
 use App\Http\Controllers\Tenant\NumberToLettersController;
+use App\Http\Services\Tenant\Cash\PettyCashBook\PettyCashBookRepository;
 use App\Http\Services\Tenant\Inventory\Kardex\KardexService;
 use App\Http\Services\Tenant\Inventory\WarehouseProduct\WarehouseProductManager;
 use App\Http\Services\Tenant\Sale\Sale\CorrelativeService;
@@ -41,12 +42,26 @@ class CreditNoteService
     private CorrelativeService $s_correlative;
     private WarehouseProductManager $s_warehouse_product;
     private KardexService $s_kardex;
+    private PettyCashBookRepository $s_cash_book;
 
     public function __construct()
     {
         $this->s_correlative       = new CorrelativeService();
         $this->s_warehouse_product = new WarehouseProductManager();
         $this->s_kardex            = new KardexService();
+        $this->s_cash_book         = new PettyCashBookRepository();
+    }
+
+    /**
+     * Capa 3: ¿esta NC atribuye caja? Solo venta DIRECTA + CONTADO. Convertida/OT (el
+     * original ya cobró) y CRÉDITO (la plata va por CxC, no por caja) -> NO atribuye.
+     */
+    private function atribuyeCaja(Sale $sale): bool
+    {
+        $esDirecta = is_null($sale->converted_from_id) && is_null($sale->work_order_id);
+        $esContado = strtoupper($sale->payment_condition_name) === 'CONTADO';
+
+        return $esDirecta && $esContado;
     }
 
     /**
@@ -76,6 +91,10 @@ class CreditNoteService
                 'total'          => number_format($sale->total, 2),
             ],
             'lines' => $lines,
+            // Capa 3: gate de caja para el botón Emitir. Solo directa+CONTADO exige caja;
+            // convertida/OT/crédito puede emitir sin caja (no atribuye).
+            'requiere_caja' => $this->atribuyeCaja($sale),
+            'caja_abierta'  => (bool) $this->s_cash_book->getCashBookUser(Auth::id()),
         ];
     }
 
@@ -104,6 +123,19 @@ class CreditNoteService
             throw new Exception('Seleccione al menos una línea con cantidad a acreditar.');
         }
 
+        // ===== CAPA 3: GATE de caja-abierta + ATRIBUCIÓN (antes del correlativo) =====
+        // La NC que atribuye caja (directa + CONTADO) exige caja ABIERTA del usuario; se
+        // atribuye a ESA caja (la de HOY, no la del cobro original -> resuelve caja-cerrada).
+        // Convertida/OT/crédito -> no atribuye caja (petty_cash_book_id = null).
+        $cajaId = null;
+        if ($this->atribuyeCaja($sale)) {
+            $caja = $this->s_cash_book->getCashBookUser(Auth::id());
+            if (! $caja) {
+                throw new Exception('Necesita una caja abierta para emitir una Nota de Crédito.');
+            }
+            $cajaId = $caja->petty_cash_book_id;
+        }
+
         // Detalle de la venta indexado por (product_id, warehouse_id) para validar y leer montos.
         $origen = DB::table('sales_documents_details')
             ->where('sale_document_id', $sale->id)
@@ -114,7 +146,7 @@ class CreditNoteService
         // de la NC sí lo exige -> se resuelve desde la tabla warehouses.
         $whNames = DB::table('warehouses')->pluck('descripcion', 'id');
 
-        return DB::transaction(function () use ($sale, $seleccion, $origen, $data) {
+        return DB::transaction(function () use ($sale, $seleccion, $origen, $data, $whNames, $cajaId) {
 
             // Correlativo NC atómico (serie FC001) por sede activa.
             $corr = $this->s_correlative->getCorrelative(self::TIPO_NC_ID);
@@ -215,6 +247,7 @@ class CreditNoteService
             // ===== Cabecera NC =====
             $nc = new CreditNote();
             $nc->sale_id                  = $sale->id;
+            $nc->petty_cash_book_id       = $cajaId;   // Capa 3: caja abierta de hoy (null si convertida/OT/crédito)
             $nc->warehouse_id             = $wh['warehouse_id'] ?? null;
             $nc->warehouse_name           = $wh['warehouse_name'] ?? '';
             $nc->type_sale_id             = self::TIPO_NC_ID;

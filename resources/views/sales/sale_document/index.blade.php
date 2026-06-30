@@ -741,6 +741,12 @@
                 document.getElementById('nc_doc').textContent = res.sale.doc;
                 ncLinesData = res.lines;
 
+                // Capa 3: gate de caja-abierta. Solo bloquea si la NC atribuye caja
+                // (directa+CONTADO) y no hay caja abierta. Convertida/OT/crédito emiten igual.
+                const faltaCaja = res.requiere_caja && !res.caja_abierta;
+                document.getElementById('nc_aviso_caja').classList.toggle('d-none', !faltaCaja);
+                document.getElementById('nc_btn_emit').disabled = faltaCaja;
+
                 document.getElementById('nc_lines').innerHTML = res.lines.map((l, i) => `
                     <tr>
                         <td><input type="checkbox" class="nc-chk" data-i="${i}"></td>

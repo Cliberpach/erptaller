@@ -55,7 +55,14 @@
                     </table>
                 </div>
 
-                <p class="text-muted small mb-0">No mueve stock ni caja todavía (capas siguientes). No se envía a SUNAT: queda PENDIENTE.</p>
+                <p class="text-muted small mb-0">No se envía a SUNAT: queda PENDIENTE.</p>
+
+                {{-- Capa 3: aviso de caja-abierta. Visible solo si la NC atribuye caja
+                     (directa+CONTADO) y el usuario no tiene caja abierta. --}}
+                <div id="nc_aviso_caja" class="alert alert-warning py-2 px-3 mt-2 mb-0 d-none" role="alert">
+                    <i class="fas fa-cash-register me-1"></i>
+                    Necesitás una <strong>caja abierta</strong> para emitir esta Nota de Crédito.
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
