@@ -240,7 +240,8 @@ class WorkOrderService
         $igv                        =   round(Company::find(1)->igv, 2);
         $warehouses                 =   Warehouse::where('estado', 'ACTIVO')->get();
 
-        $invoice_types              =   UtilController::getInvoiceTypes();
+        // Facturar OT: solo BOLETA + FACTURA (no los 7 tipos).
+        $invoice_types              =   UtilController::getInvoiceTypesOT();
         $types_identity_documents   =   UtilController::getIdentityDocuments();
         $departments                =   Department::all();
         $districts                  =   District::all();

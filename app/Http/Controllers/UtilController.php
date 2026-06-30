@@ -265,6 +265,19 @@ class UtilController extends Controller
             ->get();
     }
 
+    /**
+     * Tipos de comprobante OFRECIBLES al facturar una ORDEN DE TRABAJO: solo BOLETA (03) y
+     * FACTURA (01) -> el comprobante fiscal del trabajo. Sin TICKET/GUÍA/NC/ND/NV (no aplican).
+     * getInvoiceTypes() (los 7) queda INTACTO para la config de series.
+     */
+    public static function getInvoiceTypesOT()
+    {
+        return GeneralTableDetail::where('general_table_id', 4)
+            ->where('status', 'ACTIVO')
+            ->whereIn('symbol', ['03', '01'])
+            ->get();
+    }
+
     public function isActiveInvoiceType(int $id)
     {
         try {
