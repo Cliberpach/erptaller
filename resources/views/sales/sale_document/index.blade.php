@@ -520,7 +520,7 @@
                 });
 
                 try {
-                    const token = document.querySelector('input[name="_token"]').value;
+                    const token = document.querySelector('meta[name="csrf-token"]').content;
                     let url = @json(route('tenant.ventas.comprobante_venta.anular', ['id' => ':id']));
                     url = url.replace(':id', sale_document_id);
 
@@ -617,7 +617,7 @@
 
             Swal.fire({ title: 'Convirtiendo...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
             try {
-                const token = document.querySelector('input[name="_token"]').value;
+                const token = document.querySelector('meta[name="csrf-token"]').content;
                 const url = @json(route('tenant.ventas.comprobante_venta.convertir', ['id' => ':id'])).replace(':id', id);
                 const fd = new FormData();
                 fd.append('type_sale', type_sale);
@@ -672,7 +672,7 @@
 
                     try {
                         toastr.clear();
-                        const token = document.querySelector('input[name="_token"]').value;
+                        const token = document.querySelector('meta[name="csrf-token"]').content;
 
                         const formData = new FormData();
                         const urlInvoice = @json(route('tenant.ventas.comprobante_venta.send_sunat'));
