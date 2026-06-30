@@ -55,8 +55,8 @@
                         {{-- LOGO --}}
                         <div class="mb-4 text-center">
                             <a href="{{ url('/') }}">
-                                <img class="visible-light" src="{{ asset('assets/images/logo-full.svg') }}">
-                                <img class="visible-dark" src="{{ asset('assets/images/logo-full-white.svg') }}">
+                                <img class="visible-light" style="max-width: 220px; height: auto;" src="{{ asset('assets/images/logo-tallersuite.png') }}" alt="TallerSuite">
+                                <img class="visible-dark" style="max-width: 220px; height: auto;" src="{{ asset('assets/images/logo-tallersuite.png') }}" alt="TallerSuite">
                             </a>
                         </div>
 
