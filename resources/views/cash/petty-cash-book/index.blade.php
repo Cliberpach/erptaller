@@ -43,7 +43,6 @@
 
         function events() {
             eventsMdlOpenCash();
-            eventsMdlCloseCash();
         }
 
         function iniciarDtCash() {
@@ -137,7 +136,7 @@
                                 `
                                     <li>
                                         <button class="dropdown-item text-primary fw-semibold"
-                                                onclick="openMdlCloseCash(${data.id})">
+                                                onclick="cerrarCaja(${data.id})">
                                             <i class="fas fa-lock me-2"></i> Cerrar caja
                                         </button>
                                     </li>
