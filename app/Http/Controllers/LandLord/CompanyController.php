@@ -373,6 +373,33 @@ class CompanyController extends Controller
             $user->sedes()->attach($sede->id, ['es_default' => true]);
         }
 
+        //========= CAJA FICTICIA (placeholder de sistema) ========
+        // La facturación de una OT atribuye la venta a esta caja FICTICIO (status ANULADO)
+        // para que NO cuente en el cuadre de una caja real (SaleDto::getDtoStoreFromOrder la lee).
+        // Acá los usuarios + turnos ya existen (el book exige shift_id/user_id). Idempotente.
+        $ficticioId = DB::table('petty_cashes')->where('type', 'FICTICIO')->value('id');
+        if (! $ficticioId) {
+            $ficticioId = DB::table('petty_cashes')->insertGetId([
+                'name'       => 'CAJA FICTICIA',
+                'type'       => 'FICTICIO',
+                'status'     => 'ANULADO',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
+        if (! DB::table('petty_cash_books')->where('type', 'FICTICIO')->exists()) {
+            DB::table('petty_cash_books')->insert([
+                'petty_cash_id'   => $ficticioId,
+                'petty_cash_name' => 'CAJA FICTICIA',
+                'shift_id'        => DB::table('shifts')->value('id'),
+                'user_id'         => DB::table('users')->value('id'),
+                'status'          => 'ANULADO',
+                'initial_amount'  => 0,
+                'initial_date'    => now(),
+                'type'            => 'FICTICIO',
+            ]);
+        }
+
         //========= CLIENTE VARIOS POR DEFECTO (per-tenant, customers ahora vive en el tenant) ========
         \App\Models\Landlord\Customer::firstOrCreate(
             ['es_varios' => true],
