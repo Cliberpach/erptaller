@@ -371,52 +371,6 @@
         </table>
 
 
-        <h5 style="font-size:10px; margin-top:25px;">RESUMEN POR MÉTODO DE PAGO</h5>
-
-        <table class="table-info" style="width:100%; border-collapse: collapse;">
-            <thead>
-                <tr style="background:#f4f8fc;">
-                    <th>MÉTODO</th>
-                    <th style="text-align:right;">VENTAS</th>
-                    <th style="text-align:right;">EGRESOS</th>
-                    <th style="text-align:right;">COBRANZAS</th>
-                    <th style="text-align:right;">TOTAL NETO</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach ($payment_methods as $pm)
-                    @php
-                        $sale = collect($consolidated['report_sales']['report'])->firstWhere(
-                            'payment_method_id',
-                            $pm->id,
-                        );
-                        $expense = collect($consolidated['report_expenses']['report'])->firstWhere(
-                            'payment_method_id',
-                            $pm->id,
-                        );
-                        $customer = collect($consolidated['report_customer_accounts']['report'])->firstWhere(
-                            'payment_method_id',
-                            $pm->id,
-                        );
-
-                        $sale_amount = $sale['amount'] ?? 0;
-                        $expense_amount = $expense['amount'] ?? 0;
-                        $customer_amount = $customer['amount'] ?? 0;
-
-                        $net = $sale_amount - $expense_amount + $customer_amount;
-                    @endphp
-
-                    <tr>
-                        <td>{{ $pm->description }}</td>
-                        <td style="text-align:right;">{{ number_format($sale_amount, 2, '.', ',') }}</td>
-                        <td style="text-align:right;">{{ number_format($expense_amount, 2, '.', ',') }}</td>
-                        <td style="text-align:right;">{{ number_format($customer_amount, 2, '.', ',') }}</td>
-                        <td style="text-align:right; font-weight:bold;">{{ number_format($net, 2, '.', ',') }}</td>
-                    </tr>
-                @endforeach
-            </tbody>
-        </table>
-
         <h5 style="font-size:10px; margin-top:25px;">RESUMEN FINAL</h5>
 
         <table class="table-info table-sm table" style="border-collapse: collapse; width: 100%;">
