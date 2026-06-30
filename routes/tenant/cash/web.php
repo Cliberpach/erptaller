@@ -30,6 +30,7 @@ Route::group(["prefix" => "cajas"], function () {
         Route::get('index', [ExitMoneyController::class, 'index'])->name('tenant.cajas.egreso');
         Route::get('create', [ExitMoneyController::class, 'create'])->name('tenant.egreso.create');
         Route::get('getEgresos', [ExitMoneyController::class, 'getExitMoneys'])->name('tenant.egreso.getExitMoneys');
+        Route::get('excel', [ExitMoneyController::class, 'excelExitMoneys'])->name('tenant.egreso.excel');
         Route::post('store', [ExitMoneyController::class, 'store'])->name('tenant.egreso.store');
         Route::get('pdf-one/{id}', [ExitMoneyController::class, 'showPDF'])->name('tenant.egreso.pdf');
         Route::put('update/{id}', [ExitMoneyController::class, 'updateExit'])->name('tenant.egreso.update');

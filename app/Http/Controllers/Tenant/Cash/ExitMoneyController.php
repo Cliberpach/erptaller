@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Tenant\Cash;
 
+use App\Exports\Tenant\Cash\ExitMoney\ExitMoneyExport;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Tenant\Cash\ExitMoney\ExitMoneyStoreRequest;
 use App\Models\Company;
@@ -12,8 +13,10 @@ use App\Models\Supplier;
 use App\Models\Tenant\Cash\PettyCashBook;
 use App\Models\Tenant\PaymentMethod;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
@@ -22,25 +25,23 @@ use Yajra\DataTables\Facades\DataTables;
 
 class ExitMoneyController extends Controller
 {
-    public function index(Request $request)
+    public function index()
     {
-        $exit_money = ExitMoney::where('status', true);
-        $from_today = now()->format('Y-m-d');
-        $to_today = now()->format('Y-m-d');
-
-        if ($request->from_date && $request->to_date) {
-            $exit_money = $exit_money->where('date', '>=', $request->from_date)->where('date', '<=', $request->to_date);
-            $from_today = $request->from_date;
-            $to_today = $request->to_date;
-        }
-
-        $exit_money = $exit_money->get();
-
-        return view('cash.exit-money.index', compact('exit_money', 'from_today', 'to_today'));
+        return view('cash.exit-money.index', [
+            // Fechas por defecto = mes en curso, filtrando por em.date (fecha de emisión
+            // del egreso, no created_at/tipeo). El datatable carga al entrar.
+            'from_today' => now()->startOfMonth()->toDateString(),
+            'to_today'   => now()->toDateString(),
+        ]);
     }
 
-    public function getExitMoneys(Request $request)
+    public function queryAll(Request $request)
     {
+        $supplier_id    =   $request->get('supplier');
+        $reason         =   $request->get('reason');
+        $from_date      =   $request->get('from_date');
+        $to_date        =   $request->get('to_date');
+
         $query = DB::connection('tenant')
             ->table('exit_money as em')
             ->join('suppliers as s', 's.id', '=', 'em.supplier_id')
@@ -54,7 +55,49 @@ class ExitMoneyController extends Controller
             )
             ->where('em.status', 1);
 
-        return DataTables::of($query)->toJson();
+        if ($supplier_id) {
+            $query->where('em.supplier_id', $supplier_id);
+        }
+        if ($reason) {
+            $query->where('em.reason', $reason);
+        }
+        if ($from_date) {
+            $query->whereDate('em.date', '>=', $from_date);
+        }
+        if ($to_date) {
+            $query->whereDate('em.date', '<=', $to_date);
+        }
+
+        // Orden cronológico (más viejo arriba). Vale para el Excel; el datatable
+        // fija su propio orden inicial en JS.
+        $query->orderBy('em.date', 'asc');
+
+        return $query;
+    }
+
+    public function getExitMoneys(Request $request)
+    {
+        return DataTables::of($this->queryAll($request))->toJson();
+    }
+
+    public function excelExitMoneys(Request $request)
+    {
+        $company    =   Company::find(1);
+
+        // Mismo query que el datatable (queryAll): el Excel exporta exactamente lo
+        // que se ve filtrado (proveedor, razón, rango sobre em.date), no todo.
+        $data       =   $this->queryAll($request)->get();
+
+        $supplier   =   null;
+        if ($request->get('supplier')) {
+            $supplier   =   Supplier::findOrFail($request->get('supplier'));
+        }
+        $request->merge(['supplier' => $supplier]);
+
+        return Excel::download(
+            new ExitMoneyExport($data, $request, $company),
+            'egresos_' . Carbon::now()->format('Y-m-d') . '.xlsx'
+        );
     }
 
 

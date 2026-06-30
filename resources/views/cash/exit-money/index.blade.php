@@ -12,7 +12,10 @@
     <div class="card overflow-hidden">
         <div class="card-header d-flex align-items-center justify-content-between">
             <h6 class="card-title mb-0">LISTA DE EGRESOS</h6>
-            <div class="input-group-append">
+            <div class="input-group-append d-flex gap-2">
+                <button type="button" class="btn btn-success" onclick="downloadExcel();">
+                    <i class="fas fa-file-excel pe-1"></i> EXCEL
+                </button>
                 <a href="{{ route('tenant.egreso.create') }}" class="btn btn-primary">
                     <div class="lign-items-center d-flex align-items-center">
                         <i class="fas fa-plus pe-1"></i>
@@ -22,26 +25,55 @@
             </div>
         </div>
         <div class="card-body p-0 pb-2">
-            <form action="{{ route('tenant.cajas.egreso') }}" method="GET">
-                <div class="d-flex justify-content-center align-items-center mb-3">
-                    <div class="form-group me-3">
-                        <label for="from_date">Desde</label>
-                        <input type="date" name="from_date" id="from_date" class="form-control"
-                            value="{{ $from_today }}">
-                    </div>
-                    <div class="form-group">
-                        <label for="to_date">Hasta</label>
-                        <div class="d-flex align-items-center">
-                            <input type="date" name="to_date" id="to_date" class="form-control me-2"
-                                value="{{ $to_today }}">
-
-                            <button type="submit" class="btn btn-rounded btn-primary">
-                                <i class='bx bx-search-alt-2'></i>
-                            </button>
-                        </div>
-                    </div>
+            <div class="row px-3 mb-3">
+                <!-- Proveedor -->
+                <div class="col-lg-4 col-md-6 col-sm-12 mb-2">
+                    <label class="form-label fw-bold">
+                        <i class="fas fa-user text-primary mr-1"></i> Proveedor:
+                    </label>
+                    <select class="form-control" id="supplier" name="supplier">
+                        <option value="">Todos</option>
+                    </select>
                 </div>
-            </form>
+
+                <!-- Razón (enum: lista completa, aunque no haya egresos) -->
+                <div class="col-lg-2 col-md-3 col-sm-6 mb-2">
+                    <label class="form-label fw-bold">
+                        <i class="fas fa-tasks text-info mr-1"></i> Razón:
+                    </label>
+                    <select class="form-control" id="reason" name="reason">
+                        <option value="">Todos</option>
+                        <option value="GASTO">Gasto</option>
+                        <option value="DEVOLUCION">Devolución</option>
+                        <option value="COMPRAS">Compras</option>
+                        <option value="LIMPIEZA">Limpieza</option>
+                        <option value="ENVIO">Envío</option>
+                    </select>
+                </div>
+
+                <!-- Desde -->
+                <div class="col-lg-2 col-md-3 col-sm-6 mb-2">
+                    <label class="form-label fw-bold">
+                        <i class="fas fa-calendar-alt text-success mr-1"></i> Desde:
+                    </label>
+                    <input type="date" class="form-control" id="from_date" name="from_date" value="{{ $from_today }}">
+                </div>
+
+                <!-- Hasta -->
+                <div class="col-lg-2 col-md-3 col-sm-6 mb-2">
+                    <label class="form-label fw-bold">
+                        <i class="fas fa-calendar-check text-danger mr-1"></i> Hasta:
+                    </label>
+                    <input type="date" class="form-control" id="to_date" name="to_date" value="{{ $to_today }}">
+                </div>
+
+                <!-- Filtrar -->
+                <div class="col-lg-2 col-md-3 col-sm-12 mb-2 d-flex align-items-end">
+                    <button type="button" id="btn-filter" class="btn btn-primary w-100" onclick="filterData();">
+                        <i class="fas fa-filter mr-1"></i> Filtrar
+                    </button>
+                </div>
+            </div>
             @include('cash.exit-money.tables.tbl_list_exit_money')
         </div>
     </div>
@@ -52,13 +84,76 @@
         let dtExitMoneys = null;
 
         document.addEventListener('DOMContentLoaded', () => {
+            loadTomSelect();
             iniciarDtExitMoneys();
         });
+
+        function loadTomSelect() {
+            window.supplierSelect = new TomSelect('#supplier', {
+                valueField: 'id',
+                labelField: 'full_name',
+                searchField: ['full_name'],
+                plugins: ['clear_button'],
+                placeholder: 'Seleccione un proveedor',
+                maxOptions: 20,
+                create: false,
+                preload: false,
+                load: async (query, callback) => {
+                    if (!query.length) return callback();
+                    try {
+                        const url = `{{ route('tenant.utils.searchSupplier') }}?q=${encodeURIComponent(query)}`;
+                        const response = await fetch(url);
+                        if (!response.ok) throw new Error('Error al buscar proveedores');
+                        const data = await response.json();
+                        callback(data.data ?? []);
+                    } catch (error) {
+                        console.error('Error cargando proveedores:', error);
+                        callback();
+                    }
+                },
+                render: {
+                    option: (item, escape) => `<div><strong>${escape(item.full_name)}</strong></div>`,
+                    item: (item, escape) => `<div>${escape(item.full_name)}</div>`
+                }
+            });
+        }
+
+        function filterData() {
+            toastr.clear();
+            const fromDate = document.getElementById('from_date')?.value;
+            const toDate = document.getElementById('to_date')?.value;
+
+            if (fromDate && toDate && fromDate > toDate) {
+                toastr.error('La fecha Desde no puede ser mayor que Hasta', 'Fechas inválidas');
+                return;
+            }
+
+            dtExitMoneys.ajax.reload();
+        }
+
+        function downloadExcel() {
+            // Mismos filtros que el datatable -> el Excel exporta lo que se ve filtrado.
+            const url = route('tenant.egreso.excel', {
+                supplier: document.querySelector('#supplier').value,
+                reason: document.querySelector('#reason').value,
+                from_date: $('#from_date').val(),
+                to_date: $('#to_date').val()
+            });
+            window.open(url, '_blank');
+        }
 
         function iniciarDtExitMoneys() {
             dtExitMoneys = new DataTable('#dt-exit-moneys', {
                 processing: true,
-                ajax: '{{ route('tenant.egreso.getExitMoneys') }}',
+                ajax: {
+                    url: '{{ route('tenant.egreso.getExitMoneys') }}',
+                    data: function(d) {
+                        d.supplier = document.querySelector('#supplier').value;
+                        d.reason = document.querySelector('#reason').value;
+                        d.from_date = $('#from_date').val();
+                        d.to_date = $('#to_date').val();
+                    }
+                },
                 columns: [{
                         data: 'id',
                         className: "text-center",
@@ -153,7 +248,7 @@
                 },
 
                 order: [
-                    [0, "desc"]
+                    [1, "asc"]
                 ],
             });
         }
