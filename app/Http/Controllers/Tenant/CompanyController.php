@@ -318,8 +318,6 @@ array:16 [▼ // app\Http\Controllers\Tenant\CompanyController.php:223
         $company->instagram                 =   $request->instagram;
         $company->web                       =   $request->web;
         $company->invoicing_status          =   $request->invoicing_status;
-        $company->lat                       =   $request->get('lat');
-        $company->lng                       =   $request->get('lng');
         $company->save();
 
         return redirect()->route('tenant.mantenimientos.empresa')->with('success', 'Empresa actualizada correctamente');

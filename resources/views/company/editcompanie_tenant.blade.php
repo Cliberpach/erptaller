@@ -118,7 +118,6 @@
 
 
     <link rel="stylesheet" href="{{ asset('assets/css/styles.css') }}">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
 @endsection
 
@@ -218,19 +217,14 @@
 @endsection
 
 @section('js')
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAS6qv64RYCHFJOygheJS7DvBDYB0iV2wI&libraries=geometry,places"></script>
 
 <script>
-
-    let map;
-    let onemarker = 0;
 
     document.addEventListener('DOMContentLoaded', function () {
         iniciarSelect2();
         startDataTableNumeration();
         setUbigeoPreview();
-        setMapa();
-        events(); 
+        events();
     });
 
     function events(){
@@ -289,103 +283,6 @@
             placeholder: $( this ).data( 'placeholder' ),
             dropdownParent: $('#mdlNumeration')
         })
-    }
-
-    function setMapa(){
-
-        const lat   =   @json($company->lat);
-        const lng   =   @json($company->lng);
-
-        console.log('latitud',parseFloat(lat));
-
-        map =   new google.maps.Map(document.getElementById("map"), {
-                    zoom: 12,
-                    center: {
-                        lat: lat?parseFloat(lat):-8.1092027,
-                        lng: lng?parseFloat(lng):-79.0244529
-                    },
-                    gestureHandling: "greedy",
-                    zoomControl: false,
-                    mapTypeControl: false,
-                    streetViewControl: false,
-                    fullscreenControl: false,
-                });
-
-        if(!isNaN(parseFloat(lat)) && !isNaN(parseFloat(lng))){
-            editmarker(parseFloat(lat), parseFloat(lng))
-        }
-
-        google.maps.event.addListener(map, "click", function(event) {
-            if (onemarker == 0) {
-                var marker = new google.maps.Marker({
-                    position: event.latLng,
-                    map: map,
-                    draggable: true
-                });
-                $("#lat").val(marker.getPosition().lat());
-                $("#lng").val(marker.getPosition().lng());
-                google.maps.event.addListener(marker, "dragend", function(event) {
-                    $("#lat").val(this.getPosition().lat());
-                    $("#lng").val(this.getPosition().lng());
-                });
-                onemarker = 1;
-            }
-        });
-
-        const input = document.getElementById("searchBox");
-        const autocomplete = new google.maps.places.Autocomplete(input);
-        autocomplete.bindTo("bounds", map);
-
-
-        autocomplete.addListener("place_changed", () => {
-            const place = autocomplete.getPlace();
-
-            if (!place.geometry || !place.geometry.location) {
-                alert("No se encontró el lugar. Intenta con otra búsqueda.");
-                return;
-            }
-
-            // Centrar el mapa en la ubicación seleccionada
-            map.setCenter(place.geometry.location);
-            map.setZoom(20);
-
-            // Agregar marcador en la ubicación seleccionada
-            
-                var marker = new google.maps.Marker({
-                    position: place.geometry.location,
-                    map: map,
-                    draggable: true
-                });
-                $("#lat").val(marker.getPosition().lat());
-                $("#lng").val(marker.getPosition().lng());
-
-                google.maps.event.addListener(marker, "dragend", function(event) {
-                    $("#lat").val(this.getPosition().lat());
-                    $("#lng").val(this.getPosition().lng());
-                });
-
-                onemarker = 1;
-            
-        });
-
-    }
-
-    function editmarker(lat, lng) {
-        var marker = new google.maps.Marker({
-            position: {
-                lat: lat,
-                lng: lng
-            },
-            map: map,
-            draggable: true
-        })
-        $("#lat").val(marker.getPosition().lat());
-        $("#lng").val(marker.getPosition().lng());
-        google.maps.event.addListener(marker, "dragend", function(event) {
-            $("#lat").val(this.getPosition().lat());
-            $("#lng").val(this.getPosition().lng());
-        });
-        onemarker   =   1;
     }
 
     function setUbigeoPreview(){

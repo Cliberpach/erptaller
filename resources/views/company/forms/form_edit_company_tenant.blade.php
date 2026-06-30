@@ -97,17 +97,6 @@
             </select>
             <span class="district_customer msgErrorCustomer"  style="color:red;"></span>
         </div>
-
-        <div class="col-12">
-            <label for="map" class="form-label" style="font-weight: bold;">UBICACIÓN</label>
-            <div>
-                <input id="searchBox" type="text" placeholder="Buscar dirección..." style="width: 100%; padding: 10px; margin-bottom: 10px;">
-            </div>
-            <div id="map" style="width:100%;height:300px;">
-            </div>
-            <input type="hidden" id="lat" name="lat">
-            <input type="hidden" id="lng" name="lng">
-        </div>
     </div>
 
     <!-- Mostrar logo actual -->
