@@ -293,14 +293,20 @@ array:16 [▼ // app\Http\Controllers\Tenant\CompanyController.php:223
             }
 
             $file                   =   $request->file('logo');
-            $fileName               =   $company->ruc . '.' . $file->getClientOriginalExtension();
 
-            $base64_logo            = 'data:' . $file->getMimeType() . ';base64,' . base64_encode(file_get_contents($file));
+            // Comprimir/redimensionar el logo (max 500px, preserva transparencia PNG)
+            // antes de persistirlo: sale liviano y nítido en los PDF. El MISMO binario
+            // comprimido alimenta el archivo y el base64 (companies.base64_logo).
+            $logo                   =   $this->compressLogo($file);
+
+            $fileName               =   $company->ruc . '.' . $logo['extension'];
+
+            $base64_logo            = 'data:' . $logo['mime'] . ';base64,' . base64_encode($logo['binary']);
             $company->base64_logo   = $base64_logo; // Guardar en la columna logo_base64
             $company->logo          = 'storage/' . $company->files_route . '/logo/' . $fileName;
             $company->logo_url      = 'storage/' . $company->files_route . '/logo/' . $fileName;
 
-            $file->move($route_logo_tenant, $fileName);
+            File::put($route_logo_tenant . $fileName, $logo['binary']);
         }
 
         // Guardar los demás campos
@@ -318,6 +324,76 @@ array:16 [▼ // app\Http\Controllers\Tenant\CompanyController.php:223
         $company->save();
 
         return redirect()->route('tenant.mantenimientos.empresa')->with('success', 'Empresa actualizada correctamente');
+    }
+
+    /**
+     * Comprime y redimensiona el logo de empresa antes de persistirlo: max 500px de
+     * ancho (solo downscale, nunca agranda) y preserva la transparencia en PNG. Devuelve
+     * el binario re-encodeado + su mime/extensión, para alimentar tanto el archivo como
+     * el base64 (companies.base64_logo) que leen los PDF. Usa GD nativo (sin dependencias).
+     * GIF se normaliza a PNG (conserva alfa); JPEG queda JPEG. Si GD no puede decodificar
+     * el archivo, devuelve el original sin tocar (no rompe el upload).
+     */
+    private function compressLogo(\Illuminate\Http\UploadedFile $file): array
+    {
+        $maxWidth = 500;
+        $contents = file_get_contents($file->getRealPath());
+
+        $src = @imagecreatefromstring($contents);
+        if ($src === false) {
+            return [
+                'binary'    => $contents,
+                'mime'      => $file->getMimeType(),
+                'extension' => $file->getClientOriginalExtension(),
+            ];
+        }
+
+        $width  = imagesx($src);
+        $height = imagesy($src);
+
+        // Solo achicar si supera el max; mantener proporción.
+        if ($width > $maxWidth) {
+            $newWidth  = $maxWidth;
+            $newHeight = (int) max(1, round($height * ($maxWidth / $width)));
+        } else {
+            $newWidth  = $width;
+            $newHeight = $height;
+        }
+
+        // PNG y GIF -> salida PNG con transparencia; el resto -> JPEG.
+        $mime    = $file->getMimeType();
+        $toPng   = in_array($mime, ['image/png', 'image/gif'], true);
+
+        $dst = imagecreatetruecolor($newWidth, $newHeight);
+        if ($toPng) {
+            imagealphablending($dst, false);
+            imagesavealpha($dst, true);
+            $transparent = imagecolorallocatealpha($dst, 0, 0, 0, 127);
+            imagefill($dst, 0, 0, $transparent);
+        }
+
+        imagecopyresampled($dst, $src, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
+
+        ob_start();
+        if ($toPng) {
+            imagepng($dst, null, 7);        // lossless, nivel 7
+            $outMime = 'image/png';
+            $outExt  = 'png';
+        } else {
+            imagejpeg($dst, null, 85);      // calidad 85
+            $outMime = 'image/jpeg';
+            $outExt  = 'jpg';
+        }
+        $binary = ob_get_clean();
+
+        imagedestroy($src);
+        imagedestroy($dst);
+
+        return [
+            'binary'    => $binary,
+            'mime'      => $outMime,
+            'extension' => $outExt,
+        ];
     }
 
 
