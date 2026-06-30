@@ -109,7 +109,9 @@ class QuoteController extends Controller
         $company_invoice            =   CompanyInvoice::find(1);
         $years                      =   UtilController::getYears();
         $colors                     =   Color::where('status', 'ACTIVE')->get();
-        $customer_formatted         =   FormatController::getFormatInitialCustomer(1);
+        // Cliente Varios por flag es_varios (no id hardcodeado); fallback a 1 -> sin fatal.
+        $varios_id                  =   DB::table('customers')->where('es_varios', true)->value('id') ?? 1;
+        $customer_formatted         =   FormatController::getFormatInitialCustomer($varios_id);
 
         $categories                 =   UtilController::getCategoriesProducts();
         $brands                     =   UtilController::getBrandsProducts();

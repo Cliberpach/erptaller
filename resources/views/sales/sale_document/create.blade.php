@@ -20,6 +20,13 @@
         </x-slot>
 
         <x-slot name="contentCard">
+            {{-- Hint UX: avisa ANTES de emitir que Factura + Cliente Varios no va (el backend
+                 ya lo bloquea: DNI+FACTURA en ValidationsService). Se muestra/oculta por JS. --}}
+            <div id="factura_varios_hint" class="alert alert-warning d-none" role="alert">
+                <i class="fas fa-triangle-exclamation me-1"></i>
+                <strong>Factura requiere cliente con RUC.</strong> Cambiá el cliente (Cliente Varios no aplica para factura).
+            </div>
+
             @include('sales.sale_document.forms.form_create')
         </x-slot>
     </x-card>
@@ -50,13 +57,36 @@
 
         let debounceTimer;
 
+        // Hint UX: id del Cliente Varios (precargado por flag es_varios desde el controller).
+        const VARIOS_ID = @json($customer_formatted['id'] ?? null);
+
         document.addEventListener('DOMContentLoaded', () => {
             iniciarDataTableProductos();
             iniciarSelect2();
             loadTomSelect();
             events();
+            initFacturaVariosHint();
 
         });
+
+        // Aviso ámbar si se elige FACTURA con el Cliente Varios cargado (el backend igual lo
+        // bloquea: DNI+FACTURA). Solo avisa antes de emitir; no reemplaza la validación.
+        function initFacturaVariosHint() {
+            const typeSaleEl = document.getElementById('type_sale');
+            if (typeSaleEl) typeSaleEl.addEventListener('change', checkFacturaVariosHint);
+            checkFacturaVariosHint();
+        }
+
+        function checkFacturaVariosHint() {
+            const sel  = document.getElementById('type_sale');
+            const hint = document.getElementById('factura_varios_hint');
+            if (!sel || !hint) return;
+            const opt        = sel.options[sel.selectedIndex];
+            const isFactura  = ((opt && opt.text) || '').trim().toUpperCase() === 'FACTURA';
+            const current    = window.clientSelect ? window.clientSelect.getValue() : null;
+            const isVarios   = VARIOS_ID != null && String(current) === String(VARIOS_ID);
+            hint.classList.toggle('d-none', !(isFactura && isVarios));
+        }
 
         function events() {
 
@@ -1013,6 +1043,8 @@
         }
 
         async function actionChangeClient(value) {
+
+            checkFacturaVariosHint(); // refrescar aviso Factura+Varios (incluye el caso "limpiar")
 
             if (!value) return;
 

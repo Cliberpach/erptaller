@@ -150,7 +150,10 @@ class SaleController extends Controller
         // Combo de venta: solo BOLETA/FACTURA/TICKET (NV/NC/ND/Guía no se crean acá).
         $invoice_types      =   UtilController::getInvoiceTypesVenta();
         $payment_methods    =   PaymentMethod::where('estado', 'ACTIVO')->get();
-        $customer_formatted =   FormatController::getFormatInitialCustomer(1);
+        // Cliente Varios por flag es_varios (no id hardcodeado); fallback a 1 si el tenant
+        // no tuviera el registro -> sin fatal.
+        $varios_id          =   DB::table('customers')->where('es_varios', true)->value('id') ?? 1;
+        $customer_formatted =   FormatController::getFormatInitialCustomer($varios_id);
         $payment_conditions =   UtilController::getPaymentConditions();
 
         $years                      =   UtilController::getYears();

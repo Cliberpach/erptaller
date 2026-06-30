@@ -106,7 +106,9 @@ class WorkOrderController extends Controller
         $warehouses                 =   Warehouse::where('estado', 'ACTIVO')->get();
         $checks_inventory_vehicle   =   UtilController::getInventoryVehicleChecks();
         $technicians                =   UtilController::getTechnicians();
-        $customer_formatted         =   FormatController::getFormatInitialCustomer(1);
+        // Cliente Varios por flag es_varios (no id hardcodeado); fallback a 1 -> sin fatal.
+        $varios_id                  =   DB::table('customers')->where('es_varios', true)->value('id') ?? 1;
+        $customer_formatted         =   FormatController::getFormatInitialCustomer($varios_id);
         $validate_stock             =   Configuration::findOrFail(2)->property;
         $types_identity_documents   =   UtilController::getIdentityDocuments();
         $departments                =   Department::all();
