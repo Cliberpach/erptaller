@@ -160,15 +160,18 @@ class PettyCashBookService
         $report_expenses            =   $this->getReportExpenses($payment_methods, $id);
         $report_customer_accounts   =   $this->getReportCustomerAccounts($payment_methods, $id);
         $report_credit_sales        =   $this->getReportCreditSales($id); // informativo, NO suma
+        $report_credit_notes        =   $this->getReportCreditNotes($id); // Capa 6: RESTA del cuadre
         $petty_cash_book            =   $this->s_repository->getPettyCashBookInfo($id);
-        // Cuadre: solo ventas CONTADO + cobranzas - egresos + saldo inicial. El crédito NO suma.
-        $amount_close               =   $report_customer_accounts['total'] + $report_sales['total'] - $report_expenses['total'] + $petty_cash_book->initial_amount;
+        // Cuadre: ventas CONTADO + cobranzas - egresos - notas de crédito + saldo inicial.
+        // El crédito (venta) NO suma. Las NC restan lo devuelto al cliente en esta caja.
+        $amount_close               =   $report_customer_accounts['total'] + $report_sales['total'] - $report_expenses['total'] - $report_credit_notes['total'] + $petty_cash_book->initial_amount;
 
         return [
             'report_sales'              =>  $report_sales,
             'report_expenses'           =>  $report_expenses,
             'report_customer_accounts'  =>  $report_customer_accounts,
             'report_credit_sales'       =>  $report_credit_sales,
+            'report_credit_notes'       =>  $report_credit_notes,
             'petty_cash_book'           =>  $petty_cash_book,
             'amount_close'              =>  $amount_close
         ];
@@ -284,6 +287,26 @@ class PettyCashBookService
         $total  =   $customer_pays->sum('total');
 
         return ['total' => $total, 'report' => $report_customer_accounts];
+    }
+
+    /**
+     * Notas de Crédito del turno (Capa 6): las NC atribuidas a ESTA caja (Capa 3 guardó
+     * petty_cash_book_id = caja abierta de hoy para la NC directa+contado). Restan del
+     * cuadre. Las NC convertida/OT/crédito tienen petty_cash_book_id = null -> el WHERE
+     * las excluye solas. Sin filtro de sunat_status: la plata se devolvió al emitir.
+     */
+    public function getReportCreditNotes(int $id)
+    {
+        $credit_notes = DB::table('credit_notes')
+            ->where('petty_cash_book_id', $id)
+            ->select('id', 'serie', 'correlative', 'tipDocAfectado', 'numDocfectado', 'total')
+            ->orderBy('id')
+            ->get();
+
+        return [
+            'total'  => (float) $credit_notes->sum('total'),
+            'report' => $credit_notes,
+        ];
     }
 
 

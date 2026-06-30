@@ -371,6 +371,44 @@
         </table>
 
 
+        {{-- Capa 6: NC atribuidas a esta caja (Capa 3). Restan del cuadre (devolución al
+             cliente). Las convertida/OT/crédito tienen petty_cash_book_id null -> no entran. --}}
+        <h5 style="font-size:9px;">NOTAS DE CRÉDITO DEL TURNO</h5>
+
+        <table class="table-info table-sm table" style="border-collapse: collapse; width: 100%;">
+            <thead style="background-color: #c0c0c0; color: #000;">
+                <tr>
+                    <th>NOTA DE CRÉDITO</th>
+                    <th>DOC. AFECTADO</th>
+                    <th style="text-align:right;">TOTAL</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse ($consolidated['report_credit_notes']['report'] as $nc)
+                    @php
+                        $afectado = $nc->tipDocAfectado === '01' ? 'FACTURA' : ($nc->tipDocAfectado === '03' ? 'BOLETA' : $nc->tipDocAfectado);
+                    @endphp
+                    <tr>
+                        <td>{{ $nc->serie . '-' . $nc->correlative }}</td>
+                        <td>{{ $afectado }} {{ $nc->numDocfectado }}</td>
+                        <td style="text-align:right;">{{ number_format($nc->total, 2, '.', ',') }}</td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="3" style="text-align:center;">Sin notas de crédito en este turno.</td>
+                    </tr>
+                @endforelse
+
+                <tr style="font-weight:bold; background:#e0e0e0;">
+                    <td colspan="2" class="text-end">TOTAL</td>
+                    <td style="text-align:right;">
+                        {{ number_format($consolidated['report_credit_notes']['total'], 2, '.', ',') }}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+
         <h5 style="font-size:10px; margin-top:25px;">RESUMEN FINAL</h5>
 
         <table class="table-info table-sm table" style="border-collapse: collapse; width: 100%;">
@@ -396,6 +434,12 @@
                 <th> TOTAL COBRANZA CLIENTES</th>
                 <td style="text-align:right;">
                     {{ number_format($consolidated['report_customer_accounts']['total'], 2, '.', ',') }}
+                </td>
+            </tr>
+            <tr>
+                <th> (−) TOTAL NOTAS DE CRÉDITO</th>
+                <td style="text-align:right;">
+                    {{ number_format($consolidated['report_credit_notes']['total'], 2, '.', ',') }}
                 </td>
             </tr>
             <tr style="background:#e0f7fa;">
