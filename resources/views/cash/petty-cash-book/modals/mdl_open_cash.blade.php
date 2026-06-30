@@ -39,6 +39,15 @@
 
 <script>
     function openMdlOpenCash() {
+        // Re-fetchear "Cajas Disponibles" en cada apertura: el TomSelect tiene preload:true y
+        // se llenó una sola vez al cargar la página -> no incluía la caja recién liberada al
+        // cerrar. destroy() + iniciarTomSelect() lo re-crea (preload re-llama searchCashAvailable);
+        // el destroy previo evita instancias/listeners duplicados. Un load('') pelado no re-fetchea
+        // confiable porque TomSelect cachea el preload.
+        if (window.cashesAvailableSelect) {
+            window.cashesAvailableSelect.destroy();
+            iniciarTomSelect();
+        }
         $('#mdlOpenCash').modal('show');
     }
 
