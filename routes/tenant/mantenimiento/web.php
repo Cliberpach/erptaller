@@ -41,8 +41,6 @@ Route::group(["prefix" => "mantenimiento"], function () {
         Route::put('empresa/update/{id}', [CompanyController::class, 'update'])->name('tenant.mantenimientos.empresa.update');
         Route::post('empresa', [CompanyController::class, 'store'])->name('tenant.mantenimientos.empresas.store');
         Route::put('updateInvoice/{id}', [CompanyController::class, 'updateInvoice'])->name('tenant.mantenimientos.empresas.updateInvoice');
-        Route::post('storeNumeration', [CompanyController::class, 'storeNumeration'])->name('tenant.mantenimientos.empresas.storeNumeration');
-        Route::get('getListNumeration', [CompanyController::class, 'getListNumeration'])->name('tenant.mantenimientos.empresas.getListNumeration');
     });
 
     Route::group(["prefix" => "cargos", 'middleware' => 'can:mantenimiento.cargos.gestionar'], function () {

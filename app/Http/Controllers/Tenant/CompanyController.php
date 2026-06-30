@@ -5,20 +5,17 @@ namespace App\Http\Controllers\Tenant;
 
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\UtilController;
-use App\Http\Requests\Company\CompanyNumerationRequest;
 use App\Http\Requests\CompanyStoreRequest;
 use Illuminate\Http\Request;
 use App\Models\Company;
 use App\Models\CompanyInvoice;
 use App\Models\Department;
 use App\Models\District;
-use App\Models\Landlord\GeneralTable\GeneralTableDetail;
 use App\Models\Module;
 use App\Models\ModuleChild;
 use App\Models\ModuleGrandChild;
 use App\Models\Province;
 use App\Models\Tenant;
-use App\Models\Tenant\DocumentSerialization;
 use App\Models\User;
 use Exception;
 use Illuminate\Support\Facades\DB;
@@ -417,65 +414,4 @@ tmp\phpBE97.tmp"
         }
     }
 
-    public function getListNumeration(Request $request)
-    {
-
-        $numerations = DB::table('document_serializations as ds')
-            ->select(
-                'ds.id',
-                'ds.serie',
-                'ds.start_number',
-                'ds.description',
-                'ds.initiated'
-            )
-            ->get();
-
-        return DataTables::of($numerations)
-            ->make(true);
-    }
-
-    /*
-array:3 [ // app\Http\Controllers\Tenant\CompanyController.php:395
-  "billing_type_document"   => "3"
-  "serie"                   => "B001"
-  "start_number"            => "1"
-]
-*/
-    public function storeNumeration(CompanyNumerationRequest $request)
-    {
-        DB::beginTransaction();
-
-        try {
-
-            //====== VALIDANDO QUE NO EXISTA NUMERACIÓN PREVIA PARA ESTE TIPO DE DOCUMENTO =========
-            $numeration_exists  =   DocumentSerialization::where('document_type_id', $request->get('billing_type_document'))->first();
-
-            if ($numeration_exists) {
-                throw new Exception("ESTE DOCUMENTO YA TIENE NUMERACIÓN!!!");
-            }
-
-            //======== OBTIENDO DATA DEL TIPO DE DOCUMENTO =========
-            $type_document  =   GeneralTableDetail::findOrFail($request->get('billing_type_document'));
-
-            $serialization                      =   new DocumentSerialization();
-            $serialization->company_id          =   1;
-            $serialization->document_type_id    =   $type_document->id;
-            $serialization->serie               =   $request->get('serie');
-            $serialization->description         =   $type_document->description;
-            $serialization->start_number        =   $request->get('start_number');
-            $serialization->number_limit        =   8;
-            $serialization->destiny             =   null;
-            $serialization->default             =   'NO';
-            $serialization->final_number        =   0;
-            $serialization->initiated           =   'NO';
-            $serialization->save();
-
-            DB::commit();
-
-            return response()->json(['success' => true, 'message' => "NUMERACIÓN REGISTRADA"]);
-        } catch (Throwable $th) {
-            DB::rollBack();
-            return response()->json(['success' => false, 'message' => $th->getMessage()]);
-        }
-    }
 }

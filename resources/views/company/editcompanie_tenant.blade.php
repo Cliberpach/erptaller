@@ -179,39 +179,7 @@
         </div>
     </div>
 
-    @include('company.modals.modal_numeration')
-    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 mb-3">
-        <div class="card">
-            <div class="card-header bg-primary d-flex justify-content-between align-items-center" style="color:white;">
-                Facturación Numeración
-            </div>
-            <div class="card-body">
-                <div class="row" style="margin-top:10px;margin-bottom:10px;">
-                    <div class="col">
-                        <button class="btn btn-primary" onclick="openMdlNumeration()">
-                            <i class="fas fa-plus"></i> NUEVO
-                        </button>
-                    </div>
-                </div>
 
-                <div class="row">
-                    <div class="col-12">
-                        @include('company.tables.tbl_numeration')
-                    </div>
-                </div>
-                
-            </div>
-            <div class="card-footer">
-                <div class="row">
-                    <div class="col-12">
-                      <p style="display: block;margin:0;padding:0;font-weight:bold;" class="color_warning">Los campos con (*) son obligatorios</p>
-                    </div>
-                  </div>
-            </div>
-        </div>
-    </div>
-
-    
 </div>
 
 @endsection
@@ -222,15 +190,11 @@
 
     document.addEventListener('DOMContentLoaded', function () {
         iniciarSelect2();
-        startDataTableNumeration();
         setUbigeoPreview();
         events();
     });
 
     function events(){
-
-        eventsMdlNumeration();
-
 
         const inputLogo = document.getElementById('input-logo');
         const previewLogo = document.getElementById('preview-logo');
@@ -275,13 +239,6 @@
             theme: "bootstrap-5",
             width: $( this ).data( 'width' ) ? $( this ).data( 'width' ) : $( this ).hasClass( 'w-100' ) ? '100%' : 'style',
             placeholder: $( this ).data( 'placeholder' )
-        })
-
-        $( '.select2_form_numeration' ).select2( {
-            theme: "bootstrap-5",
-            width: $( this ).data( 'width' ) ? $( this ).data( 'width' ) : $( this ).hasClass( 'w-100' ) ? '100%' : 'style',
-            placeholder: $( this ).data( 'placeholder' ),
-            dropdownParent: $('#mdlNumeration')
         })
     }
 
