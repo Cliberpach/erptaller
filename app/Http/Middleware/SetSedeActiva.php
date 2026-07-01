@@ -3,6 +3,8 @@
 namespace App\Http\Middleware;
 
 use App\Http\Concerns\HasSedeActiva;
+use App\Models\Company;
+use App\Models\Plan;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -28,6 +30,10 @@ class SetSedeActiva
         View::share('sedeActiva', $this->sedeActiva());
         View::share('sedesDisponibles', $this->sedesDisponibles());
         View::share('cajaAbierta', $this->tieneCajaAbierta());   // CANDADO 3 (UI selector)
+
+        // Plan REAL de la empresa (misma fuente que PlanMiddleware: companies.plan -> plans).
+        // El header lo muestra; antes usaba plans->first() y mostraba siempre el primero (BÁSICO).
+        View::share('planActual', Plan::find(Company::first()?->plan)?->description);
 
         return $next($request);
     }
