@@ -21,6 +21,10 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        if ($this->app->runningInConsole()) {
+            return;
+        }
+
         $host    = request()->getHost();
         $appHost = parse_url(config('app.url'), PHP_URL_HOST);
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace Database\Seeders\tenant;
+namespace Database\Seeders\landlord;
 
 use App\Models\Province;
 use Illuminate\Database\Seeder;

@@ -1,14 +1,21 @@
 <?php return array (
   'barryvdh/laravel-dompdf' => 
   array (
+    'aliases' => 
+    array (
+      'PDF' => 'Barryvdh\\DomPDF\\Facade\\Pdf',
+      'Pdf' => 'Barryvdh\\DomPDF\\Facade\\Pdf',
+    ),
     'providers' => 
     array (
       0 => 'Barryvdh\\DomPDF\\ServiceProvider',
     ),
-    'aliases' => 
+  ),
+  'codezero/browser-locale' => 
+  array (
+    'providers' => 
     array (
-      'Pdf' => 'Barryvdh\\DomPDF\\Facade\\Pdf',
-      'PDF' => 'Barryvdh\\DomPDF\\Facade\\Pdf',
+      0 => 'CodeZero\\BrowserLocale\\Laravel\\BrowserLocaleServiceProvider',
     ),
   ),
   'laravel-lang/actions' => 
@@ -53,6 +60,20 @@
       0 => 'LaravelLang\\Locales\\ServiceProvider',
     ),
   ),
+  'laravel-lang/models' => 
+  array (
+    'providers' => 
+    array (
+      0 => 'LaravelLang\\Models\\ServiceProvider',
+    ),
+  ),
+  'laravel-lang/moonshine' => 
+  array (
+    'providers' => 
+    array (
+      0 => 'LaravelLang\\MoonShine\\ServiceProvider',
+    ),
+  ),
   'laravel-lang/publisher' => 
   array (
     'providers' => 
@@ -65,6 +86,13 @@
     'providers' => 
     array (
       0 => 'LaravelLang\\Routes\\ServiceProvider',
+    ),
+  ),
+  'laravel-lang/starter-kits' => 
+  array (
+    'providers' => 
+    array (
+      0 => 'LaravelLang\\StarterKits\\ServiceProvider',
     ),
   ),
   'laravel/fortify' => 
@@ -104,24 +132,24 @@
   ),
   'livewire/livewire' => 
   array (
-    'providers' => 
-    array (
-      0 => 'Livewire\\LivewireServiceProvider',
-    ),
     'aliases' => 
     array (
       'Livewire' => 'Livewire\\Livewire',
     ),
+    'providers' => 
+    array (
+      0 => 'Livewire\\LivewireServiceProvider',
+    ),
   ),
   'maatwebsite/excel' => 
   array (
-    'providers' => 
-    array (
-      0 => 'Maatwebsite\\Excel\\ExcelServiceProvider',
-    ),
     'aliases' => 
     array (
       'Excel' => 'Maatwebsite\\Excel\\Facades\\Excel',
+    ),
+    'providers' => 
+    array (
+      0 => 'Maatwebsite\\Excel\\ExcelServiceProvider',
     ),
   ),
   'nesbot/carbon' => 
@@ -147,24 +175,24 @@
   ),
   'spatie/laravel-ignition' => 
   array (
-    'providers' => 
-    array (
-      0 => 'Spatie\\LaravelIgnition\\IgnitionServiceProvider',
-    ),
     'aliases' => 
     array (
       'Flare' => 'Spatie\\LaravelIgnition\\Facades\\Flare',
     ),
+    'providers' => 
+    array (
+      0 => 'Spatie\\LaravelIgnition\\IgnitionServiceProvider',
+    ),
   ),
   'spatie/laravel-multitenancy' => 
   array (
-    'providers' => 
-    array (
-      0 => 'Spatie\\Multitenancy\\MultitenancyServiceProvider',
-    ),
     'aliases' => 
     array (
       'Multitenancy' => 'Spatie\\Multitenancy\\MultitenancyFacade',
+    ),
+    'providers' => 
+    array (
+      0 => 'Spatie\\Multitenancy\\MultitenancyServiceProvider',
     ),
   ),
   'spatie/laravel-permission' => 
@@ -211,13 +239,13 @@
   ),
   'yajra/laravel-datatables-oracle' => 
   array (
-    'providers' => 
-    array (
-      0 => 'Yajra\\DataTables\\DataTablesServiceProvider',
-    ),
     'aliases' => 
     array (
       'DataTables' => 'Yajra\\DataTables\\Facades\\DataTables',
+    ),
+    'providers' => 
+    array (
+      0 => 'Yajra\\DataTables\\DataTablesServiceProvider',
     ),
   ),
 );

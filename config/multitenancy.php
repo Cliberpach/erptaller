@@ -38,6 +38,7 @@ return [
         // \Spatie\Multitenancy\Tasks\SwitchTenantDatabaseTask::class,
         // \Spatie\Multitenancy\Tasks\SwitchRouteCacheTask::class,
         Spatie\Multitenancy\Tasks\SwitchTenantDatabaseTask::class,
+        \App\Tasks\SwitchAuthTask::class,
     ],
 
     /*
@@ -65,6 +66,8 @@ return [
      * The connection name to reach the landlord database
      */
     'landlord_database_connection_name' => 'landlord',
+
+    'switch_tenant_database_connection' => true,
 
     /*
      * This key will be used to bind the current tenant in the container.

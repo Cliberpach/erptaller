@@ -6,8 +6,11 @@ use Database\Seeders\landlord\BankSeeder;
 use Database\Seeders\landlord\BrandSeeder as LandlordBrandSeeder;
 use Illuminate\Database\Seeder;
 use Spatie\Multitenancy\Models\Tenant;
+use Database\Seeders\landlord\DepartmentSeeder as LandlordDepartmentSeeder;
+use Database\Seeders\landlord\DistrictSeeder as LandlordDistrictSeeder;
 use Database\Seeders\landlord\PermissionSeeder;
 use Database\Seeders\landlord\PlanSeeder;
+use Database\Seeders\landlord\ProvinceSeeder as LandlordProvinceSeeder;
 use Database\Seeders\landlord\RoleSeeder;
 use Database\Seeders\landlord\UserSeeder;
 use Database\Seeders\landlord\BrandSeeder;
@@ -18,20 +21,19 @@ use Database\Seeders\landlord\InvoiceTypeSeeder;
 use Database\Seeders\landlord\ModelSeeder;
 use Database\Seeders\landlord\ModuleSeeder;
 use Database\Seeders\landlord\TypeIdentityDocumentSeeder;
+use Database\Seeders\landlord\UnitMeasurementSeeder;
 use Database\Seeders\landlord\YearSeeder;
 use Database\Seeders\tenant\BrandSeeder as TenantBrandSeeder;
 use Database\Seeders\tenant\CategorySeeder;
 use Database\Seeders\tenant\ConfigurationSeeder;
-use Database\Seeders\tenant\DepartmentSeeder;
-use Database\Seeders\tenant\DistrictSeeder;
 use Database\Seeders\tenant\PaymentConditionSeeder;
 use Database\Seeders\tenant\PaymentMethodSeeder;
 use Database\Seeders\tenant\PettyCashSeeder;
 use Database\Seeders\tenant\PositionSeeder;
 use Database\Seeders\tenant\ProofPaymentSeeder;
-use Database\Seeders\tenant\ProvinceSeeder;
 use Database\Seeders\tenant\ShiftSeeder;
 use Database\Seeders\tenant\SupplierSeeder;
+use Database\Seeders\tenant\TenantModuleSeeder;
 use Database\Seeders\tenant\TypeFieldSeeder;
 use Database\Seeders\tenant\UserSeeder as TenantUserSeeder;
 use Database\Seeders\tenant\WarehouseSeeder;
@@ -58,11 +60,11 @@ class DatabaseSeeder extends Seeder
         $this->call(CategorySeeder::class);
         $this->call(PettyCashSeeder::class);
         $this->call(ShiftSeeder::class);
+
+        // Modules must seed before PermissionSeeder so module_children has data
+        $this->call(TenantModuleSeeder::class);
         $this->call(PermissionSeeder::class);
         $this->call(RoleSeeder::class);
-        $this->call(DepartmentSeeder::class);
-        $this->call(ProvinceSeeder::class);
-        $this->call(DistrictSeeder::class);
         $this->call(SupplierSeeder::class);
         $this->call(ProofPaymentSeeder::class);
         $this->call(TypeFieldSeeder::class);
@@ -90,5 +92,8 @@ class DatabaseSeeder extends Seeder
         $this->call(BankSeeder::class);
         $this->call(InvoiceTypeSeeder::class);
         $this->call(UnitMeasurementSeeder::class);
+        $this->call(LandlordDepartmentSeeder::class);
+        $this->call(LandlordProvinceSeeder::class);
+        $this->call(LandlordDistrictSeeder::class);
     }
 }

@@ -1,15 +1,15 @@
 <?php
 
-namespace App\Models\Tenant;
+namespace App\Models\Tenant\Maintenance\Company;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class DocumentSerialization extends Model
+class Module extends Model
 {
     use HasFactory;
-    protected $table = 'document_serializations';
-    protected $connection = 'tenant';
 
+    protected $table = 'modules';
+    protected $connection = 'tenant';
     protected $guarded = [''];
 }

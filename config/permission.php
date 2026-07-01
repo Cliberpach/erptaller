@@ -28,8 +28,8 @@ return [
          */
 
         //'role' => Spatie\Permission\Models\Role::class,
-        'permission'    => TenantPermission::class,
-        'role'          => TenantRole::class,
+        'permission' => Spatie\Permission\Models\Permission::class,
+        'role' => Spatie\Permission\Models\Role::class,
 
     ],
 
@@ -100,6 +100,8 @@ return [
 
         'team_foreign_key' => 'team_id',
     ],
+
+    'database_connection' => null,
 
     /*
      * When set to true, the method for checking permissions will be registered on the gate.
