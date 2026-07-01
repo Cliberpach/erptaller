@@ -35,6 +35,7 @@ class TenantModuleSeeder extends Seeder
                     'module_id'   => $c->module_id,
                     'description' => $c->description,
                     'route_name'  => $c->route_name,
+                    'permission'  => $c->permission, // mapeo nodo->permiso (antes se omitia -> menu vacio)
                     'order'       => $c->order,
                     'show'        => 'tenant',
                     'created_at'  => $now,
@@ -50,6 +51,7 @@ class TenantModuleSeeder extends Seeder
                     'module_child_id' => $g->module_child_id,
                     'description'     => $g->description,
                     'route_name'      => $g->route_name,
+                    'permission'      => $g->permission, // mapeo nodo->permiso (antes se omitia)
                     'order'           => $g->order,
                     'show'            => 'tenant',
                     'created_at'      => $now,
