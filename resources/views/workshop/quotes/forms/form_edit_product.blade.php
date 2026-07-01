@@ -2,6 +2,9 @@
     @csrf
     @method('POST')
 
+    {{-- Flag VEP (Capa 1): fuente única para readonly. Partial compartido por venta/cotización/OT. --}}
+    @php $puedeEditarPrecio = \App\Support\PrecioVenta::puedeEditar(); @endphp
+
     <!-- Product Info Card -->
     <div class="card mb-4 shadow-sm">
         <div class="card-body small">
@@ -36,8 +39,11 @@
             <div class="input-group">
                 <span class="input-group-text"><i class="fas fa-dollar-sign text-success"></i></span>
                 <input required type="text" class="form-control inputDecimalPositivo" id="product_price_edit" name="product_price_edit"
-                    placeholder="Ingrese nuevo precio">
+                    placeholder="Ingrese nuevo precio" @readonly(! $puedeEditarPrecio)>
             </div>
+            @if (! $puedeEditarPrecio)
+                <small class="text-muted"><i class="fas fa-lock me-1"></i>Precio fijado por configuración</small>
+            @endif
         </div>
 
         <div class="col-md-6">
