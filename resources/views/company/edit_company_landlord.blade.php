@@ -9,7 +9,8 @@
 
 @section('content')
     <div class="row">
-        <form action="{{ route('landlord.mantenimientos.empresas.update',['id'=>$company->id]) }}" method="POST" enctype="multipart/form-data">
+        <form id="form-company-edit" action="{{ route('landlord.mantenimientos.empresas.update', ['id' => $tenant_data->id]) }}"
+            method="POST" enctype="multipart/form-data">
             @csrf
             @method('PUT')
             <div class="nav-align-top mb-4">
@@ -43,7 +44,7 @@
                                 <div class="input-group mb-3">
                                     <input type="text" class="form-control @error('domain') is-invalid @enderror"
                                         placeholder="Nombre del dominio" id="domain" name="domain"
-                                        value="{{$company->domain}}"
+                                        value="{{ $tenant_data->domain }}"
                                         readonly>
                                     <span class="input-group-text">.tallersuite.store</span>
                                     <br>
@@ -57,7 +58,7 @@
                                         <div class="input-group">
                                             <input type="text" class="form-control @error('ruc') is-invalid @enderror"
                                                 id="ruc" name="ruc" placeholder="Número de ruc"
-                                                value="{{ $company->ruc }}">
+                                                value="{{ $tenant_data->ruc }}">
                                             <button class="btn btn-outline-primary" type="button" id="btn_consulta_sunat"
                                                 style="padding-right: 10px; padding-left: 10px;"><i
                                                     class="bx bx-search"></i> Sunat</button>
@@ -77,7 +78,7 @@
                                 <div class="mb-3">
                                     <label class="form-label" for="razon_social">Razón social:</label>
                                     <input type="text" class="form-control @error('razon_social') is-invalid @enderror"
-                                        id="razon_social" name="razon_social" value="{{ $company->business_name }}">
+                                        id="razon_social" name="razon_social" value="{{ $tenant_data->business_name }}">
                                 </div>
                                 @error('razon_social')
                                     <p style="color: red; margin-top: -10px;">* {{ $message }}</p>
@@ -90,20 +91,59 @@
                                         <input type="text"
                                             class="form-control @error('razon_social_abreviada') is-invalid @enderror"
                                             id="razon_social_abreviada" name="razon_social_abreviada"
-                                            value="{{ $company->abbreviated_business_name }}">
+                                            value="{{ $tenant_data->abbreviated_business_name }}">
                                     </div>
                                     <div class="col-6">
-                                        <label class="form-label" for="ubigeo">Ubigeo:</label>
-                                        <input type="text" class="form-control" id="ubigeo" name="ubigeo" value="{{$company->zip_code}}">
+                                        <label class="form-label fw-bold" for="input-logo">
+                                            <i class="fas fa-image text-primary me-1"></i> Logo
+                                        </label>
+                                        <input class="form-control" type="file" name="logo" id="input-logo"
+                                            accept="image/jpeg, image/webp">
+                                        @if ($tenant_data->logo_url)
+                                            <img id="show-logo" src="{{ asset($tenant_data->logo_url) }}"
+                                                style="max-height: 60px; margin-top: 6px;">
+                                        @endif
                                     </div>
                                 </div>
                                 @error('razon_social_abreviada')
                                     <p style="color: red; margin-top: -10px;">* {{ $message }}</p>
                                 @enderror
 
+                                <div class="row mb-3">
+                                    <div class="col-lg-4 col-md-4 col-sm-6 col-12">
+                                        <label class="required_field" for="department" style="font-weight: bold;">DEPARTAMENTO</label>
+                                        <select required name="department" id="department" data-placeholder="Seleccionar"
+                                            onchange="changeDepartment(this.value)">
+                                            <option></option>
+                                            @foreach ($departments as $department)
+                                                <option @if ($tenant_data->department_id == $department->id) selected @endif
+                                                    value="{{ $department->id }}">{{ $department->name }}</option>
+                                            @endforeach
+                                        </select>
+                                        <span class="department_error msgError" style="color:red;"></span>
+                                    </div>
+
+                                    <div class="col-lg-4 col-md-4 col-sm-6 col-12">
+                                        <label class="required_field" for="province" style="font-weight: bold;">PROVINCIA</label>
+                                        <select required name="province" id="province" data-placeholder="Seleccionar"
+                                            onchange="changeProvince(this.value)">
+                                            <option></option>
+                                        </select>
+                                        <span class="province_error msgError" style="color:red;"></span>
+                                    </div>
+
+                                    <div class="col-lg-4 col-md-4 col-sm-6 col-12">
+                                        <label class="required_field" for="district" style="font-weight: bold;">DISTRITO</label>
+                                        <select required name="district" id="district" data-placeholder="Seleccionar">
+                                            <option></option>
+                                        </select>
+                                        <span class="district_error msgError" style="color:red;"></span>
+                                    </div>
+                                </div>
+
                                 <div class="mb-3">
                                     <label for="direccion_fiscal" class="form-label">Dirección Fiscal</label>
-                                    <textarea class="form-control" id="direccion_fiscal" name="direccion_fiscal" rows="2">{{$company->fiscal_address}}</textarea>
+                                    <textarea class="form-control" id="direccion_fiscal" name="direccion_fiscal" rows="2">{{ $tenant_data->fiscal_address }}</textarea>
                                 </div>
 
                                 <div class="row">
@@ -111,7 +151,7 @@
                                         <div class="mb-3">
                                             <label class="form-label" for="correo">Correo:</label>
                                             <input type="email" class="form-control" id="correo" name="correo"
-                                                value="{{$user->email}}">
+                                                value="{{ $user->email }}">
                                         </div>
                                     </div>
                                     <div class="col-6">
@@ -120,7 +160,7 @@
                                                 <label class="form-label" for="password">Password</label>
                                                 <div class="input-group input-group-merge">
                                                     <input type="password" class="form-control" id="password"
-                                                        name="password" value="{{$user->password_visible}}">
+                                                        name="password" value="{{ $user->password_visible }}">
                                                     <span class="input-group-text cursor-pointer"><i
                                                             class="bx bx-hide"></i></span>
                                                 </div>
@@ -137,7 +177,8 @@
                                         <div class="input-group">
                                             <span class="input-group-text"><i class='bx bx-user'></i></span>
                                             <input type="text" class="form-control" placeholder="Usuario secundario"
-                                                id="secondary_user" name="secondary_user">
+                                                id="secondary_user" name="secondary_user"
+                                                value="{{ $tenant_data->secondary_user }}">
                                         </div>
                                     </div>
                                     <div class="col-6">
@@ -146,28 +187,51 @@
                                                 secundario:</label>
                                             <div class="input-group">
                                                 <span class="input-group-text"><i class='bx bx-shield'></i></span>
-                                                <input type="password" class="form-control" id="secondary_password"
-                                                    name="secondary_password">
-                                                <span class="input-group-text cursor-pointer">
-                                                    <i class="bx bx-hide"></i></span>
+                                                <input type="text" class="form-control" id="secondary_password"
+                                                    name="secondary_password" value="{{ $tenant_data->secondary_password }}">
                                             </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-lg-6 col-12 mb-3">
+                                        <label class="fw-bold" for="api_user_gre">USUARIO GUÍAS REMISIÓN</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text text-primary"><i class="fas fa-user-lock"></i></span>
+                                            <input value="{{ $tenant_data->api_user_gre }}" id="api_user_gre"
+                                                name="api_user_gre" type="text" class="form-control">
+                                        </div>
+                                    </div>
+
+                                    <div class="col-lg-6 col-12 mb-3">
+                                        <label class="fw-bold" for="api_pass_gre">CLAVE GUÍAS REMISIÓN</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text text-success"><i class="fas fa-key"></i></span>
+                                            <input value="{{ $tenant_data->api_password_gre }}" id="api_pass_gre"
+                                                name="api_pass_gre" type="text" class="form-control">
                                         </div>
                                     </div>
                                 </div>
 
                                 <div class="mb-3">
-                                    <label class="form-label" for="certificate_url">Certificado:</label>
+                                    <label class="form-label" for="certificate">Certificado:</label>
                                     <div class="input-group">
-                                        <input type="file" class="form-control" id="certificate_url"
-                                            name="certificate_url">
+                                        <input type="file" class="form-control" id="certificate" name="certificate"
+                                            accept=".pem,.p12">
                                     </div>
+                                    <div class="text-dark mt-1">
+                                        {{ $tenant_data->certificate ?: 'SIN CERTIFICADO' }}
+                                    </div>
+                                    <small class="text-primary fst-italic">
+                                        Formatos permitidos: <b>.PEM</b> o <b>.P12</b>. Si sube <b>.P12</b>, se
+                                        convertirá automáticamente a <b>.PEM</b>.
+                                    </small>
                                 </div>
 
                                 <div class="mb-3">
                                     <label class="form-label" for="certificate_password">Contraseña de
                                         Certificado:</label>
                                     <div class="input-group">
-                                        <textarea class="form-control" id="certificate_password" name="certificate_password" rows="5"></textarea>
+                                        <textarea class="form-control" id="certificate_password" name="certificate_password" rows="5">{{ $tenant_data->certificate_password }}</textarea>
                                     </div>
                                 </div>
 
@@ -184,7 +248,7 @@
                                             <option value="">Seleccione ...</option>
                                             @foreach ($plans as $plan)
                                                 <option
-                                                @if ($plan->id == $company->plan)
+                                                @if ($plan->id == $tenant_data->plan)
                                                     selected
                                                 @endif
                                                 value="{{ $plan->id }}">{{ $plan->description }}</option>
@@ -386,23 +450,6 @@
     </script>
 
     <script>
-        $('#logo').change(function() {
-            let reader = new FileReader();
-            let file = this.files[0];
-            if (file && file.type.startsWith('image/')) {
-                reader.onload = (e) => {
-                    $('#show-logo').attr('src', e.target.result);
-                }
-                reader.readAsDataURL(file);
-            } else {
-                alert('Seleccione una imagen');
-                $('#show-logo').attr('src', null);
-                $(this).val('');
-            }
-        });
-    </script>
-
-    <script>
         $(document).ready(function() {
             $('.module-checkbox').change(function() {
                 const cardBody = $(this).closest('.card-body');
@@ -482,7 +529,7 @@
                 beforeSend: function() {
                     $('#btn_guardar').attr("disabled", true);
                     $('#btn_guardar').html(
-                        '<div class="spinner-border spinner-border-sm text-white" role="status"></div> Guardando...'
+                        '<div class="spinner-border spinner-border-sm text-white" role="status"></div> Guardando...'
                     );
                 },
                 success: function(data) {
@@ -526,6 +573,184 @@
                     $('#btn_guardar').attr("disabled", false);
                 },
             });
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            loadTomSelect();
+            setUbigeoPreview();
+            events();
+        })
+
+        function events() {
+            document.querySelector('#form-company-edit').addEventListener('submit', (e) => {
+                e.preventDefault();
+                updateCompany(e.target);
+            })
+        }
+
+        function updateCompany(formUpdateCompany) {
+            Swal.fire({
+                title: '¿Desea actualizar la empresa?',
+                text: "¡Se actualizará el tenant!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Sí',
+                cancelButtonText: 'Cancelar',
+                reverseButtons: true,
+                customClass: {
+                    confirmButton: 'btn btn-primary',
+                    cancelButton: 'btn btn-secondary'
+                },
+                buttonsStyling: false
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    try {
+                        clearValidationErrors('msgError');
+
+                        Swal.fire({
+                            title: 'Actualizando empresa...',
+                            html: 'Por favor, espera',
+                            allowOutsideClick: false,
+                            didOpen: () => {
+                                Swal.showLoading();
+                            }
+                        });
+
+                        const formData = new FormData(formUpdateCompany);
+                        formData.append('_method', 'PUT');
+
+                        const res = await axios.post(formUpdateCompany.action, formData);
+                        if (res.data.success) {
+                            toastr.success(res.data.message, 'OPERACIÓN COMPLETADA');
+                            redirect("landlord.mantenimientos.empresa");
+                        } else {
+                            toastr.error(res.data.message, 'ERROR EN EL SERVIDOR');
+                            Swal.close();
+                        }
+                    } catch (error) {
+                        Swal.close();
+                        if (error.response && error.response.status === 422) {
+                            const errors = error.response.data.errors;
+                            paintValidationErrors(errors, 'error');
+                            toastr.error('ERRORES DE VALIDACIÓN EN EL FORMULARIO');
+                            return;
+                        } else {
+                            toastr.error(error, 'ERROR EN LA PETICIÓN ACTUALIZAR EMPRESA');
+                        }
+                    }
+                }
+            });
+        }
+
+        function loadTomSelect() {
+            const departmentSelect = document.getElementById('department');
+            if (departmentSelect && !departmentSelect.tomselect) {
+                window.departmentSelect = new TomSelect(departmentSelect, {
+                    valueField: 'id',
+                    labelField: 'description',
+                    searchField: ['description', 'id'],
+                    create: false,
+                    sortField: { field: 'id', direction: 'asc' },
+                    plugins: ['clear_button'],
+                    render: {
+                        option: (item, escape) => `<div>${escape(item.description)}</div>`,
+                        item: (item, escape) => `<div>${escape(item.description)}</div>`
+                    }
+                });
+            }
+
+            const provinceSelect = document.getElementById('province');
+            if (provinceSelect && !provinceSelect.tomselect) {
+                window.provinceSelect = new TomSelect(provinceSelect, {
+                    valueField: 'id',
+                    labelField: 'description',
+                    searchField: ['description', 'id'],
+                    create: false,
+                    sortField: { field: 'id', direction: 'asc' },
+                    plugins: ['clear_button'],
+                    render: {
+                        option: (item, escape) => `<div>${escape(item.description)}</div>`,
+                        item: (item, escape) => `<div>${escape(item.description)}</div>`
+                    }
+                });
+            }
+
+            const districtSelect = document.getElementById('district');
+            if (districtSelect && !districtSelect.tomselect) {
+                window.districtSelect = new TomSelect(districtSelect, {
+                    valueField: 'id',
+                    labelField: 'description',
+                    searchField: ['description', 'id'],
+                    create: false,
+                    sortField: { field: 'id', direction: 'desc' },
+                    plugins: ['clear_button'],
+                    render: {
+                        option: (item, escape) => `<div>${escape(item.description)}</div>`,
+                        item: (item, escape) => `<div>${escape(item.description)}</div>`
+                    }
+                });
+            }
+        }
+
+        function changeDepartment(department_id) {
+            const lstProvinces = @json($provinces);
+
+            if (department_id) {
+                department_id = String(department_id).padStart(2, '0');
+
+                const lstProvincesFiltered = lstProvinces.filter((province) => province.department_id == department_id);
+
+                window.provinceSelect.clearOptions();
+                lstProvincesFiltered.forEach(province => {
+                    window.provinceSelect.addOption({ id: province.id, description: province.name });
+                });
+                window.provinceSelect.setValue(null);
+            }
+        }
+
+        function changeProvince(province_id) {
+            const lstDistricts = @json($districts);
+
+            if (province_id) {
+                province_id = String(province_id).padStart(4, '0');
+
+                const lstDistrictsFiltered = lstDistricts.filter((district) => district.province_id == province_id);
+
+                window.districtSelect.clearOptions();
+                lstDistrictsFiltered.forEach(district => {
+                    window.districtSelect.addOption({ id: district.id, description: district.name });
+                });
+                window.districtSelect.setValue(null);
+            }
+        }
+
+        function setUbigeoPreview() {
+            const departmentSelect = document.getElementById("department");
+            if (departmentSelect) {
+                departmentSelect.dispatchEvent(new Event("change"));
+            }
+
+            window.provinceSelect.setValue("{{ $tenant_data->province_id }}");
+            window.districtSelect.setValue("{{ $tenant_data->district_id }}");
+        }
+    </script>
+
+    <script>
+        $('#logo').change(function() {
+            let reader = new FileReader();
+            let file = this.files[0];
+            if (file && file.type.startsWith('image/')) {
+                reader.onload = (e) => {
+                    $('#show-logo').attr('src', e.target.result);
+                }
+                reader.readAsDataURL(file);
+            } else {
+                alert('Seleccione una imagen');
+                $('#show-logo').attr('src', null);
+                $(this).val('');
+            }
         });
     </script>
 @endsection

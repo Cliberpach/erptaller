@@ -81,13 +81,48 @@
                                 <p class="razon_social_abreviada_error msgError mb-0"></p>
                             </div>
                             <div class="col-6">
-                                <label class="form-label" for="ubigeo">Ubigeo:</label>
-                                <input type="text" class="form-control" id="ubigeo" name="ubigeo">
+                                <label class="form-label fw-bold" for="input-logo">
+                                    <i class="fas fa-image text-primary me-1"></i> Logo
+                                </label>
+                                <input class="form-control" type="file" name="logo" id="input-logo"
+                                    accept="image/jpeg, image/webp">
+                                <span class="logo_error msgError" style="color:red;"></span>
                             </div>
                         </div>
                         @error('razon_social_abreviada')
                             <p style="color: red; margin-top: -10px;">* {{ $message }}</p>
                         @enderror
+
+                        <div class="row mb-3">
+                            <div class="col-lg-4 col-md-4 col-sm-6 col-12">
+                                <label class="required_field" for="department" style="font-weight: bold;">DEPARTAMENTO</label>
+                                <select required name="department" id="department" data-placeholder="Seleccionar"
+                                    onchange="changeDepartment(this.value)">
+                                    <option></option>
+                                    @foreach ($departments as $department)
+                                        <option value="{{ $department->id }}">{{ $department->name }}</option>
+                                    @endforeach
+                                </select>
+                                <span class="department_error msgError" style="color:red;"></span>
+                            </div>
+
+                            <div class="col-lg-4 col-md-4 col-sm-6 col-12">
+                                <label class="required_field" for="province" style="font-weight: bold;">PROVINCIA</label>
+                                <select required name="province" id="province" data-placeholder="Seleccionar"
+                                    onchange="changeProvince(this.value)">
+                                    <option></option>
+                                </select>
+                                <span class="province_error msgError" style="color:red;"></span>
+                            </div>
+
+                            <div class="col-lg-4 col-md-4 col-sm-6 col-12">
+                                <label class="required_field" for="district" style="font-weight: bold;">DISTRITO</label>
+                                <select required name="district" id="district" data-placeholder="Seleccionar">
+                                    <option></option>
+                                </select>
+                                <span class="district_error msgError" style="color:red;"></span>
+                            </div>
+                        </div>
 
                         <div class="mb-3">
                             <label for="direccion_fiscal" class="form-label">Dirección Fiscal</label>
@@ -143,14 +178,39 @@
                                     </div>
                                 </div>
                             </div>
+
+                            <div class="col-lg-6 col-12 mb-3">
+                                <label class="fw-bold" for="api_user_gre">USUARIO GUÍAS REMISIÓN</label>
+                                <div class="input-group">
+                                    <span class="input-group-text text-primary"><i class="fas fa-user-lock"></i></span>
+                                    <input value="" id="api_user_gre" name="api_user_gre" type="text"
+                                        class="form-control" placeholder="USUARIO GRE">
+                                </div>
+                                <p class="api_user_gre_error msgError"></p>
+                            </div>
+
+                            <div class="col-lg-6 col-12 mb-3">
+                                <label class="fw-bold" for="api_pass_gre">CLAVE GUÍAS REMISIÓN</label>
+                                <div class="input-group">
+                                    <span class="input-group-text text-success"><i class="fas fa-key"></i></span>
+                                    <input value="" id="api_pass_gre" name="api_pass_gre" type="text"
+                                        class="form-control" placeholder="CLAVE GRE">
+                                </div>
+                                <p class="api_pass_gre_error msgError"></p>
+                            </div>
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label" for="certificate_url">Certificado:</label>
+                            <label class="form-label" for="certificate">Certificado:</label>
                             <div class="input-group">
-                                <input type="file" class="form-control" id="certificate_url"
-                                    name="certificate_url">
+                                <input type="file" class="form-control" id="certificate" name="certificate"
+                                    accept=".pem,.p12">
                             </div>
+                            <small class="text-primary fst-italic">
+                                Formatos permitidos: <b>.PEM</b> o <b>.P12</b>. Si sube <b>.P12</b>, se convertirá
+                                automáticamente a <b>.PEM</b>.
+                            </small>
+                            <p class="certificate_error msgError"></p>
                         </div>
 
                         <div class="mb-3">

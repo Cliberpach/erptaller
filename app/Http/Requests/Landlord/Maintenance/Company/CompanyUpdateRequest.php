@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Landlord\Maintenance\Company;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class CompanyStoreRequest extends FormRequest
+class CompanyUpdateRequest extends FormRequest
 {
     public function authorize(): bool
     {
@@ -14,14 +14,6 @@ class CompanyStoreRequest extends FormRequest
 
     protected function prepareForValidation(): void
     {
-        if ($this->domain) {
-            $this->merge([
-                'domain' => strtolower(
-                    preg_replace('/\s+/', '', trim($this->domain))
-                ),
-            ]);
-        }
-
         $this->merge([
             'department' => str_pad($this->department, 2, '0', STR_PAD_LEFT),
             'province'   => str_pad($this->province, 4, '0', STR_PAD_LEFT),
@@ -32,16 +24,10 @@ class CompanyStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'domain' => [
-                'required',
-                'string',
-                'min:3',
-                'max:63',
-                'regex:/^(?!-)[a-z0-9-]+(?<!-)$/'
-            ],
             'ruc' => [
                 'required',
                 Rule::unique('companies')
+                    ->ignore($this->route('id'))
                     ->where(function ($query) {
                         $query->where('status', 1);
                     }),
@@ -62,11 +48,6 @@ class CompanyStoreRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'domain.required' => 'El hostname es obligatorio.',
-            'domain.regex'    => 'El hostname solo puede contener letras, números y guiones, sin iniciar ni terminar con guion.',
-            'domain.min'      => 'El hostname debe tener al menos :min caracteres.',
-            'domain.max'      => 'El hostname no debe exceder los :max caracteres.',
-
             'ruc.required'                      => 'El campo RUC es requerido',
             'ruc.unique'                        => 'El RUC ingresado ya está registrado para una empresa activa.',
             'razon_social.required'             => 'El campo razón social es requerido',

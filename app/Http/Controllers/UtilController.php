@@ -4,19 +4,24 @@ namespace App\Http\Controllers;
 
 use App\Models\Brand;
 use App\Models\Category;
+use App\Models\Department;
+use App\Models\District;
 use App\Models\Landlord\Company;
 use App\Models\Landlord\GeneralTable\GeneralTableDetail;
 use App\Models\Landlord\GlobalSetting;
 use App\Models\Landlord\TypeIdentityDocument;
 use App\Models\Landlord\Year;
+use App\Models\Province;
 use App\Models\Tenant\BillingCompany;
 use App\Models\Tenant\DocumentSerialization;
 use App\Models\Tenant\Sale\PaymentCondition\PaymentCondition;
 use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
 use Throwable;
 
 class UtilController extends Controller
@@ -334,5 +339,38 @@ class UtilController extends Controller
         })->values();
 
         return response()->json(['needs_account' => $data->isNotEmpty(), 'data' => $data]);
+    }
+    
+    public static function saveFileFromLandlord(UploadedFile $file, string $file_name, $folder): string
+    {
+        $path           =   $folder;
+        $extension      =   $file->getClientOriginalExtension();
+        $file_name      =   $file_name . '.' . $extension;
+
+        Storage::disk('public')->putFileAs($path, $file, $file_name);
+
+        return $path . '/' . $file_name;
+    }
+
+    public static function deleteFile(string $path)
+    {
+        $cleanPath = str_replace('storage/', '', $path);
+
+        Storage::disk('public')->delete($cleanPath);
+    }
+
+    public static function getDepartments()
+    {
+        return Department::all();
+    }
+
+    public static function getProvinces()
+    {
+        return Province::all();
+    }
+
+    public static function getDistricts()
+    {
+        return District::all();
     }
 }
