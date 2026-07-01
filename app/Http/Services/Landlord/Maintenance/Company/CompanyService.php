@@ -3,14 +3,24 @@
 namespace App\Http\Services\Landlord\Maintenance\Company;
 
 use App\Http\Controllers\UtilController;
+use App\Http\Services\Tenant\Cash\CajaService;
+use App\Http\Services\Tenant\Maintenance\SerieService;
 use App\Models\Landlord\Company;
 use App\Models\Landlord\CompanyInvoice;
+use App\Models\Landlord\Customer;
 use App\Models\Tenant;
+use App\Models\Tenant\Maintenance\Collaborator\Collaborator;
 use App\Models\Tenant\Maintenance\Company\Company as TenantCompany;
 use App\Models\Tenant\Maintenance\Company\CompanyInvoice as TenantCompanyInvoice;
+use App\Models\Tenant\Maintenance\Position;
+use App\Models\Tenant\Sede;
+use App\Models\Tenant\User as TenantUser;
+use App\Models\Tenant\Warehouse;
 use Exception;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+use Spatie\Permission\Models\Role;
 use Throwable;
 use Illuminate\Support\Facades\Cache;
 
@@ -79,10 +89,123 @@ class CompanyService
         $dto_user_tenant = $this->s_dto->getDtoUserTenant($data, $collaborator_tenant->id);
         $this->s_repository->updateUserAdminTenant($dto_user_tenant);
 
+        $this->seedSedePrincipal($data);
+
         return (object) [
             'company_tenant'         => $tenant_company,
             'company_invoice_tenant' => $tenant_company_invoice,
         ];
+    }
+
+    /**
+     * Provisioning Multi-Sede de la sede principal del tenant recién creado: sede, almacén,
+     * series (7 por sede), caja, los 2 usuarios adicionales (ventas/tecnico) y cliente varios.
+     * El admin (id=1) ya fue creado/actualizado arriba (placeholder del template); acá solo
+     * se enlaza a la sede. Corre después de crear el admin para que la caja ficticia pueda
+     * completar su book (necesita shift_id + user_id ya existentes).
+     */
+    private function seedSedePrincipal(array $data): void
+    {
+        $sede = Sede::create([
+            'numero'       => 1,
+            'nombre'       => 'SEDE PRINCIPAL',
+            'codigo'       => 'S001',
+            'es_principal' => true,
+            'direccion'    => $data['direccion_fiscal'],
+            'ubigeo'       => $data['ubigeo'],
+            'status'       => 'ACTIVO',
+        ]);
+
+        Warehouse::create([
+            'sede_id'      => $sede->id,
+            'descripcion'  => 'ALMACÉN PRINCIPAL',
+            'es_principal' => true,
+            'estado'       => 'ACTIVO',
+        ]);
+
+        (new SerieService())->generarSeriesSede($sede);
+        (new CajaService())->crearCajaSede($sede);
+
+        $admin = TenantUser::find(1);
+        if ($admin) {
+            $admin->sedes()->attach($sede->id, ['es_default' => true]);
+        }
+
+        $usuarios = [
+            ['name' => 'VENTAS',  'email' => 'ventas@tallersuite.com',  'password' => '123456789', 'doc' => '88888888', 'cargo' => 'VENTAS',  'rol' => 'ventas',  'full_name' => 'VENDEDOR'],
+            ['name' => 'TECNICO', 'email' => 'tecnico@tallersuite.com', 'password' => '123456789', 'doc' => '77777777', 'cargo' => 'TECNICO', 'rol' => 'tecnico', 'full_name' => 'TECNICO'],
+        ];
+
+        foreach ($usuarios as $u) {
+            $position = Position::firstOrCreate(['name' => $u['cargo']]);
+
+            $collaborator                             = new Collaborator();
+            $collaborator->full_name                  = $u['full_name'];
+            $collaborator->document_type_id           = 1;
+            $collaborator->document_number             = $u['doc'];
+            $collaborator->address                    = $data['direccion_fiscal'];
+            $collaborator->phone                      = '999999999';
+            $collaborator->work_days                   = 30;
+            $collaborator->rest_days                   = 0;
+            $collaborator->monthly_salary              = 1500;
+            $collaborator->daily_salary                = 50;
+            $collaborator->position_id                 = $position->id;
+            $collaborator->document_type_abbreviation  = 'DNI';
+            $collaborator->save();
+
+            $user                   = new TenantUser();
+            $user->name              = $u['name'];
+            $user->email             = $u['email'];
+            $user->password          = Hash::make($u['password']);
+            $user->password_visible  = $u['password'];
+            $user->collaborator_id   = $collaborator->id;
+            $user->save();
+
+            $role = Role::firstOrCreate(['name' => $u['rol']]);
+            $user->assignRole($role);
+
+            $user->sedes()->attach($sede->id, ['es_default' => true]);
+        }
+
+        //========= CAJA FICTICIA (placeholder de sistema) =========
+        // El petty_cash ya existe (creado por la migración de backfill contra el template).
+        // Acá los usuarios + turnos ya existen -> se completa el book. Idempotente.
+        $ficticioId = DB::table('petty_cashes')->where('type', 'FICTICIO')->value('id');
+        if (! $ficticioId) {
+            $ficticioId = DB::table('petty_cashes')->insertGetId([
+                'name'       => 'CAJA FICTICIA',
+                'type'       => 'FICTICIO',
+                'status'     => 'ANULADO',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
+        if (! DB::table('petty_cash_books')->where('type', 'FICTICIO')->exists()) {
+            DB::table('petty_cash_books')->insert([
+                'petty_cash_id'   => $ficticioId,
+                'petty_cash_name' => 'CAJA FICTICIA',
+                'shift_id'        => DB::table('shifts')->value('id'),
+                'user_id'         => DB::table('users')->value('id'),
+                'status'          => 'ANULADO',
+                'initial_amount'  => 0,
+                'initial_date'    => now(),
+                'type'            => 'FICTICIO',
+            ]);
+        }
+
+        //========= CLIENTE VARIOS POR DEFECTO =========
+        Customer::firstOrCreate(
+            ['es_varios' => true],
+            [
+                'name'                       => 'CLIENTE VARIOS',
+                'document_number'            => '99999999',
+                'type_identity_document_id'  => 1,
+                'type_document_code'         => '01',
+                'type_document_name'         => 'DOCUMENTO NACIONAL DE IDENTIDAD',
+                'type_document_abbreviation' => 'DNI',
+                'status'                     => 'ACTIVO',
+            ]
+        );
     }
 
     public function makeTenantFilesSpace(Company $company)
