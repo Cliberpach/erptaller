@@ -11,6 +11,9 @@ use App\Http\Services\Tenant\Sale\Sale\SaleConversionService;
 use App\Http\Services\Tenant\Sale\Sale\SaleManager;
 use App\Models\Company;
 use App\Models\CompanyInvoice;
+use App\Models\Department;
+use App\Models\District;
+use App\Models\Province;
 use App\Models\Landlord\Color;
 use App\Models\Landlord\Customer;
 use App\Models\Tenant\PaymentMethod;
@@ -143,9 +146,10 @@ class SaleController extends Controller
 
         $types_identity_documents   =   UtilController::getIdentityDocuments();
 
-        $departments    =   DB::select('select * from departments');
-        $districts      =   DB::select('select * from districts');
-        $provinces      =   DB::select('select * from provinces');
+        // Ubigeo desde el CENTRAL (los modelos usan connection='landlord') -> catalogo nacional unico.
+        $departments    =   Department::all();
+        $districts      =   District::all();
+        $provinces      =   Province::all();
 
         $company_invoice    =   CompanyInvoice::find(1);
         // Combo de venta: solo BOLETA/FACTURA/TICKET (NV/NC/ND/Guía no se crean acá).
