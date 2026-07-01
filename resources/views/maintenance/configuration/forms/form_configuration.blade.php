@@ -21,16 +21,20 @@
                     <div class="card-header">
                         <h6 class="card-title mb-0">{{ $label }}</h6>
                     </div>
-                    <div class="card-body">
+                    <div class="card-body py-2">
                         @forelse ($porGrupo->get($key, collect()) as $item)
-                            <div class="mb-3">
-                                {{-- label como bloque (d-block) para que el texto largo envuelva y no desborde la card angosta --}}
-                                <label for="configuration_{{ $item->id }}" class="d-block fw-bold mb-2" style="word-break: break-word;">
-                                    {{ $item->description }}
-                                </label>
-                                <x-toggle-switch-1 id="configuration_{{ $item->id }}" name="configuration_{{ $item->id }}"
-                                    :checked="$item->property == 1" />
-                                <p class="configuration_{{ $item->id }}_error msgError"></p>
+                            {{-- opción compacta: label a la izq (envuelve si es largo) + toggle chico a la der, en 1 fila --}}
+                            <div class="config-opt border-bottom py-1">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <label for="configuration_{{ $item->id }}" class="config-opt-label mb-0 me-2">
+                                        {{ $item->description }}
+                                    </label>
+                                    <span class="config-opt-toggle flex-shrink-0">
+                                        <x-toggle-switch-1 id="configuration_{{ $item->id }}" name="configuration_{{ $item->id }}"
+                                            :checked="$item->property == 1" />
+                                    </span>
+                                </div>
+                                <p class="configuration_{{ $item->id }}_error msgError mb-0"></p>
                             </div>
                         @empty
                             <p class="text-muted mb-0">

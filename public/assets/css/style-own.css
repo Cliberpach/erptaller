@@ -56,3 +56,28 @@
     color: var(--bs-secondary-color) !important;
     opacity: 1;
 }
+
+/*========= CONFIGURACIÓN: opciones densas (label + toggle chico en línea) ==========*/
+/* Meta: 7-8 opciones por card. Cada opción = 1 fila (label izq que envuelve + toggle chico der). */
+.config-opt-label {
+    font-size: .8rem;
+    font-weight: 600;
+    line-height: 1.2;
+    word-break: break-word;
+}
+
+/* El .toggle-switch-1 base mide 90x40 (CSS en el componente). Solo se usa en Configuración:
+   lo escalo a 1/2 (~45x20) y COLAPSO su footprint con un wrapper de tamaño fijo + overflow,
+   así entra en una fila compacta. transform-origin top-left -> queda anclado arriba-izquierda. */
+.config-opt-toggle {
+    display: inline-block;
+    width: 46px;
+    height: 21px;
+    overflow: hidden;
+}
+
+.config-opt-toggle .toggle-switch-1 {
+    transform: scale(0.5);
+    transform-origin: top left;
+    margin: 0;
+}
