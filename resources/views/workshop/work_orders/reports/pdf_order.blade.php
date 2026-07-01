@@ -286,7 +286,7 @@
                 @foreach ($data_order['products'] as $item)
                     <tr>
 
-                        <td>{{ $item->product_name }}</td>
+                        <td>{{ $item->product_name }}{{ $item->product_description ? ' - ' . $item->product_description : '' }}</td>
                         <td>{{ $item->category_name }}</td>
                         <td>{{ $item->brand_name }}</td>
 
@@ -325,7 +325,7 @@
                     <tr>
 
                         <!-- Nombre del servicio -->
-                        <td>{{ $srv->service_name }}</td>
+                        <td>{{ $srv->service_name }}{{ $srv->service_description ? ' - ' . $srv->service_description : '' }}</td>
 
                         <!-- Cantidad -->
                         <td style="text-align:right;">

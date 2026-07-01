@@ -580,11 +580,13 @@
             };
 
             const productSelected = window.productSelect.options[id];
+            const description = document.querySelector('#product_description').value.trim().slice(0, 500);
 
             const product = {
                 warehouse_id: productSelected.warehouse_id,
                 id,
                 name: productSelected.name,
+                description,
                 category_name: productSelected.category_name,
                 brand_name: productSelected.brand_name,
                 sale_price: price,
@@ -652,7 +654,7 @@
                                 <i class="fas fa-trash-alt"></i>
                             </button>
                         </td>
-                        <td>${item.name}</td>
+                        <td>${item.name}${item.description ? ' - ' + item.description : ''}</td>
                         <td>${item.category_name}</td>
                         <td>${item.brand_name}</td>
                         <td>${formatQuantity(item.quantity)}</td>
@@ -753,10 +755,12 @@
             };
 
             const serviceSelected = window.serviceSelect.options[id];
+            const description = document.querySelector('#service_description').value.trim().slice(0, 500);
 
             const service = {
                 id,
                 name: serviceSelected.name,
+                description,
                 sale_price: price,
                 quantity,
                 total: price * quantity
@@ -808,7 +812,7 @@
                                 <i class="fas fa-trash-alt"></i>
                             </button>
                         </td>
-                        <td>${item.name}</td>
+                        <td>${item.name}${item.description ? ' - ' + item.description : ''}</td>
                         <td>${formatQuantity(item.quantity)}</td>
                         <td>${formatSoles(item.sale_price)}</td>
                         <td>${formatSoles(item.total)}</td>

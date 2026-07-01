@@ -48,6 +48,12 @@
                     placeholder="Ingrese cantidad">
             </div>
         </div>
+
+        <div class="col-12">
+            <label class="form-label fw-bold"><i class="fas fa-comment-dots text-primary me-1"></i>Observación:</label>
+            <textarea class="form-control" id="product_description_edit" name="product_description_edit" maxlength="500"
+                rows="2" placeholder="Detalle u observación del producto (opcional)"></textarea>
+        </div>
     </div>
 
 </form>

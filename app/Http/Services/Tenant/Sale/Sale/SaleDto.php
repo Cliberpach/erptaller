@@ -165,7 +165,7 @@ class SaleDto
             $s_dto['service_id']              =     $service->id;
             $s_dto['service_code']            =     $service->id;
             $s_dto['service_unit']            =     'NIU';
-            $s_dto['service_description']     =     $service->id;
+            $s_dto['service_description']     =     isset($item->description) && trim($item->description) !== '' ? "{$service->name} - {$item->description}" : $service->name;
             $s_dto['service_name']            =     $service->name;
             $s_dto['quantity']                =     $item->quantity;
             $s_dto['price_sale']              =     $item->sale_price;
@@ -202,7 +202,7 @@ class SaleDto
             $s_dto['brand_id']                  =     $product->brand_id;
             $s_dto['product_code']              =     'P-' . $product->id;
             $s_dto['product_unit']              =     'NIU';
-            $s_dto['product_description']       =     $product->name;
+            $s_dto['product_description']       =     isset($item->description) && trim($item->description) !== '' ? "{$product->name} - {$item->description}" : $product->name;
             $s_dto['product_name']              =     $product->name;
             $s_dto['category_name']             =     $category->name;
             $s_dto['brand_name']                =     $brand->name;

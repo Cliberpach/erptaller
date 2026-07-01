@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Company;
 use App\Models\Plan;
 use Closure;
 use Illuminate\Http\Request;
@@ -17,7 +18,8 @@ class PlanMiddleware
      */
     public function handle(Request $request, Closure $next,string $opcion): Response
     {
-        $plan_actual    =   Plan::first();
+        $company        =   Company::find(1);
+        $plan_actual    =   Plan::find($company->plan);
 
         if($opcion === 'ventas' && $plan_actual->description === 'PLAN BÁSICO'){
             Session::flash('plan_md_error','DEBES SUBIR DE PLAN PARA PODER REALIZAR VENTAS!!!');

@@ -12,7 +12,7 @@
             </div>
 
             <div class="modal-body">
-                @include('workshop.quotes.forms.form_edit_service')
+                @include('workshop.work_orders.forms.form_edit_service')
             </div>
 
             <div class="modal-footer d-flex justify-content-between align-items-center flex-wrap">
@@ -59,6 +59,7 @@
     function paintServiceEdit(item) {
         document.querySelector('#service_price_edit').value = parseFloat(item.sale_price).toFixed(2);
         document.querySelector('#service_quantity_edit').value = formatQuantity(item.quantity);
+        document.querySelector('#service_description_edit').value = item.description ?? '';
         document.querySelector('#service_name_edit').textContent = item.name;
         document.querySelector('#service_original_price_edit').textContent = item.sale_price;
 
@@ -89,6 +90,7 @@
         const id = paramsMdlEditService.id;
         const salePrice = parseFloat(document.querySelector('#service_price_edit').value);
         const quantity = parseFloat(document.querySelector('#service_quantity_edit').value);
+        const description = document.querySelector('#service_description_edit').value.trim().slice(0, 500);
 
         const validation = validationFormService(id, quantity, salePrice);
         if (!validation) {
@@ -99,6 +101,7 @@
             id,
             sale_price: salePrice,
             quantity,
+            description,
             total: salePrice * quantity
         }
 
@@ -111,6 +114,7 @@
 
         lstItems[index].sale_price = service.sale_price;
         lstItems[index].quantity = service.quantity;
+        lstItems[index].description = service.description;
         lstItems[index].total = service.total;
 
     }

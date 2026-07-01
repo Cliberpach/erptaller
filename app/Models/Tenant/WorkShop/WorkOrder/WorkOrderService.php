@@ -14,6 +14,7 @@ class WorkOrderService extends Model
         'work_order_id',
         'service_id',
         'service_name',
+        'service_description',
         'quantity',
         'price_sale',
         'amount',

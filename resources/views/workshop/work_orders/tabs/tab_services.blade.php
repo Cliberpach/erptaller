@@ -25,7 +25,12 @@
         <p class="service_price_error msgError mb-0"></p>
     </div>
 
-    <div class="col-lg-2 col-md-4 col-sm-6 col-xs-12">
+    <!-- OBSERVACIÓN -->
+    <div class="col-lg-8 col-md-12 col-sm-12">
+        <label class="form-label fw-bold">Observación:</label>
+        <textarea class="form-control" id="service_description" name="service_description" maxlength="500"
+            rows="1" placeholder="Detalle u observación del servicio (opcional)"></textarea>
+        <p class="service_description_error msgError mb-0"></p>
     </div>
 
     <!-- AGREGAR -->

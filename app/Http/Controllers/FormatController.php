@@ -72,6 +72,7 @@ class FormatController extends Controller
                 'warehouse_id'=>$item['warehouse_id'],
                 'id' => $item['product_id'],
                 'name' => $item['product_name'],
+                'description' => $item['product_description'],
                 'category_name' => $item['category_name'],
                 'brand_name' => $item['brand_name'],
                 'sale_price' => $item['price_sale'],
@@ -91,6 +92,7 @@ class FormatController extends Controller
             $formatted[] = [
                 'id' => $item['service_id'],
                 'name' => $item['service_name'],
+                'description' => $item['service_description'],
                 'sale_price' => $item['price_sale'],
                 'quantity' => $item['quantity'],
                 'total' => $item['amount'],

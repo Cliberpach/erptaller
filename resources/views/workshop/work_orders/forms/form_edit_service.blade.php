@@ -39,6 +39,12 @@
                     name="service_quantity_edit" placeholder="Ingrese cantidad">
             </div>
         </div>
+
+        <div class="col-12">
+            <label class="form-label fw-bold"><i class="fas fa-comment-dots text-primary me-1"></i>Observación:</label>
+            <textarea class="form-control" id="service_description_edit" name="service_description_edit" maxlength="500"
+                rows="2" placeholder="Detalle u observación del servicio (opcional)"></textarea>
+        </div>
     </div>
 
 </form>

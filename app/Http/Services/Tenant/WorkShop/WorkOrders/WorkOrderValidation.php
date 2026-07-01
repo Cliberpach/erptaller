@@ -30,6 +30,12 @@ class WorkOrderValidation
             throw new Exception("DEBE INGRESAR POR LO MENOS UN PRODUCTO O SERVICIO A LA ORDEN DE TRABAJO");
         }
 
+        foreach (array_merge($lst_products, $lst_services) as $item) {
+            if (isset($item->description) && mb_strlen($item->description) > 500) {
+                throw new Exception("LA OBSERVACIÓN DE '{$item->name}' NO PUEDE SUPERAR LOS 500 CARACTERES");
+            }
+        }
+
         $quote_id   =   $data['quote_id'] ?? null;
         if ($quote_id) {
             $quote  =   Quote::findOrFail($quote_id);

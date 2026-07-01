@@ -12,7 +12,7 @@
             </div>
 
             <div class="modal-body">
-                @include('workshop.quotes.forms.form_edit_product')
+                @include('workshop.work_orders.forms.form_edit_product')
             </div>
 
             <div class="modal-footer d-flex justify-content-between align-items-center flex-wrap">
@@ -61,6 +61,7 @@
     function paintProductEdit(item) {
         document.querySelector('#product_price_edit').value = parseFloat(item.sale_price).toFixed(2);
         document.querySelector('#product_quantity_edit').value = formatQuantity(item.quantity);
+        document.querySelector('#product_description_edit').value = item.description ?? '';
         document.querySelector('#product_name_edit').textContent = item.name;
         document.querySelector('#product_category_edit').textContent = item.category_name;
         document.querySelector('#product_brand_edit').textContent = item.brand_name;
@@ -105,6 +106,7 @@
         const id = paramsMdlEditProduct.id;
         const salePrice = parseFloat(document.querySelector('#product_price_edit').value);
         const quantity = parseFloat(document.querySelector('#product_quantity_edit').value);
+        const description = document.querySelector('#product_description_edit').value.trim().slice(0, 500);
 
         const validation = validationFormProduct(id, quantity, salePrice);
         if (!validation) {
@@ -116,6 +118,7 @@
             id,
             sale_price: salePrice,
             quantity,
+            description,
             total: salePrice * quantity
         }
 
@@ -128,6 +131,7 @@
 
         lstItems[index].sale_price = product.sale_price;
         lstItems[index].quantity = product.quantity;
+        lstItems[index].description = product.description;
         lstItems[index].total = product.total;
 
     }

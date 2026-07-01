@@ -71,7 +71,7 @@ class WorkOrderDto
         $dto['product_code']    =   $product->name;
         $dto['product_name']    =   $product->name;
         $dto['product_unit']    =   'NIU';
-        $dto['product_description'] = $product->name;
+        $dto['product_description'] = isset($item->description) && trim($item->description) !== '' ? trim($item->description) : null;
 
         $category   =   Category::findOrFail($product->category_id);
         $dto['category_name']   =   $category->name;
@@ -93,6 +93,7 @@ class WorkOrderDto
         $service                =   Service::findOrFail($item->id);
         $dto['service_id']      =   $service->id;
         $dto['service_name']    =   $service->name;
+        $dto['service_description'] = isset($item->description) && trim($item->description) !== '' ? trim($item->description) : null;
 
         $dto['quantity']        =   $item->quantity;
         $dto['price_sale']      =   $item->sale_price;

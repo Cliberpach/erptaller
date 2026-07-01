@@ -34,6 +34,14 @@
         <p class="product_price_error msgError mb-0"></p>
     </div>
 
+    <!-- OBSERVACIÓN -->
+    <div class="col-lg-9 col-md-12 col-sm-12">
+        <label class="form-label fw-bold">Observación:</label>
+        <textarea class="form-control" id="product_description" name="product_description" maxlength="500"
+            rows="1" placeholder="Detalle u observación del producto (opcional)"></textarea>
+        <p class="product_description_error msgError mb-0"></p>
+    </div>
+
     <!-- AGREGAR -->
     <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
         <button class="btn btn-primary btn-add-product" type="button">AGREGAR <i class="fas fa-plus"

@@ -9,5 +9,7 @@ class Plan extends Model
 {
     use HasFactory;
 
+    protected $connection = 'landlord';
+
     protected $guarded = [''];
 }
