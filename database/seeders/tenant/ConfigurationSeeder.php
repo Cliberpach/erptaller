@@ -24,5 +24,15 @@ class ConfigurationSeeder extends Seeder
         $configuration->property    =   '0';
         $configuration->symbol      =   'VSOT';
         $configuration->save();
+
+        // VEP: '1' = ventas puede editar el precio de venta (default -> preserva el comportamiento
+        // actual). firstOrCreate -> idempotente (re-sembrar no duplica).
+        Configuration::firstOrCreate(
+            ['symbol' => 'VEP'],
+            [
+                'description' => 'EL USUARIO VENTAS PUEDE EDITAR EL PRECIO DE VENTA',
+                'property'    => '1',
+            ]
+        );
     }
 }
