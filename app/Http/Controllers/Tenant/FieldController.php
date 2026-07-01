@@ -60,7 +60,7 @@ class FieldController extends Controller
     {
         $fields         = Field::where('isDeleted', false)->get();
         $countFields    = Field::where('isDeleted', false)->count();
-        $plan           = Plan::first();
+        $plan           = Plan::find(Company::find(1)->plan);
 
         if($countFields >= $plan->number_fields){
             $create = false;
@@ -74,7 +74,7 @@ class FieldController extends Controller
     public function create()
     {
         $type_fields    = TypeField::all();
-        $plan           = Plan::first();
+        $plan           = Plan::find(Company::find(1)->plan);
         $countFields    = Field::where('isDeleted', false)->count();
 
         if($countFields >= $plan->number_fields){
