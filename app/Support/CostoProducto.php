@@ -21,22 +21,18 @@ class CostoProducto
     /**
      * ¿El usuario actual puede ver el costo del producto?
      *
-     * - admin                -> true (siempre).
-     * - flag VVC en '1'      -> true (todos, incluido ventas).
-     * - rol ventas + VVC '0' -> false (bloqueado).
-     * - otros roles          -> true (el flag aplica solo a ventas).
+     * - admin           -> true SIEMPRE (excepción; flag Sí o No).
+     * - cualquier otro  -> depende del flag: VVC='1' -> ve; VVC='0' -> NO ve.
+     *
+     * O sea: admin es la única excepción; el flag gobierna a TODOS los demás (ventas, técnico,
+     * cualquier rol). Sin sesión -> fail-closed (depende del flag, no del rol).
      */
     public static function puedeVer(): bool
     {
-        $user = Auth::user();
-
-        if (! $user || $user->hasRole('admin')) {
+        if (Auth::user()?->hasRole('admin')) {
             return true;
         }
 
-        $bloqueado = $user->hasRole('ventas')
-            && Configuration::where('symbol', 'VVC')->value('property') === '0';
-
-        return ! $bloqueado;
+        return Configuration::where('symbol', 'VVC')->value('property') === '1';
     }
 }
