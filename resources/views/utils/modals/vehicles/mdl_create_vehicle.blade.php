@@ -224,7 +224,13 @@
                         toastr.info('Vehículo ya registrado — datos cargados');
                     }
                 } else {
-                    toastr.error('Placa no encontrada en BD ni en el API');
+                    // Advertencia (no error rojo): la placa no está en BD ni en la API.
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Placa no encontrada',
+                        text: 'No encontramos la placa en el sistema ni en el servicio de consulta. Ingrese los datos manualmente.',
+                        confirmButtonText: 'Entendido'
+                    });
                 }
             } else {
                 toastr.error(res.data.message, 'ERROR EN EL SERVIDOR');
