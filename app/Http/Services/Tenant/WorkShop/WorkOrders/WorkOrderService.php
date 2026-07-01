@@ -21,6 +21,7 @@ use App\Models\Tenant\Configuration;
 use App\Models\Tenant\Sale;
 use App\Models\Tenant\Warehouse;
 use App\Models\Tenant\WorkShop\WorkOrder\WorkOrder;
+use App\Support\PrecioVenta;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\File;
@@ -49,6 +50,11 @@ class WorkOrderService
     public function store(array $data): WorkOrder
     {
         $data               =   $this->s_validation->validationStore($data);
+
+        //== ENFORCEMENT PRECIO (flag VEP): ventas+flag=No -> fuerza products.sale_price + total de linea ==
+        //== ANTES del DTO (totales) y del detalle, para que ambos usen el precio real, no el enviado ==
+        $data['lst_products'] =   PrecioVenta::forzarPrecios($data['lst_products']);
+
         $dto                =   $this->s_dto->getDtoStore($data);
 
         $work_order         =   $this->s_repository->insertWorkOrder($dto);

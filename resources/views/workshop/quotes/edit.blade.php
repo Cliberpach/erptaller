@@ -569,6 +569,7 @@
                 name: productSelected.name,
                 category_name: productSelected.category_name,
                 brand_name: productSelected.brand_name,
+                cost: productSelected.cost, // costo: presente solo si puedeVer() (gated en el JSON)
                 sale_price: price,
                 quantity,
                 total: price * quantity
@@ -609,6 +610,10 @@
             lstItems.push(itemSelected);
         }
 
+        // GATE COSTO (flag VVC): la columna COSTO se dibuja solo si puedeVer() (admin o flag=Si).
+        // Las líneas ya existentes no guardan costo -> se muestran vacías; los productos nuevos sí.
+        const puedeVerCosto = @json(\App\Support\CostoProducto::puedeVer());
+
         function paintQuoteProducts(lstItems) {
             const tbody = document.querySelector('#dt-quotes-products tbody');
             let rows = ``;
@@ -629,6 +634,7 @@
                         <td>${item.brand_name}</td>
                         <td>${formatQuantity(item.quantity)}</td>
                         <td>${formatSoles(item.sale_price)}</td>
+                        ${puedeVerCosto ? `<td>${item.cost != null ? formatSoles(item.cost) : ''}</td>` : ''}
                         <td>${formatSoles(item.total)}</td>
                     </tr>
                 `;

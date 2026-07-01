@@ -671,6 +671,14 @@
                         data: 'sale_price',
                         name: 'sale_price'
                     },
+                    @if (\App\Support\CostoProducto::puedeVer())
+                    {
+                        // GATE COSTO (flag VVC): columna solo si puedeVer(). getProductos manda
+                        // purchase_price solo en ese caso (Capa 1) -> th y columna quedan en sync.
+                        data: 'purchase_price',
+                        name: 'purchase_price'
+                    },
+                    @endif
                     {
                         data: 'stock',
                         name: 'stock'

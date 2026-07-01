@@ -98,8 +98,13 @@ class UtilController extends Controller
                 ]);
             }
 
+            // La API espera la placa SIN guion/espacios. claveComparacion normaliza (quita
+            // guion/espacios + uppercase) -> con guion o sin guion, a la API le llega igual.
+            // Solo afecta la URL de la API; el storage (con guion) y findPlate no se tocan.
+            $placaApi = \App\Support\Placa::claveComparacion($placa);
+
             // URL desde config (sin hardcodear el dominio). Base ej: https://multijc.com/api/queryplaca
-            $url = rtrim($base, '/') . '/' . $placa . '/' . $token;
+            $url = rtrim($base, '/') . '/' . $placaApi . '/' . $token;
 
             // Header Authorization SOLO si hay bearer configurado (opcional).
             $headers = ['Content-Type' => 'application/json', 'Accept' => 'application/json'];

@@ -7,6 +7,9 @@
             <th class="text-center">MARCA</th>
             <th class="text-center">CANT</th>
             <th class="text-center">PRECIO</th>
+            @if (\App\Support\CostoProducto::puedeVer())
+                <th class="text-center">COSTO</th>
+            @endif
             <th class="text-center">TOTAL</th>
         </tr>
     </thead>

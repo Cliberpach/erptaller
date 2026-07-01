@@ -17,6 +17,7 @@ use App\Models\Tenant\PaymentMethod;
 use App\Models\Tenant\Sale;
 use App\Models\Tenant\Sale\SaleService;
 use App\Models\Tenant\SaleDetail;
+use App\Support\CostoProducto;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Exception;
@@ -210,10 +211,14 @@ class SaleController extends Controller
                 'c.name as category_name',
                 'b.name as brand_name',
                 'wp.stock',
-                'p.sale_price',
-                'p.purchase_price'
+                'p.sale_price'
             )->where('wp.stock', '>', '0');
 
+        // GATE COSTO (flag VVC): el costo (purchase_price) SOLO viaja si puedeVer() (admin o flag=Si).
+        // Tapa el leak: antes se devolvia a todos por DataTables aunque no hubiera columna.
+        if (CostoProducto::puedeVer()) {
+            $products = $products->addSelect('p.purchase_price');
+        }
 
         if ($category_id) {
             $products  =   $products->where('p.category_id', $category_id);

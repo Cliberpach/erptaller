@@ -18,6 +18,7 @@ use App\Models\Landlord\GeneralTable\GeneralTableDetail;
 use App\Models\Product;
 use App\Models\Tenant\WarehouseProduct;
 use App\Models\Tenant\WorkShop\WorkOrder\WorkOrderProduct;
+use App\Support\CostoProducto;
 use Exception;
 use Illuminate\Support\Facades\File;
 use Throwable;
@@ -352,19 +353,32 @@ array:1 [ // app\Http\Controllers\Tenant\ProductController.php:190
                 'p.name',
                 'c.name as category_name',
                 'p.sale_price',
+                'p.purchase_price',
                 DB::raw('COALESCE(wp.stock, 0) as stock')
             )->get();
 
-        $data = $products->map(fn($p) => [
-            'id' => $p->id,
-            'text' => "{$p->name} - ($p->stock)",
-            'subtext' => "{$p->category_name}-{$p->brand_name}",
-            'sale_price' =>  $p->sale_price,
-            'name'  =>  $p->name,
-            'category_name' =>  $p->category_name,
-            'brand_name'    =>  $p->brand_name,
-            'stock'         =>  $p->stock
-        ]);
+        // GATE COSTO (flag VVC): el costo (purchase_price) SOLO se incluye en el JSON si puedeVer()
+        // (admin o flag=Si). Con flag No no viaja al front (ni en devtools).
+        $puedeVerCosto = CostoProducto::puedeVer();
+
+        $data = $products->map(function ($p) use ($puedeVerCosto) {
+            $item = [
+                'id' => $p->id,
+                'text' => "{$p->name} - ($p->stock)",
+                'subtext' => "{$p->category_name}-{$p->brand_name}",
+                'sale_price' =>  $p->sale_price,
+                'name'  =>  $p->name,
+                'category_name' =>  $p->category_name,
+                'brand_name'    =>  $p->brand_name,
+                'stock'         =>  $p->stock,
+            ];
+
+            if ($puedeVerCosto) {
+                $item['cost'] = $p->purchase_price;
+            }
+
+            return $item;
+        });
 
         return response()->json([
             'success' => true,

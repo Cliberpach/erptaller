@@ -29,7 +29,9 @@
     <!-- PRECIO -->
     <div class="col-lg-2 col-md-3 col-sm-6 col-xs-12">
         <label class="form-label fw-bold">Precio:</label>
-        <input readonly type="text" class="form-control inputDecimalPositivo" id="product_price" name="product_price"
+        {{-- Precio editable segun flag VEP (mismo gate que el modal). Autocompletado por JS al
+             seleccionar producto; readonly solo bloquea al usuario (el JS igual setea .value). --}}
+        <input @readonly(! \App\Support\PrecioVenta::puedeEditar()) type="text" class="form-control inputDecimalPositivo" id="product_price" name="product_price"
             placeholder="0.00">
         <p class="product_price_error msgError mb-0"></p>
     </div>

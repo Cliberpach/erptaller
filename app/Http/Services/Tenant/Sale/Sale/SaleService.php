@@ -10,6 +10,7 @@ use App\Models\Landlord\GeneralTable\GeneralTableDetail;
 use App\Models\Tenant\DocumentSerialization;
 use App\Models\Tenant\Sale;
 use App\Models\Tenant\Sale\SaleDocumentPayment;
+use App\Support\PrecioVenta;
 use Exception;
 
 class SaleService
@@ -44,6 +45,10 @@ class SaleService
 
         //======= VALIDACIÓN COMPLEJA =======
         $validated_data         =       $this->s_validations->validationStore($data);
+
+        //======= ENFORCEMENT PRECIO (flag VEP): ventas+flag=No -> fuerza products.sale_price =======
+        //======= ANTES de calcular montos, para que los totales usen el precio real, no el enviado =======
+        $validated_data->lstSale =      PrecioVenta::forzarPrecios($validated_data->lstSale);
 
         //======= OBTENIENDO MONTOS GLOBALES =======
         $amounts                =       $this->s_calculations->calculateAmounts($validated_data->lstSale, $validated_data->igv_percentage);

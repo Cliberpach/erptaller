@@ -544,6 +544,7 @@
                 description,
                 category_name: productSelected.category_name,
                 brand_name: productSelected.brand_name,
+                cost: productSelected.cost, // costo: presente solo si puedeVer() (gated en el JSON)
                 sale_price: price,
                 quantity,
                 total: price * quantity
@@ -593,6 +594,9 @@
             lstItems.push(itemSelected);
         }
 
+        // GATE COSTO (flag VVC): la columna COSTO se dibuja solo si puedeVer() (admin o flag=Si).
+        const puedeVerCosto = @json(\App\Support\CostoProducto::puedeVer());
+
         function paintOrderProducts(lstItems) {
             const tbody = document.querySelector('#dt-orders-products tbody');
             let rows = ``;
@@ -613,6 +617,7 @@
                         <td>${item.brand_name}</td>
                         <td>${formatQuantity(item.quantity)}</td>
                         <td>${formatSoles(item.sale_price)}</td>
+                        ${puedeVerCosto ? `<td>${item.cost != null ? formatSoles(item.cost) : ''}</td>` : ''}
                         <td>${formatSoles(item.total)}</td>
                     </tr>
                 `;

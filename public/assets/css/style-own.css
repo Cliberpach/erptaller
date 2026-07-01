@@ -37,3 +37,47 @@
     margin-right: 0 !important;
     max-width: 100% !important;
 }
+
+/*========= CONTRASTE TOMSELECT (modo oscuro Y claro) ==========*/
+/* tom-select.bootstrap5 fija color:#343a40 en .ts-control/input y solo el option :hover
+   usa el color del tema -> en modo oscuro el texto queda gris oscuro sobre fondo oscuro
+   (legible solo al pasar el mouse). var(--bs-*) siguen el tema (claro: oscuro / oscuro:
+   claro), sin blanco-sobre-blanco. Regla GLOBAL: cubre todos los TomSelect del sistema.
+   !important porque el bundle de Vite carga DESPUÉS de style-own.css. */
+.ts-control,
+.ts-control input,
+.ts-control .item,
+.ts-dropdown .option {
+    color: var(--bs-body-color) !important;
+}
+
+/* Placeholder ("Seleccione un cliente", "Buscar...") -> muted del tema, legible en ambos. */
+.ts-control input::placeholder {
+    color: var(--bs-secondary-color) !important;
+    opacity: 1;
+}
+
+/*========= CONFIGURACIÓN: opciones densas (label + toggle chico en línea) ==========*/
+/* Meta: 7-8 opciones por card. Cada opción = 1 fila (label izq que envuelve + toggle chico der). */
+.config-opt-label {
+    font-size: .8rem;
+    font-weight: 600;
+    line-height: 1.2;
+    word-break: break-word;
+}
+
+/* El .toggle-switch-1 base mide 90x40 (CSS en el componente). Solo se usa en Configuración:
+   lo escalo a 1/2 (~45x20) y COLAPSO su footprint con un wrapper de tamaño fijo + overflow,
+   así entra en una fila compacta. transform-origin top-left -> queda anclado arriba-izquierda. */
+.config-opt-toggle {
+    display: inline-block;
+    width: 46px;
+    height: 21px;
+    overflow: hidden;
+}
+
+.config-opt-toggle .toggle-switch-1 {
+    transform: scale(0.5);
+    transform-origin: top left;
+    margin: 0;
+}
