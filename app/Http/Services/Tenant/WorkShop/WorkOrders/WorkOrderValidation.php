@@ -26,6 +26,10 @@ class WorkOrderValidation
         $lst_services       =   json_decode($data['lst_services']);
         $lst_technicians    =   json_decode($data['lst_technicians']) ?? [];
 
+        if (empty($data['vehicle_id'])) {
+            throw new Exception("DEBE SELECCIONAR UN VEHÍCULO");
+        }
+
         if (count($lst_products) === 0 && count($lst_services) === 0) {
             throw new Exception("DEBE INGRESAR POR LO MENOS UN PRODUCTO O SERVICIO A LA ORDEN DE TRABAJO");
         }

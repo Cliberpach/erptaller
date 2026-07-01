@@ -378,6 +378,10 @@
         }
 
         function validationStoreQuote() {
+            if (!window.vehicleSelect.getValue()) {
+                toastr.error('DEBE SELECCIONAR UN VEHÍCULO');
+                return false;
+            }
             if (lstProducts.length === 0 && lstServices.length === 0) {
                 toastr.error('DEBE AGREGAR AL MENOS UN PRODUCTO O SERVICIO A LA ORDEN DE TRABAJO');
                 return false;
