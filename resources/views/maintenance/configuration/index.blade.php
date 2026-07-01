@@ -25,6 +25,18 @@
             </button>
         </div>
     </div>
+
+    {{-- ZONA DE PELIGRO: sección aparte, FUERA del form. Esqueleto vacío -> las acciones
+         destructivas (borrar tablas, resetear) se definen en una tarea posterior. --}}
+    <div class="card border-danger mt-4">
+        <div class="card-header bg-danger text-white d-flex align-items-center">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            <h4 class="card-title mb-0">Zona de Peligro</h4>
+        </div>
+        <div class="card-body">
+            <p class="text-muted mb-0">Sin acciones disponibles aún.</p>
+        </div>
+    </div>
 @endsection
 
 <script>
