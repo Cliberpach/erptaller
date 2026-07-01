@@ -7,6 +7,9 @@
             <th data-priority="3">CATEGORÍA</th>
             <th data-priority="4">MARCA</th>
             <th data-priority="5">PREC VENTA</th>
+            @if (\App\Support\CostoProducto::puedeVer())
+                <th data-priority="5">COSTO</th>
+            @endif
             <th data-priority="6">STOCK</th>
             <th>COD BARRAS</th>
             {{-- <th>IMAGE</th> --}}
