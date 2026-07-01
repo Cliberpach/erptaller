@@ -47,8 +47,14 @@
 
     function openMdlCreateVehicle() {
         setDefaultMdlVehicle();
-        if (typeof vehicleParams.plateSearchVehicle === 'string' &&
-            (vehicleParams.plateSearchVehicle.length === 8 || vehicleParams.plateSearchVehicle.length === 6)) {
+        // El gate se decide sobre la placa NORMALIZADA (sin guion/espacios): "ABC-123" (7)
+        // rechazaba porque no era 6 ni 8. Al input se pasa el valor ORIGINAL (con guion):
+        // la búsqueda ya digiere el guion (findPlate tolerante + apiPlaca normaliza) y el
+        // storage conserva el guion (normalizarStorage). NO se toca el storage.
+        const placaNorm = (typeof vehicleParams.plateSearchVehicle === 'string')
+            ? vehicleParams.plateSearchVehicle.replace(/[\s-]/g, '').toUpperCase()
+            : '';
+        if (placaNorm.length >= 6 && placaNorm.length <= 8) {
             document.querySelector('#plate_mdlvehicle').value = vehicleParams.plateSearchVehicle;
             document.querySelector('#btn_search_plate').click();
         }
