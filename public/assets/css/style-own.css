@@ -37,3 +37,22 @@
     margin-right: 0 !important;
     max-width: 100% !important;
 }
+
+/*========= CONTRASTE TOMSELECT (modo oscuro Y claro) ==========*/
+/* tom-select.bootstrap5 fija color:#343a40 en .ts-control/input y solo el option :hover
+   usa el color del tema -> en modo oscuro el texto queda gris oscuro sobre fondo oscuro
+   (legible solo al pasar el mouse). var(--bs-*) siguen el tema (claro: oscuro / oscuro:
+   claro), sin blanco-sobre-blanco. Regla GLOBAL: cubre todos los TomSelect del sistema.
+   !important porque el bundle de Vite carga DESPUÉS de style-own.css. */
+.ts-control,
+.ts-control input,
+.ts-control .item,
+.ts-dropdown .option {
+    color: var(--bs-body-color) !important;
+}
+
+/* Placeholder ("Seleccione un cliente", "Buscar...") -> muted del tema, legible en ambos. */
+.ts-control input::placeholder {
+    color: var(--bs-secondary-color) !important;
+    opacity: 1;
+}
