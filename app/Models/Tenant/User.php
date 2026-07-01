@@ -34,6 +34,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'password_visible',
         'collaborator_id'
     ];
 

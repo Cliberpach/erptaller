@@ -308,7 +308,7 @@
                     <div class="fw-bold text-dark">{{ Auth::user()->name }}</div>
                     <small class="text-body d-block lh-sm">
                         <i class="fi fi-rr-angle-down text-3xs me-1"></i>
-                        {{ DB::table('plans')->first()->description }} -
+                        {{ DB::connection('landlord')->table('plans')->first()?->description }} -
                         @foreach (Auth::user()->roles as $role)
                             {{ $role->name }}
                         @endforeach

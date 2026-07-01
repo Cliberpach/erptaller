@@ -9,6 +9,7 @@ class DocumentSerialization extends Model
 {
     use HasFactory;
     protected $table = 'document_serializations';
+    protected $connection = 'tenant';
 
     protected $guarded = [''];
 }

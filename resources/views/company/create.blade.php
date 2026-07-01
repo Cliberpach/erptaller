@@ -281,6 +281,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             events();
+            loadTomSelect();
         })
 
         function events() {
@@ -300,6 +301,88 @@
                 icon.classList.toggle('fa-eye-slash', isPassword);
             });
 
+        }
+
+        function loadTomSelect() {
+            const departmentSelect = document.getElementById('department');
+            if (departmentSelect && !departmentSelect.tomselect) {
+                window.departmentSelect = new TomSelect(departmentSelect, {
+                    valueField: 'id',
+                    labelField: 'description',
+                    searchField: ['description', 'id'],
+                    create: false,
+                    sortField: { field: 'id', direction: 'asc' },
+                    plugins: ['clear_button'],
+                    render: {
+                        option: (item, escape) => `<div>${escape(item.description)}</div>`,
+                        item: (item, escape) => `<div>${escape(item.description)}</div>`
+                    }
+                });
+            }
+
+            const provinceSelect = document.getElementById('province');
+            if (provinceSelect && !provinceSelect.tomselect) {
+                window.provinceSelect = new TomSelect(provinceSelect, {
+                    valueField: 'id',
+                    labelField: 'description',
+                    searchField: ['description', 'id'],
+                    create: false,
+                    sortField: { field: 'id', direction: 'asc' },
+                    plugins: ['clear_button'],
+                    render: {
+                        option: (item, escape) => `<div>${escape(item.description)}</div>`,
+                        item: (item, escape) => `<div>${escape(item.description)}</div>`
+                    }
+                });
+            }
+
+            const districtSelect = document.getElementById('district');
+            if (districtSelect && !districtSelect.tomselect) {
+                window.districtSelect = new TomSelect(districtSelect, {
+                    valueField: 'id',
+                    labelField: 'description',
+                    searchField: ['description', 'id'],
+                    create: false,
+                    sortField: { field: 'id', direction: 'desc' },
+                    plugins: ['clear_button'],
+                    render: {
+                        option: (item, escape) => `<div>${escape(item.description)}</div>`,
+                        item: (item, escape) => `<div>${escape(item.description)}</div>`
+                    }
+                });
+            }
+        }
+
+        function changeDepartment(department_id) {
+            const lstProvinces = @json($provinces);
+
+            if (department_id) {
+                department_id = String(department_id).padStart(2, '0');
+
+                const lstProvincesFiltered = lstProvinces.filter((province) => province.department_id == department_id);
+
+                window.provinceSelect.clearOptions();
+                lstProvincesFiltered.forEach(province => {
+                    window.provinceSelect.addOption({ id: province.id, description: province.name });
+                });
+                window.provinceSelect.setValue(null);
+            }
+        }
+
+        function changeProvince(province_id) {
+            const lstDistricts = @json($districts);
+
+            if (province_id) {
+                province_id = String(province_id).padStart(4, '0');
+
+                const lstDistrictsFiltered = lstDistricts.filter((district) => district.province_id == province_id);
+
+                window.districtSelect.clearOptions();
+                lstDistrictsFiltered.forEach(district => {
+                    window.districtSelect.addOption({ id: district.id, description: district.name });
+                });
+                window.districtSelect.setValue(null);
+            }
         }
 
         function storeEmpresa(formCompanyStore) {

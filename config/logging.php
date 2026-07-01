@@ -52,6 +52,12 @@ return [
     */
 
     'channels' => [
+        'tenant_store' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/tenant_store.log'),
+            'level' => 'debug',
+        ],
+
         'stack' => [
             'driver' => 'stack',
             'channels' => ['single'],

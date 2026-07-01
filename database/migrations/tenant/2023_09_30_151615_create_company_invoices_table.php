@@ -13,10 +13,10 @@ return new class extends Migration
     {
         Schema::create('company_invoices', function (Blueprint $table) {
             $table->id();
-            
+
             $table->unsignedBigInteger('company_id')->unsigned()->nullable();
             $table->foreign('company_id')->references('id')->on('companies')->onDelete('cascade');
-            
+
             $table->string('plan')->nullable();
             $table->string('environment')->nullable()->default('DEMO');
 
@@ -25,13 +25,10 @@ return new class extends Migration
 
             //========= UBIGEO =========
             $table->char('department_id', 2)->nullable();
-            $table->foreign('department_id')->references('id')->on('departments');
 
             $table->char('province_id', 4)->nullable();
-            $table->foreign('province_id')->references('id')->on('provinces');
 
             $table->char('district_id', 6)->nullable();
-            $table->foreign('district_id')->references('id')->on('districts');
 
             $table->string('department_name',160)->nullable();
             $table->string('province_name',160)->nullable();

@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 class PettyCashBook extends Model
 {
     use HasFactory;
+    protected $connection = 'tenant';
     public $timestamps = false;
     protected $table = 'petty_cash_books';
 

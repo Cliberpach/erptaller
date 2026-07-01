@@ -94,6 +94,11 @@
                                     </a>
                                 </li>
                                 <li>
+                                    <a class="dropdown-item" href="javascript:void(0);" onclick="blockAccount(${data.id}, ${data.block_account ? 0 : 1});">
+                                        <i class="fas fa-ban"></i> ${data.block_account ? 'Activar' : 'Bloquear'}
+                                    </a>
+                                </li>
+                                <li>
                                     <a class="dropdown-item" href="javascript:void(0);" onclick="deleteTenant(${data.id});">
                                         <i class="fas fa-trash-alt"></i> Eliminar
                                     </a>
@@ -211,6 +216,86 @@
 
         } else if (
             /* Read more about handling dismissals below */
+            result.dismiss === Swal.DismissReason.cancel
+        ) {
+            swalWithBootstrapButtons.fire({
+            title: "Operación cancelada",
+            text: "No se realizaron acciones",
+            icon: "error"
+            });
+        }
+        });
+    }
+
+
+    function blockAccount(company_id, new_status){
+        const company =   getRowById(dtCompaniesLandlord,company_id);
+
+        let message =   `${new_status ? 'Bloquear' : 'Activar'} empresa: ${company.business_name}-${company.ruc}?`;
+
+        const swalWithBootstrapButtons = Swal.mixin({
+        customClass: {
+            confirmButton: "btn btn-success",
+            cancelButton: "btn btn-danger"
+        },
+        buttonsStyling: false
+        });
+        swalWithBootstrapButtons.fire({
+        title: message,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Sí, confirmar!",
+        cancelButtonText: "No, cancelar!",
+        reverseButtons: true
+        }).then(async (result) => {
+        if (result.isConfirmed) {
+
+            Swal.fire({
+                title: `Actualizando empresa...`,
+                html: "Porfavor espere...",
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            try {
+
+                toastr.clear();
+                const token                     =   document.querySelector('input[name="_token"]').value;
+
+                const formData                  =   new FormData();
+                const urlBlockAccount           =   "{{ route('landlord.mantenimientos.empresas.bloquearEmpresa', ':id') }}".replace(':id', company_id);
+
+                formData.append('block_account', new_status);
+
+                const response  =   await fetch(urlBlockAccount, {
+                                        method: 'POST',
+                                        headers: {
+                                            'X-CSRF-TOKEN': token,
+                                            'X-HTTP-Method-Override': 'PUT'
+                                        },
+                                        body: formData
+                                    });
+
+                const   res =   await response.json();
+
+                Swal.close();
+
+                if(res.success){
+                    dtCompaniesLandlord.ajax.reload(null, false);
+                    toastr.success(res.message,'OPERACIÓN COMPLETADA');
+                    Swal.close();
+                }else{
+                    toastr.error(res.message,'ERROR EN EL SERVIDOR');
+                    Swal.close();
+                }
+
+            } catch (error) {
+                toastr.error(error,'ERROR EN LA PETICIÓN ACTUALIZAR EMPRESA');
+            }
+
+        } else if (
             result.dismiss === Swal.DismissReason.cancel
         ) {
             swalWithBootstrapButtons.fire({
