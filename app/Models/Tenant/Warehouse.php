@@ -9,6 +9,8 @@ class Warehouse extends Model
 {
     use HasFactory;
 
+    protected $connection = 'tenant';
+
     protected $table = 'warehouses';
 
     protected $guarded = [''];

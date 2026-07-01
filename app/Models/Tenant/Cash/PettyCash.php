@@ -9,6 +9,7 @@ class PettyCash extends Model
 {
     use HasFactory;
 
+    protected $connection = 'tenant';
     protected $guarded = [''];
     protected $table = 'petty_cashes';
 

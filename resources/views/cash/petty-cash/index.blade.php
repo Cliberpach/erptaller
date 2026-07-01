@@ -126,7 +126,7 @@
     async function guardarCaja() {
         toastr.clear();
         const body = { name: document.getElementById('c_name').value.trim(), sede_id: document.getElementById('c_sede').value };
-        const token = document.querySelector('input[name="_token"]').value;
+        const token = document.querySelector('meta[name="csrf-token"]').content;
         try {
             const r = await fetch('{{ route('tenant.cajas.store') }}', { method: 'POST', headers: { 'X-CSRF-TOKEN': token, 'Content-Type': 'application/json', 'Accept': 'application/json' }, body: JSON.stringify(body) });
             const res = await r.json();
@@ -154,7 +154,7 @@
         toastr.clear();
         const id = document.getElementById('e_id').value;
         const body = { name: document.getElementById('e_name').value.trim() };
-        const token = document.querySelector('input[name="_token"]').value;
+        const token = document.querySelector('meta[name="csrf-token"]').content;
         try {
             const r = await fetch('{{ route('tenant.cajas.update', ['id' => ':id']) }}'.replace(':id', id), { method: 'PUT', headers: { 'X-CSRF-TOKEN': token, 'Content-Type': 'application/json', 'Accept': 'application/json' }, body: JSON.stringify(body) });
             const res = await r.json();
@@ -171,7 +171,7 @@
             confirmButtonText: 'Sí, anular', cancelButtonText: 'Cancelar', reverseButtons: true
         }).then(async (result) => {
             if (!result.isConfirmed) return;
-            const token = document.querySelector('input[name="_token"]').value;
+            const token = document.querySelector('meta[name="csrf-token"]').content;
             try {
                 const r = await fetch('{{ route('tenant.cajas.destroy', ['id' => ':id']) }}'.replace(':id', id), { method: 'DELETE', headers: { 'X-CSRF-TOKEN': token, 'Accept': 'application/json' } });
                 const res = await r.json();

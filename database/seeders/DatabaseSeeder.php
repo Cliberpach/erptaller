@@ -23,7 +23,6 @@ use Database\Seeders\landlord\ModuleSeeder;
 use Database\Seeders\landlord\TypeIdentityDocumentSeeder;
 use Database\Seeders\landlord\UnitMeasurementSeeder;
 use Database\Seeders\landlord\YearSeeder;
-use Database\Seeders\landlord\UnitMeasurementSeeder;
 use Database\Seeders\tenant\BrandSeeder as TenantBrandSeeder;
 use Database\Seeders\tenant\CategorySeeder;
 use Database\Seeders\tenant\ConfigurationSeeder;

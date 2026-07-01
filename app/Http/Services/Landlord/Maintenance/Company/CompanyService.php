@@ -112,7 +112,7 @@ class CompanyService
             'codigo'       => 'S001',
             'es_principal' => true,
             'direccion'    => $data['direccion_fiscal'],
-            'ubigeo'       => $data['ubigeo'],
+            'ubigeo'       => $data['district'],
             'status'       => 'ACTIVO',
         ]);
 
@@ -170,9 +170,9 @@ class CompanyService
         //========= CAJA FICTICIA (placeholder de sistema) =========
         // El petty_cash ya existe (creado por la migración de backfill contra el template).
         // Acá los usuarios + turnos ya existen -> se completa el book. Idempotente.
-        $ficticioId = DB::table('petty_cashes')->where('type', 'FICTICIO')->value('id');
+        $ficticioId = DB::connection('tenant')->table('petty_cashes')->where('type', 'FICTICIO')->value('id');
         if (! $ficticioId) {
-            $ficticioId = DB::table('petty_cashes')->insertGetId([
+            $ficticioId = DB::connection('tenant')->table('petty_cashes')->insertGetId([
                 'name'       => 'CAJA FICTICIA',
                 'type'       => 'FICTICIO',
                 'status'     => 'ANULADO',
@@ -180,12 +180,12 @@ class CompanyService
                 'updated_at' => now(),
             ]);
         }
-        if (! DB::table('petty_cash_books')->where('type', 'FICTICIO')->exists()) {
-            DB::table('petty_cash_books')->insert([
+        if (! DB::connection('tenant')->table('petty_cash_books')->where('type', 'FICTICIO')->exists()) {
+            DB::connection('tenant')->table('petty_cash_books')->insert([
                 'petty_cash_id'   => $ficticioId,
                 'petty_cash_name' => 'CAJA FICTICIA',
-                'shift_id'        => DB::table('shifts')->value('id'),
-                'user_id'         => DB::table('users')->value('id'),
+                'shift_id'        => DB::connection('tenant')->table('shifts')->value('id'),
+                'user_id'         => DB::connection('tenant')->table('users')->value('id'),
                 'status'          => 'ANULADO',
                 'initial_amount'  => 0,
                 'initial_date'    => now(),

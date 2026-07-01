@@ -2,12 +2,12 @@
 
 namespace App\Tasks;
 
-use Spatie\Multitenancy\Models\Tenant;
+use Spatie\Multitenancy\Contracts\IsTenant;
 use Spatie\Permission\PermissionRegistrar;
 
 class SwitchAuthTask implements \Spatie\Multitenancy\Tasks\SwitchTenantTask
 {
-    public function makeCurrent(Tenant $tenant): void
+    public function makeCurrent(IsTenant $tenant): void
     {
         // Cuando entramos a un tenant
         config([
