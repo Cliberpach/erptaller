@@ -7,6 +7,10 @@
       <th>PLAN</th>
       <th>CORREO</th>
       <th>FACTURACIÓN</th>
+      <th>CERTIFICADO</th>
+      <th>LOGO</th>
+      <th>AMBIENTE</th>
+      <th>ESTADO</th>
       <th>FECHA CREACIÓN</th>
       <th>ACCIONES</th>
       <!-- <th>TOTAL COMPROBANTES</th> -->

@@ -12,7 +12,15 @@
         @csrf
         <div class="card-header d-flex justify-content-between align-items-center">
             <h5 class="mb-0">MANTENIMIENTO DE EMPRESAS</h5>
-            <span class="float-end">
+            <span class="float-end d-flex align-items-center gap-2">
+                <select id="filtroEstado" class="form-select form-select-sm" style="width:auto;">
+                    <option value="">Todas</option>
+                    <option value="0">Activas</option>
+                    <option value="1">Bloqueadas</option>
+                </select>
+                <a href="{{ route('landlord.mantenimientos.empresas.export') }}" class="btn btn-outline-success me-1">
+                    <i class="fas fa-file-csv"></i> Exportar
+                </a>
                 <a href="{{ route('landlord.mantenimientos.empresas.create') }}" class="btn btn-outline-primary me-1">Nueva
                     Empresa</a>
             </span>
@@ -36,7 +44,9 @@
     })
 
     function events(){
-
+        document.getElementById('filtroEstado').addEventListener('change', () => {
+            dtCompaniesLandlord.ajax.reload();
+        });
     }
 
     function startDataTableCompanies() {
@@ -47,7 +57,10 @@
             processing: true,
             ajax: {
                 url: urlGetCompanies,
-                type: 'GET'
+                type: 'GET',
+                data: function (d) {
+                    d.estado = document.getElementById('filtroEstado').value;
+                }
             },
             order: [[0, 'desc']],
             columns: [
@@ -70,6 +83,46 @@
                         return data === 1 ? 'SI' : 'NO';
                     },
                     name: 'invoicing_status'
+                },
+                {
+                    data: 'certificate',
+                    render: function (data) {
+                        return data ? '<span class="text-success">✔</span>' : '<span class="text-danger">✘</span>';
+                    },
+                    name: 'certificate',
+                    orderable: false,
+                    searchable: false
+                },
+                {
+                    data: 'logo',
+                    render: function (data) {
+                        return data ? '<span class="text-success">✔</span>' : '<span class="text-danger">✘</span>';
+                    },
+                    name: 'logo',
+                    orderable: false,
+                    searchable: false
+                },
+                {
+                    data: 'environment',
+                    render: function (data) {
+                        const env = data ?? 'DEMO';
+                        const isProd = env.toUpperCase() === 'PRODUCCION' || env.toUpperCase() === 'PRODUCCIÓN';
+                        return `<span class="badge ${isProd ? 'bg-label-success' : 'bg-label-warning'}">${isProd ? 'Producción' : 'Demo'}</span>`;
+                    },
+                    name: 'environment',
+                    orderable: false,
+                    searchable: false
+                },
+                {
+                    data: 'block_account',
+                    render: function (data) {
+                        return data
+                            ? '<span class="badge bg-label-danger">Bloqueada</span>'
+                            : '<span class="badge bg-label-success">Activa</span>';
+                    },
+                    name: 'block_account',
+                    orderable: false,
+                    searchable: false
                 },
                 { data: 'created_at', name: 'created_at' },
                 {
@@ -96,11 +149,6 @@
                                 <li>
                                     <a class="dropdown-item" href="javascript:void(0);" onclick="blockAccount(${data.id}, ${data.block_account ? 0 : 1});">
                                         <i class="fas fa-ban"></i> ${data.block_account ? 'Activar' : 'Bloquear'}
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item" href="javascript:void(0);" onclick="deleteTenant(${data.id});">
-                                        <i class="fas fa-trash-alt"></i> Eliminar
                                     </a>
                                 </li>
                             </ul>
@@ -296,96 +344,6 @@
             }
 
         } else if (
-            result.dismiss === Swal.DismissReason.cancel
-        ) {
-            swalWithBootstrapButtons.fire({
-            title: "Operación cancelada",
-            text: "No se realizaron acciones",
-            icon: "error"
-            });
-        }
-        });
-    }
-
-
-    function deleteTenant(company_id){
-        const company =   getRowById(dtCompaniesLandlord,company_id);
-
-        let message =   `Eliminar empresa: ${company.business_name}-${company.ruc}?`;
-
-        const swalWithBootstrapButtons = Swal.mixin({
-        customClass: {
-            confirmButton: "btn btn-success",
-            cancelButton: "btn btn-danger"
-        },
-        buttonsStyling: false
-        });
-        swalWithBootstrapButtons.fire({
-        title: message,
-        text: "OPERACIÓN NO REVERSIBLE!",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonText: "Sí, eliminar!",
-        cancelButtonText: "No, cancelar!",
-        reverseButtons: true
-        }).then(async (result) => {
-        if (result.isConfirmed) {
-
-            Swal.fire({
-                title: `Eliminando empresa...`,
-                html: "Porfavor espere...",
-                allowOutsideClick: false,
-                didOpen: () => {
-                    Swal.showLoading(); 
-                }
-            });
-
-            try {
-
-                toastr.clear();
-                const token                     =   document.querySelector('input[name="_token"]').value;
-                
-                const formData                  =   new FormData();
-                const urlDeleteTenant           =   "{{ route('landlord.mantenimientos.empresas.deleteTenant', ':id') }}".replace(':id', company_id);
-
-                formData.append('company_id',company_id);
-
-                const response  =   await fetch(urlDeleteTenant, {
-                                        method: 'POST',
-                                        headers: {
-                                            'X-CSRF-TOKEN': token,
-                                            'X-HTTP-Method-Override': 'DELETE' 
-                                        }
-                                    });
-
-                const   res =   await response.json();
-
-                Swal.close();
-
-                if(response.status === 422){
-                    if('errors' in res){
-                        //pintarErroresValidacion(res.errors);
-                    }
-                    Swal.close();
-                    return;
-                }
-                
-                if(res.success){
-                    dtCompaniesLandlord.ajax.reload(null, false);
-                    toastr.success(res.message,'OPERACIÓN COMPLETADA');
-                    //window.location.href    =   sale_index;
-                    Swal.close();
-                }else{
-                    toastr.error(res.message,'ERROR EN EL SERVIDOR');
-                    Swal.close();
-                }
-
-            } catch (error) {
-                toastr.error(error,'ERROR EN LA PETICIÓN ELIMINAR EMPRESA');
-            }
-
-        } else if (
-            /* Read more about handling dismissals below */
             result.dismiss === Swal.DismissReason.cancel
         ) {
             swalWithBootstrapButtons.fire({

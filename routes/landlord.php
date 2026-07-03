@@ -25,11 +25,11 @@ Route::middleware(['auth:web', 'verified'])->group(function () {
         Route::get('empresa', [CompanyController::class, 'index'])->name('landlord.mantenimientos.empresa');
         Route::get('empresa/edit/{id}', [CompanyController::class, 'edit'])->name('landlord.mantenimientos.empresas.edit');
         Route::get('empresa/getCompanies', [CompanyController::class, 'getCompanies'])->name('landlord.mantenimientos.getCompanies');
+        Route::get('empresa/export', [CompanyController::class, 'exportar'])->name('landlord.mantenimientos.empresas.export');
         Route::get('empresa/registrar', [CompanyController::class, 'create'])->name('landlord.mantenimientos.empresas.create');
         Route::post('empresa', [CompanyController::class, 'store'])->name('landlord.mantenimientos.empresas.store');
         Route::post('empresa/resetearClave', [CompanyController::class, 'resetearClave'])->name('landlord.mantenimientos.empresas.resetearClave');
         Route::put('empresa/update/{id}', [CompanyController::class, 'update'])->name('landlord.mantenimientos.empresas.update');
-        Route::delete('empresa/deleteTenant/{id}', [CompanyController::class, 'deleteTenant'])->name('landlord.mantenimientos.empresas.deleteTenant');
         Route::put('empresa/block_account/{id}', [CompanyController::class, 'blockAccount'])->name('landlord.mantenimientos.empresas.bloquearEmpresa');
 
         Route::get('plan', [PlanController::class, 'index'])->name('landlord.mantenimientos.plan');

@@ -8,14 +8,11 @@ use App\Http\Requests\Landlord\Maintenance\Company\CompanyUpdateRequest;
 use App\Http\Services\Landlord\Maintenance\Company\CompanyManager;
 use App\Models\Department;
 use App\Models\District;
-use App\Models\Landlord\Company as LandlordCompany;
 use App\Models\Module;
 use App\Models\Plan;
 use App\Models\Province;
-use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
 use Illuminate\View\View;
@@ -42,6 +39,7 @@ class CompanyController extends Controller
         $companies = DB::table('companies as e')
             ->join('tenants as t', 'e.tenant_id', 't.id')
             ->join('plans as p', 'p.id', 'e.plan')
+            ->leftJoin('company_invoice as ci', 'ci.company_id', 'e.id')
             ->select(
                 'e.id',
                 'e.ruc',
@@ -52,12 +50,59 @@ class CompanyController extends Controller
                 'p.description as plan_name',
                 'e.email',
                 'e.invoicing_status',
-                'e.block_account'
+                'e.block_account',
+                'e.logo',
+                'ci.certificate',
+                'ci.environment'
             )
-            ->where('status', '1')
+            ->where('e.status', '1')
+            ->when($request->filled('estado'), function ($query) use ($request) {
+                $query->where('e.block_account', $request->get('estado'));
+            })
             ->get();
 
         return DataTables::of($companies)->make(true);
+    }
+
+    public function exportar()
+    {
+        $companies = DB::table('companies as e')
+            ->join('tenants as t', 'e.tenant_id', 't.id')
+            ->join('plans as p', 'p.id', 'e.plan')
+            ->leftJoin('company_invoice as ci', 'ci.company_id', 'e.id')
+            ->select(
+                't.domain',
+                'e.ruc',
+                'e.business_name',
+                'p.description as plan_name',
+                'ci.environment',
+                'e.block_account',
+                'e.created_at'
+            )
+            ->where('e.status', '1')
+            ->orderBy('e.business_name')
+            ->get();
+
+        $filename = 'empresas_' . now()->format('Y-m-d_His') . '.csv';
+
+        return response()->streamDownload(function () use ($companies) {
+            $handle = fopen('php://output', 'w');
+            fputcsv($handle, ['Subdominio', 'RUC', 'Razón Social', 'Plan', 'Ambiente', 'Estado', 'Creado']);
+
+            foreach ($companies as $c) {
+                fputcsv($handle, [
+                    $c->domain,
+                    $c->ruc,
+                    $c->business_name,
+                    $c->plan_name,
+                    $c->environment ?? 'DEMO',
+                    $c->block_account ? 'BLOQUEADA' : 'ACTIVA',
+                    $c->created_at,
+                ]);
+            }
+
+            fclose($handle);
+        }, $filename);
     }
 
     public function create(): View
@@ -191,39 +236,6 @@ array:17 [▼ // app\Http\Controllers\LandLord\CompanyController.php:315
             return response()->json(['success' => true, 'message' => 'CLAVE RESETEADA CON ÉXITO!!!']);
         } catch (\Throwable $th) {
             DB::rollBack();
-            return response()->json(['success' => false, 'message' => $th->getMessage()]);
-        }
-    }
-
-    public function deleteTenant($id)
-    {
-        try {
-            $company = LandlordCompany::findOrFail($id);
-
-            $tenant_data = DB::select('select
-                                            c.ruc,
-                                            t.database
-                                            from tenants as t
-                                            inner join companies as c on c.tenant_id = t.id
-                                            where c.id = ?', [$id])[0];
-
-            $exists = DB::select("SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = ?", [$tenant_data->database]);
-            if (!$exists) {
-                throw new Exception("NO EXISTE LA BD DEL TENANT!!");
-            }
-
-            DB::statement("DROP DATABASE IF EXISTS {$tenant_data->database}");
-
-            $path_directory_tenant = public_path('storage/' . $company->files_route);
-            if (File::exists($path_directory_tenant) && File::isDirectory($path_directory_tenant)) {
-                File::deleteDirectory($path_directory_tenant);
-            }
-
-            $company->status = '0';
-            $company->update();
-
-            return response()->json(['success' => true, 'message' => 'EMPRESA ELIMINADA!!!']);
-        } catch (\Throwable $th) {
             return response()->json(['success' => false, 'message' => $th->getMessage()]);
         }
     }
