@@ -19,6 +19,12 @@ return new class extends Migration
     {
         $db = DB::connection('landlord');
 
+        // En migrate:fresh, general_tables aun no tiene datos (los siembra el seeder despues).
+        // Este parche es solo para BD existentes con el registro COMPROBANTES (id=4) ya creado.
+        if (!$db->table('general_tables')->where('id', self::GT_COMPROBANTES)->exists()) {
+            return;
+        }
+
         if (!$db->table('general_table_details')->where('general_table_id', self::GT_COMPROBANTES)->where('parameter', 'BB')->exists()) {
             $db->table('general_table_details')->insert([
                 'general_table_id' => self::GT_COMPROBANTES,
