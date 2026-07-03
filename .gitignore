@@ -19,3 +19,5 @@ yarn-error.log
 /.vscode
 /bootstrap/cache/*
 !/bootstrap/cache/.gitignore
+/Greenter/cache/*
+!/Greenter/cache/.gitignore
