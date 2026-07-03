@@ -127,7 +127,7 @@ class DashboardMarketService
                             SUM(c.total) as total
                             FROM purchase_documents as c
                             WHERE
-                            c.estado = "ACTIVO"
+                            c.status = "ACTIVO"
                             AND  YEAR(c.created_at) = ?
                             AND  MONTH(c.created_at) = ?
                             ', [$anio, $mes]);
@@ -428,7 +428,7 @@ class DashboardMarketService
                 DB::raw('UPPER(MONTHNAME(c.created_at)) as nombre_mes'),
                 DB::raw('SUM(c.total) as total_mes')
             )
-            ->where('c.estado', 'ACTIVO')
+            ->where('c.status', 'ACTIVO')
             ->whereYear('c.created_at', $anio)
             ->groupBy(DB::raw('MONTH(c.created_at)'), DB::raw('UPPER(MONTHNAME(c.created_at))'))
             ->orderBy('mes')
@@ -532,7 +532,7 @@ class DashboardMarketService
                                     IFNULL(ROUND(SUM(c.total),2),0) as total
                                     from purchase_documents as c
                                     where
-                                    c.estado = "ACTIVO"
+                                    c.status = "ACTIVO"
                                     AND YEAR(c.created_at) = ?
                                     AND MONTH(c.created_at) = ?
                                 ', [$anio, $mes]);

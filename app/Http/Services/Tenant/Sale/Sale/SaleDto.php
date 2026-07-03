@@ -175,13 +175,14 @@ class SaleDto
             $s_dto['price_sale']              =     $item->sale_price;
             $s_dto['amount']                  =     $item->quantity * $item->sale_price;
 
-            $s_dto['mto_valor_unitario']     =   (float)($item->sale_price / 1.18);
-            $s_dto['mto_valor_venta']        =   (float)($s_dto['amount'] / 1.18);
-            $s_dto['mto_base_igv']           =   (float)($s_dto['amount'] / 1.18);
+            $factor_igv                      =   1 + ((float) $sale->igv_percentage / 100);
+            $s_dto['mto_valor_unitario']     =   (float)($item->sale_price / $factor_igv);
+            $s_dto['mto_valor_venta']        =   (float)($s_dto['amount'] / $factor_igv);
+            $s_dto['mto_base_igv']           =   (float)($s_dto['amount'] / $factor_igv);
             $s_dto['porcentaje_igv']         =   $sale->igv_percentage;
-            $s_dto['igv']                    =   (float)($s_dto['amount']) - (float)($s_dto['amount'] / 1.18);
-            $s_dto['tip_afe_igv']            =   10;
-            $s_dto['total_impuestos']        =   (float)($s_dto['amount']) - (float)($s_dto['amount'] / 1.18);
+            $s_dto['igv']                    =   (float)($s_dto['amount']) - (float)($s_dto['amount'] / $factor_igv);
+            $s_dto['tip_afe_igv']            =   (float) $sale->igv_percentage > 0 ? 10 : 20;
+            $s_dto['total_impuestos']        =   (float)($s_dto['amount']) - (float)($s_dto['amount'] / $factor_igv);
             $s_dto['mto_precio_unitario']    =   (float)($item->sale_price);
 
             $dto[]  =   $s_dto;
@@ -216,13 +217,14 @@ class SaleDto
             $s_dto['price_sale']                =     $item->sale_price;
             $s_dto['amount']                    =     $item->quantity * $item->sale_price;
 
-            $s_dto['mto_valor_unitario']     =   (float)($item->sale_price / 1.18);
-            $s_dto['mto_valor_venta']        =   (float)($s_dto['amount'] / 1.18);
-            $s_dto['mto_base_igv']           =   (float)($s_dto['amount'] / 1.18);
+            $factor_igv                      =   1 + ((float) $sale->igv_percentage / 100);
+            $s_dto['mto_valor_unitario']     =   (float)($item->sale_price / $factor_igv);
+            $s_dto['mto_valor_venta']        =   (float)($s_dto['amount'] / $factor_igv);
+            $s_dto['mto_base_igv']           =   (float)($s_dto['amount'] / $factor_igv);
             $s_dto['porcentaje_igv']         =   $sale->igv_percentage;
-            $s_dto['igv']                    =   (float)($s_dto['amount']) - (float)($s_dto['amount'] / 1.18);
-            $s_dto['tip_afe_igv']            =   10;
-            $s_dto['total_impuestos']        =   (float)($s_dto['amount']) - (float)($s_dto['amount'] / 1.18);
+            $s_dto['igv']                    =   (float)($s_dto['amount']) - (float)($s_dto['amount'] / $factor_igv);
+            $s_dto['tip_afe_igv']            =   (float) $sale->igv_percentage > 0 ? 10 : 20;
+            $s_dto['total_impuestos']        =   (float)($s_dto['amount']) - (float)($s_dto['amount'] / $factor_igv);
             $s_dto['mto_precio_unitario']    =   (float)($item->sale_price);
 
             $dto[]  =   $s_dto;

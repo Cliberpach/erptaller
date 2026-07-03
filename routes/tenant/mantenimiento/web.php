@@ -80,6 +80,11 @@ Route::group(["prefix" => "mantenimiento"], function () {
         //========== CONFIGURACION =========
         Route::get('configuracion', [ConfigurationController::class, 'index'])->name('tenant.mantenimientos.configuracion');
         Route::post('configuracion/store', [ConfigurationController::class, 'store'])->name('tenant.mantenimientos.configuracion.store');
+
+        //========== HERRAMIENTAS DE ADMINISTRACIÓN (solo admin, gate reforzado en el controller) =========
+        Route::get('configuracion/backup', [ConfigurationController::class, 'backup'])->name('tenant.mantenimientos.configuracion.backup');
+        Route::post('configuracion/limpiar-documentos', [ConfigurationController::class, 'limpiarDocumentos'])->name('tenant.mantenimientos.configuracion.limpiarDocumentos');
+        Route::post('configuracion/limpiar-todo', [ConfigurationController::class, 'limpiarTodo'])->name('tenant.mantenimientos.configuracion.limpiarTodo');
     });
 
     Route::group(["prefix" => "rol", 'middleware' => 'can:mantenimiento.roles.gestionar'], function () {

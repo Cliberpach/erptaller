@@ -27,7 +27,10 @@
     </div>
 @endsection
 
+@section('js')
 <script>
+    let tipoLimpiar = null;
+
     document.addEventListener('DOMContentLoaded', () => {
         events();
     })
@@ -36,6 +39,10 @@
         document.querySelector('#frmConfiguration').addEventListener('submit', (e) => {
             e.preventDefault();
             saveConfiguration(e.target);
+        })
+
+        document.getElementById('input_confirmar_limpiar').addEventListener('input', (e) => {
+            document.getElementById('btn_confirmar_limpiar').disabled = e.target.value.trim() !== 'ELIMINAR';
         })
     }
 
@@ -116,5 +123,73 @@
             }
         });
     }
+
+    function abrirModalLimpiar(tipo) {
+        tipoLimpiar = tipo;
+
+        const textos = {
+            documentos: 'Se eliminarán TODOS los documentos de venta, compra y órdenes de trabajo. Se conserva el catálogo (productos, clientes, almacenes). Esta operación NO se puede deshacer.',
+            todo: 'Se eliminará TODA la información del tenant (catálogo, documentos, usuarios) y se reiniciará con los datos base (seeders) + un usuario admin por defecto. Esta operación NO se puede deshacer.'
+        };
+        const titulos = {
+            documentos: 'Eliminar Documentos',
+            todo: 'Eliminar TODO'
+        };
+
+        document.getElementById('modal_confirmar_limpiar_titulo').textContent = titulos[tipo];
+        document.getElementById('modal_confirmar_limpiar_texto').textContent = textos[tipo];
+        document.getElementById('input_confirmar_limpiar').value = '';
+        document.getElementById('btn_confirmar_limpiar').disabled = true;
+
+        new bootstrap.Modal(document.getElementById('modal_confirmar_limpiar')).show();
+    }
+
+    async function ejecutarLimpiar() {
+        const confirmacion = document.getElementById('input_confirmar_limpiar').value;
+        const btn = document.getElementById('btn_confirmar_limpiar');
+        const urls = {
+            documentos: @json(route('tenant.mantenimientos.configuracion.limpiarDocumentos')),
+            todo: @json(route('tenant.mantenimientos.configuracion.limpiarTodo'))
+        };
+
+        try {
+            btn.disabled = true;
+            btn.innerHTML = '<div class="spinner-border spinner-border-sm text-white" role="status"></div> Eliminando...';
+
+            const token = document.querySelector('input[name="_token"]').value;
+            const formData = new FormData();
+            formData.append('confirmacion', confirmacion);
+
+            const response = await fetch(urls[tipoLimpiar], {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': token
+                },
+                body: formData
+            });
+
+            const res = await response.json();
+
+            bootstrap.Modal.getInstance(document.getElementById('modal_confirmar_limpiar')).hide();
+
+            if (res.success) {
+                toastr.success(res.message, 'OPERACIÓN COMPLETADA');
+                if (res.logout) {
+                    setTimeout(() => {
+                        window.location.href = @json(route('module.logout'));
+                    }, 3000);
+                } else {
+                    setTimeout(() => window.location.reload(), 1500);
+                }
+            } else {
+                toastr.error(res.message, 'ERROR EN EL SERVIDOR');
+            }
+        } catch (error) {
+            toastr.error(error, 'ERROR EN LA PETICIÓN');
+        } finally {
+            btn.textContent = 'Sí, eliminar';
+        }
+    }
 </script>
 <script src="{{ asset('assets/js/utils.js') }}"></script>
+@endsection

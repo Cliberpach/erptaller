@@ -48,5 +48,27 @@ class ConfigurationSeeder extends Seeder
                 'group_name'  => 'VENTAS',
             ]
         );
+
+        // AMB_GRE: ambiente de facturación electrónica Greenter. Valores válidos: DEMO |
+        // PRODUCCION (InvoicingManager los valida exacto). Default DEMO -> ningún tenant nuevo
+        // factura en producción sin que alguien lo cambie explícitamente.
+        Configuration::firstOrCreate(
+            ['symbol' => 'AMB_GRE'],
+            [
+                'description' => 'AMBIENTE DE FACTURACIÓN ELECTRÓNICA (GREENTER)',
+                'property'    => 'DEMO',
+                'group_name'  => 'SUNAT',
+            ]
+        );
+
+        // UMB_DNI: monto mínimo (S/) a partir del cual una boleta exige DNI del cliente.
+        Configuration::firstOrCreate(
+            ['symbol' => 'UMB_DNI'],
+            [
+                'description' => 'MONTO MÍNIMO (S/) PARA EXIGIR DNI EN BOLETA',
+                'property'    => '700',
+                'group_name'  => 'SUNAT',
+            ]
+        );
     }
 }

@@ -107,7 +107,7 @@
                     render: function (data) {
                         const env = data ?? 'DEMO';
                         const isProd = env.toUpperCase() === 'PRODUCCION' || env.toUpperCase() === 'PRODUCCIÓN';
-                        return `<span class="badge ${isProd ? 'bg-label-success' : 'bg-label-warning'}">${isProd ? 'Producción' : 'Demo'}</span>`;
+                        return `<span class="badge ${isProd ? 'bg-success' : 'bg-warning text-dark'}">${isProd ? 'Producción' : 'Demo'}</span>`;
                     },
                     name: 'environment',
                     orderable: false,
@@ -117,8 +117,8 @@
                     data: 'block_account',
                     render: function (data) {
                         return data
-                            ? '<span class="badge bg-label-danger">Bloqueada</span>'
-                            : '<span class="badge bg-label-success">Activa</span>';
+                            ? '<span class="badge bg-danger">Bloqueada</span>'
+                            : '<span class="badge bg-success">Activa</span>';
                     },
                     name: 'block_account',
                     orderable: false,

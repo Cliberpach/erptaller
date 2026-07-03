@@ -112,8 +112,7 @@
                                 <div class="row mb-3">
                                     <div class="col-lg-4 col-md-4 col-sm-6 col-12">
                                         <label class="required_field" for="department" style="font-weight: bold;">DEPARTAMENTO</label>
-                                        <select required name="department" id="department" data-placeholder="Seleccionar"
-                                            onchange="changeDepartment(this.value)">
+                                        <select required name="department" id="department" data-placeholder="Seleccionar">
                                             <option></option>
                                             @foreach ($departments as $department)
                                                 <option @if ($tenant_data->department_id == $department->id) selected @endif
@@ -125,8 +124,7 @@
 
                                     <div class="col-lg-4 col-md-4 col-sm-6 col-12">
                                         <label class="required_field" for="province" style="font-weight: bold;">PROVINCIA</label>
-                                        <select required name="province" id="province" data-placeholder="Seleccionar"
-                                            onchange="changeProvince(this.value)">
+                                        <select required name="province" id="province" data-placeholder="Seleccionar">
                                             <option></option>
                                         </select>
                                         <span class="province_error msgError" style="color:red;"></span>
@@ -161,8 +159,8 @@
                                                 <div class="input-group input-group-merge">
                                                     <input type="password" class="form-control" id="password"
                                                         name="password" value="{{ $user->password_visible }}">
-                                                    <span class="input-group-text cursor-pointer"><i
-                                                            class="bx bx-hide"></i></span>
+                                                    <span class="input-group-text cursor-pointer" id="togglePassword"><i
+                                                            class="fas fa-eye-slash"></i></span>
                                                 </div>
                                             </div>
                                         </div>
@@ -400,194 +398,210 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
-        $(document).on('click', '#btn_consulta_sunat', function() {
-            const user_ruc = $('#ruc').val();
-            if (user_ruc.length == 11) {
-                Swal.fire({
-                    title: 'Consultar',
-                    text: "¿Desea consultar RUC a Sunat?",
-                    icon: 'question',
-                    showCancelButton: true,
-                    confirmButtonColor: "#696cff",
-                    confirmButtonText: 'Si, Confirmar',
-                    cancelButtonText: "No, Cancelar",
-                    showLoaderOnConfirm: true,
-                    preConfirm: function() {
-                        var url = '/landlord/ruc/' + user_ruc;
-                        return $.ajax({
-                            url: url,
-                            type: 'GET',
-                            dataType: 'json'
-                        });
-                    },
-                    allowOutsideClick: function() {
-                        return !Swal.isLoading();
-                    }
-                }).then(function(data) {
-                    if (data.value.success === false) {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Oops...',
-                            text: 'RUC inválido o no existe!'
-                        });
-                        $('#estado').val(data.value.message);
-                        $('#razon_social').val('');
-                        $('#razon_social_abreviada').val('');
-                    } else {
-                        $('#estado').val(data.value.data.estado);
-                        $('#razon_social').val(data.value.data.nombre_o_razon_social);
-                        $('#razon_social_abreviada').val(data.value.data.nombre_o_razon_social);
-                    }
-                });
-            } else {
+        document.addEventListener('DOMContentLoaded', () => {
+            loadTomSelect();
+            events();
+            setUbigeoPreview();
+        })
+
+        function events() {
+            document.getElementById('form-company-edit').addEventListener('submit', (e) => {
+                e.preventDefault();
+                updateCompany(e.target);
+            });
+
+            document.getElementById('btn_consulta_sunat').addEventListener('click', consultarSunat);
+
+            document.getElementById('togglePassword').addEventListener('click', togglePasswordVisibility);
+
+            document.getElementById('frm_plan').addEventListener('submit', (e) => {
+                e.preventDefault();
+                storePlan(e.target);
+            });
+
+            document.getElementById('input-logo').addEventListener('change', previewLogo);
+
+            document.getElementById('department').addEventListener('change', (e) => {
+                changeDepartment(e.target.value);
+            });
+
+            document.getElementById('province').addEventListener('change', (e) => {
+                changeProvince(e.target.value);
+            });
+
+            document.querySelectorAll('.module-checkbox').forEach((checkbox) => {
+                checkbox.addEventListener('change', () => toggleModuleCheckbox(checkbox));
+            });
+
+            document.querySelectorAll('.child-checkbox, .child-grandchild-checkbox').forEach((checkbox) => {
+                checkbox.addEventListener('change', () => toggleChildCheckbox(checkbox));
+            });
+
+            document.querySelectorAll('.grandchild-checkbox').forEach((checkbox) => {
+                checkbox.addEventListener('change', () => toggleGrandchildCheckbox(checkbox));
+            });
+        }
+
+        function consultarSunat() {
+            const user_ruc = document.getElementById('ruc').value;
+
+            if (user_ruc.length !== 11) {
                 Swal.fire({
                     icon: 'error',
                     title: 'Oops...',
                     text: 'El RUC debe contener 11 dígitos'
                 });
+                return;
             }
-        });
-    </script>
 
-    <script>
-        $(document).ready(function() {
-            $('.module-checkbox').change(function() {
-                const cardBody = $(this).closest('.card-body');
-                const childCheckboxes = cardBody.find('.child-checkbox, .child-grandchild-checkbox');
-                const grandchildCheckboxes = cardBody.find('.grandchild-checkbox');
-
-                if ($(this).prop('checked')) {
-                    childCheckboxes.prop('checked', true);
-                    grandchildCheckboxes.prop('checked', true);
-                } else {
-                    childCheckboxes.prop('checked', false);
-                    grandchildCheckboxes.prop('checked', false);
-                }
-            });
-
-            $('.child-checkbox, .child-grandchild-checkbox').change(function() {
-                const cardBody = $(this).closest('.card-body');
-                const moduleCheckbox = cardBody.find('.module-checkbox');
-
-                if ($(this).prop('checked')) {
-                    moduleCheckbox.prop('checked', true);
-                } else {
-                    let allCheckboxes = cardBody.find('.child-checkbox, .child-grandchild-checkbox');
-
-                    if (allCheckboxes.filter(':checked').length === 0) {
-                        moduleCheckbox.prop('checked', false);
-                    }
-                }
-            });
-
-            $('.grandchild-checkbox').change(function() {
-                const cardBody = $(this).closest('.card-body');
-                const childGrandchildCheckboxes = cardBody.find('.child-grandchild-checkbox');
-                const childCheckboxes = cardBody.find('.child-checkbox');
-                const moduleCheckboxes = cardBody.find('.module-checkbox');
-
-                if ($(this).prop('checked')) {
-
-                    childGrandchildCheckboxes.prop('checked', true);
-                    moduleCheckboxes.prop('checked', true);
-
-                } else {
-                    let allGrandchildCheckboxes = cardBody.find('.grandchild-checkbox');
-
-                    if (allGrandchildCheckboxes.filter(':checked').length === 0) {
-                        childGrandchildCheckboxes.prop('checked', false);
-
-                        if (childCheckboxes.filter(':checked').length === 0)
-                            moduleCheckboxes.prop('checked', false);
-                    }
-                }
-            });
-
-            $('.child-grandchild-checkbox').change(function() {
-                const cardBody = $(this).closest('.card-body');
-                const grandchildCheckboxes = cardBody.find('.grandchild-checkbox');
-
-                if ($(this).prop('checked')) {
-                    grandchildCheckboxes.prop('checked', true);
-                } else {
-                    grandchildCheckboxes.prop('checked', false);
-                }
-            });
-        });
-    </script>
-
-    <script>
-        $("#frm_plan").on("submit", function(e) {
-            e.preventDefault();
-            $.ajax({
-                url: '{{ route('landlord.mantenimientos.planes.store') }}',
-                method: 'POST',
-                dataType: 'json',
-                data: new FormData($("#frm_plan")[0]),
-                contentType: false,
-                processData: false,
-                beforeSend: function() {
-                    $('#btn_guardar').attr("disabled", true);
-                    $('#btn_guardar').html(
-                        '<div class="spinner-border spinner-border-sm text-white" role="status"></div> Guardando...'
-                    );
+            Swal.fire({
+                title: 'Consultar',
+                text: "¿Desea consultar RUC a Sunat?",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: "#696cff",
+                confirmButtonText: 'Si, Confirmar',
+                cancelButtonText: "No, Cancelar",
+                showLoaderOnConfirm: true,
+                preConfirm: async () => {
+                    const response = await fetch(`/landlord/ruc/${user_ruc}`);
+                    return response.json();
                 },
-                success: function(data) {
-                    $('#modal_create_plan').modal('hide');
-                    $('#frm_plan')[0].reset();
-                    toastr.success(data.message, 'Crear Registro', {
-                        timeOut: 3000
+                allowOutsideClick: () => !Swal.isLoading()
+            }).then((result) => {
+                const data = result.value;
+
+                if (data.success === false) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: 'RUC inválido o no existe!'
                     });
-
-                    let select = $('#plan_id');
-                    select.empty();
-
-                    $.each(data.plans, function(index, plan) {
-                        select.append($('<option>', {
-                            value: plan.id,
-                            text: plan.description
-                        }));
-                    });
-
-                    $('#description_error').text('');
-                    $('#number_fields_error').text('');
-                    $('#price_error').text('');
-                },
-                error: function(data) {
-                    let errores = data.responseJSON.errors;
-
-                    errores.hasOwnProperty('description') ? $('#description_error').text(
-                        `* ${errores.description[0]}`) : $('#description_error').text('');
-
-                    errores.hasOwnProperty('number_fields') ? $('#number_fields_error').text(
-                        `* ${errores.number_fields[0]}`) : $('#number_fields_error').text('');
-
-                    errores.hasOwnProperty('price') ? $('#price_error').text(`* ${errores.price[0]}`) :
-                        $('#price_error').text('');
-
-                    $('#btn_guardar').text('Registrar');
-                    $('#btn_guardar').attr("disabled", false);
-                },
-                complete: function() {
-                    $('#btn_guardar').text('Guardar');
-                    $('#btn_guardar').attr("disabled", false);
-                },
+                    document.getElementById('estado').value = data.message;
+                    document.getElementById('razon_social').value = '';
+                    document.getElementById('razon_social_abreviada').value = '';
+                } else {
+                    document.getElementById('estado').value = data.data.estado;
+                    document.getElementById('razon_social').value = data.data.nombre_o_razon_social;
+                    document.getElementById('razon_social_abreviada').value = data.data.nombre_o_razon_social;
+                }
             });
-        });
-    </script>
+        }
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            loadTomSelect();
-            setUbigeoPreview();
-            events();
-        })
+        function togglePasswordVisibility(e) {
+            const passwordInput = document.getElementById('password');
 
-        function events() {
-            document.querySelector('#form-company-edit').addEventListener('submit', (e) => {
-                e.preventDefault();
-                updateCompany(e.target);
-            })
+            const isPassword = passwordInput.type === 'password';
+            passwordInput.type = isPassword ? 'text' : 'password';
+
+            const icon = e.currentTarget.querySelector('i');
+            icon.classList.toggle('fa-eye', isPassword);
+            icon.classList.toggle('fa-eye-slash', !isPassword);
+        }
+
+        function toggleModuleCheckbox(checkbox) {
+            const cardBody = checkbox.closest('.card-body');
+            const childCheckboxes = cardBody.querySelectorAll('.child-checkbox, .child-grandchild-checkbox');
+            const grandchildCheckboxes = cardBody.querySelectorAll('.grandchild-checkbox');
+
+            childCheckboxes.forEach(c => c.checked = checkbox.checked);
+            grandchildCheckboxes.forEach(c => c.checked = checkbox.checked);
+        }
+
+        function toggleChildCheckbox(checkbox) {
+            const cardBody = checkbox.closest('.card-body');
+            const moduleCheckbox = cardBody.querySelector('.module-checkbox');
+
+            if (checkbox.checked) {
+                moduleCheckbox.checked = true;
+                return;
+            }
+
+            const allCheckboxes = cardBody.querySelectorAll('.child-checkbox, .child-grandchild-checkbox');
+            const anyChecked = Array.from(allCheckboxes).some(c => c.checked);
+
+            if (!anyChecked) {
+                moduleCheckbox.checked = false;
+            }
+        }
+
+        function toggleGrandchildCheckbox(checkbox) {
+            const cardBody = checkbox.closest('.card-body');
+            const childGrandchildCheckboxes = cardBody.querySelectorAll('.child-grandchild-checkbox');
+            const childCheckboxes = cardBody.querySelectorAll('.child-checkbox');
+            const moduleCheckbox = cardBody.querySelector('.module-checkbox');
+
+            if (checkbox.checked) {
+                childGrandchildCheckboxes.forEach(c => c.checked = true);
+                moduleCheckbox.checked = true;
+                return;
+            }
+
+            const grandchildCheckboxes = cardBody.querySelectorAll('.grandchild-checkbox');
+            const anyGrandchildChecked = Array.from(grandchildCheckboxes).some(c => c.checked);
+
+            if (!anyGrandchildChecked) {
+                childGrandchildCheckboxes.forEach(c => c.checked = false);
+
+                const anyChildChecked = Array.from(childCheckboxes).some(c => c.checked);
+                if (!anyChildChecked) {
+                    moduleCheckbox.checked = false;
+                }
+            }
+        }
+
+        async function storePlan(formPlan) {
+            const btnGuardar = document.getElementById('btn_guardar');
+
+            try {
+                clearValidationErrors('msgError');
+                document.getElementById('description_error').textContent = '';
+                document.getElementById('number_fields_error').textContent = '';
+                document.getElementById('price_error').textContent = '';
+
+                btnGuardar.disabled = true;
+                btnGuardar.innerHTML = '<div class="spinner-border spinner-border-sm text-white" role="status"></div> Guardando...';
+
+                const token = document.querySelector('input[name="_token"]').value;
+                const formData = new FormData(formPlan);
+
+                const response = await fetch("{{ route('landlord.mantenimientos.planes.store') }}", {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': token
+                    },
+                    body: formData
+                });
+
+                const res = await response.json();
+
+                if (response.status === 422) {
+                    const errores = res.errors;
+
+                    document.getElementById('description_error').textContent = errores.description ? `* ${errores.description[0]}` : '';
+                    document.getElementById('number_fields_error').textContent = errores.number_fields ? `* ${errores.number_fields[0]}` : '';
+                    document.getElementById('price_error').textContent = errores.price ? `* ${errores.price[0]}` : '';
+                    return;
+                }
+
+                bootstrap.Modal.getInstance(document.getElementById('modal_create_plan')).hide();
+                formPlan.reset();
+                toastr.success(res.message, 'Crear Registro', { timeOut: 3000 });
+
+                const select = document.getElementById('plan_id');
+                select.innerHTML = '';
+                res.plans.forEach((plan) => {
+                    const option = document.createElement('option');
+                    option.value = plan.id;
+                    option.textContent = plan.description;
+                    select.appendChild(option);
+                });
+            } catch (error) {
+                toastr.error(error, 'ERROR EN LA PETICIÓN CREAR PLAN');
+            } finally {
+                btnGuardar.textContent = 'Guardar';
+                btnGuardar.disabled = false;
+            }
         }
 
         function updateCompany(formUpdateCompany) {
@@ -618,27 +632,36 @@
                             }
                         });
 
+                        const token = document.querySelector('input[name="_token"]').value;
                         const formData = new FormData(formUpdateCompany);
-                        formData.append('_method', 'PUT');
 
-                        const res = await axios.post(formUpdateCompany.action, formData);
-                        if (res.data.success) {
-                            toastr.success(res.data.message, 'OPERACIÓN COMPLETADA');
+                        const response = await fetch(formUpdateCompany.action, {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': token
+                            },
+                            body: formData
+                        });
+
+                        const res = await response.json();
+
+                        Swal.close();
+
+                        if (response.status === 422) {
+                            paintValidationErrors(res.errors, 'error');
+                            toastr.error('ERRORES DE VALIDACIÓN EN EL FORMULARIO');
+                            return;
+                        }
+
+                        if (res.success) {
+                            toastr.success(res.message, 'OPERACIÓN COMPLETADA');
                             redirect("landlord.mantenimientos.empresa");
                         } else {
-                            toastr.error(res.data.message, 'ERROR EN EL SERVIDOR');
-                            Swal.close();
+                            toastr.error(res.message, 'ERROR EN EL SERVIDOR');
                         }
                     } catch (error) {
                         Swal.close();
-                        if (error.response && error.response.status === 422) {
-                            const errors = error.response.data.errors;
-                            paintValidationErrors(errors, 'error');
-                            toastr.error('ERRORES DE VALIDACIÓN EN EL FORMULARIO');
-                            return;
-                        } else {
-                            toastr.error(error, 'ERROR EN LA PETICIÓN ACTUALIZAR EMPRESA');
-                        }
+                        toastr.error(error, 'ERROR EN LA PETICIÓN ACTUALIZAR EMPRESA');
                     }
                 }
             });
@@ -735,22 +758,22 @@
             window.provinceSelect.setValue("{{ $tenant_data->province_id }}");
             window.districtSelect.setValue("{{ $tenant_data->district_id }}");
         }
-    </script>
 
-    <script>
-        $('#logo').change(function() {
-            let reader = new FileReader();
-            let file = this.files[0];
+        function previewLogo(e) {
+            const file = e.target.files[0];
+            const showLogo = document.getElementById('show-logo');
+
             if (file && file.type.startsWith('image/')) {
-                reader.onload = (e) => {
-                    $('#show-logo').attr('src', e.target.result);
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    if (showLogo) showLogo.src = ev.target.result;
                 }
                 reader.readAsDataURL(file);
             } else {
                 alert('Seleccione una imagen');
-                $('#show-logo').attr('src', null);
-                $(this).val('');
+                if (showLogo) showLogo.src = '';
+                e.target.value = '';
             }
-        });
+        }
     </script>
 @endsection

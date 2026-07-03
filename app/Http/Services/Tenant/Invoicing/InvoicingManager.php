@@ -25,13 +25,18 @@ class InvoicingManager
     {
         $greenter_config = DB::table('company_invoices as ci')
             ->join('companies as c', 'c.id', '=', 'ci.company_id')
-            ->select('ci.environment', 'ci.certificate_url', 'c.files_route', 'c.ruc', 'ci.secondary_user', 'ci.secondary_password')
+            ->select('ci.certificate_url', 'c.files_route', 'c.ruc', 'ci.secondary_user', 'ci.secondary_password')
             ->where('ci.company_id', 1)
             ->first();
 
         if (!$greenter_config) {
             throw new Exception('NO SE ENCONTRÓ NINGUNA CONFIGURACIÓN PARA GREENTER');
         }
+
+        // Ambiente configurable por el tenant en Mantenimiento > Configuración (symbol AMB_GRE),
+        // ya no fijo en company_invoices.environment.
+        $greenter_config->environment = DB::table('configuration')->where('symbol', 'AMB_GRE')->value('property');
+
         if ($greenter_config->environment !== 'DEMO' && $greenter_config->environment !== 'PRODUCCION') {
             throw new Exception('NO SE HA CONFIGURADO EL AMBIENTE BETA O PRODUCCIÓN PARA GREENTER');
         }
