@@ -27,10 +27,15 @@ Route::group(["prefix" => "ventas"], function () {
         Route::get('{id}/convert-data', [SaleController::class, 'getConvertData'])->name('tenant.ventas.comprobante_venta.convertData')->middleware('validar.plan:ventas');
         Route::post('{id}/convertir', [SaleController::class, 'convertir'])->name('tenant.ventas.comprobante_venta.convertir')->middleware(['validar.plan:ventas', 'can:ventas.crear']);
 
-        // Nota de Crédito (Capa 1: documento + PDF; sin SUNAT/stock/caja todavía).
+        // Nota de Crédito: documento + PDF (Capa 1) + listado/SUNAT/descargas (Capa 2).
+        Route::get('nota-credito/index', [CreditNoteController::class, 'index'])->name('tenant.ventas.nota_credito.index')->middleware('validar.plan:ventas');
+        Route::get('nota-credito/getAll', [CreditNoteController::class, 'getAll'])->name('tenant.ventas.nota_credito.getAll')->middleware('validar.plan:ventas');
         Route::get('nota-credito/data/{id}', [CreditNoteController::class, 'data'])->name('tenant.ventas.nota_credito.data')->middleware('validar.plan:ventas');
         Route::post('nota-credito/store', [CreditNoteController::class, 'store'])->name('tenant.ventas.nota_credito.store')->middleware(['validar.plan:ventas', 'can:ventas.crear']);
+        Route::post('nota-credito/send_sunat', [CreditNoteController::class, 'sendSunat'])->name('tenant.ventas.nota_credito.send_sunat')->middleware(['validar.plan:ventas', 'can:ventas.enviar_sunat']);
         Route::get('nota-credito/pdf/{id}', [CreditNoteController::class, 'pdf'])->name('tenant.ventas.nota_credito.pdf')->middleware('validar.plan:ventas');
+        Route::get('nota-credito/downloadXml/{id}', [CreditNoteController::class, 'downloadXml'])->name('tenant.ventas.nota_credito.downloadXml')->middleware('validar.plan:ventas');
+        Route::get('nota-credito/downloadCdr/{id}', [CreditNoteController::class, 'downloadCdr'])->name('tenant.ventas.nota_credito.downloadCdr')->middleware('validar.plan:ventas');
 
         Route::get('comprobante-electronico', [SaleController::class, 'electronicReceipt'])->name('tenant.ventas.comprobante_electronico');
         Route::get('cotizacion', [SaleController::class, 'quotation'])->name('tenant.ventas.cotizacion');

@@ -17,4 +17,9 @@ class SaleManager
         return $this->s_sale->store($data);
     }
 
+    public function sendSunat(int $sale_id): Sale
+    {
+        return $this->s_sale->sendSunat($sale_id);
+    }
+
 }

@@ -4,6 +4,7 @@ namespace App\Http\Services\Tenant\Sale\CreditNote;
 
 use App\Http\Controllers\Tenant\NumberToLettersController;
 use App\Http\Services\Tenant\Cash\PettyCashBook\PettyCashBookRepository;
+use App\Http\Services\Tenant\Invoicing\InvoicingManager;
 use App\Http\Services\Tenant\Inventory\Kardex\KardexService;
 use App\Http\Services\Tenant\Inventory\WarehouseProduct\WarehouseProductManager;
 use App\Http\Services\Tenant\Sale\Sale\CorrelativeService;
@@ -35,14 +36,35 @@ use Illuminate\Support\Facades\Log;
  */
 class CreditNoteService
 {
-    private const TIPO_NC_ID   = 68;     // general_table_details: NOTA DE CRÉDITO ELECTRÓNICA (serie FC001)
     private const TIPO_NC_CODE = '07';   // SUNAT catálogo 01: nota de crédito
     private const FISCALES     = ['01', '03']; // factura / boleta
+    private const GT_COMPROBANTES = 4;   // general_table_details: COMPROBANTES DE VENTA
+
+    /**
+     * NC de FACTURA (serie FF) vs NC de BOLETA (serie BB): la serie dobla la letra del
+     * comprobante afectado, no hay un solo tipo genérico de NC.
+     */
+    private function resolveTipoNcId(string $saleTypeSaleCode): int
+    {
+        $parameter = $saleTypeSaleCode === '01' ? 'FF' : 'BB';
+
+        $id = GeneralTableDetail::where('general_table_id', self::GT_COMPROBANTES)
+            ->where('parameter', $parameter)
+            ->where('status', 'ACTIVO')
+            ->value('id');
+
+        if (!$id) {
+            throw new Exception("NO EXISTE EL TIPO DE NOTA DE CRÉDITO ({$parameter}) EN LA BD!!!");
+        }
+
+        return $id;
+    }
 
     private CorrelativeService $s_correlative;
     private WarehouseProductManager $s_warehouse_product;
     private KardexService $s_kardex;
     private PettyCashBookRepository $s_cash_book;
+    private InvoicingManager $s_invoicing;
 
     public function __construct()
     {
@@ -50,6 +72,7 @@ class CreditNoteService
         $this->s_warehouse_product = new WarehouseProductManager();
         $this->s_kardex            = new KardexService();
         $this->s_cash_book         = new PettyCashBookRepository();
+        $this->s_invoicing         = new InvoicingManager();
     }
 
     /**
@@ -148,8 +171,11 @@ class CreditNoteService
 
         return DB::transaction(function () use ($sale, $seleccion, $origen, $data, $whNames, $cajaId) {
 
-            // Correlativo NC atómico (serie FC001) por sede activa.
-            $corr = $this->s_correlative->getCorrelative(self::TIPO_NC_ID);
+            // NC de FACTURA (serie FF) o de BOLETA (serie BB) según el comprobante afectado.
+            $tipoNcId = $this->resolveTipoNcId($sale->type_sale_code);
+
+            // Correlativo NC atómico por sede activa.
+            $corr = $this->s_correlative->getCorrelative($tipoNcId);
 
             // Construir líneas (escala por cantidad acreditada) AGRUPANDO por product_id.
             $acc = [];
@@ -241,16 +267,17 @@ class CreditNoteService
             $igvTotal = round(array_sum(array_column($acc, 'igv')), 2);
             $total    = round(array_sum(array_column($acc, 'amount')), 2);
 
-            $tipoNc = GeneralTableDetail::find(self::TIPO_NC_ID);
+            $tipoNc = GeneralTableDetail::find($tipoNcId);
             $wh     = reset($acc); // warehouse de cabecera = el de la primera línea (mono-almacén)
 
             // ===== Cabecera NC =====
             $nc = new CreditNote();
             $nc->sale_id                  = $sale->id;
+            $nc->sede_id                  = $sale->sede_id; // denormalizado de la venta origen, evita join al listar/filtrar
             $nc->petty_cash_book_id       = $cajaId;   // Capa 3: caja abierta de hoy (null si convertida/OT/crédito)
             $nc->warehouse_id             = $wh['warehouse_id'] ?? null;
             $nc->warehouse_name           = $wh['warehouse_name'] ?? '';
-            $nc->type_sale_id             = self::TIPO_NC_ID;
+            $nc->type_sale_id             = $tipoNcId;
             $nc->type_sale_code           = self::TIPO_NC_CODE;
             $nc->type_sale_name           = $tipoNc->description ?? 'NOTA DE CREDITO ELECTRONICA';
             $nc->customer_name            = $sale->customer_name;
@@ -325,5 +352,63 @@ class CreditNoteService
 
             return $nc;
         });
+    }
+
+    /**
+     * Envía la NC a SUNAT y persiste la respuesta. Mismo contrato de sunat_status que
+     * SaleService::sendSunat (PENDIENTE/ACEPTADO/OBSERVADO/RECHAZADO, sin ENVIADO).
+     */
+    public function sendSunat(int $credit_note_id): CreditNote
+    {
+        $nc = CreditNote::findOrFail($credit_note_id);
+
+        if ($nc->sunat_status === 'ACEPTADO') {
+            throw new Exception('NOTA DE CRÉDITO: ' . $nc->serie . '-' . $nc->correlative . ', YA FUE ACEPTADA POR SUNAT');
+        }
+
+        $this->s_invoicing->isActiveTypeInvoice($nc->type_sale_id);
+
+        $details = DB::table('credit_notes_details')
+            ->where('credit_note_id', $credit_note_id)
+            ->get()
+            ->all();
+
+        if (count($details) === 0) {
+            throw new Exception('EL DETALLE DE LA NOTA DE CRÉDITO ESTÁ VACÍO!!!');
+        }
+
+        $customer = DB::table('customers')
+            ->join('sales_documents', 'sales_documents.customer_id', '=', 'customers.id')
+            ->where('sales_documents.id', $nc->sale_id)
+            ->select('customers.address', 'customers.email', 'customers.phone')
+            ->first();
+
+        if (!$customer) {
+            throw new Exception('ERROR AL OBTENER CLIENTE DE LA NOTA DE CRÉDITO!!!');
+        }
+
+        $data = $this->s_invoicing->sendCreditNote($nc, $details, $customer);
+
+        return $this->saveSunatData($data, $nc);
+    }
+
+    private function saveSunatData(array $data, CreditNote $nc): CreditNote
+    {
+        $nc->response_success         = $data['response_success'];
+        $nc->response_cdrZip          = $data['response_cdrZip'];
+        $nc->response_error_code      = $data['response_error_code'];
+        $nc->response_error_message   = $data['response_error_message'];
+        $nc->cdr_response_id          = $data['cdr_response_id'];
+        $nc->cdr_response_code        = $data['cdr_response_code'];
+        $nc->cdr_response_description = $data['cdr_response_description'];
+        $nc->cdr_response_notes       = $data['cdr_response_notes'];
+        $nc->cdr_response_reference   = $data['cdr_response_reference'];
+        $nc->ruta_xml                  = $data['ruta_xml'];
+        $nc->ruta_cdr                  = $data['ruta_cdr'];
+        $nc->sunat_status              = $data['sunat_status'];
+        $nc->last_send_message         = $data['message'];
+        $nc->save();
+
+        return $nc;
     }
 }

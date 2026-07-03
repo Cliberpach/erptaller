@@ -12,14 +12,18 @@ use App\Models\Tenant\Sede;
  * La llaman SedeController@store (sedes nuevas) y el provisioning (sede principal del
  * tenant). NO se repite la lógica: un solo lugar genera las series.
  *
- * El sufijo de la serie = `numero` de la sede con padding a 3 dígitos:
- *   sede numero=1 -> B001/F001/NV001 ; numero=2 -> B002/F002/NV002 ; ...
+ * La serie SIEMPRE tiene 4 caracteres: `parameter` del tipo de comprobante + el `numero`
+ * de la sede paddeado a la izquierda hasta completar 4 (parameter 1 char -> pad 3 dígitos,
+ * parameter 2 chars -> pad 2 dígitos). Ejemplos con sede numero=1: B001, F001, NV01, FF01, BB01.
  * El prefijo sale del `parameter` del tipo de comprobante (general_table_details, GT=4).
  */
 class SerieService
 {
     /** general_table_id de "COMPROBANTES DE VENTA" (tipos de documento con serie). */
     private const GT_COMPROBANTES = 4;
+
+    /** La serie completa (parameter + número de sede) siempre mide esto. */
+    private const LARGO_SERIE = 4;
 
     /**
      * Genera (idempotente) todas las series de la sede.
@@ -28,18 +32,19 @@ class SerieService
      */
     public function generarSeriesSede(Sede $sede): void
     {
-        $sufijo = str_pad((string) $sede->numero, 3, '0', STR_PAD_LEFT);
-
         $tipos = GeneralTableDetail::where('general_table_id', self::GT_COMPROBANTES)
             ->where('status', 'ACTIVO')
             ->get();
 
         foreach ($tipos as $tipo) {
+            $digitos = self::LARGO_SERIE - strlen($tipo->parameter);
+            $sufijo  = str_pad((string) $sede->numero, max($digitos, 1), '0', STR_PAD_LEFT);
+
             DocumentSerialization::firstOrCreate(
                 ['sede_id' => $sede->id, 'document_type_id' => $tipo->id],
                 [
                     'company_id'     => 1,                          // legado (se deprecará; manda sede_id)
-                    'serie'          => $tipo->parameter . $sufijo, // ej. B + 001 = B001
+                    'serie'          => $tipo->parameter . $sufijo, // ej. B + 001 = B001 ; FF + 01 = FF01
                     'description'    => $tipo->description,
                     'destiny'        => null,
                     'default'        => 'NO',

@@ -4,6 +4,8 @@ namespace App\Http\Services\Tenant\Sale\Sale;
 
 use App\Http\Controllers\Tenant\NumberToLettersController;
 use App\Http\Services\Tenant\Accounts\CustomerAccount\CustomerAccountService;
+use App\Http\Services\Tenant\Invoicing\Invoice\InvoiceService;
+use App\Http\Services\Tenant\Invoicing\InvoicingManager;
 use App\Http\Services\Tenant\Inventory\Kardex\KardexService;
 use App\Http\Services\Tenant\Maintenance\Company\CompanyManager;
 use App\Models\Landlord\GeneralTable\GeneralTableDetail;
@@ -12,6 +14,7 @@ use App\Models\Tenant\Sale;
 use App\Models\Tenant\Sale\SaleDocumentPayment;
 use App\Support\PrecioVenta;
 use Exception;
+use Illuminate\Support\Facades\DB;
 
 class SaleService
 {
@@ -24,6 +27,8 @@ class SaleService
     private CompanyManager $s_company;
     private CustomerAccountService $s_customer_account;
     private KardexService $s_kardex;
+    private InvoicingManager $s_invoicing;
+    private InvoiceService $s_invoice;
 
     public function __construct()
     {
@@ -36,6 +41,8 @@ class SaleService
         $this->s_dto                =   new SaleDto();
         $this->s_customer_account   =   new CustomerAccountService();
         $this->s_kardex             =   new KardexService();
+        $this->s_invoicing          =   new InvoicingManager();
+        $this->s_invoice            =   new InvoiceService();
     }
 
     public function store(array $data): Sale
@@ -105,6 +112,43 @@ class SaleService
                 'operation_number'  => $pay->operation_number ?? null,
             ]);
         }
+    }
+
+    /**
+     * Envía el comprobante (boleta/factura) a SUNAT y persiste la respuesta.
+     * Cubre ambos orígenes de venta (POS normal y venta desde OT): el detalle sale de
+     * sales_documents_details + sales_documents_services (ya no se omiten los servicios).
+     */
+    public function sendSunat(int $sale_id): Sale
+    {
+        $sale = $this->s_repository->findSale($sale_id);
+
+        ValidationsService::validationSend($sale);
+        self::isActiveTypeSale($sale->type_sale_id);
+        $this->s_invoicing->isActiveTypeInvoice($sale->type_sale_id);
+
+        $products = $this->s_repository->getDetailProducts($sale_id);
+        $services = $this->s_repository->getDetailServices($sale_id);
+
+        if (count($products) === 0 && count($services) === 0) {
+            throw new Exception('EL DETALLE DEL DOCUMENTO DE VENTA ESTÁ VACÍO!!!');
+        }
+
+        $customer = DB::table('customers')->where('id', $sale->customer_id)
+            ->select('address', 'email', 'phone')
+            ->first();
+
+        if (!$customer) {
+            throw new Exception('ERROR AL OBTENER CLIENTE DE LA VENTA!!!');
+        }
+
+        $util       = $this->s_invoicing->getUtil();
+        $see        = $this->s_invoicing->config($util);
+        $filesRoute = $this->s_invoicing->filesRoute();
+
+        $data = $this->s_invoice->sendInvoice($sale, $products, $services, $customer, $filesRoute, $util, $see);
+
+        return $this->s_repository->saveSunatData($data, $sale);
     }
 
     public static function isActiveTypeSale($type_sale)

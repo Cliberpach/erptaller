@@ -33,6 +33,8 @@ class SaleDto
     ): array {
         $dto = [];
 
+        $dto['sede_id']                     = $validated_data->sede_id;
+
         //======= CLIENTE =======
         $dto['customer_id']                = $validated_data->customer->id;
         $dto['customer_name']              = $validated_data->customer->name;
@@ -96,6 +98,8 @@ class SaleDto
     public function getDtoStoreFromOrder(array $data)
     {
         $dto    =   [];
+
+        $dto['sede_id']                      =   $data['sede_id'];
 
         $customer                           =   $data['customer'];
         $dto['customer_id']                 =   $customer->id;

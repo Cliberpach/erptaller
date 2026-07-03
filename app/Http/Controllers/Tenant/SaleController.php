@@ -508,28 +508,20 @@ sale_document_id:1
 */
     public function send_sunat(Request $request)
     {
-
         try {
-
-            $sale_document_id   =   $request->get('sale_document_id');
+            $sale_document_id = $request->get('sale_document_id');
 
             if (!$sale_document_id) {
                 throw new Exception("NO SE ENCONTRÓ EL ID DEL COMPROBANTE DE PAGO");
             }
 
-            $sale_document = Sale::find($sale_document_id);
+            $sale = $this->s_sale->sendSunat((int) $sale_document_id);
 
-            if (!$sale_document) {
-                throw new Exception("COMPROBANTE DE RESERVA NO ENCONTRADO EN LA BD");
-            }
+            // El resultado real (ACEPTADO/OBSERVADO/RECHAZADO/PENDIENTE) lo comunica el badge de
+            // la fila tras recargar la tabla; success=true acá solo significa "no hubo excepción".
+            return response()->json(['success' => true, 'message' => $sale->last_send_message]);
         } catch (Throwable $th) {
-            return response()->json(['success' => false, 'message' => $th->getMessage()]);
+            return response()->json(['success' => false, 'message' => $th->getMessage(), 'line' => $th->getLine(), 'file' => $th->getFile()]);
         }
-
-        $request->merge([
-            'type' => "SALE_DOCUMENT"
-        ]);
-        $res    =   InvoiceController::send_sunat($request);
-        return $res;
     }
 }

@@ -12,6 +12,8 @@ class Sale extends Model
     protected $table = 'sales_documents';
 
     protected $fillable = [
+        'sede_id',
+
         'customer_id',
         'customer_name',
         'customer_type_document',
@@ -45,8 +47,6 @@ class Sale extends Model
         'correlative',
         'serie',
 
-        'estado',
-
         'response_cdrZip',
         'response_success',
         'response_error_code',
@@ -61,6 +61,7 @@ class Sale extends Model
         'ruta_cdr',
         'ruta_xml',
         'ruta_qr',
+        'last_send_message',
 
         'type',
         'work_order_id',
@@ -75,6 +76,11 @@ class Sale extends Model
         'vehicle_id',
         'plate',
     ];
+
+    public function sede()
+    {
+        return $this->belongsTo(Sede::class, 'sede_id');
+    }
 
     // PASO 4 - Pago en la venta (Capa A): N líneas de pago (método+cuenta+monto+operación).
     public function payments()

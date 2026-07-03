@@ -55,13 +55,15 @@ class InvoiceTypeSeeder extends Seeder
         $tipo_doc->editable         =   false;
         $tipo_doc->save();
 
-        // Multi-Sede Etapa 5: completar los 7 tipos canónicos de comprobante.
+        // Multi-Sede Etapa 5: completar los tipos canónicos de comprobante.
         // symbol = código SUNAT (07/08/09) / interno (50); parameter = letra de serie.
+        // NC: la serie dobla la letra del comprobante afectado (Boleta B -> BB, Factura F -> FF).
         $extra = [
-            ['name' => 'NOTA DE CRÉDITO ELECTRÓNICA', 'symbol' => '07', 'parameter' => 'FC'],
-            ['name' => 'NOTA DE DÉBITO ELECTRÓNICA',  'symbol' => '08', 'parameter' => 'FD'],
-            ['name' => 'GUÍA DE REMISIÓN',            'symbol' => '09', 'parameter' => 'T'],
-            ['name' => 'TICKET',                       'symbol' => '50', 'parameter' => 'TV'],
+            ['name' => 'NOTA DE CRÉDITO ELECTRÓNICA - BOLETA',  'symbol' => '07', 'parameter' => 'BB'],
+            ['name' => 'NOTA DE CRÉDITO ELECTRÓNICA - FACTURA', 'symbol' => '07', 'parameter' => 'FF'],
+            ['name' => 'NOTA DE DÉBITO ELECTRÓNICA',            'symbol' => '08', 'parameter' => 'FD'],
+            ['name' => 'GUÍA DE REMISIÓN',                       'symbol' => '09', 'parameter' => 'T'],
+            ['name' => 'TICKET',                                  'symbol' => '50', 'parameter' => 'TV'],
         ];
 
         foreach ($extra as $e) {

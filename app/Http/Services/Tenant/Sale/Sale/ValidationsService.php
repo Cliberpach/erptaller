@@ -6,6 +6,7 @@ use App\Models\Company;
 use App\Models\Landlord\Customer;
 use App\Models\Landlord\GeneralTable\GeneralTableDetail;
 use App\Models\Product;
+use App\Models\Tenant\Sale;
 use App\Models\Tenant\Sale\PaymentCondition\PaymentCondition;
 use App\Models\User;
 use Exception;
@@ -124,6 +125,7 @@ class ValidationsService
             'customer'          =>  $customer[0],
             'user_recorder'     =>  $user_recorder,
             'petty_cash'        =>  $user_in_petty_cash[0],
+            'sede_id'           =>  (int) $sede_activa_id,
             'type_sale_id'      =>  $type_sale->id,
             'type_sale_code'    =>  $type_sale->symbol,
             'type_sale_name'    =>  $type_sale_name,
@@ -138,6 +140,19 @@ class ValidationsService
             'vehicle_id'        =>  $data['vehicle_id'],
             'plate'             =>  $data['plate']
         ];
+    }
+
+    /**
+     * Antes de reenviar a SUNAT: no tocar un documento ya ACEPTADO ni uno ANULADO.
+     */
+    public static function validationSend(Sale $sale): void
+    {
+        if ($sale->sunat_status === 'ACEPTADO') {
+            throw new Exception('DOCUMENTO DE VENTA: ' . $sale->serie . '-' . $sale->correlative . ', YA FUE ACEPTADO POR SUNAT');
+        }
+        if ($sale->status === 'ANULADO') {
+            throw new Exception('DOCUMENTO DE VENTA: ' . $sale->serie . '-' . $sale->correlative . ', SE ENCUENTRA ANULADO');
+        }
     }
 
     public static function validationLstPays(array $lstPays, object $amounts):array
@@ -237,12 +252,17 @@ class ValidationsService
         //====== VALIDANDO IGV PORCENTAJE DE LA COMPAÑIA =====
         $company    =   Company::find(1);
 
+        // Multi-sede: la venta desde OT no pasa por caja real (usa PettyCash FICTICIO), así que
+        // la sede sale del almacén elegido en la OT, no de la sesión.
+        $sede_id    =   \App\Models\Tenant\Warehouse::findOrFail($data['warehouse_id'])->sede_id;
+
         $data['customer']       =   $customer;
         $data['invoice_type']   =   $invoice_tpye;
         $data['igv_percentage'] =   $company->igv;
         $data['lst_products']   =   $lst_products;
         $data['lst_services']   =   $lst_services;
         $data['type']           =   'PRODUCTOS';
+        $data['sede_id']        =   $sede_id;
 
         return $data;
     }

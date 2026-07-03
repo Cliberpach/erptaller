@@ -115,6 +115,12 @@
         <br>
         <p class="p-0 m-0 text-uppercase">SON: <b>{{ $credit_note->legend }}</b></p>
     </div>
+
+    <div class="cabecera">
+        @if ($credit_note->ruta_qr)
+            <img style="height:120px;object-fit: contain;" src="{{ public_path($credit_note->ruta_qr) }}">
+        @endif
+    </div>
 </body>
 
 </html>

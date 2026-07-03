@@ -149,6 +149,13 @@ class ModuleSeeder extends Seeder
             'order' => '2'
         ]);
 
+        ModuleChild::create([
+            'module_id' => $sale->id,
+            'description' => 'Notas de Crédito',
+            'route_name' => 'ventas.nota_credito.index',
+            'order' => '3'
+        ]);
+
         // Métodos Pago + Condiciones Pago se movieron a Mantenimiento (ver $maintenance).
 
         /*============ CUENTAS ==========*/
@@ -486,6 +493,7 @@ class ModuleSeeder extends Seeder
             'taller.citas.index'                  => 'taller.citas.gestionar',
             'ventas.comprobante_venta'            => 'ventas.ver',
             'ventas.cliente'                      => 'ventas.clientes.gestionar',
+            'ventas.nota_credito.index'           => 'ventas.ver',
             // Movidos a Mantenimiento: ahora gestionados con el permiso de mantenimiento.
             'ventas.metodo_pago'                  => 'mantenimiento.config_pago.gestionar',
             'ventas.condiciones_pago.index'       => 'mantenimiento.config_pago.gestionar',

@@ -15,7 +15,7 @@ use Twig\Template;
 use Twig\TemplateWrapper;
 
 /* invoice2.1.xml.twig */
-class __TwigTemplate_c04b9f7f84fc418896be679f4ee8bb42 extends Template
+class __TwigTemplate_6486494cfbff0e48ef2cd4b2467eca1f extends Template
 {
     private Source $source;
     /**
@@ -39,7 +39,7 @@ class __TwigTemplate_c04b9f7f84fc418896be679f4ee8bb42 extends Template
     {
         $macros = $this->macros;
         // line 1
-        $___internal_parse_0_ = ('' === $tmp = \Twig\Extension\CoreExtension::captureOutput((function () use (&$context, $macros, $blocks) {
+        $_v0 = ('' === $tmp = \Twig\Extension\CoreExtension::captureOutput((function () use (&$context, $macros, $blocks) {
             // line 2
             yield "<?xml version=\"1.0\" encoding=\"utf-8\"?>
 <Invoice xmlns=\"urn:oasis:names:specification:ubl:schema:xsd:Invoice-2\" xmlns:cac=\"urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2\" xmlns:cbc=\"urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2\" xmlns:ds=\"http://www.w3.org/2000/09/xmldsig#\" xmlns:ext=\"urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2\">
@@ -70,7 +70,7 @@ class __TwigTemplate_c04b9f7f84fc418896be679f4ee8bb42 extends Template
             yield "</cbc:IssueTime>
     ";
             // line 15
-            if (CoreExtension::getAttribute($this->env, $this->source, ($context["doc"] ?? null), "fecVencimiento", [], "any", false, false, false, 15)) {
+            if ((($tmp = CoreExtension::getAttribute($this->env, $this->source, ($context["doc"] ?? null), "fecVencimiento", [], "any", false, false, false, 15)) && $tmp instanceof Markup ? (string) $tmp : $tmp)) {
                 // line 16
                 yield "    <cbc:DueDate>";
                 yield $this->extensions['Twig\Extension\CoreExtension']->formatDate(CoreExtension::getAttribute($this->env, $this->source, ($context["doc"] ?? null), "fecVencimiento", [], "any", false, false, false, 16), "Y-m-d");
@@ -101,7 +101,7 @@ class __TwigTemplate_c04b9f7f84fc418896be679f4ee8bb42 extends Template
             $context = array_intersect_key($context, $_parent) + $_parent;
             // line 22
             yield "    ";
-            if (CoreExtension::getAttribute($this->env, $this->source, ($context["doc"] ?? null), "observacion", [], "any", false, false, false, 22)) {
+            if ((($tmp = CoreExtension::getAttribute($this->env, $this->source, ($context["doc"] ?? null), "observacion", [], "any", false, false, false, 22)) && $tmp instanceof Markup ? (string) $tmp : $tmp)) {
                 // line 23
                 yield "    <cbc:Note><![CDATA[";
                 yield CoreExtension::getAttribute($this->env, $this->source, ($context["doc"] ?? null), "observacion", [], "any", false, false, false, 23);
@@ -114,7 +114,7 @@ class __TwigTemplate_c04b9f7f84fc418896be679f4ee8bb42 extends Template
             yield "</cbc:DocumentCurrencyCode>
     ";
             // line 26
-            if (CoreExtension::getAttribute($this->env, $this->source, ($context["doc"] ?? null), "compra", [], "any", false, false, false, 26)) {
+            if ((($tmp = CoreExtension::getAttribute($this->env, $this->source, ($context["doc"] ?? null), "compra", [], "any", false, false, false, 26)) && $tmp instanceof Markup ? (string) $tmp : $tmp)) {
                 // line 27
                 yield "    <cac:OrderReference>
         <cbc:ID>";
@@ -126,7 +126,7 @@ class __TwigTemplate_c04b9f7f84fc418896be679f4ee8bb42 extends Template
             }
             // line 31
             yield "    ";
-            if (CoreExtension::getAttribute($this->env, $this->source, ($context["doc"] ?? null), "guias", [], "any", false, false, false, 31)) {
+            if ((($tmp = CoreExtension::getAttribute($this->env, $this->source, ($context["doc"] ?? null), "guias", [], "any", false, false, false, 31)) && $tmp instanceof Markup ? (string) $tmp : $tmp)) {
                 // line 32
                 yield "    ";
                 $context['_parent'] = $context;
@@ -153,7 +153,7 @@ class __TwigTemplate_c04b9f7f84fc418896be679f4ee8bb42 extends Template
             }
             // line 39
             yield "    ";
-            if (CoreExtension::getAttribute($this->env, $this->source, ($context["doc"] ?? null), "relDocs", [], "any", false, false, false, 39)) {
+            if ((($tmp = CoreExtension::getAttribute($this->env, $this->source, ($context["doc"] ?? null), "relDocs", [], "any", false, false, false, 39)) && $tmp instanceof Markup ? (string) $tmp : $tmp)) {
                 // line 40
                 yield "    ";
                 $context['_parent'] = $context;
@@ -180,7 +180,7 @@ class __TwigTemplate_c04b9f7f84fc418896be679f4ee8bb42 extends Template
             }
             // line 47
             yield "    ";
-            if (CoreExtension::getAttribute($this->env, $this->source, ($context["doc"] ?? null), "anticipos", [], "any", false, false, false, 47)) {
+            if ((($tmp = CoreExtension::getAttribute($this->env, $this->source, ($context["doc"] ?? null), "anticipos", [], "any", false, false, false, 47)) && $tmp instanceof Markup ? (string) $tmp : $tmp)) {
                 // line 48
                 yield "    ";
                 $context['_parent'] = $context;
@@ -274,7 +274,7 @@ class __TwigTemplate_c04b9f7f84fc418896be679f4ee8bb42 extends Template
             </cac:PartyIdentification>
 \t\t\t";
             // line 82
-            if (CoreExtension::getAttribute($this->env, $this->source, ($context["emp"] ?? null), "nombreComercial", [], "any", false, false, false, 82)) {
+            if ((($tmp = CoreExtension::getAttribute($this->env, $this->source, ($context["emp"] ?? null), "nombreComercial", [], "any", false, false, false, 82)) && $tmp instanceof Markup ? (string) $tmp : $tmp)) {
                 // line 83
                 yield "            <cac:PartyName>
                 <cbc:Name><![CDATA[";
@@ -305,7 +305,7 @@ class __TwigTemplate_c04b9f7f84fc418896be679f4ee8bb42 extends Template
             yield "</cbc:AddressTypeCode>
                     ";
             // line 93
-            if (CoreExtension::getAttribute($this->env, $this->source, ($context["addr"] ?? null), "urbanizacion", [], "any", false, false, false, 93)) {
+            if ((($tmp = CoreExtension::getAttribute($this->env, $this->source, ($context["addr"] ?? null), "urbanizacion", [], "any", false, false, false, 93)) && $tmp instanceof Markup ? (string) $tmp : $tmp)) {
                 // line 94
                 yield "                    <cbc:CitySubdivisionName>";
                 yield CoreExtension::getAttribute($this->env, $this->source, ($context["addr"] ?? null), "urbanizacion", [], "any", false, false, false, 94);
@@ -345,7 +345,7 @@ class __TwigTemplate_c04b9f7f84fc418896be679f4ee8bb42 extends Template
                 yield "            <cac:Contact>
                 ";
                 // line 109
-                if (CoreExtension::getAttribute($this->env, $this->source, ($context["emp"] ?? null), "telephone", [], "any", false, false, false, 109)) {
+                if ((($tmp = CoreExtension::getAttribute($this->env, $this->source, ($context["emp"] ?? null), "telephone", [], "any", false, false, false, 109)) && $tmp instanceof Markup ? (string) $tmp : $tmp)) {
                     // line 110
                     yield "                <cbc:Telephone>";
                     yield CoreExtension::getAttribute($this->env, $this->source, ($context["emp"] ?? null), "telephone", [], "any", false, false, false, 110);
@@ -354,7 +354,7 @@ class __TwigTemplate_c04b9f7f84fc418896be679f4ee8bb42 extends Template
                 }
                 // line 112
                 yield "                ";
-                if (CoreExtension::getAttribute($this->env, $this->source, ($context["emp"] ?? null), "email", [], "any", false, false, false, 112)) {
+                if ((($tmp = CoreExtension::getAttribute($this->env, $this->source, ($context["emp"] ?? null), "email", [], "any", false, false, false, 112)) && $tmp instanceof Markup ? (string) $tmp : $tmp)) {
                     // line 113
                     yield "                <cbc:ElectronicMail>";
                     yield CoreExtension::getAttribute($this->env, $this->source, ($context["emp"] ?? null), "email", [], "any", false, false, false, 113);
@@ -389,7 +389,7 @@ class __TwigTemplate_c04b9f7f84fc418896be679f4ee8bb42 extends Template
             yield "]]></cbc:RegistrationName>
                 ";
             // line 127
-            if (CoreExtension::getAttribute($this->env, $this->source, ($context["client"] ?? null), "address", [], "any", false, false, false, 127)) {
+            if ((($tmp = CoreExtension::getAttribute($this->env, $this->source, ($context["client"] ?? null), "address", [], "any", false, false, false, 127)) && $tmp instanceof Markup ? (string) $tmp : $tmp)) {
                 // line 128
                 yield "                ";
                 $context["addr"] = CoreExtension::getAttribute($this->env, $this->source, ($context["client"] ?? null), "address", [], "any", false, false, false, 128);
@@ -397,7 +397,7 @@ class __TwigTemplate_c04b9f7f84fc418896be679f4ee8bb42 extends Template
                 yield "                <cac:RegistrationAddress>
                     ";
                 // line 130
-                if (CoreExtension::getAttribute($this->env, $this->source, ($context["addr"] ?? null), "ubigueo", [], "any", false, false, false, 130)) {
+                if ((($tmp = CoreExtension::getAttribute($this->env, $this->source, ($context["addr"] ?? null), "ubigueo", [], "any", false, false, false, 130)) && $tmp instanceof Markup ? (string) $tmp : $tmp)) {
                     // line 131
                     yield "                    <cbc:ID>";
                     yield CoreExtension::getAttribute($this->env, $this->source, ($context["addr"] ?? null), "ubigueo", [], "any", false, false, false, 131);
@@ -429,7 +429,7 @@ class __TwigTemplate_c04b9f7f84fc418896be679f4ee8bb42 extends Template
                 yield "            <cac:Contact>
                 ";
                 // line 144
-                if (CoreExtension::getAttribute($this->env, $this->source, ($context["client"] ?? null), "telephone", [], "any", false, false, false, 144)) {
+                if ((($tmp = CoreExtension::getAttribute($this->env, $this->source, ($context["client"] ?? null), "telephone", [], "any", false, false, false, 144)) && $tmp instanceof Markup ? (string) $tmp : $tmp)) {
                     // line 145
                     yield "                <cbc:Telephone>";
                     yield CoreExtension::getAttribute($this->env, $this->source, ($context["client"] ?? null), "telephone", [], "any", false, false, false, 145);
@@ -438,7 +438,7 @@ class __TwigTemplate_c04b9f7f84fc418896be679f4ee8bb42 extends Template
                 }
                 // line 147
                 yield "                ";
-                if (CoreExtension::getAttribute($this->env, $this->source, ($context["client"] ?? null), "email", [], "any", false, false, false, 147)) {
+                if ((($tmp = CoreExtension::getAttribute($this->env, $this->source, ($context["client"] ?? null), "email", [], "any", false, false, false, 147)) && $tmp instanceof Markup ? (string) $tmp : $tmp)) {
                     // line 148
                     yield "                <cbc:ElectronicMail>";
                     yield CoreExtension::getAttribute($this->env, $this->source, ($context["client"] ?? null), "email", [], "any", false, false, false, 148);
@@ -457,7 +457,7 @@ class __TwigTemplate_c04b9f7f84fc418896be679f4ee8bb42 extends Template
             $context["seller"] = CoreExtension::getAttribute($this->env, $this->source, ($context["doc"] ?? null), "seller", [], "any", false, false, false, 154);
             // line 155
             yield "    ";
-            if (($context["seller"] ?? null)) {
+            if ((($tmp = ($context["seller"] ?? null)) && $tmp instanceof Markup ? (string) $tmp : $tmp)) {
                 // line 156
                 yield "    <cac:SellerSupplierParty>
         <cac:Party>
@@ -476,7 +476,7 @@ class __TwigTemplate_c04b9f7f84fc418896be679f4ee8bb42 extends Template
                 yield "]]></cbc:RegistrationName>
                 ";
                 // line 163
-                if (CoreExtension::getAttribute($this->env, $this->source, ($context["seller"] ?? null), "address", [], "any", false, false, false, 163)) {
+                if ((($tmp = CoreExtension::getAttribute($this->env, $this->source, ($context["seller"] ?? null), "address", [], "any", false, false, false, 163)) && $tmp instanceof Markup ? (string) $tmp : $tmp)) {
                     // line 164
                     yield "                ";
                     $context["addr"] = CoreExtension::getAttribute($this->env, $this->source, ($context["seller"] ?? null), "address", [], "any", false, false, false, 164);
@@ -484,7 +484,7 @@ class __TwigTemplate_c04b9f7f84fc418896be679f4ee8bb42 extends Template
                     yield "                <cac:RegistrationAddress>
                     ";
                     // line 166
-                    if (CoreExtension::getAttribute($this->env, $this->source, ($context["addr"] ?? null), "ubigueo", [], "any", false, false, false, 166)) {
+                    if ((($tmp = CoreExtension::getAttribute($this->env, $this->source, ($context["addr"] ?? null), "ubigueo", [], "any", false, false, false, 166)) && $tmp instanceof Markup ? (string) $tmp : $tmp)) {
                         // line 167
                         yield "                    <cbc:ID>";
                         yield CoreExtension::getAttribute($this->env, $this->source, ($context["addr"] ?? null), "ubigueo", [], "any", false, false, false, 167);
@@ -516,7 +516,7 @@ class __TwigTemplate_c04b9f7f84fc418896be679f4ee8bb42 extends Template
                     yield "            <cac:Contact>
                 ";
                     // line 180
-                    if (CoreExtension::getAttribute($this->env, $this->source, ($context["seller"] ?? null), "telephone", [], "any", false, false, false, 180)) {
+                    if ((($tmp = CoreExtension::getAttribute($this->env, $this->source, ($context["seller"] ?? null), "telephone", [], "any", false, false, false, 180)) && $tmp instanceof Markup ? (string) $tmp : $tmp)) {
                         // line 181
                         yield "                <cbc:Telephone>";
                         yield CoreExtension::getAttribute($this->env, $this->source, ($context["seller"] ?? null), "telephone", [], "any", false, false, false, 181);
@@ -525,7 +525,7 @@ class __TwigTemplate_c04b9f7f84fc418896be679f4ee8bb42 extends Template
                     }
                     // line 183
                     yield "                ";
-                    if (CoreExtension::getAttribute($this->env, $this->source, ($context["seller"] ?? null), "email", [], "any", false, false, false, 183)) {
+                    if ((($tmp = CoreExtension::getAttribute($this->env, $this->source, ($context["seller"] ?? null), "email", [], "any", false, false, false, 183)) && $tmp instanceof Markup ? (string) $tmp : $tmp)) {
                         // line 184
                         yield "                <cbc:ElectronicMail>";
                         yield CoreExtension::getAttribute($this->env, $this->source, ($context["seller"] ?? null), "email", [], "any", false, false, false, 184);
@@ -543,7 +543,7 @@ class __TwigTemplate_c04b9f7f84fc418896be679f4ee8bb42 extends Template
             }
             // line 191
             yield "    ";
-            if (CoreExtension::getAttribute($this->env, $this->source, ($context["doc"] ?? null), "direccionEntrega", [], "any", false, false, false, 191)) {
+            if ((($tmp = CoreExtension::getAttribute($this->env, $this->source, ($context["doc"] ?? null), "direccionEntrega", [], "any", false, false, false, 191)) && $tmp instanceof Markup ? (string) $tmp : $tmp)) {
                 // line 192
                 yield "        ";
                 $context["addr"] = CoreExtension::getAttribute($this->env, $this->source, ($context["doc"] ?? null), "direccionEntrega", [], "any", false, false, false, 192);
@@ -557,7 +557,7 @@ class __TwigTemplate_c04b9f7f84fc418896be679f4ee8bb42 extends Template
                 yield "</cbc:ID>
                     ";
                 // line 197
-                if (CoreExtension::getAttribute($this->env, $this->source, ($context["addr"] ?? null), "urbanizacion", [], "any", false, false, false, 197)) {
+                if ((($tmp = CoreExtension::getAttribute($this->env, $this->source, ($context["addr"] ?? null), "urbanizacion", [], "any", false, false, false, 197)) && $tmp instanceof Markup ? (string) $tmp : $tmp)) {
                     // line 198
                     yield "                    <cbc:CitySubdivisionName>";
                     yield CoreExtension::getAttribute($this->env, $this->source, ($context["addr"] ?? null), "urbanizacion", [], "any", false, false, false, 198);
@@ -595,7 +595,7 @@ class __TwigTemplate_c04b9f7f84fc418896be679f4ee8bb42 extends Template
             }
             // line 213
             yield "    ";
-            if (CoreExtension::getAttribute($this->env, $this->source, ($context["doc"] ?? null), "detraccion", [], "any", false, false, false, 213)) {
+            if ((($tmp = CoreExtension::getAttribute($this->env, $this->source, ($context["doc"] ?? null), "detraccion", [], "any", false, false, false, 213)) && $tmp instanceof Markup ? (string) $tmp : $tmp)) {
                 // line 214
                 yield "    ";
                 $context["detr"] = CoreExtension::getAttribute($this->env, $this->source, ($context["doc"] ?? null), "detraccion", [], "any", false, false, false, 214);
@@ -632,7 +632,7 @@ class __TwigTemplate_c04b9f7f84fc418896be679f4ee8bb42 extends Template
             }
             // line 229
             yield "    ";
-            if (CoreExtension::getAttribute($this->env, $this->source, ($context["doc"] ?? null), "perception", [], "any", false, false, false, 229)) {
+            if ((($tmp = CoreExtension::getAttribute($this->env, $this->source, ($context["doc"] ?? null), "perception", [], "any", false, false, false, 229)) && $tmp instanceof Markup ? (string) $tmp : $tmp)) {
                 // line 230
                 yield "    <cac:PaymentTerms>
         <cbc:ID>Percepcion</cbc:ID>
@@ -645,7 +645,7 @@ class __TwigTemplate_c04b9f7f84fc418896be679f4ee8bb42 extends Template
             }
             // line 235
             yield "    ";
-            if (CoreExtension::getAttribute($this->env, $this->source, ($context["doc"] ?? null), "formaPago", [], "any", false, false, false, 235)) {
+            if ((($tmp = CoreExtension::getAttribute($this->env, $this->source, ($context["doc"] ?? null), "formaPago", [], "any", false, false, false, 235)) && $tmp instanceof Markup ? (string) $tmp : $tmp)) {
                 // line 236
                 yield "    <cac:PaymentTerms>
         <cbc:ID>FormaPago</cbc:ID>
@@ -655,10 +655,10 @@ class __TwigTemplate_c04b9f7f84fc418896be679f4ee8bb42 extends Template
                 yield "</cbc:PaymentMeansID>
         ";
                 // line 239
-                if (CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, ($context["doc"] ?? null), "formaPago", [], "any", false, false, false, 239), "monto", [], "any", false, false, false, 239)) {
+                if ((($tmp = CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, ($context["doc"] ?? null), "formaPago", [], "any", false, false, false, 239), "monto", [], "any", false, false, false, 239)) && $tmp instanceof Markup ? (string) $tmp : $tmp)) {
                     // line 240
                     yield "        <cbc:Amount currencyID=\"";
-                    yield ((CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, ($context["doc"] ?? null), "formaPago", [], "any", false, true, false, 240), "moneda", [], "any", true, true, false, 240)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, ($context["doc"] ?? null), "formaPago", [], "any", false, true, false, 240), "moneda", [], "any", false, false, false, 240), CoreExtension::getAttribute($this->env, $this->source, ($context["doc"] ?? null), "tipoMoneda", [], "any", false, false, false, 240))) : (CoreExtension::getAttribute($this->env, $this->source, ($context["doc"] ?? null), "tipoMoneda", [], "any", false, false, false, 240)));
+                    yield ((CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, ($context["doc"] ?? null), "formaPago", [], "any", false, true, false, 240), "moneda", [], "any", true, true, false, 240)) ? (Twig\Extension\CoreExtension::default(CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, ($context["doc"] ?? null), "formaPago", [], "any", false, false, false, 240), "moneda", [], "any", false, false, false, 240), CoreExtension::getAttribute($this->env, $this->source, ($context["doc"] ?? null), "tipoMoneda", [], "any", false, false, false, 240))) : (CoreExtension::getAttribute($this->env, $this->source, ($context["doc"] ?? null), "tipoMoneda", [], "any", false, false, false, 240)));
                     yield "\">";
                     yield $this->env->getFilter('n_format')->getCallable()(CoreExtension::getAttribute($this->env, $this->source, CoreExtension::getAttribute($this->env, $this->source, ($context["doc"] ?? null), "formaPago", [], "any", false, false, false, 240), "monto", [], "any", false, false, false, 240));
                     yield "</cbc:Amount>
@@ -670,7 +670,7 @@ class __TwigTemplate_c04b9f7f84fc418896be679f4ee8bb42 extends Template
             }
             // line 244
             yield "    ";
-            if (CoreExtension::getAttribute($this->env, $this->source, ($context["doc"] ?? null), "cuotas", [], "any", false, false, false, 244)) {
+            if ((($tmp = CoreExtension::getAttribute($this->env, $this->source, ($context["doc"] ?? null), "cuotas", [], "any", false, false, false, 244)) && $tmp instanceof Markup ? (string) $tmp : $tmp)) {
                 // line 245
                 yield "    ";
                 $context['_parent'] = $context;
@@ -725,7 +725,7 @@ class __TwigTemplate_c04b9f7f84fc418896be679f4ee8bb42 extends Template
             }
             // line 254
             yield "    ";
-            if (CoreExtension::getAttribute($this->env, $this->source, ($context["doc"] ?? null), "anticipos", [], "any", false, false, false, 254)) {
+            if ((($tmp = CoreExtension::getAttribute($this->env, $this->source, ($context["doc"] ?? null), "anticipos", [], "any", false, false, false, 254)) && $tmp instanceof Markup ? (string) $tmp : $tmp)) {
                 // line 255
                 yield "    ";
                 $context['_parent'] = $context;
@@ -775,7 +775,7 @@ class __TwigTemplate_c04b9f7f84fc418896be679f4ee8bb42 extends Template
             }
             // line 262
             yield "    ";
-            if (CoreExtension::getAttribute($this->env, $this->source, ($context["doc"] ?? null), "cargos", [], "any", false, false, false, 262)) {
+            if ((($tmp = CoreExtension::getAttribute($this->env, $this->source, ($context["doc"] ?? null), "cargos", [], "any", false, false, false, 262)) && $tmp instanceof Markup ? (string) $tmp : $tmp)) {
                 // line 263
                 yield "    ";
                 $context['_parent'] = $context;
@@ -815,7 +815,7 @@ class __TwigTemplate_c04b9f7f84fc418896be679f4ee8bb42 extends Template
             }
             // line 273
             yield "    ";
-            if (CoreExtension::getAttribute($this->env, $this->source, ($context["doc"] ?? null), "descuentos", [], "any", false, false, false, 273)) {
+            if ((($tmp = CoreExtension::getAttribute($this->env, $this->source, ($context["doc"] ?? null), "descuentos", [], "any", false, false, false, 273)) && $tmp instanceof Markup ? (string) $tmp : $tmp)) {
                 // line 274
                 yield "    ";
                 $context['_parent'] = $context;
@@ -830,7 +830,7 @@ class __TwigTemplate_c04b9f7f84fc418896be679f4ee8bb42 extends Template
                     yield "</cbc:AllowanceChargeReasonCode>
         ";
                     // line 278
-                    if ( !(null === CoreExtension::getAttribute($this->env, $this->source, $context["desc"], "factor", [], "any", false, false, false, 278))) {
+                    if ((($tmp =  !(null === CoreExtension::getAttribute($this->env, $this->source, $context["desc"], "factor", [], "any", false, false, false, 278))) && $tmp instanceof Markup ? (string) $tmp : $tmp)) {
                         // line 279
                         yield "        <cbc:MultiplierFactorNumeric>";
                         yield $this->env->getFilter('n_format_limit')->getCallable()(CoreExtension::getAttribute($this->env, $this->source, $context["desc"], "factor", [], "any", false, false, false, 279), 5);
@@ -860,7 +860,7 @@ class __TwigTemplate_c04b9f7f84fc418896be679f4ee8bb42 extends Template
             }
             // line 286
             yield "    ";
-            if (CoreExtension::getAttribute($this->env, $this->source, ($context["doc"] ?? null), "perception", [], "any", false, false, false, 286)) {
+            if ((($tmp = CoreExtension::getAttribute($this->env, $this->source, ($context["doc"] ?? null), "perception", [], "any", false, false, false, 286)) && $tmp instanceof Markup ? (string) $tmp : $tmp)) {
                 // line 287
                 yield "    ";
                 $context["perc"] = CoreExtension::getAttribute($this->env, $this->source, ($context["doc"] ?? null), "perception", [], "any", false, false, false, 287);
@@ -896,7 +896,7 @@ class __TwigTemplate_c04b9f7f84fc418896be679f4ee8bb42 extends Template
             yield "</cbc:TaxAmount>
         ";
             // line 298
-            if (CoreExtension::getAttribute($this->env, $this->source, ($context["doc"] ?? null), "mtoISC", [], "any", false, false, false, 298)) {
+            if ((($tmp = CoreExtension::getAttribute($this->env, $this->source, ($context["doc"] ?? null), "mtoISC", [], "any", false, false, false, 298)) && $tmp instanceof Markup ? (string) $tmp : $tmp)) {
                 // line 299
                 yield "        <cac:TaxSubtotal>
             <cbc:TaxableAmount currencyID=\"";
@@ -923,7 +923,7 @@ class __TwigTemplate_c04b9f7f84fc418896be679f4ee8bb42 extends Template
             }
             // line 311
             yield "        ";
-            if ( !(null === CoreExtension::getAttribute($this->env, $this->source, ($context["doc"] ?? null), "mtoOperGravadas", [], "any", false, false, false, 311))) {
+            if ((($tmp =  !(null === CoreExtension::getAttribute($this->env, $this->source, ($context["doc"] ?? null), "mtoOperGravadas", [], "any", false, false, false, 311))) && $tmp instanceof Markup ? (string) $tmp : $tmp)) {
                 // line 312
                 yield "        <cac:TaxSubtotal>
             <cbc:TaxableAmount currencyID=\"";
@@ -950,7 +950,7 @@ class __TwigTemplate_c04b9f7f84fc418896be679f4ee8bb42 extends Template
             }
             // line 324
             yield "        ";
-            if ( !(null === CoreExtension::getAttribute($this->env, $this->source, ($context["doc"] ?? null), "mtoOperInafectas", [], "any", false, false, false, 324))) {
+            if ((($tmp =  !(null === CoreExtension::getAttribute($this->env, $this->source, ($context["doc"] ?? null), "mtoOperInafectas", [], "any", false, false, false, 324))) && $tmp instanceof Markup ? (string) $tmp : $tmp)) {
                 // line 325
                 yield "            <cac:TaxSubtotal>
                 <cbc:TaxableAmount currencyID=\"";
@@ -975,7 +975,7 @@ class __TwigTemplate_c04b9f7f84fc418896be679f4ee8bb42 extends Template
             }
             // line 337
             yield "        ";
-            if ( !(null === CoreExtension::getAttribute($this->env, $this->source, ($context["doc"] ?? null), "mtoOperExoneradas", [], "any", false, false, false, 337))) {
+            if ((($tmp =  !(null === CoreExtension::getAttribute($this->env, $this->source, ($context["doc"] ?? null), "mtoOperExoneradas", [], "any", false, false, false, 337))) && $tmp instanceof Markup ? (string) $tmp : $tmp)) {
                 // line 338
                 yield "            <cac:TaxSubtotal>
                 <cbc:TaxableAmount currencyID=\"";
@@ -1000,7 +1000,7 @@ class __TwigTemplate_c04b9f7f84fc418896be679f4ee8bb42 extends Template
             }
             // line 350
             yield "        ";
-            if ( !(null === CoreExtension::getAttribute($this->env, $this->source, ($context["doc"] ?? null), "mtoOperGratuitas", [], "any", false, false, false, 350))) {
+            if ((($tmp =  !(null === CoreExtension::getAttribute($this->env, $this->source, ($context["doc"] ?? null), "mtoOperGratuitas", [], "any", false, false, false, 350))) && $tmp instanceof Markup ? (string) $tmp : $tmp)) {
                 // line 351
                 yield "            <cac:TaxSubtotal>
                 <cbc:TaxableAmount currencyID=\"";
@@ -1027,7 +1027,7 @@ class __TwigTemplate_c04b9f7f84fc418896be679f4ee8bb42 extends Template
             }
             // line 363
             yield "        ";
-            if ( !(null === CoreExtension::getAttribute($this->env, $this->source, ($context["doc"] ?? null), "mtoOperExportacion", [], "any", false, false, false, 363))) {
+            if ((($tmp =  !(null === CoreExtension::getAttribute($this->env, $this->source, ($context["doc"] ?? null), "mtoOperExportacion", [], "any", false, false, false, 363))) && $tmp instanceof Markup ? (string) $tmp : $tmp)) {
                 // line 364
                 yield "            <cac:TaxSubtotal>
                 <cbc:TaxableAmount currencyID=\"";
@@ -1052,7 +1052,7 @@ class __TwigTemplate_c04b9f7f84fc418896be679f4ee8bb42 extends Template
             }
             // line 376
             yield "        ";
-            if (CoreExtension::getAttribute($this->env, $this->source, ($context["doc"] ?? null), "mtoIvap", [], "any", false, false, false, 376)) {
+            if ((($tmp = CoreExtension::getAttribute($this->env, $this->source, ($context["doc"] ?? null), "mtoIvap", [], "any", false, false, false, 376)) && $tmp instanceof Markup ? (string) $tmp : $tmp)) {
                 // line 377
                 yield "        <cac:TaxSubtotal>
             <cbc:TaxableAmount currencyID=\"";
@@ -1079,7 +1079,7 @@ class __TwigTemplate_c04b9f7f84fc418896be679f4ee8bb42 extends Template
             }
             // line 389
             yield "        ";
-            if (CoreExtension::getAttribute($this->env, $this->source, ($context["doc"] ?? null), "mtoOtrosTributos", [], "any", false, false, false, 389)) {
+            if ((($tmp = CoreExtension::getAttribute($this->env, $this->source, ($context["doc"] ?? null), "mtoOtrosTributos", [], "any", false, false, false, 389)) && $tmp instanceof Markup ? (string) $tmp : $tmp)) {
                 // line 390
                 yield "        <cac:TaxSubtotal>
             <cbc:TaxableAmount currencyID=\"";
@@ -1106,7 +1106,7 @@ class __TwigTemplate_c04b9f7f84fc418896be679f4ee8bb42 extends Template
             }
             // line 402
             yield "        ";
-            if (CoreExtension::getAttribute($this->env, $this->source, ($context["doc"] ?? null), "icbper", [], "any", false, false, false, 402)) {
+            if ((($tmp = CoreExtension::getAttribute($this->env, $this->source, ($context["doc"] ?? null), "icbper", [], "any", false, false, false, 402)) && $tmp instanceof Markup ? (string) $tmp : $tmp)) {
                 // line 403
                 yield "            <cac:TaxSubtotal>
                 <cbc:TaxAmount currencyID=\"";
@@ -1136,7 +1136,7 @@ class __TwigTemplate_c04b9f7f84fc418896be679f4ee8bb42 extends Template
             yield "</cbc:LineExtensionAmount>
         ";
             // line 417
-            if ( !(null === CoreExtension::getAttribute($this->env, $this->source, ($context["doc"] ?? null), "subTotal", [], "any", false, false, false, 417))) {
+            if ((($tmp =  !(null === CoreExtension::getAttribute($this->env, $this->source, ($context["doc"] ?? null), "subTotal", [], "any", false, false, false, 417))) && $tmp instanceof Markup ? (string) $tmp : $tmp)) {
                 // line 418
                 yield "        <cbc:TaxInclusiveAmount currencyID=\"";
                 yield CoreExtension::getAttribute($this->env, $this->source, ($context["doc"] ?? null), "tipoMoneda", [], "any", false, false, false, 418);
@@ -1147,7 +1147,7 @@ class __TwigTemplate_c04b9f7f84fc418896be679f4ee8bb42 extends Template
             }
             // line 420
             yield "        ";
-            if ( !(null === CoreExtension::getAttribute($this->env, $this->source, ($context["doc"] ?? null), "sumOtrosDescuentos", [], "any", false, false, false, 420))) {
+            if ((($tmp =  !(null === CoreExtension::getAttribute($this->env, $this->source, ($context["doc"] ?? null), "sumOtrosDescuentos", [], "any", false, false, false, 420))) && $tmp instanceof Markup ? (string) $tmp : $tmp)) {
                 // line 421
                 yield "        <cbc:AllowanceTotalAmount currencyID=\"";
                 yield CoreExtension::getAttribute($this->env, $this->source, ($context["doc"] ?? null), "tipoMoneda", [], "any", false, false, false, 421);
@@ -1158,7 +1158,7 @@ class __TwigTemplate_c04b9f7f84fc418896be679f4ee8bb42 extends Template
             }
             // line 423
             yield "        ";
-            if ( !(null === CoreExtension::getAttribute($this->env, $this->source, ($context["doc"] ?? null), "sumOtrosCargos", [], "any", false, false, false, 423))) {
+            if ((($tmp =  !(null === CoreExtension::getAttribute($this->env, $this->source, ($context["doc"] ?? null), "sumOtrosCargos", [], "any", false, false, false, 423))) && $tmp instanceof Markup ? (string) $tmp : $tmp)) {
                 // line 424
                 yield "        <cbc:ChargeTotalAmount currencyID=\"";
                 yield CoreExtension::getAttribute($this->env, $this->source, ($context["doc"] ?? null), "tipoMoneda", [], "any", false, false, false, 424);
@@ -1169,7 +1169,7 @@ class __TwigTemplate_c04b9f7f84fc418896be679f4ee8bb42 extends Template
             }
             // line 426
             yield "        ";
-            if ( !(null === CoreExtension::getAttribute($this->env, $this->source, ($context["doc"] ?? null), "totalAnticipos", [], "any", false, false, false, 426))) {
+            if ((($tmp =  !(null === CoreExtension::getAttribute($this->env, $this->source, ($context["doc"] ?? null), "totalAnticipos", [], "any", false, false, false, 426))) && $tmp instanceof Markup ? (string) $tmp : $tmp)) {
                 // line 427
                 yield "        <cbc:PrepaidAmount currencyID=\"";
                 yield CoreExtension::getAttribute($this->env, $this->source, ($context["doc"] ?? null), "tipoMoneda", [], "any", false, false, false, 427);
@@ -1180,7 +1180,7 @@ class __TwigTemplate_c04b9f7f84fc418896be679f4ee8bb42 extends Template
             }
             // line 429
             yield "        ";
-            if ( !(null === CoreExtension::getAttribute($this->env, $this->source, ($context["doc"] ?? null), "redondeo", [], "any", false, false, false, 429))) {
+            if ((($tmp =  !(null === CoreExtension::getAttribute($this->env, $this->source, ($context["doc"] ?? null), "redondeo", [], "any", false, false, false, 429))) && $tmp instanceof Markup ? (string) $tmp : $tmp)) {
                 // line 430
                 yield "        <cbc:PayableRoundingAmount currencyID=\"";
                 yield CoreExtension::getAttribute($this->env, $this->source, ($context["doc"] ?? null), "tipoMoneda", [], "any", false, false, false, 430);
@@ -1235,7 +1235,7 @@ class __TwigTemplate_c04b9f7f84fc418896be679f4ee8bb42 extends Template
         <cac:PricingReference>
             ";
                 // line 440
-                if (CoreExtension::getAttribute($this->env, $this->source, $context["detail"], "mtoValorGratuito", [], "any", false, false, false, 440)) {
+                if ((($tmp = CoreExtension::getAttribute($this->env, $this->source, $context["detail"], "mtoValorGratuito", [], "any", false, false, false, 440)) && $tmp instanceof Markup ? (string) $tmp : $tmp)) {
                     // line 441
                     yield "            <cac:AlternativeConditionPrice>
                 <cbc:PriceAmount currencyID=\"";
@@ -1264,7 +1264,7 @@ class __TwigTemplate_c04b9f7f84fc418896be679f4ee8bb42 extends Template
                 yield "        </cac:PricingReference>
         ";
                 // line 452
-                if (CoreExtension::getAttribute($this->env, $this->source, $context["detail"], "cargos", [], "any", false, false, false, 452)) {
+                if ((($tmp = CoreExtension::getAttribute($this->env, $this->source, $context["detail"], "cargos", [], "any", false, false, false, 452)) && $tmp instanceof Markup ? (string) $tmp : $tmp)) {
                     // line 453
                     yield "        ";
                     $context['_parent'] = $context;
@@ -1304,7 +1304,7 @@ class __TwigTemplate_c04b9f7f84fc418896be679f4ee8bb42 extends Template
                 }
                 // line 463
                 yield "        ";
-                if (CoreExtension::getAttribute($this->env, $this->source, $context["detail"], "descuentos", [], "any", false, false, false, 463)) {
+                if ((($tmp = CoreExtension::getAttribute($this->env, $this->source, $context["detail"], "descuentos", [], "any", false, false, false, 463)) && $tmp instanceof Markup ? (string) $tmp : $tmp)) {
                     // line 464
                     yield "        ";
                     $context['_parent'] = $context;
@@ -1352,7 +1352,7 @@ class __TwigTemplate_c04b9f7f84fc418896be679f4ee8bb42 extends Template
                 yield "</cbc:TaxAmount>
             ";
                 // line 476
-                if (CoreExtension::getAttribute($this->env, $this->source, $context["detail"], "isc", [], "any", false, false, false, 476)) {
+                if ((($tmp = CoreExtension::getAttribute($this->env, $this->source, $context["detail"], "isc", [], "any", false, false, false, 476)) && $tmp instanceof Markup ? (string) $tmp : $tmp)) {
                     // line 477
                     yield "            <cac:TaxSubtotal>
                 <cbc:TaxableAmount currencyID=\"";
@@ -1430,7 +1430,7 @@ class __TwigTemplate_c04b9f7f84fc418896be679f4ee8bb42 extends Template
             </cac:TaxSubtotal>
             ";
                 // line 505
-                if (CoreExtension::getAttribute($this->env, $this->source, $context["detail"], "otroTributo", [], "any", false, false, false, 505)) {
+                if ((($tmp = CoreExtension::getAttribute($this->env, $this->source, $context["detail"], "otroTributo", [], "any", false, false, false, 505)) && $tmp instanceof Markup ? (string) $tmp : $tmp)) {
                     // line 506
                     yield "                <cac:TaxSubtotal>
                     <cbc:TaxableAmount currencyID=\"";
@@ -1461,7 +1461,7 @@ class __TwigTemplate_c04b9f7f84fc418896be679f4ee8bb42 extends Template
                 }
                 // line 519
                 yield "            ";
-                if (CoreExtension::getAttribute($this->env, $this->source, $context["detail"], "icbper", [], "any", false, false, false, 519)) {
+                if ((($tmp = CoreExtension::getAttribute($this->env, $this->source, $context["detail"], "icbper", [], "any", false, false, false, 519)) && $tmp instanceof Markup ? (string) $tmp : $tmp)) {
                     // line 520
                     yield "            <cac:TaxSubtotal>
                 <cbc:TaxAmount currencyID=\"";
@@ -1499,7 +1499,7 @@ class __TwigTemplate_c04b9f7f84fc418896be679f4ee8bb42 extends Template
                 yield "]]></cbc:Description>
             ";
                 // line 536
-                if (CoreExtension::getAttribute($this->env, $this->source, $context["detail"], "codProducto", [], "any", false, false, false, 536)) {
+                if ((($tmp = CoreExtension::getAttribute($this->env, $this->source, $context["detail"], "codProducto", [], "any", false, false, false, 536)) && $tmp instanceof Markup ? (string) $tmp : $tmp)) {
                     // line 537
                     yield "            <cac:SellersItemIdentification>
                 <cbc:ID>";
@@ -1511,7 +1511,7 @@ class __TwigTemplate_c04b9f7f84fc418896be679f4ee8bb42 extends Template
                 }
                 // line 541
                 yield "            ";
-                if (CoreExtension::getAttribute($this->env, $this->source, $context["detail"], "codProdGS1", [], "any", false, false, false, 541)) {
+                if ((($tmp = CoreExtension::getAttribute($this->env, $this->source, $context["detail"], "codProdGS1", [], "any", false, false, false, 541)) && $tmp instanceof Markup ? (string) $tmp : $tmp)) {
                     // line 542
                     yield "            <cac:StandardItemIdentification>
                 <cbc:ID>";
@@ -1523,7 +1523,7 @@ class __TwigTemplate_c04b9f7f84fc418896be679f4ee8bb42 extends Template
                 }
                 // line 546
                 yield "            ";
-                if (CoreExtension::getAttribute($this->env, $this->source, $context["detail"], "codProdSunat", [], "any", false, false, false, 546)) {
+                if ((($tmp = CoreExtension::getAttribute($this->env, $this->source, $context["detail"], "codProdSunat", [], "any", false, false, false, 546)) && $tmp instanceof Markup ? (string) $tmp : $tmp)) {
                     // line 547
                     yield "            <cac:CommodityClassification>
                 <cbc:ItemClassificationCode>";
@@ -1535,7 +1535,7 @@ class __TwigTemplate_c04b9f7f84fc418896be679f4ee8bb42 extends Template
                 }
                 // line 551
                 yield "            ";
-                if (CoreExtension::getAttribute($this->env, $this->source, $context["detail"], "atributos", [], "any", false, false, false, 551)) {
+                if ((($tmp = CoreExtension::getAttribute($this->env, $this->source, $context["detail"], "atributos", [], "any", false, false, false, 551)) && $tmp instanceof Markup ? (string) $tmp : $tmp)) {
                     // line 552
                     yield "                ";
                     $context['_parent'] = $context;
@@ -1553,7 +1553,7 @@ class __TwigTemplate_c04b9f7f84fc418896be679f4ee8bb42 extends Template
                         yield "</cbc:NameCode>
                         ";
                         // line 556
-                        if ( !(null === CoreExtension::getAttribute($this->env, $this->source, $context["atr"], "value", [], "any", false, false, false, 556))) {
+                        if ((($tmp =  !(null === CoreExtension::getAttribute($this->env, $this->source, $context["atr"], "value", [], "any", false, false, false, 556))) && $tmp instanceof Markup ? (string) $tmp : $tmp)) {
                             // line 557
                             yield "                        <cbc:Value>";
                             yield CoreExtension::getAttribute($this->env, $this->source, $context["atr"], "value", [], "any", false, false, false, 557);
@@ -1567,7 +1567,7 @@ class __TwigTemplate_c04b9f7f84fc418896be679f4ee8bb42 extends Template
                             yield "                            <cac:UsabilityPeriod>
                                 ";
                             // line 561
-                            if (CoreExtension::getAttribute($this->env, $this->source, $context["atr"], "fecInicio", [], "any", false, false, false, 561)) {
+                            if ((($tmp = CoreExtension::getAttribute($this->env, $this->source, $context["atr"], "fecInicio", [], "any", false, false, false, 561)) && $tmp instanceof Markup ? (string) $tmp : $tmp)) {
                                 // line 562
                                 yield "                                <cbc:StartDate>";
                                 yield $this->extensions['Twig\Extension\CoreExtension']->formatDate(CoreExtension::getAttribute($this->env, $this->source, $context["atr"], "fecInicio", [], "any", false, false, false, 562), "Y-m-d");
@@ -1576,7 +1576,7 @@ class __TwigTemplate_c04b9f7f84fc418896be679f4ee8bb42 extends Template
                             }
                             // line 564
                             yield "                                ";
-                            if (CoreExtension::getAttribute($this->env, $this->source, $context["atr"], "fecFin", [], "any", false, false, false, 564)) {
+                            if ((($tmp = CoreExtension::getAttribute($this->env, $this->source, $context["atr"], "fecFin", [], "any", false, false, false, 564)) && $tmp instanceof Markup ? (string) $tmp : $tmp)) {
                                 // line 565
                                 yield "                                <cbc:EndDate>";
                                 yield $this->extensions['Twig\Extension\CoreExtension']->formatDate(CoreExtension::getAttribute($this->env, $this->source, $context["atr"], "fecFin", [], "any", false, false, false, 565), "Y-m-d");
@@ -1585,7 +1585,7 @@ class __TwigTemplate_c04b9f7f84fc418896be679f4ee8bb42 extends Template
                             }
                             // line 567
                             yield "                                ";
-                            if (CoreExtension::getAttribute($this->env, $this->source, $context["atr"], "duracion", [], "any", false, false, false, 567)) {
+                            if ((($tmp = CoreExtension::getAttribute($this->env, $this->source, $context["atr"], "duracion", [], "any", false, false, false, 567)) && $tmp instanceof Markup ? (string) $tmp : $tmp)) {
                                 // line 568
                                 yield "                                <cbc:DurationMeasure unitCode=\"DAY\">";
                                 yield CoreExtension::getAttribute($this->env, $this->source, $context["atr"], "duracion", [], "any", false, false, false, 568);
@@ -1636,7 +1636,7 @@ class __TwigTemplate_c04b9f7f84fc418896be679f4ee8bb42 extends Template
             yield from [];
         })())) ? '' : new Markup($tmp, $this->env->getCharset());
         // line 1
-        yield Twig\Extension\CoreExtension::spaceless($___internal_parse_0_);
+        yield Twig\Extension\CoreExtension::spaceless($this->env->getRuntime('Twig\Runtime\EscaperRuntime')->escape($_v0, "html", null, true));
         yield from [];
     }
 
@@ -1666,6 +1666,6 @@ class __TwigTemplate_c04b9f7f84fc418896be679f4ee8bb42 extends Template
 
     public function getSourceContext(): Source
     {
-        return new Source("", "invoice2.1.xml.twig", "C:\\Users\\Corei5\\Documents\\GitHub\\ErpDEportivoApp\\vendor\\greenter\\xml\\src\\Xml\\Templates\\invoice2.1.xml.twig");
+        return new Source("", "invoice2.1.xml.twig", "C:\\laragon\\www\\erptaller\\vendor\\greenter\\xml\\src\\Xml\\Templates\\invoice2.1.xml.twig");
     }
 }

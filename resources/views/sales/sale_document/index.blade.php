@@ -120,12 +120,10 @@
                     </label>
                     <select class="form-control" id="status" name="status">
                         <option value="">Todo</option>
-                        <option value="ACEPTADO">Aceptado</option>
                         <option selected value="PENDIENTE">Pendiente</option>
-                        <option value="ENVIADO">Enviado</option>
+                        <option value="ACEPTADO">Aceptado</option>
                         <option value="RECHAZADO">Rechazado</option>
-                        <option value="ANULADO">Anulado</option>
-                        <option value="ANULADO PARCIAL">Anulado Parcial</option>
+                        <option value="OBSERVADO">Observado</option>
                     </select>
                 </div>
 
@@ -302,15 +300,13 @@
                             if (data.sunat_status === 'PENDIENTE') {
                                 badge_class = 'danger';
                             }
-                            if (data.sunat_status === 'ENVIADO') {
-                                badge_class = 'warning';
-                            }
                             if (data.sunat_status === 'ACEPTADO') {
                                 badge_class = 'primary';
                             }
                             if (data.sunat_status === 'RECHAZADO') {
                                 badge_class = 'dark';
                             }
+                            // OBSERVADO: sin regla de color (igual que la referencia) -> badge sin clase.
 
                             return `<span class="badge bg-${badge_class}">${data.sunat_status}</span>`;
                         },
@@ -347,14 +343,42 @@
                         data: null,
                         render: function(data, type, row) {
 
-                            const urlPdf =
-                                "{{ route('tenant.ventas.comprobante_venta.pdf_voucher', ':id') }}".replace(
-                                    ':id', data.id);
                             const urlDownloadXml =
                                 "{{ route('tenant.ventas.comprobante_venta.downloadXml', ':id') }}".replace(
                                     ':id', data.id);
                             const urlDownloadCdr =
                                 "{{ route('tenant.ventas.comprobante_venta.downloadCdr', ':id') }}".replace(
+                                    ':id', data.id);
+
+                            let descargas =
+                                `<div style="display: flex; justify-content: flex-start; gap: 10px; flex-wrap: nowrap;">`;
+
+                            if (data.ruta_xml) {
+                                descargas += `<a class="btn btn-success btn-sm" style="color:white;" href="${urlDownloadXml}">
+                                                <i class="fa-solid fa-file-excel"></i> XML
+                                            </a>`;
+                            }
+
+                            if (data.ruta_cdr) {
+                                descargas += `<a class="btn btn-primary btn-sm" style="color:white;" href="${urlDownloadCdr}">
+                                                <i class="fa-solid fa-book"></i> CDR
+                                            </a>`;
+                            }
+
+                            descargas += `</div>`;
+
+                            return descargas;
+                        },
+                        name: 'descargas',
+                        orderable: false,
+                        searchable: false
+                    },
+                    {
+                        data: null,
+                        render: function(data, type, row) {
+
+                            const urlPdf =
+                                "{{ route('tenant.ventas.comprobante_venta.pdf_voucher', ':id') }}".replace(
                                     ':id', data.id);
 
                             let acciones = `
@@ -374,23 +398,6 @@
                                                 <i class="fa-solid fa-file-pdf text-danger"></i> PDF
                                             </a>
                                         </li>`;
-
-                            // XML/CDR movidos desde la columna Descargas (solo comprobantes SUNAT).
-                            if (data.ruta_xml) {
-                                acciones += `<li>
-                                                <a class="dropdown-item" href="${urlDownloadXml}">
-                                                    <i class="fa-solid fa-file-excel text-success"></i> XML
-                                                </a>
-                                            </li>`;
-                            }
-
-                            if (data.ruta_cdr) {
-                                acciones += `<li>
-                                                <a class="dropdown-item" href="${urlDownloadCdr}">
-                                                    <i class="fa-solid fa-book text-primary"></i> CDR
-                                                </a>
-                                            </li>`;
-                            }
 
                             // ===== Acciones por tipo de documento (SOLO UI, sin lógica aún) =====
                             // Documento INTERNO (NV legacy + TICKET '50') -> Convertir + Anular.
@@ -426,9 +433,16 @@
                                                     <i class="fa-solid fa-file-invoice"></i> Nota de Crédito
                                                 </a>
                                             </li>`;
+                                const urlVerNc =
+                                    "{{ route('tenant.ventas.nota_credito.index') }}?sale_id=" + data.id;
+                                acciones += `<li>
+                                                <a class="dropdown-item" target="_blank" href="${urlVerNc}">
+                                                    <i class="fa-solid fa-file-invoice text-info"></i> Ver Notas de Crédito
+                                                </a>
+                                            </li>`;
                             }
 
-                            if (data.type_sale_code === '09' || data.type_sale_code === '01') {
+                            if (data.type_sale_code === '03' || data.type_sale_code === '01') {
 
                                 if (data.sunat_status === 'PENDIENTE' || data.sunat_status ===
                                     'RECHAZADO') {
@@ -474,6 +488,20 @@
                         "sortDescending": ": activar para ordenar la columna de manera descendente"
                     }
                 }
+            });
+
+            // Fix: dropdown de acciones no se corte con scrollbar lateral cuando hay pocas filas
+            // (card overflow-hidden + responsive:true de DataTables atrapan el Popper por defecto).
+            dtSales.on('draw.dt', function() {
+                document.querySelectorAll('#tbl_list_sales [data-bs-toggle="dropdown"]').forEach(function(el) {
+                    const existing = bootstrap.Dropdown.getInstance(el);
+                    if (existing) existing.dispose();
+                    new bootstrap.Dropdown(el, {
+                        popperConfig: {
+                            strategy: 'fixed'
+                        }
+                    });
+                });
             });
         }
 

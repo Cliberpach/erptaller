@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Greenter\Data;
+namespace Greenter\Data;
 
 use Illuminate\Http\Request;
 use Greenter\Model\Company\Company;
