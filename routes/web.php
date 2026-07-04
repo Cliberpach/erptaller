@@ -46,7 +46,7 @@ Route::get('/', function () {
 //     })->name('dashboard');
 // });
 
-Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified', 'sede.activa'])->group(function () {
+Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified', 'company.status', 'sede.activa'])->group(function () {
     Route::get('/dashboard', [ModuleController::class, 'home'])->name('tenant.home');
 
     // Multi-sede: cambiar la sede activa (Etapa 2)
@@ -192,7 +192,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
 
 // P3: utils/* = lookups AJAX (product/customer/vehicle/etc.). Solo-auth (sin permiso),
 // pero ya NO quedan fuera de autenticación: requieren sesión válida.
-Route::group(["prefix" => "utils", 'middleware' => ['auth:sanctum', config('jetstream.auth_session'), 'verified']], function () {
+Route::group(["prefix" => "utils", 'middleware' => ['auth:sanctum', config('jetstream.auth_session'), 'verified', 'company.status']], function () {
     // PASO 4 (transversal): combo de cuentas por método — lo usan el cobro de venta y el egreso.
     Route::get('payment-accounts/{method}', [UtilController::class, 'paymentAccounts'])->name('tenant.utils.paymentAccounts');
     Route::get('cash-available-search', [PettyCashController::class, 'searchCashAvailable'])->name('tenant.utils.searchCashAvailable');

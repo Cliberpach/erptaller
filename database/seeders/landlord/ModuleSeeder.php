@@ -302,6 +302,46 @@ class ModuleSeeder extends Seeder
         ]);
 
 
+        //========== DASHBOARD (landlord) ===========
+        $dashboardLandlord = Module::create([
+            'description'   =>  'Dashboard',
+            'order'         =>  '1',
+            'show'          =>  'landlord',
+            'icon'          =>  'dashboard-graph-analytics-report-svgrepo-com.svg'
+        ]);
+
+        ModuleChild::create([
+            'module_id'   => $dashboardLandlord->id,
+            'description' => 'Dashboard',
+            'route_name'  => 'home',
+            'order'       => '1',
+            'show'        => 'landlord',
+        ]);
+
+        //========== CONFIGURACIÓN (landlord) ===========
+        $configuracion = Module::create([
+            'description'   =>  'Configuración',
+            'order'         =>  '2',
+            'show'          =>  'landlord',
+            'icon'          =>  'configuration-svgrepo-com.svg'
+        ]);
+
+        ModuleChild::create([
+            'module_id'   => $configuracion->id,
+            'description' => 'API de Placas',
+            'route_name'  => 'configuracion.api_placas',
+            'order'       => '1',
+            'show'        => 'landlord',
+        ]);
+
+        ModuleChild::create([
+            'module_id'   => $configuracion->id,
+            'description' => 'Copias de Seguridad',
+            'route_name'  => 'configuracion.backups',
+            'order'       => '2',
+            'show'        => 'landlord',
+        ]);
+
         //========= MANTENIMIENTO ===========
         $maintenance = Module::create([
             'description'   =>  'Mantenimiento',

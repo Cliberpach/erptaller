@@ -6,9 +6,14 @@
 
 @section('content')
     <div class="card">
-        <div class="card-header">
-            <h5 class="mb-0">CONFIGURACIÓN — API DE PLACAS</h5>
-            <small class="text-muted">Parámetro GLOBAL de la plataforma (aplica a todos los tenants).</small>
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <div>
+                <h5 class="mb-0">CONFIGURACIÓN — API DE PLACAS</h5>
+                <small class="text-muted">Parámetro GLOBAL de la plataforma (aplica a todos los tenants).</small>
+            </div>
+            <a href="{{ route('landlord.configuracion.backups') }}" class="btn btn-outline-secondary">
+                <i class="fas fa-database"></i> Copias de Seguridad
+            </a>
         </div>
 
         <div class="card-body">

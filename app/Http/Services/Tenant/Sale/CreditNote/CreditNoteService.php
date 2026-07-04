@@ -89,6 +89,9 @@ class CreditNoteService
 
     /**
      * Datos para el modal: la venta fiscal + sus líneas (para elegir parcial/total).
+     * Cada línea trae 'ya_acreditado' y 'disponible' (vendido - ya acreditado en NCs
+     * previas de esta venta) para que el modal no deje tipear una cantidad que el
+     * backend va a rechazar igual (guarda de sobre-devolución en emit()).
      */
     public function dataForCreditNote(int $saleId): array
     {
@@ -104,6 +107,20 @@ class CreditNoteService
                 'product_id', 'warehouse_id', 'product_name',
                 'brand_name', 'product_unit', 'quantity', 'price_sale',
             ]);
+
+        $acreditadoPorProducto = DB::table('credit_notes_details as cnd')
+            ->join('credit_notes as cn', 'cn.id', '=', 'cnd.credit_note_id')
+            ->where('cn.sale_id', $saleId)
+            ->groupBy('cnd.product_id')
+            ->selectRaw('cnd.product_id, SUM(cnd.quantity) as q')
+            ->pluck('q', 'cnd.product_id');
+
+        $lines = $lines->map(function ($l) use ($acreditadoPorProducto) {
+            $yaAcreditado     = (float) ($acreditadoPorProducto[$l->product_id] ?? 0);
+            $l->ya_acreditado = $yaAcreditado;
+            $l->disponible    = max(0, round((float) $l->quantity - $yaAcreditado, 6));
+            return $l;
+        });
 
         return [
             'sale' => [
@@ -325,12 +342,15 @@ class CreditNoteService
             }
 
             // ===== CAPA 2: reversa de STOCK (regla ORIGEN + regla ALMACÉN) =====
-            // Solo venta DIRECTA devuelve. Convertida de ticket (converted_from_id) o desde
-            // OT (work_order_id): el documento original ya movió el stock -> la NC NO toca
-            // inventario (devolver sería doble conteo; se revierte sobre el original).
-            $esDirecta = is_null($sale->converted_from_id) && is_null($sale->work_order_id);
+            // Solo venta CONVERTIDA de ticket (converted_from_id) NO devuelve stock acá: el
+            // ticket original sigue existiendo y es anulable por separado (SaleController@anular
+            // sí revierte stock) -> ese es el camino real, evita doble reversa.
+            // Venta de OT (work_order_id) SÍ devuelve: el stock se descontó al agregar el
+            // producto a la OT (WorkOrderService::decreaseStock), y no existe ningún flujo de
+            // "deshacer producto de OT" que lo compense -> la NC es el único lugar posible.
+            $noDevuelve = ! is_null($sale->converted_from_id);
 
-            if ($esDirecta) {
+            if (! $noDevuelve) {
                 // Devuelve al MISMO almacén de origen, por la cantidad ACREDITADA (no la vendida).
                 foreach ($acc as $row) {
                     $this->s_warehouse_product->increaseStock(
@@ -342,11 +362,10 @@ class CreditNoteService
                 // Kardex ENTRADA (espejo invertido de la SALIDA de la emisión), atado a la NC.
                 $this->s_kardex->storeFromCreditNote($nc);
             } else {
-                Log::info('NC sin reversa de stock: origen convertido/OT — revertir sobre el documento original.', [
+                Log::info('NC sin reversa de stock: origen convertido de ticket — revertir anulando el ticket original.', [
                     'credit_note_id'    => $nc->id,
                     'sale_id'           => $sale->id,
                     'converted_from_id' => $sale->converted_from_id,
-                    'work_order_id'     => $sale->work_order_id,
                 ]);
             }
 

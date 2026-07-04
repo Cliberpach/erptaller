@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LandLord\ApiController;
+use App\Http\Controllers\LandLord\BackupController;
 use App\Http\Controllers\LandLord\CompanyController;
 use App\Http\Controllers\LandLord\ConfigController;
 use App\Http\Controllers\LandLord\ModuleController;
@@ -14,10 +15,7 @@ Route::get('/', function () {
 
 Route::middleware(['auth:web', 'verified'])->group(function () {
 
-    Route::get('/dashboard', function () {
-        return redirect()->route('landlord.mantenimientos.empresa');
-    });
-    //Route::get('/dashboard', [ModuleController::class, 'home'])->name('landlord.home');
+    Route::get('/dashboard', [ModuleController::class, 'home'])->name('landlord.home');
 
     Route::group(["prefix" => "mantenimiento"], function () {
         
@@ -44,6 +42,13 @@ Route::middleware(['auth:web', 'verified'])->group(function () {
     Route::group(["prefix" => "configuracion"], function () {
         Route::get('api-placas', [ConfigController::class, 'apiPlacas'])->name('landlord.configuracion.api_placas');
         Route::put('api-placas', [ConfigController::class, 'apiPlacasUpdate'])->name('landlord.configuracion.api_placas.update');
+
+        //======== COPIAS DE SEGURIDAD (submódulo de Configuración) =======
+        Route::get('backups', [BackupController::class, 'index'])->name('landlord.configuracion.backups');
+        Route::get('backups/estado', [BackupController::class, 'estado'])->name('landlord.configuracion.backups.estado');
+        Route::post('backups/generar', [BackupController::class, 'generar'])->name('landlord.configuracion.backups.generar');
+        Route::get('backups/{archivo}/descargar', [BackupController::class, 'descargar'])->name('landlord.configuracion.backups.descargar');
+        Route::delete('backups/{archivo}', [BackupController::class, 'eliminar'])->name('landlord.configuracion.backups.eliminar');
     });
 });
 

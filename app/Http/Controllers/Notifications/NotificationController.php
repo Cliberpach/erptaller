@@ -8,12 +8,25 @@ use App\Models\Tenant\Alerts\AlertUser;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Spatie\Multitenancy\Models\Tenant;
 use Throwable;
 
 class NotificationController extends Controller
 {
     public function getNotifications(Request $request)
     {
+        // Notificaciones son un feature solo-tenant (tabla `alerts` no existe en landlord).
+        if (!Tenant::current()) {
+            return response()->json([
+                'success' => true,
+                'count' => 0,
+                'notifications' => [],
+                'current_page' => 1,
+                'per_page' => 20,
+                'has_more' => false,
+            ]);
+        }
+
         $userId = auth()->id();
         $today = Carbon::today();
 
@@ -68,6 +81,11 @@ class NotificationController extends Controller
 
     public function getNotificationsCount()
     {
+        // Notificaciones son un feature solo-tenant (tabla `alerts` no existe en landlord).
+        if (!Tenant::current()) {
+            return response()->json(['success' => true, 'count' => 0]);
+        }
+
         $userId = auth()->id();
         $today = Carbon::today();
 

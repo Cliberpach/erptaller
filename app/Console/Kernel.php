@@ -16,6 +16,10 @@ class Kernel extends ConsoleKernel
         $schedule->command('alerts:dispatch')
             ->everyMinute()
             ->withoutOverlapping();
+
+        $schedule->command('backup:global')
+            ->dailyAt('03:00')
+            ->withoutOverlapping();
     }
 
     /**

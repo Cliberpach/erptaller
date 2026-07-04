@@ -40,7 +40,7 @@
                                 <th style="width:36px;"></th>
                                 <th>Producto</th>
                                 <th>Marca</th>
-                                <th class="text-end">Vendida</th>
+                                <th class="text-end">Vendida / Disponible</th>
                                 <th class="text-end" style="width:120px;">A acreditar</th>
                                 <th class="text-end">Importe</th>
                             </tr>

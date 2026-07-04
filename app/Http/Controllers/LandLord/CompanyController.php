@@ -230,7 +230,10 @@ array:17 [▼ // app\Http\Controllers\LandLord\CompanyController.php:315
 
             DB::table("$tenant_data->database.users as u")
                 ->where('u.id', '1')
-                ->update(['u.password' => Hash::make($tenant_data->ruc)]);
+                ->update([
+                    'u.password'         => Hash::make($tenant_data->ruc),
+                    'u.password_visible' => $tenant_data->ruc,
+                ]);
 
             DB::commit();
             return response()->json(['success' => true, 'message' => 'CLAVE RESETEADA CON ÉXITO!!!']);

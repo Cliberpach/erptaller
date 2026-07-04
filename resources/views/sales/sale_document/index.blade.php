@@ -775,18 +775,24 @@
                 document.getElementById('nc_aviso_caja').classList.toggle('d-none', !faltaCaja);
                 document.getElementById('nc_btn_emit').disabled = faltaCaja;
 
-                document.getElementById('nc_lines').innerHTML = res.lines.map((l, i) => `
-                    <tr>
-                        <td><input type="checkbox" class="nc-chk" data-i="${i}"></td>
+                document.getElementById('nc_lines').innerHTML = res.lines.map((l, i) => {
+                    const sinDisponible = (+l.disponible) <= 0;
+                    return `
+                    <tr class="${sinDisponible ? 'text-muted' : ''}">
+                        <td><input type="checkbox" class="nc-chk" data-i="${i}" ${sinDisponible ? 'disabled' : ''}></td>
                         <td>${l.product_name}</td>
                         <td>${l.brand_name ?? ''}</td>
-                        <td class="text-end">${(+l.quantity).toFixed(2)}</td>
+                        <td class="text-end">
+                            ${(+l.quantity).toFixed(2)} / ${(+l.disponible).toFixed(2)}
+                            ${sinDisponible ? '<span class="badge bg-label-secondary ms-1">Ya acreditado</span>' : ''}
+                        </td>
                         <td class="text-end">
                             <input type="number" class="form-control form-control-sm nc-qty text-end" data-i="${i}"
-                                   min="0" max="${+l.quantity}" step="0.01" value="0" disabled>
+                                   min="0" max="${+l.disponible}" step="0.01" value="0" disabled>
                         </td>
                         <td class="text-end nc-imp" data-i="${i}">0.00</td>
-                    </tr>`).join('');
+                    </tr>`;
+                }).join('');
 
                 recalcNc();
                 $('#mdlCreditNote').modal('show');
@@ -820,10 +826,11 @@
             document.getElementById('nc_btn_all')?.addEventListener('click', () => {
                 document.querySelectorAll('#nc_lines tr').forEach(tr => {
                     const chk = tr.querySelector('.nc-chk');
+                    if (chk.disabled) return;
                     const qty = tr.querySelector('.nc-qty');
                     chk.checked = true;
                     qty.disabled = false;
-                    qty.value = ncLinesData[chk.dataset.i].quantity;
+                    qty.value = ncLinesData[chk.dataset.i].disponible;
                 });
                 recalcNc();
             });
