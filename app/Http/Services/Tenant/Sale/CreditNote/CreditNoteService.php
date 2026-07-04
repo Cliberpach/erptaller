@@ -342,13 +342,35 @@ class CreditNoteService
             }
 
             // ===== CAPA 2: reversa de STOCK (regla ORIGEN + regla ALMACÉN) =====
-            // Solo venta CONVERTIDA de ticket (converted_from_id) NO devuelve stock acá: el
-            // ticket original sigue existiendo y es anulable por separado (SaleController@anular
+            // Venta CONVERTIDA de ticket (converted_from_id): NO devuelve acá. El ticket
+            // original sigue existiendo y es anulable por separado (SaleController@anular
             // sí revierte stock) -> ese es el camino real, evita doble reversa.
-            // Venta de OT (work_order_id) SÍ devuelve: el stock se descontó al agregar el
-            // producto a la OT (WorkOrderService::decreaseStock), y no existe ningún flujo de
-            // "deshacer producto de OT" que lo compense -> la NC es el único lugar posible.
+            //
+            // Venta de OT (work_order_id): el stock de la OT se descuenta en UNO de dos
+            // momentos, según el switch "VALIDAR STOCK EN ORDENES DE TRABAJO"
+            // (Configuration id=2) vigente AL CREAR esa OT específica (WorkOrder::validation_stock,
+            // congelado en esa fila, no el valor actual del config):
+            //   - validation_stock=1 -> se descontó AL CREAR la OT (WorkOrderRepository::insertWorkOrderDetail).
+            //   - validation_stock=0 -> se descuenta recién AL FINALIZAR la OT (WorkOrderService::finish()).
+            // Una OT se puede facturar (Sale) SIN pasar por finish() (el botón "Facturar" solo
+            // exige status_invoice != FACTURADO, no status == FINALIZADO) -> si validation_stock=0
+            // y la OT nunca se finalizó, el stock NUNCA bajó y la NC NO debe devolver nada
+            // (sería stock fantasma). Se resuelve consultando la OT real, no solo "es de OT".
             $noDevuelve = ! is_null($sale->converted_from_id);
+
+            if (! $noDevuelve && ! is_null($sale->work_order_id)) {
+                $workOrder = DB::table('work_orders')->where('id', $sale->work_order_id)->first();
+                $stockYaDescontado = $workOrder && ((bool) $workOrder->validation_stock || $workOrder->status === 'FINALIZADO');
+
+                if (! $stockYaDescontado) {
+                    $noDevuelve = true;
+                    Log::info('NC sin reversa de stock: la OT de origen nunca descontó stock (validation_stock=0 y no finalizada).', [
+                        'credit_note_id' => $nc->id,
+                        'sale_id'        => $sale->id,
+                        'work_order_id'  => $sale->work_order_id,
+                    ]);
+                }
+            }
 
             if (! $noDevuelve) {
                 // Devuelve al MISMO almacén de origen, por la cantidad ACREDITADA (no la vendida).
@@ -361,13 +383,14 @@ class CreditNoteService
                 }
                 // Kardex ENTRADA (espejo invertido de la SALIDA de la emisión), atado a la NC.
                 $this->s_kardex->storeFromCreditNote($nc);
-            } else {
+            } elseif (! is_null($sale->converted_from_id)) {
                 Log::info('NC sin reversa de stock: origen convertido de ticket — revertir anulando el ticket original.', [
                     'credit_note_id'    => $nc->id,
                     'sale_id'           => $sale->id,
                     'converted_from_id' => $sale->converted_from_id,
                 ]);
             }
+            // Caso OT-sin-descuento ya logueado arriba (no duplicar mensaje acá).
 
             return $nc;
         });
