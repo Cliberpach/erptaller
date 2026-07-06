@@ -10,9 +10,20 @@ class TenantModuleSeeder extends Seeder
     public function run(): void
     {
         $now      = now();
-        $modules  = DB::connection('landlord')->table('modules')->get();
-        $children = DB::connection('landlord')->table('module_children')->get();
-        $grands   = DB::connection('landlord')->table('module_grand_children')->get();
+        $children = DB::connection('landlord')->table('module_children')->where('show', 'tenant')->get();
+        $grands   = DB::connection('landlord')->table('module_grand_children')->where('show', 'tenant')->get();
+
+        // Un módulo se copia al tenant si ES tenant, O si tiene AL MENOS UN hijo tenant
+        // (caso "Mantenimiento": módulo show=landlord pero con hijos mixtos landlord/tenant,
+        // compartido entre ambos paneles con distinto contenido -> no se puede filtrar solo
+        // por el show del módulo, se rompería el lado tenant).
+        $moduleIdsConHijoTenant = $children->pluck('module_id')->unique();
+        $modules = DB::connection('landlord')->table('modules')
+            ->where(function ($q) use ($moduleIdsConHijoTenant) {
+                $q->where('show', 'tenant')
+                    ->orWhereIn('id', $moduleIdsConHijoTenant);
+            })
+            ->get();
 
         if ($modules->isNotEmpty()) {
             DB::table('modules')->insert(
