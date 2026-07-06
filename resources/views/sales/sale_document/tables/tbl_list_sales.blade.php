@@ -12,7 +12,7 @@
             <th>Pago</th>
             <th>Método</th>
             <th>Descargas</th>
-            <th>Acción</th>
+            <th data-priority="1">Acción</th>
         </tr>
     </thead>
     <tbody>
