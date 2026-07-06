@@ -86,8 +86,12 @@ class WorkOrderRepository
                     $this->s_warehouse_product->increaseStock($item->warehouse_id, $item->id, abs($delta));
                 }
 
+                // PK compuesta (work_order_id, product_id) sin columna 'id' ->
+                // $existente->update() asumiría PK 'id' y rompería. Update vía query builder.
                 $dto_item = $this->s_dto->getDtoOrderProduct($item, $work_order);
-                $existente->update($dto_item);
+                WorkOrderProduct::where('work_order_id', $work_order->id)
+                    ->where('product_id', $item->id)
+                    ->update($dto_item);
             } else {
                 $this->s_validation->validationProduct($item, $work_order->validation_stock);
 
@@ -105,7 +109,9 @@ class WorkOrderRepository
                 if ($work_order->validation_stock) {
                     $this->s_warehouse_product->increaseStock($existente->warehouse_id, $existente->product_id, $existente->quantity);
                 }
-                $existente->delete();
+                WorkOrderProduct::where('work_order_id', $work_order->id)
+                    ->where('product_id', $productId)
+                    ->delete();
             }
         }
 
@@ -117,7 +123,9 @@ class WorkOrderRepository
             $dto_item  = $this->s_dto->getDtoOrderService($item, $work_order);
 
             if ($existente) {
-                $existente->update($dto_item);
+                WorkOrderService::where('work_order_id', $work_order->id)
+                    ->where('service_id', $item->id)
+                    ->update($dto_item);
             } else {
                 WorkOrderService::create($dto_item);
             }
@@ -125,7 +133,9 @@ class WorkOrderRepository
 
         foreach ($existentesServicios as $serviceId => $existente) {
             if (! in_array($serviceId, $idsNuevosServicios)) {
-                $existente->delete();
+                WorkOrderService::where('work_order_id', $work_order->id)
+                    ->where('service_id', $serviceId)
+                    ->delete();
             }
         }
     }
@@ -250,13 +260,16 @@ class WorkOrderRepository
 
             $nueva_invoiced_quantity = round((float) $linea->invoiced_quantity + (float) $product->quantity, 6);
 
-            $linea->update([
-                'invoiced_quantity' => $nueva_invoiced_quantity,
-                // 'invoiced' queda como flag informativo: true cuando ya no queda pendiente.
-                'invoiced' => $nueva_invoiced_quantity >= (float) $linea->quantity,
-                'invoiced_sale_id' => $sale->id,
-                'invoiced_sale_serie' => $sale->serie . '-' . $sale->correlative
-            ]);
+            // PK compuesta (work_order_id, product_id): update vía query builder, no en la instancia.
+            WorkOrderProduct::where('work_order_id', $work_order_id)
+                ->where('product_id', $product->id)
+                ->update([
+                    'invoiced_quantity' => $nueva_invoiced_quantity,
+                    // 'invoiced' queda como flag informativo: true cuando ya no queda pendiente.
+                    'invoiced' => $nueva_invoiced_quantity >= (float) $linea->quantity,
+                    'invoiced_sale_id' => $sale->id,
+                    'invoiced_sale_serie' => $sale->serie . '-' . $sale->correlative
+                ]);
         }
     }
 
@@ -273,12 +286,14 @@ class WorkOrderRepository
 
             $nueva_invoiced_quantity = round((float) $linea->invoiced_quantity + (float) $service->quantity, 6);
 
-            $linea->update([
-                'invoiced_quantity' => $nueva_invoiced_quantity,
-                'invoiced' => $nueva_invoiced_quantity >= (float) $linea->quantity,
-                'invoiced_sale_id' => $sale->id,
-                'invoiced_sale_serie' => $sale->serie . '-' . $sale->correlative
-            ]);
+            WorkOrderService::where('work_order_id', $work_order_id)
+                ->where('service_id', $service->id)
+                ->update([
+                    'invoiced_quantity' => $nueva_invoiced_quantity,
+                    'invoiced' => $nueva_invoiced_quantity >= (float) $linea->quantity,
+                    'invoiced_sale_id' => $sale->id,
+                    'invoiced_sale_serie' => $sale->serie . '-' . $sale->correlative
+                ]);
         }
     }
 

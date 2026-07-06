@@ -94,7 +94,15 @@ class SyncWorkOrdersInvoiced extends Command
                 $lineasCompletas++;
             }
 
-            $this->aplicarSiCambia($linea, "OT-{$workOrderId} producto {$linea->product_name}", $facturado, $lastSale, $dryRun);
+            $this->aplicarSiCambia(
+                WorkOrderProduct::class,
+                ['work_order_id' => $workOrderId, 'product_id' => $linea->product_id],
+                $linea,
+                "OT-{$workOrderId} producto {$linea->product_name}",
+                $facturado,
+                $lastSale,
+                $dryRun
+            );
         }
 
         foreach (WorkOrderService::where('work_order_id', $workOrderId)->get() as $linea) {
@@ -108,7 +116,15 @@ class SyncWorkOrdersInvoiced extends Command
                 $lineasCompletas++;
             }
 
-            $this->aplicarSiCambia($linea, "OT-{$workOrderId} servicio {$linea->service_name}", $facturado, $lastSale, $dryRun);
+            $this->aplicarSiCambia(
+                WorkOrderService::class,
+                ['work_order_id' => $workOrderId, 'service_id' => $linea->service_id],
+                $linea,
+                "OT-{$workOrderId} servicio {$linea->service_name}",
+                $facturado,
+                $lastSale,
+                $dryRun
+            );
         }
 
         $nuevoStatus = ($totalLineas > 0 && $lineasCompletas === $totalLineas) ? 'FACTURADO' : 'FACTURADO PARCIAL';
@@ -122,7 +138,12 @@ class SyncWorkOrdersInvoiced extends Command
         }
     }
 
-    private function aplicarSiCambia($linea, string $label, float $facturado, Sale $lastSale, bool $dryRun): void
+    /**
+     * $linea es solo para LEER (quantity actual, invoiced_quantity actual). El UPDATE
+     * va por query builder con $keyWhere (PK compuesta work_order_id+product_id/service_id,
+     * no hay columna 'id' -> $linea->update() rompería con "Unknown column 'id'").
+     */
+    private function aplicarSiCambia(string $modelClass, array $keyWhere, $linea, string $label, float $facturado, Sale $lastSale, bool $dryRun): void
     {
         $actual = round((float) $linea->invoiced_quantity, 6);
         $cambia = abs($actual - $facturado) > 1e-6;
@@ -137,7 +158,12 @@ class SyncWorkOrdersInvoiced extends Command
             return;
         }
 
-        $linea->update([
+        $query = $modelClass::query();
+        foreach ($keyWhere as $column => $value) {
+            $query->where($column, $value);
+        }
+
+        $query->update([
             'invoiced_quantity'   => $facturado,
             'invoiced'            => $facturado >= (float) $linea->quantity,
             'invoiced_sale_id'    => $lastSale->id,
