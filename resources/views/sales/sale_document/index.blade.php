@@ -439,7 +439,7 @@
                                 const urlVerNc =
                                     "{{ route('tenant.ventas.nota_credito.index') }}?sale_id=" + data.id;
                                 acciones += `<li>
-                                                <a class="dropdown-item" target="_blank" href="${urlVerNc}">
+                                                <a class="dropdown-item" href="${urlVerNc}">
                                                     <i class="fa-solid fa-file-invoice text-info"></i> Ver Notas de Crédito
                                                 </a>
                                             </li>`;

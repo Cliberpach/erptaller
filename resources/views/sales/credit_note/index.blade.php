@@ -47,8 +47,8 @@
                         <i class="fas fa-tasks text-info mr-1"></i> Sunat:
                     </label>
                     <select class="form-control" id="status" name="status">
-                        <option value="">Todo</option>
-                        <option selected value="PENDIENTE">Pendiente</option>
+                        <option value="" {{ $sale_id ? 'selected' : '' }}>Todo</option>
+                        <option value="PENDIENTE" {{ !$sale_id ? 'selected' : '' }}>Pendiente</option>
                         <option value="ACEPTADO">Aceptado</option>
                         <option value="RECHAZADO">Rechazado</option>
                         <option value="OBSERVADO">Observado</option>
