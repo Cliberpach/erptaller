@@ -8,7 +8,11 @@
     const baseUrl = @json($base);
 
     lstSearchModules.forEach((item) => {
-        item.url = route(`${baseUrl}${item.url}`);
+        try {
+            item.url = route(`${baseUrl}${item.url}`);
+        } catch (e) {
+            console.warn('Ruta de búsqueda no disponible en este contexto:', item.url);
+        }
     })
 </script>
 

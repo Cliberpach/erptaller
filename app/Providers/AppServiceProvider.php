@@ -112,6 +112,7 @@ class AppServiceProvider extends ServiceProvider
                                 "fi fi-rr-file" AS icon
                             FROM module_children as mc
                             WHERE mc.route_name IS NOT NULL
+                            AND mc.show = ?
 
                             UNION ALL
 
@@ -127,7 +128,9 @@ class AppServiceProvider extends ServiceProvider
                                 ) AS category,
                                 "fi fi-rr-file" AS icon
                             FROM module_grand_children  AS mgc
-                            WHERE mgc.route_name IS NOT NULL'
+                            WHERE mgc.route_name IS NOT NULL
+                            AND mgc.show = ?',
+            [$base, $base]
         );
 
         return $lst_modules;
