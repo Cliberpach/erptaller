@@ -16,6 +16,7 @@ use Database\Seeders\landlord\UserSeeder;
 use Database\Seeders\landlord\BrandSeeder;
 use Database\Seeders\landlord\CustomerSeeder;
 use Database\Seeders\landlord\GeneralTableSeeder;
+use Database\Seeders\landlord\GlobalSettingSeeder;
 use Database\Seeders\landlord\IdentityDocumentSeeder;
 use Database\Seeders\landlord\InvoiceTypeSeeder;
 use Database\Seeders\landlord\ModelSeeder;
@@ -79,6 +80,7 @@ class DatabaseSeeder extends Seeder
     {
         // note: no olvida llamar al seeder en use part
         $this->call(ModuleSeeder::class);
+        $this->call(GlobalSettingSeeder::class);
         $this->call(PermissionSeeder::class);
         $this->call(PlanSeeder::class);
         $this->call(RoleSeeder::class);
