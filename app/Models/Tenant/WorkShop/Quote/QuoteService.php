@@ -14,6 +14,7 @@ class QuoteService extends Model
         'quote_id',
         'service_id',
         'service_name',
+        'service_description',
         'quantity',
         'price_sale',
         'amount',

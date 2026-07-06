@@ -88,6 +88,7 @@ class QuoteDto
         $service                =   Service::findOrFail($item->id);
         $dto['service_id']      =   $service->id;
         $dto['service_name']    =   $service->name;
+        $dto['service_description'] = isset($item->description) && trim($item->description) !== '' ? trim($item->description) : null;
 
         $dto['quantity']        =   $item->quantity;
         $dto['price_sale']      =   $item->sale_price;
