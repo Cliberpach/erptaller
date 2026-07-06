@@ -269,7 +269,9 @@ class DashboardMarketService
                                 CONCAT(c.type_document_abbreviation,":",c.document_number,"-",c.name) as cliente_nombre,
                                 round(SUM(cc.balance),2) as cliente_saldo
                                 FROM customer_accounts as cc
-                                INNER JOIN customers as c on c.id = cc.customer_id
+                                LEFT JOIN sales_documents as sd on sd.id = cc.sale_id
+                                LEFT JOIN work_orders as wo on wo.id = cc.work_order_id
+                                INNER JOIN customers as c on c.id = COALESCE(sd.customer_id, wo.customer_id)
                                 WHERE
                                 cc.status <> "ANULADO"
                                 GROUP BY c.type_document_abbreviation,c.document_number,c.name');
