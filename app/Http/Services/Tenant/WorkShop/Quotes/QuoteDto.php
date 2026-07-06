@@ -30,8 +30,8 @@ class QuoteDto
         $dto['customer_document_number']            =   $customer->document_number;
         $dto['customer_name']                       =   mb_strtoupper(trim($customer->name));
 
-        $dto['plate']       =   Placa::normalizarStorage($data['plate']);
-        $dto['vehicle_id']  =   $data['vehicle_id'];
+        $dto['plate']       =   Placa::normalizarStorage($data['plate'] ?? '');
+        $dto['vehicle_id']  =   $data['vehicle_id'] ?? null;
 
         $days_validity      =   0;
         if (isset($data['expiration_date'])) {
