@@ -53,9 +53,15 @@ class QuoteService
     public function update(array $data, int $id): Quote
     {
         $data       =   $this->s_validation->validationUpdate($data, $id);
+
+        //== ENFORCEMENT PRECIO (flag VEP): igual que en store(), antes del DTO y del detalle ==
+        $data['lst_products'] =   PrecioVenta::forzarPrecios($data['lst_products']);
+
         $dto        =   $this->s_dto->getDtoStore($data);
 
         $quote      =   $this->s_repository->updateQuote($dto, $id);
+        $this->s_repository->updateQuoteDetail($data['lst_products'], $data['lst_services'], $quote);
+
         return $quote;
     }
 

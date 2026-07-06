@@ -42,6 +42,14 @@ class QuoteRepository
         return $quote;
     }
 
+    public function updateQuoteDetail(array $lst_products, array $lst_services, Quote $quote): void
+    {
+        QuoteProduct::where('quote_id', $quote->id)->delete();
+        QuoteService::where('quote_id', $quote->id)->delete();
+
+        $this->insertQuoteDetail($lst_products, $lst_services, $quote);
+    }
+
     public function destroy(int $id): Quote
     {
         $quote            =   Quote::findOrFail($id);
