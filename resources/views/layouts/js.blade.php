@@ -248,17 +248,19 @@
     }
 
     function redirectToObject(alert) {
+        // PRODUCCION: sin módulo/ruta propia todavía -> no hay a dónde redirigir.
         const routes = {
-            'ORDEN_TRABAJO': '/ordenes-trabajo/',
-            'COTIZACION': '/cotizaciones/',
-            'VENTA': '/ventas/',
-            'PRODUCCION': '/produccion/',
-            'COMPRA': '/compras/',
+            'ORDEN_TRABAJO': "{{ route('tenant.taller.ordenes_trabajo.index') }}",
+            'COTIZACION': "{{ route('tenant.taller.cotizaciones.index') }}",
+            'VENTA': "{{ route('tenant.ventas.comprobante_venta') }}",
+            'COMPRA': "{{ route('tenant.compras.documento_compra.index') }}",
         };
 
-        const baseRoute = routes[alert.type_object];
-        if (baseRoute) {
-            window.location.href = baseRoute + alert.object_id;
+        const baseUrl = routes[alert.type_object];
+        if (baseUrl) {
+            window.location.href = `${baseUrl}?id=${alert.object_id}`;
+        } else {
+            toastr.info('ESTE TIPO DE ALERTA AÚN NO TIENE UNA PÁGINA DE DESTINO');
         }
     }
 
@@ -338,16 +340,10 @@
 
     // Navegar a notificación
     function navigateToNotification(type, objectId) {
-        const routes = {
-            'ORDEN_TRABAJO': `/orden-trabajo/${objectId}`,
-            'COTIZACION': `/cotizacion/${objectId}`,
-            'VENTA': `/venta/${objectId}`,
-            'PRODUCCION': `/produccion/${objectId}`,
-            'COMPRA': `/compra/${objectId}`
-        };
-
-        const url = routes[type];
-        if (url) window.location.href = url;
+        redirectToObject({
+            type_object: type,
+            object_id: objectId
+        });
     }
 
     // Obtener iconos

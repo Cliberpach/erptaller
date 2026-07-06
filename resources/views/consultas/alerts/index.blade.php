@@ -277,6 +277,14 @@
             dtQuery.ajax.reload();
         }
 
+        function verDetalle(id) {
+            const row = getRowById(dtQuery, id);
+            redirectToObject({
+                type_object: row.type_object,
+                object_id: row.object_id
+            });
+        }
+
         function finishAlert(id) {
             toastr.clear();
             let row = getRowById(dtQuery, id);

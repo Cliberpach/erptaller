@@ -67,6 +67,7 @@ class SaleController extends Controller
         $status         =   $request->get('status');
         $seller_id      =   $request->get('seller_id');
         $plate          =   $request->get('plate');
+        $filter_id      =   $request->get('id');
 
         $esAdmin = auth()->user()->hasRole('admin');
 
@@ -140,6 +141,9 @@ class SaleController extends Controller
         // Filtro Placa (taller): búsqueda parcial sobre sales_documents.plate.
         if ($plate) {
             $sales->where('sd.plate', 'like', '%' . $plate . '%');
+        }
+        if ($filter_id) {
+            $sales->where('sd.id', $filter_id);
         }
 
         return DataTables::of($sales)->make(true);

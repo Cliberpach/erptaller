@@ -171,6 +171,7 @@
         let dtSales = null;
         // Gate del ítem Anular (además del candado en la ruta can:ventas.anular).
         const puedeAnular = @json($puedeAnular);
+        const filterId = @json(request('id'));
 
         document.addEventListener('DOMContentLoaded', () => {
             loadTomSelect();
@@ -245,6 +246,7 @@
                         // Filtro Vendedor solo existe para admin; no-admin no lo envía
                         // (y el backend lo ignora de todos modos: su query es fijo a su user).
                         d.seller_id = $('#seller_id').val() || '';
+                        d.id = filterId || '';
                     }
                 },
                 order: [

@@ -43,6 +43,7 @@ class QuoteController extends Controller
         $start_date     =   $request->get('start_date');
         $end_date       =   $request->get('end_date');
         $status         =   $request->get('status');
+        $filter_id      =   $request->get('id');
 
         $quotes =   DB::connection('tenant')
             ->table('quotes as q')
@@ -74,6 +75,9 @@ class QuoteController extends Controller
         }
         if ($status) {
             $quotes->where('q.status', '=', $status);
+        }
+        if ($filter_id) {
+            $quotes->where('q.id', $filter_id);
         }
 
         return DataTables::of($quotes)

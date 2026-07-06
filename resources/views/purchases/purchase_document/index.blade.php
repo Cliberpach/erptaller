@@ -96,6 +96,7 @@
 @section('js')
     <script>
         let dtPurchaseDocuments = null;
+        const filterId = @json(request('id'));
 
         document.addEventListener('DOMContentLoaded', () => {
             loadDtPurchases();
@@ -117,6 +118,7 @@
                         d.status = document.querySelector('#status').value;
                         d.start_date = $('#start_date').val();
                         d.end_date = $('#end_date').val();
+                        d.id = filterId || '';
                     }
                 },
                 order: [

@@ -48,6 +48,7 @@ class PurchaseDocumentoController extends Controller
         $status         =   $request->get('status');
         $start_date     =   $request->get('start_date');
         $end_date       =   $request->get('end_date');
+        $filter_id      =   $request->get('id');
 
         $items  =    DB::table('purchase_documents as pd')
             ->select(
@@ -77,6 +78,9 @@ class PurchaseDocumentoController extends Controller
         }
         if ($end_date) {
             $items->whereDate('pd.delivery_date', '<=', $end_date);
+        }
+        if ($filter_id) {
+            $items->where('pd.id', $filter_id);
         }
 
         return $items;

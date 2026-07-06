@@ -87,6 +87,7 @@
 @section('js')
     <script>
         let dtQuotes = null;
+        const filterId = @json(request('id'));
 
         document.addEventListener('DOMContentLoaded', () => {
             iniciarDtQuotes();
@@ -150,6 +151,7 @@
                         d.customer_id = $('#client_id').val();
                         d.start_date = $('#start_date').val();
                         d.end_date = $('#end_date').val();
+                        d.id = filterId || '';
                     }
                 },
                 "columns": [{

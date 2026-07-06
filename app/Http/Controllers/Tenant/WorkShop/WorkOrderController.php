@@ -42,6 +42,7 @@ class WorkOrderController extends Controller
         $start_date     =   $request->get('start_date');
         $end_date       =   $request->get('end_date');
         $status         =   $request->get('status');
+        $id             =   $request->get('id');
 
         $orders = DB::connection('tenant')
             ->table('work_orders as o')
@@ -76,6 +77,9 @@ class WorkOrderController extends Controller
         }
         if ($status) {
             $orders->where('o.status', '=', $status);
+        }
+        if ($id) {
+            $orders->where('o.id', $id);
         }
 
         return DataTables::of($orders)
