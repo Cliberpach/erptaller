@@ -122,6 +122,10 @@ class CreditNoteService
             return $l;
         });
 
+        if ($lines->every(fn ($l) => $l->disponible <= 0)) {
+            throw new Exception('YA SE ACREDITÓ EL 100% DE ESTA VENTA. NO SE PUEDE EMITIR OTRA NOTA DE CRÉDITO.');
+        }
+
         return [
             'sale' => [
                 'id'             => $sale->id,

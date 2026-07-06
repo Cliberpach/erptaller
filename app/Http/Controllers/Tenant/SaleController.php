@@ -96,7 +96,18 @@ class SaleController extends Controller
                           FROM sales_documents f WHERE f.id = sd.converted_to_id) AS converted_to_doc"),
                 'sd.ruta_xml',
                 'sd.ruta_cdr',
-                'sd.payment_status'
+                'sd.payment_status',
+                // ¿Ya se acreditó (NC) todo lo vendido? Comparación agregada: el backend
+                // (CreditNoteService::emit) ya bloquea sobre-acreditar por producto, así que
+                // si el total acreditado iguala al total vendido, no puede quedar ningún
+                // producto con saldo -> oculta "Nota de Crédito" en el dropdown del index.
+                DB::raw("(
+                    (SELECT COALESCE(SUM(sdd.quantity), 0) FROM sales_documents_details sdd WHERE sdd.sale_document_id = sd.id)
+                    <=
+                    (SELECT COALESCE(SUM(cnd.quantity), 0) FROM credit_notes_details cnd
+                        JOIN credit_notes cn ON cn.id = cnd.credit_note_id
+                        WHERE cn.sale_id = sd.id)
+                ) AS fully_credited")
             );
             // Antes había un hard filter (sunat_status != ANULADO). Se quitó: los anulados
             // ahora SE VEN en el index con badge ANULADO (estado real en sd.status).

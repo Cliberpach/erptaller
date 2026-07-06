@@ -428,11 +428,14 @@
                                                     <i class="fa-solid fa-truck text-secondary"></i> Generar Guía
                                                 </a>
                                             </li>`;
-                                acciones += `<li>
-                                                <a class="dropdown-item text-danger" href="javascript:void(0);" onclick="openCreditNote(${data.id})">
-                                                    <i class="fa-solid fa-file-invoice"></i> Nota de Crédito
-                                                </a>
-                                            </li>`;
+                                // Ya acreditado 100% (NC total o suma de parciales) -> ocultar opción.
+                                if (!data.fully_credited || data.fully_credited == '0') {
+                                    acciones += `<li>
+                                                    <a class="dropdown-item text-danger" href="javascript:void(0);" onclick="openCreditNote(${data.id})">
+                                                        <i class="fa-solid fa-file-invoice"></i> Nota de Crédito
+                                                    </a>
+                                                </li>`;
+                                }
                                 const urlVerNc =
                                     "{{ route('tenant.ventas.nota_credito.index') }}?sale_id=" + data.id;
                                 acciones += `<li>
