@@ -86,17 +86,8 @@ class WorkOrderService
         //======== UPDATE =========
         $work_order =   $this->s_repository->updateWorkOrder($dto, $id);
 
-        //========= INCREASE STOCK ==========
-        if ($data['validation_stock_preview']) {
-            $products_preview   =   $this->s_repository->getWorkProducts($id);
-            foreach ($products_preview as $item) {
-                $this->s_warehouse_product->increaseStock($item->warehouse_id, $item->product_id, $item->quantity);
-            }
-        }
-
-        $this->s_repository->deleteDetailProduct($id);
-        $this->s_repository->deleteDetailService($id);
-        $this->s_repository->insertWorkOrderDetail($data['lst_products'], $data['lst_services'], $work_order);
+        //======== DETALLE (upsert in-place: preserva invoiced_quantity, ajusta stock solo por delta) ========
+        $this->s_repository->upsertWorkOrderDetail($data['lst_products'], $data['lst_services'], $work_order);
 
         $this->s_repository->deleteDetailInventory($id);
         $dto_inventory      =   $this->s_dto->getDtoInventory($data['inventory_items'] ?? [], $work_order);

@@ -29,6 +29,7 @@ class WorkOrderProduct extends Model
         'status',
 
         'invoiced',
+        'invoiced_quantity',
         'invoiced_sale_id',
         'invoiced_sale_serie',
 

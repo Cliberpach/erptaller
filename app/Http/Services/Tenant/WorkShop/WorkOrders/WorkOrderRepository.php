@@ -54,6 +54,82 @@ class WorkOrderRepository
         }
     }
 
+    /**
+     * Sincroniza el detalle en un EDIT: a diferencia de insertWorkOrderDetail
+     * (OT nueva, nada que preservar), acá cada línea existente se actualiza
+     * IN-PLACE (nunca se borra+recrea) para no perder invoiced_quantity. El
+     * stock se ajusta solo por el DELTA de cantidad, no por el total.
+     * WorkOrderValidation::validationInvoicedLines() ya garantizó que ninguna
+     * línea facturada baja de cantidad ni desaparece -> acá no se vuelve a
+     * chequear eso.
+     */
+    public function upsertWorkOrderDetail(array $lst_products, array $lst_services, WorkOrder $work_order): void
+    {
+        $existentesProductos = WorkOrderProduct::where('work_order_id', $work_order->id)->get()->keyBy('product_id');
+        $idsNuevosProductos   = collect($lst_products)->pluck('id')->all();
+
+        foreach ($lst_products as $item) {
+            $existente = $existentesProductos->get($item->id);
+
+            if ($existente) {
+                $delta = round((float) $item->quantity - (float) $existente->quantity, 6);
+
+                if ($work_order->validation_stock && $delta > 0) {
+                    $this->s_validation->validationProduct((object) [
+                        'id'           => $item->id,
+                        'name'         => $item->name,
+                        'warehouse_id' => $item->warehouse_id,
+                        'quantity'     => $delta,
+                    ], $work_order->validation_stock);
+                    $this->s_warehouse_product->decreaseStock($item->warehouse_id, $item->id, $delta);
+                } elseif ($work_order->validation_stock && $delta < 0) {
+                    $this->s_warehouse_product->increaseStock($item->warehouse_id, $item->id, abs($delta));
+                }
+
+                $dto_item = $this->s_dto->getDtoOrderProduct($item, $work_order);
+                $existente->update($dto_item);
+            } else {
+                $this->s_validation->validationProduct($item, $work_order->validation_stock);
+
+                if ($work_order->validation_stock) {
+                    $this->s_warehouse_product->decreaseStock($item->warehouse_id, $item->id, $item->quantity);
+                }
+
+                $dto_item = $this->s_dto->getDtoOrderProduct($item, $work_order);
+                WorkOrderProduct::create($dto_item);
+            }
+        }
+
+        foreach ($existentesProductos as $productId => $existente) {
+            if (! in_array($productId, $idsNuevosProductos)) {
+                if ($work_order->validation_stock) {
+                    $this->s_warehouse_product->increaseStock($existente->warehouse_id, $existente->product_id, $existente->quantity);
+                }
+                $existente->delete();
+            }
+        }
+
+        $existentesServicios = WorkOrderService::where('work_order_id', $work_order->id)->get()->keyBy('service_id');
+        $idsNuevosServicios   = collect($lst_services)->pluck('id')->all();
+
+        foreach ($lst_services as $item) {
+            $existente = $existentesServicios->get($item->id);
+            $dto_item  = $this->s_dto->getDtoOrderService($item, $work_order);
+
+            if ($existente) {
+                $existente->update($dto_item);
+            } else {
+                WorkOrderService::create($dto_item);
+            }
+        }
+
+        foreach ($existentesServicios as $serviceId => $existente) {
+            if (! in_array($serviceId, $idsNuevosServicios)) {
+                $existente->delete();
+            }
+        }
+    }
+
     public function insertWorkInventory(array $dto)
     {
         WorkOrderInventory::insert($dto);
@@ -90,16 +166,6 @@ class WorkOrderRepository
         $work_order->status    =   'FINALIZADO';
         $work_order->save();
         return $work_order;
-    }
-
-    public function deleteDetailProduct(int $id)
-    {
-        WorkOrderProduct::where('work_order_id', $id)->delete();
-    }
-
-    public function deleteDetailService(int $id)
-    {
-        WorkOrderService::where('work_order_id', $id)->delete();
     }
 
     public function deleteDetailInventory(int $id)
@@ -170,49 +236,49 @@ class WorkOrderRepository
         return WorkOrderService::where('work_order_id', $id)->get();
     }
 
-    public function isWorkProductInvoiced(int $work_order_id, int $product_id): bool
-    {
-        $exists =   WorkOrderProduct::where('work_order_id', $work_order_id)
-            ->where('product_id', $product_id)
-            ->where('invoiced', true)
-            ->exists();
-
-        return $exists;
-    }
-
-    public function isWorkServiceInvoiced(int $work_order_id, int $service_id): bool
-    {
-        $exists =   WorkOrderService::where('work_order_id', $work_order_id)
-            ->where('service_id', $service_id)
-            ->where('invoiced', true)
-            ->exists();
-
-        return $exists;
-    }
 
     public function setInvoicedWorkProducts(int $work_order_id, Sale $sale, array $lst_products)
     {
         foreach ($lst_products as $product) {
-            WorkOrderProduct::where('work_order_id', $work_order_id)
+            $linea = WorkOrderProduct::where('work_order_id', $work_order_id)
                 ->where('product_id', $product->id)
-                ->update([
-                    'invoiced' => true,
-                    'invoiced_sale_id' => $sale->id,
-                    'invoiced_sale_serie' => $sale->serie . '-' . $sale->correlative
-                ]);
+                ->first();
+
+            if (! $linea) {
+                continue;
+            }
+
+            $nueva_invoiced_quantity = round((float) $linea->invoiced_quantity + (float) $product->quantity, 6);
+
+            $linea->update([
+                'invoiced_quantity' => $nueva_invoiced_quantity,
+                // 'invoiced' queda como flag informativo: true cuando ya no queda pendiente.
+                'invoiced' => $nueva_invoiced_quantity >= (float) $linea->quantity,
+                'invoiced_sale_id' => $sale->id,
+                'invoiced_sale_serie' => $sale->serie . '-' . $sale->correlative
+            ]);
         }
     }
 
     public function setInvoicedWorkServices(int $work_order_id, Sale $sale, array $lst_services)
     {
         foreach ($lst_services as $service) {
-            WorkOrderService::where('work_order_id', $work_order_id)
+            $linea = WorkOrderService::where('work_order_id', $work_order_id)
                 ->where('service_id', $service->id)
-                ->update([
-                    'invoiced' => true,
-                    'invoiced_sale_id' => $sale->id,
-                    'invoiced_sale_serie' => $sale->serie . '-' . $sale->correlative
-                ]);
+                ->first();
+
+            if (! $linea) {
+                continue;
+            }
+
+            $nueva_invoiced_quantity = round((float) $linea->invoiced_quantity + (float) $service->quantity, 6);
+
+            $linea->update([
+                'invoiced_quantity' => $nueva_invoiced_quantity,
+                'invoiced' => $nueva_invoiced_quantity >= (float) $linea->quantity,
+                'invoiced_sale_id' => $sale->id,
+                'invoiced_sale_serie' => $sale->serie . '-' . $sale->correlative
+            ]);
         }
     }
 

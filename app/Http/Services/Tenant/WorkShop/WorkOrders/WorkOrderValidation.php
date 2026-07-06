@@ -86,10 +86,58 @@ class WorkOrderValidation
             throw new Exception("ESTA ORDEN TIENE UNA CUENTA CON ESTADO: " . $account->status . ", NO SE PERMITE EDITAR");
         }
 
+        //========= FACTURACIÓN: no bajar cantidad ni quitar líneas ya facturadas =========
+        $this->validationInvoicedLines($data['lst_products'], $data['lst_services'], $id);
+
         $data['validation_stock']           =   Configuration::findOrFail(2)->property === '1' ? true : false;
         $data['validation_stock_preview']   =   $order->validation_stock ? true : false;
 
         return $data;
+    }
+
+    /**
+     * Bloquea el edit si intenta bajar la cantidad de una línea por debajo de
+     * lo ya facturado (invoiced_quantity), o quitarla de la lista por
+     * completo. Subir cantidad siempre está permitido (amplía el pendiente
+     * por facturar). Ver docs/PLAN_OT_INVOICE.md.
+     */
+    private function validationInvoicedLines(array $lst_products, array $lst_services, int $work_order_id): void
+    {
+        $productos_nuevos = collect($lst_products)->keyBy('id');
+
+        foreach (WorkOrderProduct::where('work_order_id', $work_order_id)->get() as $existente) {
+            if ((float) $existente->invoiced_quantity <= 0) {
+                continue;
+            }
+
+            $nuevo = $productos_nuevos->get($existente->product_id);
+
+            if (! $nuevo) {
+                throw new Exception("EL PRODUCTO '{$existente->product_name}' YA TIENE {$existente->invoiced_quantity} UNIDADES FACTURADAS, NO SE PUEDE ELIMINAR DE LA ORDEN.");
+            }
+
+            if ((float) $nuevo->quantity < (float) $existente->invoiced_quantity) {
+                throw new Exception("EL PRODUCTO '{$existente->product_name}' YA TIENE {$existente->invoiced_quantity} UNIDADES FACTURADAS, NO SE PUEDE BAJAR LA CANTIDAD A {$nuevo->quantity}.");
+            }
+        }
+
+        $servicios_nuevos = collect($lst_services)->keyBy('id');
+
+        foreach (WorkOrderService::where('work_order_id', $work_order_id)->get() as $existente) {
+            if ((float) $existente->invoiced_quantity <= 0) {
+                continue;
+            }
+
+            $nuevo = $servicios_nuevos->get($existente->service_id);
+
+            if (! $nuevo) {
+                throw new Exception("EL SERVICIO '{$existente->service_name}' YA TIENE {$existente->invoiced_quantity} UNIDADES FACTURADAS, NO SE PUEDE ELIMINAR DE LA ORDEN.");
+            }
+
+            if ((float) $nuevo->quantity < (float) $existente->invoiced_quantity) {
+                throw new Exception("EL SERVICIO '{$existente->service_name}' YA TIENE {$existente->invoiced_quantity} UNIDADES FACTURADAS, NO SE PUEDE BAJAR LA CANTIDAD A {$nuevo->quantity}.");
+            }
+        }
     }
 
     public function validationProduct($item, $validation_stock)
@@ -122,24 +170,26 @@ class WorkOrderValidation
         }
 
         foreach ($lst_products as $item) {
-            $exists =   WorkOrderProduct::where('work_order_id', $work_order_id)
+            $linea = WorkOrderProduct::where('work_order_id', $work_order_id)
                 ->where('product_id', $item->id)
-                ->where('invoiced', true)
-                ->exists();
+                ->first();
 
-            if ($exists) {
-                throw new Exception($item->name . ',YA FUE FACTURADO EN ESTA ORDEN: OT-' . $work_order_id->id);
+            $pendiente = $linea ? round((float) $linea->quantity - (float) $linea->invoiced_quantity, 6) : 0;
+
+            if ((float) $item->quantity > $pendiente + 1e-6) {
+                throw new Exception("{$item->name}: SOLO QUEDAN {$pendiente} UNIDADES PENDIENTES POR FACTURAR EN ESTA ORDEN (OT-{$work_order_id}).");
             }
         }
 
         foreach ($lst_services as $item) {
-            $exists =   WorkOrderService::where('work_order_id', $work_order_id)
+            $linea = WorkOrderService::where('work_order_id', $work_order_id)
                 ->where('service_id', $item->id)
-                ->where('invoiced', true)
-                ->exists();
+                ->first();
 
-            if ($exists) {
-                throw new Exception($item->name . ',YA FUE FACTURADO EN ESTA ORDEN: OT-' . $work_order_id->id);
+            $pendiente = $linea ? round((float) $linea->quantity - (float) $linea->invoiced_quantity, 6) : 0;
+
+            if ((float) $item->quantity > $pendiente + 1e-6) {
+                throw new Exception("{$item->name}: SOLO QUEDAN {$pendiente} UNIDADES PENDIENTES POR FACTURAR EN ESTA ORDEN (OT-{$work_order_id}).");
             }
         }
 
